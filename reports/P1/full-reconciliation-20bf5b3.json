@@ -1,0 +1,78 @@
+{
+  "scope": "machine-readable reconciliation of the 20bf5b3 full snapshot vs normalized 7afe7fb JSONL vs local-source audit receipt",
+  "snapshot": "build/snapshot-full-20bf5b3/knowledge.sqlite",
+  "snapshot_size_bytes": 21516320768,
+  "manifest_sha256": "7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c",
+  "converter_source_commit": "7afe7fb0e234455f070cf0311619d86423e55d87",
+  "builder_source_commit": "20bf5b315e47f1c7038af06307424bb734efcc10",
+  "build_receipt": "build/build-full-20bf5b3.json",
+  "verify_receipt": "build/verify-full-20bf5b3.json",
+  "normalized_duplicate_semantics": "seen_fingerprints keys on sha256 of the raw normalized JSONL line bytes within one source_id; a duplicate is an exact byte-identical record, never a semantic near-duplicate",
+  "danbooru": {
+    "normalized_input": 1397729,
+    "entities": {"input": 295497, "duplicate": 0, "note": "wiki_pages table rows; all distinct"},
+    "wiki_links": {"input": 1022285, "distinct": 997840, "byte_identical_duplicates": 24445,
+                    "first_duplicate_line": 295507,
+                    "first_duplicate_sha256": "63d32202c95039c1c393d359abde0aff4c52d58493671cf6c33784d3f59fe9ff",
+                    "example": "source page 10 -> resolved page 49309; the same physical link row (same source_id, same target, same resolved_id) appears in multiple page body dumps"},
+    "unresolved_wiki_links": {"converter_unresolved": 79947, "build_unresolved": 78995,
+                              "byte_identical_duplicates": 952,
+                              "first_duplicate_line": 296135,
+                              "first_duplicate_sha256": "2dfda773df00d4e2f81e1b7a0921e1a156ebf407b9f6f51c625d5f2eb1fe1701",
+                              "example": "page 105 'ukagaka' -> target 'Teddy (ukagaka)' with resolved_id null; identical row duplicated across page bodies",
+                              "explanation": "79947 - 952 duplicates = 78995 unique unresolved rows; no unresolved record was dropped or merged by content change"},
+    "over_2mb_lines": 0
+  },
+  "tag_wiki": {
+    "entity_records": {"input": 1349568, "distinct": 1349568,
+                        "note": "one entity record per (tag_key, source table) across 7 occurrence groups plus alias/annotation tables; distinct tag EntryKeys are fewer because the same tag_key appears in multiple groups; groups are stored as occurrences, not identities"},
+    "wiki_match_candidate_links": {"input": 193494, "distinct": 96747, "byte_identical_duplicates": 96747,
+                                    "multiplicity": "every distinct candidate line appears exactly twice in the normalized file (multiplicity distribution {2: 96747})",
+                                    "distinct_tag_dataset_wiki_triples": 96747,
+                                    "dataset_id_values": {"NULL": 193494},
+                                    "first_duplicate_line": 771427,
+                                    "first_duplicate_sha256": "0f2085cf9c879938bcc5d6e0794c94929acdbe06717682bd9b338723f081c195",
+                                    "example": "tag 'akanbe' -> wiki page 5438, match_type exact_title, confidence 1.0, dataset_id NULL",
+                                    "explanation": "the frozen tag_evidence table itself contains each (tag_key, wiki_id, matched_text) row twice with identical bytes; both copies were emitted and the importer deduplicated byte-identical lines. No dataset/evidence/locator was lost: the 96747 distinct raw rows fully account for all 193494 input lines."},
+    "over_2mb_lines": 0
+  },
+  "bangumi": {
+    "normalized_input": 6695782,
+    "adapter_records": {"entity": 2712814, "link": 3982968, "sum_equals_input": true},
+    "duplicate": 1,
+    "unresolved_missing_endpoint": 15892,
+    "unresolved_breakdown": {
+      "credit_person_subject_person": {"src_missing_subject": 7744, "dst_missing_person": 5,
+                                        "note": "subject-persons rows reference person or subject IDs not present as entities in the same archive cut"},
+      "subject_relation_subject_subject": {"src_missing": 4104, "dst_missing": 1601, "both_missing": 1599,
+                                             "note": "subject-relations rows referencing subjects outside the archive cut (external or deleted subjects)"},
+      "features_character_subject_character": {"src_missing_subject": 832},
+      "character_relation_character_character": {"src_missing": 3, "dst_missing": 4},
+      "example_src_missing": {"src": {"kind": "subject", "namespace": "bangumi.subject", "value": "2"},
+                               "dst": {"kind": "person", "namespace": "bangumi.person", "value": "22"},
+                               "method": "bangumi.Archive:subject-persons"},
+      "example_both_missing": {"src": {"kind": "subject", "value": "3936"}, "dst": {"kind": "subject", "value": "6634"},
+                                 "method": "bangumi.Archive:subject-relations"},
+      "classification": "all are archive-internal reference gaps (endpoint entity absent from the same cut), not adapter key encoding errors: every checked endpoint namespace/value pair matches the archive's own ID scheme"
+    }
+  },
+  "mapping": {
+    "normalized_input": 97279,
+    "unresolved_missing_endpoint": 9,
+    "breakdown": {"src_missing_bangumi_character": 9,
+                    "example": {"src": {"kind": "character", "namespace": "bangumi.character", "value": "184689"},
+                                 "dst": {"kind": "character", "namespace": "moegirl.character"},
+                                 "method": "moegirl.bgm2moegirl"},
+                    "classification": "bangumi character IDs absent from the bangumi archive cut; candidate links are never promoted"}
+  },
+  "missing_endpoint_total": {"build_total": 15901, "bangumi": 15892, "mapping": 9, "arithmetic": "15892 + 9 = 15901"},
+  "unresolved_wiki_link_total": {"build_total": 78995, "danbooru": 78995, "arithmetic": "79947 converter - 952 byte-identical duplicates = 78995"},
+  "rejected_lines_all_sources": 0,
+  "conflicted_entries": 0,
+  "audit_binding": {
+    "audit_receipt": "reports/P1/local-source-audit.json",
+    "bangumi_zip_sha256_matches_official": true,
+    "tag_wiki_frozen_backup_sha256": "bfe3d0c4c8609770459c1c143e59d15bda0620dcea9b974c62c980b2226dd9b2",
+    "note": "per-source input -> normalized -> build hash chain is recorded in the manifest source entries; source_rows counts in the manifest bind to these audit-observed figures"
+  }
+}
