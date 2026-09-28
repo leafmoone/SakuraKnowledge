@@ -8,12 +8,17 @@ import argparse
 import json
 import statistics
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 
 import psutil
 
 from sakura_knowledge.api import Knowledge
 from sakura_knowledge.model import EntryKey
+
+
+def now_utc():
+    return datetime.now(UTC).isoformat()
 
 
 def percentiles(values):
@@ -50,14 +55,16 @@ def main():
     process = psutil.Process()
     peak = process.memory_info().rss
     result = {"database": str(args.database.resolve()),
-              "started_at_utc": time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime()),
-              "operations": {}, "budget_failures": {}}
+              "started_at_utc": now_utc(), "operations": {}, "budget_failures": {}}
     with Knowledge(args.database) as api:
-        # Deterministic real CJK two-character query terms from the snapshot's
-        # own trusted aliases (console-safe: no hard-coded guesses).
+        # Deterministic real pure-CJK two-character query terms from the
+        # snapshot's own trusted aliases (codepoint filter in Python; the SQL
+        # GLOB alone can admit mixed ASCII+CJK words). Receipt JSON is written
+        # UTF-8 with ensure_ascii=True so the terms survive any console page.
         cjk_terms = [row["text"] for row in api.conn.execute(
-            "SELECT text FROM aliases WHERE length(text)=2 AND "
-            "text GLOB '*[一-龥]*' ORDER BY text LIMIT 2")]
+            "SELECT text FROM aliases WHERE length(text)=2 "
+            "AND text NOT LIKE '%[a-zA-Z0-9_%]' ORDER BY text LIMIT 40000")
+            if all("\u4e00" <= ch <= "\u9fff" for ch in row["text"])][:2]
         if len(cjk_terms) < 2:
             raise SystemExit("expected real CJK alias terms in snapshot")
         def workload(name, fn, reps=5):
@@ -92,11 +99,11 @@ def main():
         workload("ask_page_no_verified_tag",
                  lambda: api.ask("10", kind="page", namespace="danbooru.wiki"))
     result["peak_rss_bytes"] = peak
-    result["completed_at_utc"] = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime())
+    result["completed_at_utc"] = now_utc()
     args.receipt.parent.mkdir(parents=True, exist_ok=True)
-    args.receipt.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n",
+    args.receipt.write_text(json.dumps(result, indent=2, ensure_ascii=True) + "\n",
                             encoding="utf-8")
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    print(json.dumps(result, ensure_ascii=True, indent=2))
 
 
 if __name__ == "__main__":
