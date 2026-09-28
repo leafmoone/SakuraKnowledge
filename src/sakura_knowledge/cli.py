@@ -52,7 +52,10 @@ def main(argv=None):
         command.add_argument("database")
         command.add_argument("query")
         command.add_argument("--kind")
-        command.add_argument("--namespace")
+        command.add_argument("--namespace", help="filter SOURCE entity namespace")
+        if name == "ask":
+            command.add_argument("--target-tag-namespace",
+                                 help="requested tag namespace, independent of source --namespace")
         if name in {"lookup", "related"}:
             command.add_argument("--key", action="store_true",
                                  help="query is exact value; requires kind and namespace")
@@ -84,6 +87,8 @@ def main(argv=None):
                               if args.command == "related" else knowledge.lookup(key=key))
                 else:
                     options = {"kind": args.kind, "namespace": args.namespace}
+                    if args.command == "ask":
+                        options["target_tag_namespace"] = args.target_tag_namespace
                     if args.command == "search":
                         options["topk"] = args.limit
                     result = getattr(knowledge, args.command)(args.query, **options)

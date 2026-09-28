@@ -108,6 +108,57 @@ def test_bm25_ties_deduplicate_multiple_documents(tmp_path):
         assert not any("CORRELATED" in p for p in plan)
 
 
+def test_target_tag_namespace_is_not_source_namespace_or_candidate(tmp_path, capsys):
+    from sakura_knowledge.cli import main
+
+    local = entity("tag", "same_spelling", namespace="local.tag_aggregate",
+                   status="source_backed")
+    native = entity("tag", "same_spelling", namespace="danbooru.tag",
+                    status="source_backed")
+    source = entity("character", "hero", namespace="bangumi.character",
+                    status="source_backed")
+    verified_source = entity("character", "verified_hero", namespace="bangumi.character",
+                             status="source_backed")
+    links = [{"record_type": "link", "src": src["key"], "dst": dst["key"],
+              "relation": "entity_tag", "method": "fixture",
+              "verification_status": "candidate"} for src, dst in
+             ((local, native), (native, local), (source, native))]
+    links.append({"record_type": "link", "src": verified_source["key"], "dst": native["key"],
+                  "relation": "entity_tag", "method": "fixture",
+                  "verification_status": "verified"})
+    out = tmp_path / "target-snapshot"
+    build(fixture_manifest(tmp_path, [local, native, source, verified_source, *links]), out)
+    database = out / "knowledge.sqlite"
+    with Knowledge(database) as api:
+        local_only = api.ask("same_spelling", kind="tag", namespace="local.tag_aggregate")
+        assert local_only["status"] == "found"
+        assert local_only["mapping_status"] == "local_identity_only"
+        assert "local.tag_aggregate" in local_only["answer"]
+        assert local_only["target_namespace"] is None
+        target = api.ask("same_spelling", kind="tag", namespace="local.tag_aggregate",
+                         target_tag_namespace="danbooru.tag")
+        assert target["status"] == "entity_found_tag_unmapped"
+        assert target["mapping_status"] == "target_unmapped"
+        assert target["tag_key"] is None and target["relations"] == []
+        assert target["entry_key"] == local["key"]
+        assert target["canonical"]["entry_key"] == local["key"]
+        assert api.ask("same_spelling", kind="tag", namespace="danbooru.tag",
+                       target_tag_namespace="danbooru.tag")["mapping_status"] == "target_identity"
+        assert api.ask("hero", kind="character", target_tag_namespace="danbooru.tag")[
+            "mapping_status"] == "target_unmapped"
+        mapped = api.ask("verified_hero", target_tag_namespace="danbooru.tag")
+        assert mapped["mapping_status"] == "target_verified"
+        assert mapped["tag_key"] == {"namespace": "danbooru.tag", "value": "same_spelling"}
+        assert api.ask("same_spelling", kind="tag")["status"] == "entity_ambiguous"
+        with pytest.raises(ValueError, match="target_tag_namespace"):
+            api.ask("hero", target_tag_namespace="")
+    assert main(["ask", str(database), "same_spelling", "--kind", "tag", "--namespace",
+                 "local.tag_aggregate", "--target-tag-namespace", "danbooru.tag"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["mapping_status"] == "target_unmapped" and payload["tag_key"] is None
+    assert payload["target_namespace"] == "danbooru.tag"
+
+
 def test_no_implicit_bare_tag_evidence_and_conflict_order(tmp_path):
     bare = entity("tag", "bare", namespace="danbooru.tag")
     manifest = fixture_manifest(tmp_path, [bare], name="bare")

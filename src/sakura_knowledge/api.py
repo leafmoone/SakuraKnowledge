@@ -180,28 +180,62 @@ class Knowledge:
                               "payload": r["payload"]} for r in rows]
         return base
 
-    def ask(self, query, *, kind=None, namespace=None):
+    def ask(self, query, *, kind=None, namespace=None, target_tag_namespace=None):
+        """Resolve an exact *source* entity, then independently assess a target tag.
+
+        namespace filters source entities only. Spelling, wiki titles and candidate
+        links do not confer membership in a requested target namespace.
+        """
         self._budget()
+        if target_tag_namespace is not None and (not isinstance(target_tag_namespace, str)
+                                                 or not 1 <= len(target_tag_namespace) <= 256):
+            raise ValueError("target_tag_namespace must contain 1..256 characters")
         result = self.lookup(query, kind=kind, namespace=namespace)
+        result["target_namespace"] = target_tag_namespace
+        result["mapping_status"] = "unknown"
         if result["status"] == "not_found":
             result["status"] = "unknown"
-        elif result["status"] == "ambiguous":
+            result["answer"] = "No reliable exact source entity match."
+            return result
+        if result["status"] == "ambiguous":
             result["status"] = "entity_ambiguous"
-        elif result["tag_key"] is None:
-            linked = self.related(result["entry_key"], relation="entity_tag", kind="tag", limit=100)
-            verified = [r for r in linked["relations"] if r["verification_status"] == "verified"]
-            keys = {(r["dst"]["namespace"], r["dst"]["value"]) for r in verified}
-            result["relations"] = verified
-            result["status"] = ("entity_found_tag_unmapped" if not keys else
-                                "tag_ambiguous" if len(keys) > 1 else "found")
-            if len(keys) == 1:
-                ns, value = next(iter(keys))
-                result["tag_key"] = {"namespace": ns, "value": value}
-            result["citations"].extend({"source_id": r["source_id"], "evidence_id": r["evidence_id"]}
-                                       for r in verified)
-        result["answer"] = {"unknown": "No reliable exact entity match.",
-                            "entity_ambiguous": "Multiple entity matches; specify a key.",
-                            "tag_ambiguous": "Multiple explicit tag mappings; no tag selected.",
-                            "entity_found_tag_unmapped": "Entity found; no verified tag mapping.",
-                            "found": "Reliable exact match found."}[result["status"]]
+            result["mapping_status"] = "entity_ambiguous"
+            result["answer"] = "Multiple source entity matches; specify a source key."
+            return result
+
+        source_tag = result["tag_key"]
+        if source_tag and (target_tag_namespace is None or
+                           source_tag["namespace"] == target_tag_namespace):
+            result["mapping_status"] = ("target_identity" if target_tag_namespace is not None
+                                        else "local_identity_only" if
+                                        source_tag["namespace"] == "local.tag_aggregate"
+                                        else "source_identity_only")
+            result["answer"] = (f"Exact tag identity in {source_tag['namespace']}; "
+                                "no cross-namespace mapping inferred.")
+            return result
+        # Do not retain a source tag as the *target* when its namespace differs.
+        result["tag_key"] = None
+        linked = self.related(result["entry_key"], relation="entity_tag", kind="tag", limit=100)
+        verified = [r for r in linked["relations"] if r["verification_status"] == "verified"
+                    and (target_tag_namespace is None or
+                         r["dst"]["namespace"] == target_tag_namespace)]
+        keys = {(r["dst"]["namespace"], r["dst"]["value"]) for r in verified}
+        result["relations"] = verified
+        result["citations"].extend({"source_id": r["source_id"], "evidence_id": r["evidence_id"]}
+                                   for r in verified)
+        if len(keys) == 1:
+            ns, value = next(iter(keys))
+            result["tag_key"] = {"namespace": ns, "value": value}
+            result["mapping_status"] = "target_verified" if target_tag_namespace else "verified"
+            result["answer"] = f"Verified entity_tag mapping to {ns}; source entity retained."
+        elif len(keys) > 1:
+            result["status"] = "tag_ambiguous"
+            result["mapping_status"] = "target_ambiguous" if target_tag_namespace else "ambiguous"
+            result["answer"] = "Multiple verified tag mappings; no target selected."
+        else:
+            result["status"] = "entity_found_tag_unmapped"
+            result["mapping_status"] = "target_unmapped" if target_tag_namespace else "unmapped"
+            result["answer"] = (f"Source entity found; no verified tag mapping to "
+                                f"{target_tag_namespace}." if target_tag_namespace else
+                                "Source entity found; no verified tag mapping in any namespace.")
         return result
