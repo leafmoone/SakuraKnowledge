@@ -5,7 +5,7 @@ import zipfile
 import pytest
 
 from sakura_knowledge.api import Knowledge
-from sakura_knowledge.model import EntryKey, GROUPS, match_query
+from sakura_knowledge.model import GROUPS, EntryKey, match_query
 from sakura_knowledge.safety import safe_extract
 from sakura_knowledge.storage import REQUIRED_SOURCE, build, digest, verify
 

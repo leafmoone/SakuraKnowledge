@@ -1,7 +1,12 @@
 """Public identities and versioned tokenization."""
-from dataclasses import dataclass
 import re
 import unicodedata
+from dataclasses import dataclass
+
+_WORDS = re.compile(r"[\u3040-\u30ff\u3400-\u9fff]+|[^\W_]+")
+_CJK = re.compile(r"[\u3040-\u30ff\u3400-\u9fff]+\Z")
+_MAX_WORD = 256
+_MAX_QUERY_TOKENS = 256
 
 STATUSES = frozenset({"source_backed", "generated_from_evidence", "unverified_draft",
                       "no_reference", "conflict", "failed"})
@@ -41,25 +46,33 @@ class TagKey:
         return EntryKey("tag", self.namespace, self.value)
 
 
+def _lex(text):
+    # Use the same normalization and lexing for queries and indexed documents.
+    # Do not split at arbitrary chunk boundaries: this loses Latin words and CJK bigrams.
+    for match in _WORDS.finditer(unicodedata.normalize("NFKC", text).casefold()):
+        word = match.group()
+        if _CJK.fullmatch(word):
+            for index in range(len(word) - 1):
+                yield word[index:index + 2]
+        elif len(word) <= _MAX_WORD:
+            yield word
+
+
 def tokens(text):
     if not isinstance(text, str) or len(text) > 4096:
-        raise ValueError("query/text chunk exceeds 4096 characters")
-    text = unicodedata.normalize("NFKC", text).casefold()
+        raise ValueError("query exceeds 4096 characters")
     result = []
-    for match in re.finditer(r"[\u3040-\u30ff\u3400-\u9fff]+|[^\W_]+", text):
-        word = match.group()
-        if re.fullmatch(r"[\u3040-\u30ff\u3400-\u9fff]+", word):
-            result.extend(word[i:i + 2] for i in range(len(word) - 1))
-        else:
-            result.append(word)
-    return result[:256]
+    for token in _lex(text):
+        if len(result) == _MAX_QUERY_TOKENS:
+            raise ValueError("query exceeds 256 tokens")
+        result.append(token)
+    return result
 
 
 def search_text(text):
     if not isinstance(text, str) or len(text) > 100_000:
         raise ValueError("document exceeds 100000 characters")
-    return " ".join(t for start in range(0, len(text), 2048)
-                    for t in tokens(text[start:start + 2049]))
+    return " ".join(_lex(text))
 
 
 def match_query(text):

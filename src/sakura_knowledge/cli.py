@@ -1,11 +1,12 @@
 """JSON-only stdout; offline queries. Metadata refresh is explicitly opt-in."""
 import argparse
 import json
-from pathlib import Path
+import sqlite3
 import sys
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from pathlib import Path
 
 from .api import Knowledge
 from .model import EntryKey
@@ -15,7 +16,7 @@ LATEST_URL = "https://raw.githubusercontent.com/bangumi/Archive/master/aux/lates
 
 
 def check_latest(output):
-    result = {"url": LATEST_URL, "checked_at_utc": datetime.now(timezone.utc).isoformat(),
+    result = {"url": LATEST_URL, "checked_at_utc": datetime.now(UTC).isoformat(),
               "status": "failed"}
     try:
         with urllib.request.urlopen(LATEST_URL, timeout=30) as response:
@@ -88,7 +89,7 @@ def main(argv=None):
                     result = getattr(knowledge, args.command)(args.query, **options)
         print(json.dumps(result, ensure_ascii=False))
         return 1 if result.get("ok") is False or result.get("status") == "failed" else 0
-    except Exception as exc:
+    except (OSError, ValueError, TypeError, KeyError, sqlite3.Error, json.JSONDecodeError) as exc:
         print(json.dumps({"error": type(exc).__name__, "message": str(exc)}, ensure_ascii=False),
               file=sys.stderr)
         return 2

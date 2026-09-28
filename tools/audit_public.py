@@ -1,9 +1,9 @@
 """Explicit metadata/source-code audit; never fetches datasets or runs upstream code."""
-from datetime import datetime, timezone
 import hashlib
 import json
-from pathlib import Path
 import urllib.request
+from datetime import UTC, datetime
+from pathlib import Path
 
 URLS = {
     "moegirl_tree": "https://api.github.com/repos/Zzzzzzyt/moegirl-dataset/git/trees/main?recursive=1",
@@ -18,7 +18,7 @@ def main():
     results = []
     for name, url in URLS.items():
         item = {"name": name, "url": url,
-                "inspected_at_utc": datetime.now(timezone.utc).isoformat()}
+                "inspected_at_utc": datetime.now(UTC).isoformat()}
         try:
             request = urllib.request.Request(url, headers={"User-Agent": "SakuraKnowledge-audit"})
             with urllib.request.urlopen(request, timeout=25) as response:

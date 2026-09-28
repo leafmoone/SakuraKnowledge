@@ -1,8 +1,8 @@
 """Fetch only source files discovered in the recorded tree at its pinned revision."""
 import hashlib
 import json
-from pathlib import Path
 import urllib.request
+from pathlib import Path
 
 root = Path("reports/P1/public-audit")
 tree = json.loads((root / "moegirl_tree.json").read_text(encoding="utf-8"))

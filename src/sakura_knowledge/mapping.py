@@ -19,7 +19,7 @@ def audit_candidates(forward, reverse, character_ids, page_titles):
         for title in titles:
             back = reverse.get(title, []) or []
             if not isinstance(back, list):
-                raise ValueError("reverse mapping values must be ID lists")
+                raise TypeError("reverse mapping values must be ID lists")
             missing = cid not in character_ids or title not in page_titles
             inconsistent = cid not in {str(i) for i in back}
             counts["missing"] += missing

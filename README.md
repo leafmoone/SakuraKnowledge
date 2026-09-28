@@ -24,7 +24,8 @@ Build inputs: JSON manifest (supports explicit nulls) plus UTF-8 JSONL, see `doc
 
 ```
 python -m pytest -q
-python -m ruff check --isolated --select E4,E7,E9,F src tests tools
+python -m ruff check src tests tools
+git diff --check
 ```
 
-See `reports/P1/P1_REPORT.md` for evidence, source blockers and incomplete requirements.
+See `reports/P1/P1_REPORT.md` for evidence, source blockers and incomplete requirements. The normalized contract is a fixture-only engine boundary, not an adapter for uninspected upstream schemas.
