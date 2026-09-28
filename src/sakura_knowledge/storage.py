@@ -39,9 +39,12 @@ CREATE TABLE links(id INTEGER PRIMARY KEY, src INTEGER REFERENCES entries,
  evidence_id TEXT, method TEXT, verification_status TEXT, payload TEXT);
 CREATE TABLE build_meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE VIRTUAL TABLE search_fts USING fts5(text, document_id UNINDEXED, entry_id UNINDEXED);
+CREATE INDEX entry_value ON entries(value);
 CREATE INDEX alias_exact ON aliases(text,status);
+CREATE INDEX alias_entry ON aliases(entry_id,text,status);
+CREATE INDEX document_entry ON documents(entry_id,status);
 CREATE INDEX entry_evidence_entry ON entry_evidence(entry_id,status);
-CREATE INDEX link_src ON links(src,relation);
+CREATE INDEX link_src ON links(src,relation,verification_status);
 CREATE TABLE source_counts(source_id TEXT PRIMARY KEY REFERENCES sources, input INTEGER NOT NULL,
  accepted INTEGER NOT NULL, rejected INTEGER NOT NULL, conflicted INTEGER NOT NULL,
  duplicate INTEGER NOT NULL, unresolved INTEGER NOT NULL, by_kind TEXT NOT NULL);

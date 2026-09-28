@@ -215,20 +215,37 @@ class Knowledge:
             return result
         # Do not retain a source tag as the *target* when its namespace differs.
         result["tag_key"] = None
-        linked = self.related(result["entry_key"], relation="entity_tag", kind="tag", limit=100)
-        verified = [r for r in linked["relations"] if r["verification_status"] == "verified"
-                    and (target_tag_namespace is None or
-                         r["dst"]["namespace"] == target_tag_namespace)]
-        keys = {(r["dst"]["namespace"], r["dst"]["value"]) for r in verified}
-        result["relations"] = verified
-        result["citations"].extend({"source_id": r["source_id"], "evidence_id": r["evidence_id"]}
-                                   for r in verified)
-        if len(keys) == 1:
-            ns, value = next(iter(keys))
+        key = result["entry_key"]
+        src_id = self._execute(
+            "SELECT id FROM entries WHERE kind=? AND namespace=? AND value=?",
+            (key["kind"], key["namespace"], key["value"])).fetchone()[0]
+        # A display limit on related() is NOT a cardinality proof: the 101st
+        # verified link could point to a second target. Group all eligible
+        # edges, then fetch at most two *distinct* trusted target identities.
+        identities = self._execute(
+            "SELECT d.namespace,d.value,MIN(l.id) AS proof_id FROM links l "
+            "JOIN entries d ON d.id=l.dst WHERE l.src=? AND l.relation='entity_tag' "
+            "AND l.verification_status='verified' AND d.kind='tag' AND d.conflicted=0 "
+            "AND (? IS NULL OR d.namespace=?) AND EXISTS "
+            "(SELECT 1 FROM entry_evidence v WHERE v.entry_id=d.id "
+            "AND v.status IN ('source_backed','generated_from_evidence')) "
+            "GROUP BY d.namespace,d.value ORDER BY d.namespace,d.value LIMIT 2",
+            (src_id, target_tag_namespace, target_tag_namespace)).fetchall()
+        for identity in identities:
+            proof = self._execute(
+                "SELECT relation,method,verification_status,source_id,evidence_id,payload "
+                "FROM links WHERE id=?", (identity["proof_id"],)).fetchone()
+            result["relations"].append({"dst": {"kind": "tag", "namespace": identity["namespace"],
+                                                 "value": identity["value"]},
+                                        **dict(proof)})
+            result["citations"].append({"source_id": proof["source_id"],
+                                        "evidence_id": proof["evidence_id"]})
+        if len(identities) == 1:
+            ns, value = identities[0]["namespace"], identities[0]["value"]
             result["tag_key"] = {"namespace": ns, "value": value}
             result["mapping_status"] = "target_verified" if target_tag_namespace else "verified"
             result["answer"] = f"Verified entity_tag mapping to {ns}; source entity retained."
-        elif len(keys) > 1:
+        elif len(identities) > 1:
             result["status"] = "tag_ambiguous"
             result["mapping_status"] = "target_ambiguous" if target_tag_namespace else "ambiguous"
             result["answer"] = "Multiple verified tag mappings; no target selected."

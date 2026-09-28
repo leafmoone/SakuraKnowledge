@@ -108,6 +108,48 @@ def test_bm25_ties_deduplicate_multiple_documents(tmp_path):
         assert not any("CORRELATED" in p for p in plan)
 
 
+def test_target_cardinality_ignores_link_display_cap_and_untrusted_edges(tmp_path):
+    hero = entity("character", "hero", status="source_backed")
+    a = entity("tag", "a", namespace="danbooru.tag", status="source_backed")
+    b = entity("tag", "b", namespace="danbooru.tag", status="source_backed")
+    other = entity("tag", "elsewhere", namespace="local.tag_aggregate",
+                   status="source_backed")
+    draft = entity("tag", "draft", namespace="danbooru.tag", status="no_reference")
+
+    def edge(dst, status="verified", relation="entity_tag", ordinal=None):
+        return {"record_type": "link", "src": hero["key"], "dst": dst["key"],
+                "relation": relation, "method": "fixture", "verification_status": status,
+                "evidence_id": f"fixture-proof-{ordinal}" if ordinal is not None else "single-proof"}
+
+    records = [hero, a, b, other, draft, *[edge(a, ordinal=i) for i in range(100)],
+               *[edge(b, "candidate") for _ in range(80)],
+               *[edge(b, "native") for _ in range(40)],
+               edge(draft), edge(other), edge(a, relation="points_to"), edge(b)]
+    out = tmp_path / "many-links"
+    build(fixture_manifest(tmp_path, records), out)
+    with Knowledge(out / "knowledge.sqlite") as api:
+        result = api.ask("hero", target_tag_namespace="danbooru.tag")
+        assert result["status"] == "tag_ambiguous"
+        assert result["mapping_status"] == "target_ambiguous"
+        assert result["tag_key"] is None
+        assert {r["dst"]["value"] for r in result["relations"]} == {"a", "b"}
+        local = api.ask("hero", target_tag_namespace="local.tag_aggregate")
+        assert local["tag_key"] == {"namespace": "local.tag_aggregate", "value": "elsewhere"}
+        assert len(api.related(hero["key"], limit=100)["relations"]) == 100
+    with sqlite3.connect(out / "knowledge.sqlite") as conn:
+        plans = {
+            "value": "SELECT id FROM entries WHERE value='hero'",
+            "document": "SELECT id FROM documents WHERE entry_id=1 AND status='source_backed'",
+            "alias": "SELECT id FROM aliases WHERE entry_id=1 AND text='hero'",
+            "links": ("SELECT dst FROM links WHERE src=1 AND relation='entity_tag' "
+                      "AND verification_status='verified'"),
+        }
+        for label, sql in plans.items():
+            detail = " ".join(r[3] for r in conn.execute("EXPLAIN QUERY PLAN " + sql))
+            assert {"value": "entry_value", "document": "document_entry",
+                    "alias": "alias_entry", "links": "link_src"}[label] in detail
+
+
 def test_target_tag_namespace_is_not_source_namespace_or_candidate(tmp_path, capsys):
     from sakura_knowledge.cli import main
 
