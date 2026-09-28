@@ -71,6 +71,7 @@ def test_fts_exact_first_dedup_stable_and_long_document(tmp_path):
     with Knowledge(out / "knowledge.sqlite") as api:
         first = api.search("hello")
         assert first["candidates"][0]["entry_key"]["value"] == "exact"
+        assert len(api.search("hello", topk=1)["candidates"]) == 1
         assert first["citations"] == [{"source_id": "fixture-v1",
                                        "evidence_id": "alias-exact"}]
         assert [c["entry_key"]["value"] for c in first["candidates"]].count("a") == 1
@@ -98,6 +99,32 @@ def test_bm25_ties_deduplicate_multiple_documents(tmp_path):
         assert keys == [c["entry_key"]["value"] for c in
                         api.search("same", topk=20)["candidates"]]
     assert verify(out / "knowledge.sqlite")["ok"]
+    # Single-pass FTS grouping; no correlated per-document FTS scan.
+    with sqlite3.connect(out / "knowledge.sqlite") as conn:
+        plan = [detail for _, _, _, detail in conn.execute(
+            "EXPLAIN QUERY PLAN SELECT document_id,count(*) FROM search_fts "
+            "GROUP BY document_id")]
+        assert sum("SCAN search_fts VIRTUAL TABLE" in p for p in plan) == 1
+        assert not any("CORRELATED" in p for p in plan)
+
+
+def test_no_implicit_bare_tag_evidence_and_conflict_order(tmp_path):
+    bare = entity("tag", "bare", namespace="danbooru.tag")
+    manifest = fixture_manifest(tmp_path, [bare], name="bare")
+    out = tmp_path / "bare-snapshot"
+    build(manifest, out)
+    with Knowledge(out / "knowledge.sqlite") as api:
+        assert api.ask("bare", kind="tag", namespace="danbooru.tag")["status"] == "unknown"
+    for n, values in enumerate(((None, "/one", "/two"),
+                                ("/one", None, "/two"))):
+        records = [entity("page", "same", locator=value, status="source_backed")
+                   for value in values]
+        manifest = fixture_manifest(tmp_path, records, name=f"perm{n}")
+        out = tmp_path / f"perm{n}-snapshot"
+        result = build(manifest, out)
+        assert result["counts"]["fixture-v1"]["conflicted"] == 1
+        with Knowledge(out / "knowledge.sqlite") as api:
+            assert api.lookup("same")["status"] == "not_found"
 
 
 def test_history_conflict_quarantine_and_date_not_refreshed(tmp_path):
@@ -139,13 +166,13 @@ def test_mapping_date_kept_across_separate_source_revisions(tmp_path):
 
 
 def test_order_independent_links_related_bounds_and_accounts(tmp_path):
-    src = entity("character", "hero")
-    dst = entity("tag", "safe")
+    src = entity("character", "hero", status="source_backed")
+    dst = entity("tag", "safe", status="source_backed")
     link = {"record_type": "link", "src": src["key"], "dst": dst["key"],
             "relation": "entity_tag", "method": "fixture", "verification_status": "verified"}
     items = [link, src, dst]
     for number in range(101):
-        other = entity("page", str(number))
+        other = entity("page", str(number), status="source_backed")
         items += [{"record_type": "link", "src": src["key"], "dst": other["key"],
                    "relation": "points_to", "method": "fixture", "verification_status": "native"},
                   other]

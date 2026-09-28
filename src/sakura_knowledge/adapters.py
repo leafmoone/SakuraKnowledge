@@ -48,11 +48,11 @@ def bangumi_entity(name, row):
     text = row.get("summary", row.get("description", "")) or ""
     if not isinstance(text, str):
         raise TypeError("unexpected Bangumi body")
-    # Large infoboxes remain in raw payload and are indexed only up to the
-    # documented search-text 100k limit; no arbitrary 256-query-token cutoff.
-    original = (text + "\n" + (row.get("infobox") or ""))[:90_000]
+    # Preserve the full original source body, even beyond indexing/response
+    # limits. Infobox remains in raw with its original type and bytes.
+    original = text
     docs = [_document(title, original)] if title or original else []
-    raw = {k: v for k, v in row.items() if k not in {"name", "name_cn", "summary", "description"}}
+    raw = {k: v for k, v in row.items() if k not in {"name", "name_cn"}}
     return _entity(_key(name, f"bangumi.{name}", ident), aliases=aliases,
                    documents=docs, **raw)
 
@@ -185,7 +185,7 @@ def iter_danbooru_pages(parquet, *, sample=None):
                 aliases += [_alias(value, "other_names") for value in row["other_names"] or []
                             if isinstance(value, str) and value]
                 yield _entity(key, aliases=aliases,
-                              documents=[_document(row["title"], (row["body"] or "")[:90_000])],
+                              documents=[_document(row["title"], row["body"] or "")],
                               raw_page_metadata={k: v for k, v in row.items() if k != "body"})
             rows += 1
             if sample is not None and rows >= sample:
@@ -214,7 +214,7 @@ def iter_danbooru_links(parquet, *, sample=None):
 
 def tag_group_record(group, row):
     item = dict(row)
-    key = _key("tag", "danbooru.tag", item["tag_key"])
+    key = _key("tag", "local.tag_aggregate", item["tag_key"])
     return _entity(key, status="source_backed", aliases=[_alias(
         item["tag_key"], "tag_key")], occurrences=[{
         "group": group, "dataset": group, "frequency": item["source_count"],
@@ -232,8 +232,8 @@ def iter_tag_wiki(path, *, sample=None):
                 sql += f" LIMIT {int(sample)}"
             for row in conn.execute(sql):
                 # Tag occurrences are observed by the seven datasets, but
-                # namespace danbooru.tag is a local contract label, not evidence
-                # that every input dataset uses native Danbooru identifiers.
+                # Local aggregate of seven native tag-occurrence tables: no
+                # native Danbooru tag identity is implied by shared spelling.
                 yield tag_group_record(group, row)
         sql = "SELECT * FROM tag_evidence"
         if sample is not None:
@@ -243,7 +243,7 @@ def iter_tag_wiki(path, *, sample=None):
             # Confidence/exact title is a matching *candidate*, never proof
             # that the tag denotes the page. These records are not verified
             # entity_tag links and thus cannot make ask() assert an identity.
-            yield {"record_type": "link", "src": _key("tag", "danbooru.tag",
+            yield {"record_type": "link", "src": _key("tag", "local.tag_aggregate",
                    item["tag_key"]), "dst": _key("page", "danbooru.wiki",
                    item["wiki_id"]), "relation": "wiki_match_candidate",
                    "method": "tag_wiki.tag_evidence", "verification_status": "candidate",
@@ -259,7 +259,7 @@ def iter_tag_wiki(path, *, sample=None):
                 item = dict(row)
                 raw_status = item["status"]
                 status = "no_reference" if raw_status == "no_reference" else "unverified_draft"
-                yield _entity(_key("tag", "danbooru.tag", item["tag_key"]),
+                yield _entity(_key("tag", "local.tag_aggregate", item["tag_key"]),
                               status=status,
                               documents=[_document(item["tag_key"], item[text_field] or "",
                                                    status=status, raw_model=item.get("model"),

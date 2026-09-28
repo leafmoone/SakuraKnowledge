@@ -45,7 +45,10 @@ class Knowledge:
     def describe(self, row, alias_text=None):
         key = EntryKey(row["kind"], row["namespace"], row["value"]).as_dict()
         docs = self._execute(
-            "SELECT title,original,source_id,evidence_id,status FROM documents WHERE entry_id=? "
+            "SELECT title,substr(original,1,4000) AS original, "
+            "length(original)>4000 AS response_truncated, "
+            "json_extract(payload,'$.search_text_truncated') AS search_text_truncated, "
+            "source_id,evidence_id,status FROM documents WHERE entry_id=? "
             "AND status IN ('source_backed','generated_from_evidence') ORDER BY id LIMIT 10",
             (row["id"],)).fetchall()
         aliases = (self._execute(
@@ -54,12 +57,12 @@ class Knowledge:
             "ORDER BY source_id,evidence_id LIMIT 100", (row["id"], alias_text)).fetchall()
             if alias_text is not None else [])
         identities = self._execute(
-            "SELECT source_id,evidence_id,status,type,locator,payload FROM entry_evidence "
+            "SELECT source_id,evidence_id,status,type,locator FROM entry_evidence "
             "WHERE entry_id=? AND status IN ('source_backed','generated_from_evidence') "
             "ORDER BY source_id,evidence_id LIMIT 100", (row["id"],)).fetchall()
         identity_proofs = aliases if alias_text is not None and alias_text != row["value"] else identities
         return {"entry_key": key, "locator": row["locator"],
-                "descriptions": [{**dict(d), "original": d["original"][:4000]} for d in docs],
+                "descriptions": [dict(d) for d in docs],
                 "aliases": [dict(a) for a in aliases],
                 "identity_evidence": [dict(d) for d in identities],
                 "citations": [{"source_id": d["source_id"], "evidence_id": d["evidence_id"]}
@@ -134,6 +137,8 @@ class Knowledge:
                  c["entry_key"]["value"]) for c in candidates}
         scanned = 0
         for row in rows:
+            if len(candidates) >= topk:
+                break
             scanned += 1
             if scanned > 10000:
                 break

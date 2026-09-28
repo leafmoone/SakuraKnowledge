@@ -129,11 +129,26 @@ def verify(path):
             "OR f.text!=d.search_text OR d.status NOT IN "
             "('source_backed','generated_from_evidence') OR (NOT ? AND e.kind='episode')",
             (index_episodes,)).fetchone()[0]
-        missing = conn.execute(
-            "SELECT count(*) FROM documents d JOIN entries e ON e.id=d.entry_id "
-            "WHERE d.status IN ('source_backed','generated_from_evidence') "
-            "AND (? OR e.kind!='episode') AND (SELECT count(*) FROM search_fts f "
-            "WHERE f.document_id=d.id)!=1", (index_episodes,)).fetchone()[0]
+        # FTS document_id is UNINDEXED. A per-document correlated lookup
+        # scans the entire FTS table once for every document (O(D*F)).
+        # Stream one grouped FTS pass into a Python set; no temp writes on the
+        # immutable/query_only connection, no O(documents*FTS) correlated scan.
+        grouped = conn.execute("SELECT document_id,count(*) FROM search_fts "
+                               "GROUP BY document_id")
+        indexed_ids = set()
+        duplicate = 0
+        for document_id, number in grouped:
+            if number != 1:
+                duplicate += 1
+            else:
+                indexed_ids.add(document_id)
+        missing = duplicate
+        for (document_id,) in conn.execute(
+                "SELECT d.id FROM documents d JOIN entries e ON e.id=d.entry_id "
+                "WHERE d.status IN ('source_backed','generated_from_evidence') "
+                "AND (? OR e.kind!='episode')", (index_episodes,)):
+            if document_id not in indexed_ids:
+                missing += 1
         accounts = []
         for row in conn.execute("SELECT s.source_id,c.* FROM sources s LEFT JOIN source_counts c "
                                 "ON c.source_id=s.source_id"):
@@ -213,15 +228,15 @@ def insert_record(conn, record, source, line, index_episodes):
                      (sid, line, json.dumps(record, ensure_ascii=False)))
         return "unresolved"
     eid = entry_id(conn, record["key"], True, record)
-    previous = conn.execute("SELECT type,locator,conflicted FROM entries WHERE id=?", (eid,)).fetchone()
-    conflict = any(previous[field] is not None and record.get(field) is not None
-                   and previous[field] != record[field] for field in ("type", "locator"))
+    conflict = any(conn.execute(
+        "SELECT 1 FROM entry_evidence WHERE entry_id=? AND " + field +
+        " IS NOT NULL AND " + field + " != ? LIMIT 1", (eid, record[field])).fetchone()
+        for field in ("type", "locator") if record.get(field) is not None)
     if conflict:
         conn.execute("UPDATE entries SET conflicted=1 WHERE id=?", (eid,))
     supporting = any(item.get("status", "no_reference") in TRUSTED
                      for group in ("aliases", "documents") for item in record.get(group, []))
-    status = record.get("status", "source_backed" if supporting or not any(
-        record.get(group) for group in ("aliases", "documents")) else "unverified_draft")
+    status = record.get("status", "source_backed" if supporting else "no_reference")
     if status not in STATUSES:
         raise ValueError("unknown entry status")
     metadata = {k: v for k, v in record.items()
@@ -240,12 +255,15 @@ def insert_record(conn, record, source, line, index_episodes):
     for doc in record.get("documents", []):
         status, ref = evidence(doc, fallback)
         original = doc.get("original", "")
-        text = (search_text(doc.get("title", "") + " " + original)
-                if status in TRUSTED else "")
+        searchable = doc.get("title", "") + " " + original
+        limited = searchable[:100_000]
+        text = search_text(limited) if status in TRUSTED else ""
         cur = conn.execute("INSERT INTO documents(entry_id,title,original,search_text,language,"
                            "status,source_id,evidence_id,payload) VALUES(?,?,?,?,?,?,?,?,?)",
                            (eid, doc.get("title", ""), original, text, doc.get("language"),
-                            status, sid, ref, json.dumps(doc, ensure_ascii=False)))
+                            status, sid, ref, json.dumps({**doc, "search_text_truncated":
+                                status in TRUSTED and len(searchable) > 100_000},
+                                ensure_ascii=False)))
         if status in TRUSTED and (record["key"]["kind"] != "episode" or index_episodes):
             conn.execute("INSERT INTO search_fts VALUES(?,?,?)", (text, cur.lastrowid, eid))
     for occurrence in record.get("occurrences", []):

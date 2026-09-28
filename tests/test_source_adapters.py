@@ -24,7 +24,7 @@ def test_bangumi_four_id_spaces_person_types_and_context():
         record = bangumi_entity(kind, row)
         assert record["key"] == {"kind": kind, "namespace": f"bangumi.{kind}", "value": "1"}
         assert record["raw"]["type"] == 2
-        assert record["documents"][0]["original"] == "original body\n"
+        assert record["documents"][0]["original"] == "original body"
     for code, kind in (("prsn", "person"), ("crt", "character")):
         link = bangumi_relation("person-relations", {"person_type": code,
             "person_id": 7, "related_person_id": 8, "relation_type": 1002,
@@ -43,6 +43,43 @@ def test_bangumi_four_id_spaces_person_types_and_context():
                       "character_id": 4, "type": 1, "summary": "voice"})
     assert cv["raw"]["subject_id"] == 292
     assert cv["relation"] == "portrays_character"
+
+
+def test_source_long_body_is_preserved_and_response_bounded(tmp_path):
+    from sakura_knowledge.adapters import iter_danbooru_pages
+
+    long = "introduction " + "x " * 52_000 + " final_tail_provenance"
+    record = bangumi_entity("subject", {"id": 91, "name": "long", "summary": long,
+                                       "infobox": "infobox marker"})
+    assert record["documents"][0]["original"].endswith("final_tail_provenance")
+    assert record["raw"]["summary"].endswith("final_tail_provenance")
+    assert record["raw"]["infobox"] == "infobox marker"
+    manifest = fixture_manifest(tmp_path, [record], name="longbody")
+    out = tmp_path / "longbody-snapshot"
+    build(manifest, out)
+    with sqlite3.connect(out / "knowledge.sqlite") as conn:
+        original, text, payload = conn.execute(
+            "SELECT original,search_text,payload FROM documents").fetchone()
+        assert original.endswith("final_tail_provenance")
+        assert "final_tail_provenance" not in text
+        assert json.loads(payload)["search_text_truncated"] is True
+    with Knowledge(out / "knowledge.sqlite") as api:
+        desc = api.lookup("long")["descriptions"][0]
+        assert desc["response_truncated"] == 1
+        assert desc["search_text_truncated"] == 1
+        assert len(desc["original"]) == 4000
+    try:
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+    except ImportError:
+        pytest.skip("optional ingestion-only pyarrow not installed")
+    file = tmp_path / "pages.parquet"
+    pq.write_table(pa.Table.from_pylist([{"id": 99, "title": "test-page",
+        "other_names": [], "body": long, "is_deleted": False,
+        "is_locked": False, "created_at": "", "updated_at": ""}]), file)
+    page, = list(iter_danbooru_pages(file, sample=1))
+    assert page["documents"][0]["original"].endswith("final_tail_provenance")
+    assert page["documents"][0]["original"] == long
 
 
 def test_moegirl_category_not_work_and_mapping_candidate(tmp_path):
@@ -86,10 +123,12 @@ def test_tag_evidence_exact_match_and_ai_status_are_not_verified(tmp_path):
     items = list(iter_tag_wiki(database))
     assert len(items) == 4
     tag, match, annotation, cache = items
+    assert tag["key"]["namespace"] == "local.tag_aggregate"
     assert tag["occurrences"][0]["group"] == "anime_pictures_1_noncommon"
     assert match["verification_status"] == "candidate"
     assert match["raw"]["confidence"] == 1.0
     assert match["src"]["kind"] == "tag" and match["dst"]["kind"] == "page"
+    assert match["src"]["namespace"] == "local.tag_aggregate"
     for item in (annotation, cache):
         assert item["status"] == "unverified_draft"
         assert item["documents"][0]["status"] == "unverified_draft"
@@ -115,6 +154,7 @@ def test_explicit_unresolved_policy_quarantines_links_not_unknown_codes(tmp_path
     with Knowledge(out / "knowledge.sqlite") as api:
         assert api.ask("akanbe")["status"] == "found"
         assert api.ask("akanbe")["citations"]
+        assert api.ask("akanbe", kind="tag", namespace="danbooru.tag")["status"] == "unknown"
     blocked = fixture_manifest(tmp_path, [tag, unknown], name="blocked")
     data = json.loads(blocked.read_text(encoding="utf-8"))
     data["allow_unresolved_reasons"] = ["unresolved_wiki_link"]

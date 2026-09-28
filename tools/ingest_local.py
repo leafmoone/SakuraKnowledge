@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import sqlite3
+import subprocess
 import time
 from collections import Counter
 from pathlib import Path
@@ -115,7 +116,7 @@ def sample_dependencies(output, paths, links, keys, counts):
             # More explicit namespace dispatch for Danbooru vs other content.
             if key["namespace"] == "danbooru.wiki":
                 group = "danbooru"
-            elif key["namespace"] == "danbooru.tag":
+            elif key["namespace"] == "local.tag_aggregate":
                 group = "tag_wiki"
             needed[group].add(identity)
 
@@ -175,7 +176,8 @@ def sample_dependencies(output, paths, links, keys, counts):
     return {group: len(values - keys) for group, values in needed.items()}
 
 
-def source_meta(group, source_files, normalized_path, audit, root, *, sample):
+def source_meta(group, source_files, normalized_path, audit, root, *, sample,
+                commit, converter_command, source_rows):
     mapping_commit = "1ff222f8af5e399e230b9f88eb50995869ed22bf"
     bangumi_digest = audit["files"]["Archive_dump-2026-09-22.zip"]["sha256"]
     sources = {"bangumi": "https://github.com/bangumi/Archive/releases/tag/archive",
@@ -215,8 +217,11 @@ def source_meta(group, source_files, normalized_path, audit, root, *, sample):
             "exported_at": None, "fetched_at_utc": None,
             "inspected_at_utc": audit["observed_at_utc"],
             "schema_version": "audited-native-2026-09-28", "importer_version": "P1-Rev2",
+            "converter_source_commit": commit,
+            "converter_command": converter_command,
+            "conversion_spec_version": "local-ingest-v2-full-original-local-tags",
             "mapping_generator_revision": mapping_commit if group == "mapping" else None,
-            "input_file_inventory": inventory, "counts": {"source_rows": None},
+            "input_file_inventory": inventory, "counts": {"source_rows": source_rows},
             "source_references": [ref[group]], "refresh_status": "local_frozen_sample" if sample
             else "local_frozen_full", "code_license": None, "data_license": None,
             "unknown_reasons": unknown, "path": str(normalized_path.resolve()),
@@ -245,6 +250,15 @@ def main():
     if args.sample is not None and not 1 <= args.sample <= 100:
         raise ValueError("sample must be 1..100")
     audit = json.loads(args.audit.read_text(encoding="utf-8"))
+    commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    if subprocess.check_output(["git", "status", "--porcelain", "--", "src", "tools"],
+                               text=True).strip():
+        raise ValueError("converter sources modified; commit before converting")
+    command = ["PYTHONPATH=src", "build/ingest-venv/Scripts/python", "tools/ingest_local.py",
+               "--source", str(root), "--audit", str(args.audit.resolve()),
+               "--cache", str(cache), "--output", str(output)]
+    if args.sample:
+        command.extend(["--sample", str(args.sample)])
     if Path(audit["root"]).resolve() != root or not audit["official_zip_digest_match"] or not (
             audit["all_zip_members_match"] and audit["sqlite"]["integrity"] == "ok"):
         raise ValueError("audit does not verify these frozen source bytes")
@@ -298,13 +312,38 @@ def main():
         print("sample_only_edges_dropped", len(sample_links) - sum(c.get("sample_link", 0)
                                                        for c in counts.values()), flush=True)
         print("sample_only_unresolved_excluded", dict(sample_unresolved), flush=True)
+    archive_counts = {name: info["rows"] for name, info in audit["archive"].items()}
+    source_counts = {
+        "bangumi": {"archive_files": archive_counts,
+                    "record_rows": sum(archive_counts.values())},
+        "moegirl": {"generated_entities": counts["moegirl"].get("entity", 0),
+                    "scope": "normalized, not source row count"},
+        "mapping": {"generated_candidate_links": counts["mapping"].get("link", 0),
+                    "scope": "normalized, not source row count"},
+        "danbooru": {"wiki_pages": counts["danbooru"].get("entity", 0),
+                     "wiki_links": (counts["danbooru"].get("link", 0) +
+                                    counts["danbooru"].get("unresolved", 0)),
+                     "scope": "normalized all Parquet rows; footer checked separately"},
+        "tag_wiki": {"tables": {name: info["rows"] for name, info in
+                                  audit["sqlite"]["tables"].items()},
+                     "scope": "frozen-backup rows, not unique EntryKeys"}}
+    if args.sample is None and (source_counts["bangumi"]["record_rows"] != sum(
+            counts["bangumi"].values()) or
+            source_counts["danbooru"]["wiki_pages"] !=
+            audit["sqlite"]["tables"]["wiki_pages"]["rows"]):
+        raise ValueError("source inventory and adapter counts disagree")
     sources = [source_meta(group, source_files[group], output / f"{group}.jsonl", audit,
-                           root, sample=args.sample) for group in GROUPS]
+                           root, sample=args.sample, commit=commit,
+                           converter_command=command,
+                           source_rows=source_counts[group]) for group in GROUPS]
     manifest = output / "manifest.json"
     manifest.write_text(json.dumps({"sources": sources, "index_episodes": False,
                       "audit_receipt_sha256": digest(args.audit), "sample_limit": args.sample,
                       "tag_wiki_frozen_source": str(paths["tag_wiki"]),
                       "tag_wiki_frozen_sha256": audit["sqlite"]["backup_file"]["sha256"],
+                      "converter_source_commit": commit,
+                      "converter_command": command,
+                      "conversion_spec_version": "local-ingest-v2-full-original-local-tags",
                       "adapter_counts": counts,
                       "sample_excluded_unresolved": dict(sample_unresolved),
                       "sample_unavailable_edge_dependencies": missing_sample_dependencies,
