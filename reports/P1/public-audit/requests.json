@@ -1,0 +1,23 @@
+[
+  {
+    "name": "moegirl_tree",
+    "url": "https://api.github.com/repos/Zzzzzzyt/moegirl-dataset/git/trees/main?recursive=1",
+    "inspected_at_utc": "2026-09-28T10:15:34.010912+00:00",
+    "http_status": 200,
+    "size": 19742,
+    "sha256": "5c25bb9a56a728c3c13a3cc777a2b3509e71155d9c30d775c4a0fa2366d80010",
+    "artifact": "moegirl_tree.json"
+  },
+  {
+    "name": "dump_converter",
+    "url": "https://raw.githubusercontent.com/Zzzzzzyt/moegirl-dataset/main/bangumi/dump_converter.py",
+    "inspected_at_utc": "2026-09-28T10:15:35.276474+00:00",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "moegirl_mapper",
+    "url": "https://raw.githubusercontent.com/Zzzzzzyt/moegirl-dataset/main/bangumi/moegirl_mapper.py",
+    "inspected_at_utc": "2026-09-28T10:15:36.344125+00:00",
+    "error": "HTTP Error 404: Not Found"
+  }
+]
