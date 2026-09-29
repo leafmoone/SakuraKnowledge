@@ -1,0 +1,15 @@
+{
+  "created_at_utc": "2026-09-29T13:31:14Z",
+  "snapshot_sha256": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073",
+  "code_sha": "889ed9adcc525df977aeed535cef7618e3682875",
+  "artifacts": {
+    "wheel": {
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sakura_knowledge-0.2.0-py3-none-any.whl",
+      "sha256": "726c58f72ab1130a7fdb2e7ad2cd8157caecad1abe100a239a367f06ebb7999f"
+    },
+    "rust_binary": {
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+      "sha256": "c897c093b5299ae99bd5938dc306a81828e5a390d0ccfd01e51f97e6287c9e0b"
+    }
+  }
+}

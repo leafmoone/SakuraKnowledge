@@ -9,18 +9,23 @@ struct Opt {
     namespace: Option<String>,
     relation: Option<String>,
     limit: u32,
+    limit_given: bool,
     topk: u32,
     key: bool,
     target: Option<String>,
 }
 
+const USAGE: &str = "usage: sknow-rs lookup DB QUERY [--kind K --namespace N] [--key]
+       sknow-rs search DB QUERY [--limit N | --topk N] [--kind K --namespace N]
+       sknow-rs related DB VALUE --kind K --namespace N [--relation R --limit N]
+       sknow-rs related DB KIND NAMESPACE VALUE [--relation R --kind DSTKIND --limit N]
+       sknow-rs ask DB QUERY [--kind K --namespace N --target-tag-namespace T]
+       sknow-rs inspect DB
+       sknow-rs runtime
+       sknow-rs -h | --help";
+
 fn usage() -> ExitCode {
-    eprintln!("usage: sknow-rs lookup DB QUERY [--kind K --namespace N] [--key]");
-    eprintln!("       sknow-rs search DB QUERY [--topk N --kind K --namespace N]");
-    eprintln!("       sknow-rs related DB KIND NAMESPACE VALUE [--relation R --kind K --limit N]");
-    eprintln!("       sknow-rs ask DB QUERY [--kind K --namespace N --target-tag-namespace T]");
-    eprintln!("       sknow-rs inspect DB");
-    eprintln!("       sknow-rs runtime");
+    eprintln!("{USAGE}");
     ExitCode::from(2)
 }
 
@@ -29,6 +34,10 @@ fn main() -> ExitCode {
     if args.is_empty() {
         return usage();
     }
+    if matches!(args[0].as_str(), "-h" | "--help") {
+        println!("{USAGE}");
+        return ExitCode::SUCCESS;
+    }
     let cmd = args[0].clone();
     let rest: Vec<String> = args[1..].to_vec();
     let mut opt = Opt {
@@ -36,6 +45,7 @@ fn main() -> ExitCode {
         namespace: None,
         relation: None,
         limit: 20,
+        limit_given: false,
         topk: 20,
         key: false,
         target: None,
@@ -69,6 +79,7 @@ fn main() -> ExitCode {
             "--limit" => match rest.get(i + 1).and_then(|v| v.parse().ok()) {
                 Some(v) => {
                     opt.limit = v;
+                    opt.limit_given = true;
                     i += 1;
                 }
                 None => return usage(),
@@ -112,14 +123,32 @@ fn main() -> ExitCode {
         "search" => {
             let (db, query) = two_pos(&pos)?;
             let mut rt = Runtime::open(db)?;
-            Ok(rt.search(
-                query,
-                opt.topk,
-                opt.kind.as_deref(),
-                opt.namespace.as_deref(),
-            )?)
+            // Python CLI surface: `search --limit N` is the result cap.
+            let topk = if opt.limit_given { opt.limit } else { opt.topk };
+            Ok(rt.search(query, topk, opt.kind.as_deref(), opt.namespace.as_deref())?)
         }
         "related" => {
+            if pos.len() == 2 {
+                // Python CLI surface: source key given by --kind/--namespace,
+                // VALUE positional; there is no destination-kind filter.
+                let (kind, namespace) = match (opt.kind.clone(), opt.namespace.clone()) {
+                    (Some(k), Some(n)) => (k, n),
+                    _ => {
+                        return Err(Error::Invalid(
+                            "exact key requires --kind and --namespace".into(),
+                        ))
+                    }
+                };
+                let mut rt = Runtime::open(pos[0].clone())?;
+                return Ok(rt.related(
+                    &kind,
+                    &namespace,
+                    &pos[1],
+                    opt.relation.as_deref(),
+                    None,
+                    opt.limit,
+                )?);
+            }
             if pos.len() < 4 {
                 return Err(Error::Invalid(
                     "related requires KIND NAMESPACE VALUE".into(),

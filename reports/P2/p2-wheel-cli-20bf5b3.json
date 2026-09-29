@@ -1,0 +1,336 @@
+{
+  "started_at_utc": "2026-09-29T13:31:14Z",
+  "snapshot": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+    "sha256": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073"
+  },
+  "code_sha": "889ed9adcc525df977aeed535cef7618e3682875",
+  "wheel": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sakura_knowledge-0.2.0-py3-none-any.whl",
+    "sha256": "726c58f72ab1130a7fdb2e7ad2cd8157caecad1abe100a239a367f06ebb7999f"
+  },
+  "venv_created": {
+    "cmd": [
+      "C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+      "-m",
+      "venv",
+      "--without-pip",
+      "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv"
+    ],
+    "exit": 0
+  },
+  "wheel_installed": {
+    "ensurepip_exit": 0,
+    "pip_install_exit": 0,
+    "pip_stderr_tail": "",
+    "pip_show": "Name: sakura-knowledge\nVersion: 0.2.0\nSummary: Offline evidence-preserving knowledge snapshot core\nHome-page: \nAuthor: \nAuthor-email: \nLicense: \nLocation: D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Lib\\site-packages\nRequires: \nRequired-by:"
+  },
+  "executor": {
+    "python": "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\python.exe",
+    "python_version": "Python 3.14.5",
+    "system_python": "3.14.5",
+    "isolation": "fresh venv, --without-pip, installed only the wheel"
+  },
+  "wheel_cli": {
+    "help": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "--help"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.367,
+      "stdout": "usage: sknow [-h] {inspect,sources,build,verify,lookup,search,related,ask} ...\n\npositional arguments:\n  {inspect,sources,build,verify,lookup,search,related,ask}\n\noptions:\n  -h, --help            show this help message and exit\n",
+      "stderr": ""
+    },
+    "help_short": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "-h"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.289,
+      "stdout": "usage: sknow [-h] {inspect,sources,build,verify,lookup,search,related,ask} ...\n\npositional arguments:\n  {inspect,sources,build,verify,lookup,search,related,ask}\n\noptions:\n  -h, --help            show this help message and exit\n",
+      "stderr": ""
+    },
+    "lookup": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "lookup",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "975"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.31,
+      "stdout": "{\"contract_version\": \"2\", \"snapshot\": \"7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c\", \"query\": \"975\", \"status\": \"ambiguous\", \"entry_key\": null, \"tag_key\": null, \"canonical\": null, \"candidates\": [{\"entry_key\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"975\"}, \"locator\": null, \"descriptions\": [{\"title\": \"オルゴン\", \"original\": \"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\", \"status\": \"source_backed\"}], \"matched_documents\": [{\"title\": \"オルゴン\", \"original\": \"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\", \"status\": \"source_backed\"}], \"aliases\": [], \"identity_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\", \"status\": \"source_backed\", \"type\": \"character\", \"locator\": null, \"payload\": \"{\\\"key\\\": {\\\"kind\\\": \\\"character\\\", \\\"namespace\\\": \\\"bangumi.character\\\", \\\"value\\\": \\\"975\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 975, \\\"role\\\": 1, \\\"infobox\\\": \\\"{{Infobox Crt\\\\r\\\\n|简体中文名=奥尔冈\\\\r\\\\n|声优=斧アツシ\\\\r\\\\n|性别=男（？）\\\\r\\\\n|生日=\\\\r\\\\n|血型=\\\\r\\\\n|身高=\\\\r\\\\n|体重=\\\\r\\\\n|BWH=\\\\r\\\\n}}\\\", \\\"summary\\\": \\\"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\\\", \\\"comments\\\": 0, \\\"collects\\\": 0}}\"}], \"source_fields\": {}, \"source_fields_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\"}], \"matched_by\": \"exact\", \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\", \"citations\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\"}]}, {\"entry_key\": {\"kind\": \"episode\", \"namespace\": \"bangumi.episode\", \"value\": \"975\"}, \"locator\": null, \"descriptions\": [{\"title\": \"探求\", \"original\": \"\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\", \"status\": \"source_backed\"}], \"matched_documents\": [{\"title\": \"探求\", \"original\": \"\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\", \"status\": \"source_backed\"}], \"aliases\": [], \"identity_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\", \"status\": \"source_backed\", \"type\": \"episode\", \"locator\": null, \"payload\": \"{\\\"key\\\": {\\\"kind\\\": \\\"episode\\\", \\\"namespace\\\": \\\"bangumi.episode\\\", \\\"value\\\": \\\"975\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 975, \\\"description\\\": \\\"\\\", \\\"airdate\\\": \\\"\\\", \\\"disc\\\": 0, \\\"duration\\\": \\\"\\\", \\\"subject_id\\\": 903, \\\"sort\\\": 13, \\\"type\\\": 0}}\"}], \"source_fields\": {}, \"source_fields_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-compl...[truncated 15739 bytes]",
+      "stderr": ""
+    },
+    "lookup_key": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "lookup",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "1",
+        "--key",
+        "--kind",
+        "subject",
+        "--namespace",
+        "bangumi.subject"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.289,
+      "stdout": "{\"contract_version\": \"2\", \"snapshot\": \"7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c\", \"query\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"1\"}, \"status\": \"found\", \"entry_key\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"1\"}, \"tag_key\": null, \"canonical\": {\"entry_key\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"1\"}, \"locator\": null, \"descriptions\": [{\"title\": \"第一次的親密接觸\", \"original\": \"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\r\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\r\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\r\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\r\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\r\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\r\\n　　蔡智恆最真實的情感原點\\r\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\r\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\", \"status\": \"source_backed\"}], \"matched_documents\": [{\"title\": \"第一次的親密接觸\", \"original\": \"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\r\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\r\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\r\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\r\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\r\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\r\\n　　蔡智恆最真實的情感原點\\r\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\r\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\", \"status\": \"source_backed\"}], \"aliases\": [], \"identity_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\", \"status\": \"source_backed\", \"type\": \"subject\", \"locator\": null, \"payload\": \"{\\\"key\\\": {\\\"kind\\\": \\\"subject\\\", \\\"namespace\\\": \\\"bangumi.subject\\\", \\\"value\\\": \\\"1\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 1, \\\"type\\\": 1, \\\"infobox\\\": \\\"{{Infobox animanga/Novel\\\\r\\\\n|中文名= 第一次的亲密接触\\\\r\\\\n|别名={\\\\r\\\\n}\\\\r\\\\n|出版社= 紅色文化、知识出版社\\\\r\\\\n|价格= NT$160\\\\r\\\\n|连载杂志= \\\\r\\\\n|发售日= 1998-09-25\\\\r\\\\n|册数= \\\\r\\\\n|页数= 188\\\\r\\\\n|话数= \\\\r\\\\n|ISBN= 9789577086709\\\\r\\\\n|其他= \\\\r\\\\n|作者= 蔡智恒\\\\r\\\\n|ISBN-10= 9577086705\\\\r\\\\n}}\\\", \\\"platform\\\": 1002, \\\"summary\\\": \\\"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\\\r\\\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\\\r\\\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\\\r\\\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\\\r\\\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\\\r\\\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\\\r\\\\n　　蔡智恆最真實的情感原點\\\\r\\\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\\\r\\\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\\\", \\\"nsfw\\\": false, \\\"tags\\\": [{\\\"name\\\": \\\"痞子蔡\\\", \\\"count\\\": 24}, {\\\"name\\\": \\\"小说\\\", \\\"count\\\": 16}, {\\\"name\\\": \\\"爱情\\\", \\\"count\\\": 15}, {\\\"name\\\": \\\"轻舞飞扬\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"台湾\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"蔡智恒\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"国产\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"网络小说\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"经典\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"三次元\\\", \\\"count\\\": 5}, {\\\"name\\\": \\\"1999\\\", \\\"count\\\": 4}], \\\"meta_tags\\\": [], \\\"score\\\": 7.7, \\\"score_details\\\": {\\\"1\\\": 1, \\\"2\\\": 0, \\\"3\\\": 1, \\\"4\\\": 0, \\\"5\\\": 0, \\\"6\\\": 10, \\\"7\\\": 18, \\\"8\\\": 39, \\\"9\\\": 11, \\\"10\\\": 6}, \\\"rank\\\": 1913, \\\"date\\\": \\\"1998-09-25\\\", \\\"favorite\\\": {\\\"wish\\\": 57, \\\"done\\\": 128, \\\"doing\\\": 6, \\\"on_hold\\\": 8, \\\"dropped\\\": 2}, \\\"series\\\": false}}\"}], \"source_fields\": {}, \"source_fields_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\"}], \"matched_by\": \"exact\", \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\", \"citations\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\"}]}, \"candidates\": [{\"entry_key\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"1\"}, \"locator\": null, \"descriptions\": [{\"title\": ...[truncated 9158 bytes]",
+      "stderr": ""
+    },
+    "search": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "search",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "heavy",
+        "--limit",
+        "10"
+      ],
+      "exit": 0,
+      "elapsed_s": 1.603,
+      "stdout": "{\"contract_version\": \"2\", \"snapshot\": \"7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c\", \"query\": \"heavy\", \"status\": \"ambiguous\", \"entry_key\": null, \"tag_key\": null, \"canonical\": null, \"candidates\": [{\"entry_key\": {\"kind\": \"page\", \"namespace\": \"danbooru.wiki\", \"value\": \"24198\"}, \"locator\": null, \"descriptions\": [{\"title\": \"heavy\", \"original\": \"When an item or a character's weight is depicted as overwhelming to the load-bearing thing or character.\\r\\n\\r\\nh4. Examples\\r\\n\\r\\n* !post #5866720: Character struggling to lift a weapon\\r\\n* !post #9948630: Character struggling to carry another character\\r\\n* !post #6680961: Character breaking a chair due to being heavy\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"danbooru-complete-a26a3829dd42\", \"evidence_id\": \"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\", \"status\": \"source_backed\"}], \"matched_documents\": [{\"title\": \"heavy\", \"original\": \"When an item or a character's weight is depicted as overwhelming to the load-bearing thing or character.\\r\\n\\r\\nh4. Examples\\r\\n\\r\\n* !post #5866720: Character struggling to lift a weapon\\r\\n* !post #9948630: Character struggling to carry another character\\r\\n* !post #6680961: Character breaking a chair due to being heavy\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"danbooru-complete-a26a3829dd42\", \"evidence_id\": \"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\", \"status\": \"source_backed\"}], \"aliases\": [{\"text\": \"heavy\", \"source_id\": \"danbooru-complete-a26a3829dd42\", \"evidence_id\": \"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\", \"status\": \"source_backed\"}], \"identity_evidence\": [{\"source_id\": \"danbooru-complete-a26a3829dd42\", \"evidence_id\": \"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\", \"status\": \"source_backed\", \"type\": \"page\", \"locator\": null, \"payload\": \"{\\\"key\\\": {\\\"kind\\\": \\\"page\\\", \\\"namespace\\\": \\\"danbooru.wiki\\\", \\\"value\\\": \\\"24198\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"raw_page_metadata\\\": {\\\"id\\\": 24198, \\\"title\\\": \\\"heavy\\\", \\\"other_names\\\": [], \\\"is_locked\\\": false, \\\"is_deleted\\\": false, \\\"created_at\\\": \\\"2010-12-25T04:18:37.372-05:00\\\", \\\"updated_at\\\": \\\"2025-09-21T02:19:29.304-04:00\\\"}}}\"}], \"source_fields\": {}, \"source_fields_evidence\": [{\"source_id\": \"danbooru-complete-a26a3829dd42\", \"evidence_id\": \"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\"}], \"matched_by\": \"alias\", \"source_id\": \"danbooru-complete-a26a3829dd42\", \"evidence_id\": \"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\", \"citations\": [{\"source_id\": \"danbooru-complete-a26a3829dd42\", \"evidence_id\": \"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\"}]}, {\"entry_key\": {\"kind\": \"page\", \"namespace\": \"danbooru.wiki\", \"value\": \"273391\"}, \"locator\": null, \"descriptions\": [{\"title\": \"heavy_(metal_family)\", \"original\": \"Heavy is one of the main characters in the animated web series [[Metal Family]]\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"danbooru-complete-a26a3829dd42\", \"evidence_id\": \"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:263484\", \"status\": \"source_backed\"}], \"matched_documents\": [{\"title\": \"heavy_(metal_family)\", \"original\": \"Heavy is one of the main characters in the animated web series [[Metal Family]]\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"danbooru-complete-a26a3829dd42\", \"evidence_id\": \"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:263484\", \"status\": \"source_backed\"}], \"aliases\": [{\"text\": \"heavy\", \"source_id\": \"danb...[truncated 25677 bytes]",
+      "stderr": ""
+    },
+    "related": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "related",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "1",
+        "--kind",
+        "subject",
+        "--namespace",
+        "bangumi.subject",
+        "--limit",
+        "10"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.292,
+      "stdout": "{\"contract_version\": \"2\", \"snapshot\": \"7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c\", \"query\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"1\"}, \"status\": \"found\", \"entry_key\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"1\"}, \"tag_key\": null, \"canonical\": {\"entry_key\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"1\"}, \"locator\": null, \"descriptions\": [{\"title\": \"第一次的親密接觸\", \"original\": \"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\r\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\r\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\r\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\r\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\r\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\r\\n　　蔡智恆最真實的情感原點\\r\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\r\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\", \"status\": \"source_backed\"}], \"matched_documents\": [{\"title\": \"第一次的親密接觸\", \"original\": \"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\r\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\r\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\r\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\r\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\r\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\r\\n　　蔡智恆最真實的情感原點\\r\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\r\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\", \"status\": \"source_backed\"}], \"aliases\": [], \"identity_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\", \"status\": \"source_backed\", \"type\": \"subject\", \"locator\": null, \"payload\": \"{\\\"key\\\": {\\\"kind\\\": \\\"subject\\\", \\\"namespace\\\": \\\"bangumi.subject\\\", \\\"value\\\": \\\"1\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 1, \\\"type\\\": 1, \\\"infobox\\\": \\\"{{Infobox animanga/Novel\\\\r\\\\n|中文名= 第一次的亲密接触\\\\r\\\\n|别名={\\\\r\\\\n}\\\\r\\\\n|出版社= 紅色文化、知识出版社\\\\r\\\\n|价格= NT$160\\\\r\\\\n|连载杂志= \\\\r\\\\n|发售日= 1998-09-25\\\\r\\\\n|册数= \\\\r\\\\n|页数= 188\\\\r\\\\n|话数= \\\\r\\\\n|ISBN= 9789577086709\\\\r\\\\n|其他= \\\\r\\\\n|作者= 蔡智恒\\\\r\\\\n|ISBN-10= 9577086705\\\\r\\\\n}}\\\", \\\"platform\\\": 1002, \\\"summary\\\": \\\"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\\\r\\\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\\\r\\\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\\\r\\\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\\\r\\\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\\\r\\\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\\\r\\\\n　　蔡智恆最真實的情感原點\\\\r\\\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\\\r\\\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\\\", \\\"nsfw\\\": false, \\\"tags\\\": [{\\\"name\\\": \\\"痞子蔡\\\", \\\"count\\\": 24}, {\\\"name\\\": \\\"小说\\\", \\\"count\\\": 16}, {\\\"name\\\": \\\"爱情\\\", \\\"count\\\": 15}, {\\\"name\\\": \\\"轻舞飞扬\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"台湾\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"蔡智恒\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"国产\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"网络小说\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"经典\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"三次元\\\", \\\"count\\\": 5}, {\\\"name\\\": \\\"1999\\\", \\\"count\\\": 4}], \\\"meta_tags\\\": [], \\\"score\\\": 7.7, \\\"score_details\\\": {\\\"1\\\": 1, \\\"2\\\": 0, \\\"3\\\": 1, \\\"4\\\": 0, \\\"5\\\": 0, \\\"6\\\": 10, \\\"7\\\": 18, \\\"8\\\": 39, \\\"9\\\": 11, \\\"10\\\": 6}, \\\"rank\\\": 1913, \\\"date\\\": \\\"1998-09-25\\\", \\\"favorite\\\": {\\\"wish\\\": 57, \\\"done\\\": 128, \\\"doing\\\": 6, \\\"on_hold\\\": 8, \\\"dropped\\\": 2}, \\\"series\\\": false}}\"}], \"source_fields\": {}, \"source_fields_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\"}], \"matched_by\": \"exact\", \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\", \"citations\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\"}]}, \"candidates\": [{\"entry_key\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"1\"}, \"locator\": null, \"descriptions\": [{\"title\": ...[truncated 11546 bytes]",
+      "stderr": ""
+    },
+    "ask": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "ask",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "975 的标签是什么"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.299,
+      "stdout": "{\"contract_version\": \"2\", \"snapshot\": \"7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c\", \"query\": \"975\", \"status\": \"entity_ambiguous\", \"entry_key\": null, \"tag_key\": null, \"canonical\": null, \"candidates\": [{\"entry_key\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"975\"}, \"locator\": null, \"descriptions\": [{\"title\": \"オルゴン\", \"original\": \"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\", \"status\": \"source_backed\"}], \"matched_documents\": [{\"title\": \"オルゴン\", \"original\": \"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\", \"status\": \"source_backed\"}], \"aliases\": [], \"identity_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\", \"status\": \"source_backed\", \"type\": \"character\", \"locator\": null, \"payload\": \"{\\\"key\\\": {\\\"kind\\\": \\\"character\\\", \\\"namespace\\\": \\\"bangumi.character\\\", \\\"value\\\": \\\"975\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 975, \\\"role\\\": 1, \\\"infobox\\\": \\\"{{Infobox Crt\\\\r\\\\n|简体中文名=奥尔冈\\\\r\\\\n|声优=斧アツシ\\\\r\\\\n|性别=男（？）\\\\r\\\\n|生日=\\\\r\\\\n|血型=\\\\r\\\\n|身高=\\\\r\\\\n|体重=\\\\r\\\\n|BWH=\\\\r\\\\n}}\\\", \\\"summary\\\": \\\"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\\\", \\\"comments\\\": 0, \\\"collects\\\": 0}}\"}], \"source_fields\": {}, \"source_fields_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\"}], \"matched_by\": \"exact\", \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\", \"citations\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\"}]}, {\"entry_key\": {\"kind\": \"episode\", \"namespace\": \"bangumi.episode\", \"value\": \"975\"}, \"locator\": null, \"descriptions\": [{\"title\": \"探求\", \"original\": \"\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\", \"status\": \"source_backed\"}], \"matched_documents\": [{\"title\": \"探求\", \"original\": \"\", \"response_truncated\": 0, \"search_text_truncated\": 0, \"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\", \"status\": \"source_backed\"}], \"aliases\": [], \"identity_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\", \"status\": \"source_backed\", \"type\": \"episode\", \"locator\": null, \"payload\": \"{\\\"key\\\": {\\\"kind\\\": \\\"episode\\\", \\\"namespace\\\": \\\"bangumi.episode\\\", \\\"value\\\": \\\"975\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 975, \\\"description\\\": \\\"\\\", \\\"airdate\\\": \\\"\\\", \\\"disc\\\": 0, \\\"duration\\\": \\\"\\\", \\\"subject_id\\\": 903, \\\"sort\\\": 13, \\\"type\\\": 0}}\"}], \"source_fields\": {}, \"source_fields_evidence\": [{\"source_id\": \"bangumi-complete-6a75aefb769a\", \"evidence_id\": \"bangum...[truncated 15956 bytes]",
+      "stderr": ""
+    },
+    "ask_danbooru": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "ask",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "碧蓝航线:响 的 Danbooru tag 是什么"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.312,
+      "stdout": "{\"contract_version\": \"2\", \"snapshot\": \"7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c\", \"query\": \"碧蓝航线:响\", \"status\": \"entity_found_tag_unmapped\", \"entry_key\": {\"kind\": \"character\", \"namespace\": \"moegirl.character\", \"value\": \"碧蓝航线:响\"}, \"tag_key\": null, \"canonical\": {\"entry_key\": {\"kind\": \"character\", \"namespace\": \"moegirl.character\", \"value\": \"碧蓝航线:响\"}, \"locator\": null, \"descriptions\": [], \"matched_documents\": [], \"aliases\": [], \"identity_evidence\": [{\"source_id\": \"moegirl-complete-5072f7cf3e3e\", \"evidence_id\": \"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\", \"status\": \"source_backed\", \"type\": \"character\", \"locator\": null, \"payload\": \"{\\\"key\\\": {\\\"kind\\\": \\\"character\\\", \\\"namespace\\\": \\\"moegirl.character\\\", \\\"value\\\": \\\"碧蓝航线:响\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"extra_processed\\\": {\\\"本名\\\": [\\\"响\\\"], \\\"别名\\\": [\\\"栀\\\", \\\"信赖\\\", \\\"\\\\\\\"不死鸟\\\\\\\"\\\", \\\"响爷\\\"], \\\"声优\\\": [], \\\"image\\\": [{\\\"alt\\\": \\\"P站ID：[https://www.pixiv.net/artworks/82354313 82354313] 作者：光太郎☆\\\", \\\"url\\\": \\\"File:BLHX_82354313_p0.jpg\\\"}], \\\"发色\\\": [\\\"灰\\\"], \\\"瞳色\\\": [\\\"红\\\"], \\\"萌点\\\": [\\\"长发\\\", \\\"白丝\\\", \\\"长筒袜\\\", \\\"过膝袜\\\", \\\"呆毛\\\", \\\"白发红眼\\\", \\\"超短裙\\\", \\\"露脐装\\\", \\\"绝对领域\\\", \\\"萝莉\\\", \\\"角\\\", \\\"怪力女\\\", \\\"元气\\\"], \\\"生日\\\": [null, 6, 16]}, \\\"raw_attributes\\\": [\\\"萝莉\\\", \\\"怪力女\\\", \\\"银发\\\", \\\"红瞳\\\", \\\"长发\\\", \\\"呆毛\\\", \\\"双角\\\", \\\"元气\\\", \\\"绝对领域\\\", \\\"露脐装\\\", \\\"白色过膝袜\\\"], \\\"raw_subject_categories\\\": [\\\"中国作品\\\", \\\"碧蓝航线\\\", \\\"碧蓝航线角色\\\", \\\"碧蓝航线舰船\\\", \\\"碧蓝航线换装主题\\\", \\\"碧蓝航线换装:新年和服\\\", \\\"碧蓝航线舰船稀有度\\\", \\\"碧蓝航线精锐舰船\\\", \\\"碧蓝航线舰船阵营\\\", \\\"碧蓝航线重樱舰船\\\", \\\"碧蓝航线舰种\\\", \\\"碧蓝航线驱逐\\\"], \\\"raw_cv_names\\\": [\\\"内田真礼\\\"], \\\"raw_gender\\\": \\\"female\\\"}}\"}], \"source_fields\": {\"raw_attributes\": [\"萝莉\", \"怪力女\", \"银发\", \"红瞳\", \"长发\", \"呆毛\", \"双角\", \"元气\", \"绝对领域\", \"露脐装\", \"白色过膝袜\"], \"raw_subject_categories\": [\"中国作品\", \"碧蓝航线\", \"碧蓝航线角色\", \"碧蓝航线舰船\", \"碧蓝航线换装主题\", \"碧蓝航线换装:新年和服\", \"碧蓝航线舰船稀有度\", \"碧蓝航线精锐舰船\", \"碧蓝航线舰船阵营\", \"碧蓝航线重樱舰船\", \"碧蓝航线舰种\", \"碧蓝航线驱逐\"], \"raw_cv_names\": [\"内田真礼\"], \"raw_gender\": \"female\"}, \"source_fields_evidence\": [{\"source_id\": \"moegirl-complete-5072f7cf3e3e\", \"evidence_id\": \"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\"}], \"matched_by\": \"exact\", \"source_id\": \"moegirl-complete-5072f7cf3e3e\", \"evidence_id\": \"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\", \"citations\": [{\"source_id\": \"moegirl-complete-5072f7cf3e3e\", \"evidence_id\": \"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\"}]}, \"candidates\": [{\"entry_key\": {\"kind\": \"character\", \"namespace\": \"moegirl.character\", \"value\": \"碧蓝航线:响\"}, \"locator\": null, \"descriptions\": [], \"matched_documents\": [], \"aliases\": [], \"identity_evidence\": [{\"source_id\": \"moegirl-complete-5072f7cf3e3e\", \"evidence_id\": \"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\", \"status\": \"source_backed\", \"type\": \"character\", \"locator\": null, \"payload\": \"{\\\"key\\\": {\\\"kind\\\": \\\"character\\\", \\\"namespace\\\": \\\"moegirl.character\\\", \\\"value\\\": \\\"碧蓝航线:响\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"extra_processed\\\": {\\\"本名\\\": [\\\"响\\\"], \\\"别名\\\": [\\\"栀\\\", \\\"信赖\\\", \\\"\\\\\\\"不死鸟\\\\\\\"\\\", \\\"响爷\\\"], \\\"声优\\\": [], \\\"image\\\": [{\\\"alt\\\": \\\"P站ID：[https://www.pixiv.net/artworks/82354313 82354313] 作者：光太郎☆\\\", \\\"url\\\": \\\"File:BLHX_82354313_p0.jpg\\\"}], \\\"发色\\\": [\\\"灰\\\"], \\\"瞳色\\\": [\\\"红\\\"], \\\"萌点\\\": [\\\"长发\\\", \\\"白丝\\\", \\\"长筒袜\\\", \\\"过膝袜\\\", \\\"呆毛\\\", \\\"白发红眼\\\", \\\"超短裙\\\", \\\"露脐装\\\", \\\"绝对领域\\\", \\\"萝莉\\\", \\\"角\\\", \\\"怪力女\\\", \\\"元气\\\"], \\\"生日\\\": [null, 6, 16]}, \\\"raw_attributes\\\": [\\\"萝莉\\\", \\\"怪力女\\\", \\\"银发\\\", \\\"红瞳\\\", \\\"长发\\\", \\\"呆毛\\\", \\\"双角\\\", \\\"元气\\\", \\\"绝对领域\\\", \\\"露脐装\\\", \\\"白色过膝袜\\\"], \\\"raw_subject_categories\\\": [\\\"中国作品\\\", \\\"碧蓝航线\\\", \\\"碧蓝航线角色\\\", \\\"碧蓝航线舰船\\\", \\\"碧蓝航线换装主题\\\", \\\"碧蓝航线换装:新年和服\\\", \\\"碧蓝航线舰船稀有度\\\", \\\"碧蓝航线精锐舰船\\\", \\\"碧蓝航线舰船阵营\\\", \\\"碧蓝航线重樱舰船\\\", \\\"碧蓝航线舰种\\\", \\\"碧蓝航线驱逐\\\"], \\\"raw_cv_names\\\": [\\\"内田真礼\\\"], \\\"raw_gender\\\": \\\"female\\\"}}\"}], \"source_fields\": {\"raw_attributes\": [\"萝莉\", \"怪力女\", \"银发\", \"红瞳\", \"长发\", \"呆毛\", \"双角\", \"元气\", \"...[truncated 6051 bytes]",
+      "stderr": ""
+    },
+    "error_topk": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "search",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "one piece",
+        "--limit",
+        "0"
+      ],
+      "exit": 2,
+      "elapsed_s": 0.294,
+      "stdout": "",
+      "stderr": "{\"error\": \"ValueError\", \"message\": \"topk must be 1..100\"}\n"
+    },
+    "error_missing_db": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "lookup",
+        "D:\\SakuraTool\\SakuraKnowledge\\no_such.db",
+        "x"
+      ],
+      "exit": 2,
+      "elapsed_s": 0.287,
+      "stdout": "",
+      "stderr": "{\"error\": \"OperationalError\", \"message\": \"unable to open database file\"}\n"
+    },
+    "error_unknown_op": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "frobnicate"
+      ],
+      "exit": 2,
+      "elapsed_s": 0.288,
+      "stdout": "",
+      "stderr": "usage: sknow [-h] {inspect,sources,build,verify,lookup,search,related,ask} ...\nsknow: error: argument command: invalid choice: 'frobnicate' (choose from 'inspect', 'sources', 'build', 'verify', 'lookup', 'search', 'related', 'ask')\n"
+    }
+  },
+  "rust_distribution": {
+    "source_tree_binary": "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\release\\sknow-rs.exe",
+    "distribution_dir": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64",
+    "outside_source_tree": true,
+    "binary_sha256": "c897c093b5299ae99bd5938dc306a81828e5a390d0ccfd01e51f97e6287c9e0b",
+    "source_sha256_matches": true
+  },
+  "rust_cli": {
+    "help": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "--help"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.217,
+      "stdout": "usage: sknow-rs lookup DB QUERY [--kind K --namespace N] [--key]\n       sknow-rs search DB QUERY [--limit N | --topk N] [--kind K --namespace N]\n       sknow-rs related DB VALUE --kind K --namespace N [--relation R --limit N]\n       sknow-rs related DB KIND NAMESPACE VALUE [--relation R --kind DSTKIND --limit N]\n       sknow-rs ask DB QUERY [--kind K --namespace N --target-tag-namespace T]\n       sknow-rs inspect DB\n       sknow-rs runtime\n       sknow-rs -h | --help\n",
+      "stderr": ""
+    },
+    "help_short": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "-h"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.048,
+      "stdout": "usage: sknow-rs lookup DB QUERY [--kind K --namespace N] [--key]\n       sknow-rs search DB QUERY [--limit N | --topk N] [--kind K --namespace N]\n       sknow-rs related DB VALUE --kind K --namespace N [--relation R --limit N]\n       sknow-rs related DB KIND NAMESPACE VALUE [--relation R --kind DSTKIND --limit N]\n       sknow-rs ask DB QUERY [--kind K --namespace N --target-tag-namespace T]\n       sknow-rs inspect DB\n       sknow-rs runtime\n       sknow-rs -h | --help\n",
+      "stderr": ""
+    },
+    "lookup": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "lookup",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "975"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.062,
+      "stdout": "{\"candidates\":[{\"aliases\":[],\"citations\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"descriptions\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"original\":\"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"オルゴン\"}],\"entry_key\":{\"kind\":\"character\",\"namespace\":\"bangumi.character\",\"value\":\"975\"},\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"identity_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"locator\":null,\"payload\":\"{\\\"key\\\": {\\\"kind\\\": \\\"character\\\", \\\"namespace\\\": \\\"bangumi.character\\\", \\\"value\\\": \\\"975\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 975, \\\"role\\\": 1, \\\"infobox\\\": \\\"{{Infobox Crt\\\\r\\\\n|简体中文名=奥尔冈\\\\r\\\\n|声优=斧アツシ\\\\r\\\\n|性别=男（？）\\\\r\\\\n|生日=\\\\r\\\\n|血型=\\\\r\\\\n|身高=\\\\r\\\\n|体重=\\\\r\\\\n|BWH=\\\\r\\\\n}}\\\", \\\"summary\\\": \\\"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\\\", \\\"comments\\\": 0, \\\"collects\\\": 0}}\",\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"type\":\"character\"}],\"locator\":null,\"matched_by\":\"exact\",\"matched_documents\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"original\":\"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"オルゴン\"}],\"source_fields\":{},\"source_fields_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"source_id\":\"bangumi-complete-6a75aefb769a\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"descriptions\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\",\"original\":\"\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"探求\"}],\"entry_key\":{\"kind\":\"episode\",\"namespace\":\"bangumi.episode\",\"value\":\"975\"},\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\",\"identity_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\",\"locator\":null,\"payload\":\"{\\\"key\\\": {\\\"kind\\\": \\\"episode\\\", \\\"namespace\\\": \\\"bangumi.episode\\\", \\\"value\\\": \\\"975\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 975, \\\"description\\\": \\\"\\\", \\\"airdate\\\": \\\"\\\", \\\"disc\\\": 0, \\\"duration\\\": \\\"\\\", \\\"subject_id\\\": 903, \\\"sort\\\": 13, \\\"type\\\": 0}}\",\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"type\":\"episode\"}],\"locator\":null,\"matched_by\":\"exact\",\"matched_documents\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\",\"original\":\"\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"探求\"}],\"source_fields\":{},\"source_fields_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769...[truncated 15493 bytes]",
+      "stderr": ""
+    },
+    "lookup_key": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "lookup",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "1",
+        "--key",
+        "--kind",
+        "subject",
+        "--namespace",
+        "bangumi.subject"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.061,
+      "stdout": "{\"candidates\":[{\"aliases\":[],\"citations\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"descriptions\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"original\":\"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\r\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\r\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\r\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\r\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\r\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\r\\n　　蔡智恆最真實的情感原點\\r\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\r\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"第一次的親密接觸\"}],\"entry_key\":{\"kind\":\"subject\",\"namespace\":\"bangumi.subject\",\"value\":\"1\"},\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"identity_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"locator\":null,\"payload\":\"{\\\"key\\\": {\\\"kind\\\": \\\"subject\\\", \\\"namespace\\\": \\\"bangumi.subject\\\", \\\"value\\\": \\\"1\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 1, \\\"type\\\": 1, \\\"infobox\\\": \\\"{{Infobox animanga/Novel\\\\r\\\\n|中文名= 第一次的亲密接触\\\\r\\\\n|别名={\\\\r\\\\n}\\\\r\\\\n|出版社= 紅色文化、知识出版社\\\\r\\\\n|价格= NT$160\\\\r\\\\n|连载杂志= \\\\r\\\\n|发售日= 1998-09-25\\\\r\\\\n|册数= \\\\r\\\\n|页数= 188\\\\r\\\\n|话数= \\\\r\\\\n|ISBN= 9789577086709\\\\r\\\\n|其他= \\\\r\\\\n|作者= 蔡智恒\\\\r\\\\n|ISBN-10= 9577086705\\\\r\\\\n}}\\\", \\\"platform\\\": 1002, \\\"summary\\\": \\\"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\\\r\\\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\\\r\\\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\\\r\\\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\\\r\\\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\\\r\\\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\\\r\\\\n　　蔡智恆最真實的情感原點\\\\r\\\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\\\r\\\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\\\", \\\"nsfw\\\": false, \\\"tags\\\": [{\\\"name\\\": \\\"痞子蔡\\\", \\\"count\\\": 24}, {\\\"name\\\": \\\"小说\\\", \\\"count\\\": 16}, {\\\"name\\\": \\\"爱情\\\", \\\"count\\\": 15}, {\\\"name\\\": \\\"轻舞飞扬\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"台湾\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"蔡智恒\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"国产\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"网络小说\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"经典\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"三次元\\\", \\\"count\\\": 5}, {\\\"name\\\": \\\"1999\\\", \\\"count\\\": 4}], \\\"meta_tags\\\": [], \\\"score\\\": 7.7, \\\"score_details\\\": {\\\"1\\\": 1, \\\"2\\\": 0, \\\"3\\\": 1, \\\"4\\\": 0, \\\"5\\\": 0, \\\"6\\\": 10, \\\"7\\\": 18, \\\"8\\\": 39, \\\"9\\\": 11, \\\"10\\\": 6}, \\\"rank\\\": 1913, \\\"date\\\": \\\"1998-09-25\\\", \\\"favorite\\\": {\\\"wish\\\": 57, \\\"done\\\": 128, \\\"doing\\\": 6, \\\"on_hold\\\": 8, \\\"dropped\\\": 2}, \\\"series\\\": false}}\",\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"type\":\"subject\"}],\"locator\":null,\"matched_by\":\"exact\",\"matched_documents\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"original\":\"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\r\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\r\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\r\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\r\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\r\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\r\\n　　蔡智恆最真實的情感原點\\r\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\r\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"第一次的親密接觸\"}],\"source_fields\":{},\"source_fields_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"canonical\":{\"aliases\":[],\"citations\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"descriptions\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"original\":\"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\r\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\r\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\r\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\r\\n　　PH值小於7的微酸心情，讓十年後的痞...[truncated 8987 bytes]",
+      "stderr": ""
+    },
+    "search": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "search",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "heavy",
+        "--limit",
+        "10"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.198,
+      "stdout": "{\"candidates\":[{\"aliases\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\",\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"text\":\"heavy\"}],\"citations\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"descriptions\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\",\"original\":\"When an item or a character's weight is depicted as overwhelming to the load-bearing thing or character.\\r\\n\\r\\nh4. Examples\\r\\n\\r\\n* !post #5866720: Character struggling to lift a weapon\\r\\n* !post #9948630: Character struggling to carry another character\\r\\n* !post #6680961: Character breaking a chair due to being heavy\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"heavy\"}],\"entry_key\":{\"kind\":\"page\",\"namespace\":\"danbooru.wiki\",\"value\":\"24198\"},\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\",\"identity_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\",\"locator\":null,\"payload\":\"{\\\"key\\\": {\\\"kind\\\": \\\"page\\\", \\\"namespace\\\": \\\"danbooru.wiki\\\", \\\"value\\\": \\\"24198\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"raw_page_metadata\\\": {\\\"id\\\": 24198, \\\"title\\\": \\\"heavy\\\", \\\"other_names\\\": [], \\\"is_locked\\\": false, \\\"is_deleted\\\": false, \\\"created_at\\\": \\\"2010-12-25T04:18:37.372-05:00\\\", \\\"updated_at\\\": \\\"2025-09-21T02:19:29.304-04:00\\\"}}}\",\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"type\":\"page\"}],\"locator\":null,\"matched_by\":\"alias\",\"matched_documents\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\",\"original\":\"When an item or a character's weight is depicted as overwhelming to the load-bearing thing or character.\\r\\n\\r\\nh4. Examples\\r\\n\\r\\n* !post #5866720: Character struggling to lift a weapon\\r\\n* !post #9948630: Character struggling to carry another character\\r\\n* !post #6680961: Character breaking a chair due to being heavy\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"heavy\"}],\"source_fields\":{},\"source_fields_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:18499\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"source_id\":\"danbooru-complete-a26a3829dd42\"},{\"aliases\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:263484\",\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"text\":\"heavy\"}],\"citations\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:263484\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"descriptions\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:263484\",\"original\":\"Heavy is one of the main characters in the animated web series [[Metal Family]]\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"heavy_(metal_family)\"}],\"entry_key\":{\"kind\":\"page\",\"namespace\":\"danbooru.wiki\",\"value\":\"273391\"},\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:263484\",\"identity_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:263484\",\"locator\":null,\"payload\":\"{\\\"key\\\": {\\\"kind\\\": \\\"page\\\", \\\"namespace\\\": ...[truncated 25033 bytes]",
+      "stderr": ""
+    },
+    "related": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "related",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "1",
+        "--kind",
+        "subject",
+        "--namespace",
+        "bangumi.subject",
+        "--limit",
+        "10"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.055,
+      "stdout": "{\"candidates\":[{\"aliases\":[],\"citations\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"descriptions\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"original\":\"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\r\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\r\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\r\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\r\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\r\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\r\\n　　蔡智恆最真實的情感原點\\r\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\r\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"第一次的親密接觸\"}],\"entry_key\":{\"kind\":\"subject\",\"namespace\":\"bangumi.subject\",\"value\":\"1\"},\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"identity_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"locator\":null,\"payload\":\"{\\\"key\\\": {\\\"kind\\\": \\\"subject\\\", \\\"namespace\\\": \\\"bangumi.subject\\\", \\\"value\\\": \\\"1\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 1, \\\"type\\\": 1, \\\"infobox\\\": \\\"{{Infobox animanga/Novel\\\\r\\\\n|中文名= 第一次的亲密接触\\\\r\\\\n|别名={\\\\r\\\\n}\\\\r\\\\n|出版社= 紅色文化、知识出版社\\\\r\\\\n|价格= NT$160\\\\r\\\\n|连载杂志= \\\\r\\\\n|发售日= 1998-09-25\\\\r\\\\n|册数= \\\\r\\\\n|页数= 188\\\\r\\\\n|话数= \\\\r\\\\n|ISBN= 9789577086709\\\\r\\\\n|其他= \\\\r\\\\n|作者= 蔡智恒\\\\r\\\\n|ISBN-10= 9577086705\\\\r\\\\n}}\\\", \\\"platform\\\": 1002, \\\"summary\\\": \\\"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\\\r\\\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\\\r\\\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\\\r\\\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\\\r\\\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\\\r\\\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\\\r\\\\n　　蔡智恆最真實的情感原點\\\\r\\\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\\\r\\\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\\\", \\\"nsfw\\\": false, \\\"tags\\\": [{\\\"name\\\": \\\"痞子蔡\\\", \\\"count\\\": 24}, {\\\"name\\\": \\\"小说\\\", \\\"count\\\": 16}, {\\\"name\\\": \\\"爱情\\\", \\\"count\\\": 15}, {\\\"name\\\": \\\"轻舞飞扬\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"台湾\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"蔡智恒\\\", \\\"count\\\": 11}, {\\\"name\\\": \\\"国产\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"网络小说\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"经典\\\", \\\"count\\\": 6}, {\\\"name\\\": \\\"三次元\\\", \\\"count\\\": 5}, {\\\"name\\\": \\\"1999\\\", \\\"count\\\": 4}], \\\"meta_tags\\\": [], \\\"score\\\": 7.7, \\\"score_details\\\": {\\\"1\\\": 1, \\\"2\\\": 0, \\\"3\\\": 1, \\\"4\\\": 0, \\\"5\\\": 0, \\\"6\\\": 10, \\\"7\\\": 18, \\\"8\\\": 39, \\\"9\\\": 11, \\\"10\\\": 6}, \\\"rank\\\": 1913, \\\"date\\\": \\\"1998-09-25\\\", \\\"favorite\\\": {\\\"wish\\\": 57, \\\"done\\\": 128, \\\"doing\\\": 6, \\\"on_hold\\\": 8, \\\"dropped\\\": 2}, \\\"series\\\": false}}\",\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"type\":\"subject\"}],\"locator\":null,\"matched_by\":\"exact\",\"matched_documents\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"original\":\"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\r\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\r\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\r\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\r\\n　　PH值小於7的微酸心情，讓十年後的痞子蔡告訴你。\\r\\n　　一場最美麗的網路解逅，當痞子蔡遇見輕舞飛揚……\\r\\n　　蔡智恆最真實的情感原點\\r\\n　　痞子蔡與輕舞飛揚一起記錄的甜蜜日子\\r\\n　　一則發生在成大校園的純愛故事，網路上一再被轉載的熱門小說。\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"第一次的親密接觸\"}],\"source_fields\":{},\"source_fields_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"canonical\":{\"aliases\":[],\"citations\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"descriptions\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1\",\"original\":\"　　風靡華人世界的網戀小說經典，暢銷紀錄超過百萬冊！\\r\\n　　有最初的《第一次的親密接觸》，才有今日網路文學。\\r\\n　　蔡智恆的最新作品《暖暖》，提升你的戀愛幸福溫度。\\r\\n　　紀念版收錄蔡智恆醞釀十年，最溫柔的純愛萬語宣言。\\r\\n　　PH值小於7的微酸心情，讓十年後的痞...[truncated 11319 bytes]",
+      "stderr": ""
+    },
+    "ask": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "ask",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "975 的标签是什么"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.077,
+      "stdout": "{\"answer\":\"Multiple source entity matches; specify a source key.\",\"candidates\":[{\"aliases\":[],\"citations\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"descriptions\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"original\":\"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"オルゴン\"}],\"entry_key\":{\"kind\":\"character\",\"namespace\":\"bangumi.character\",\"value\":\"975\"},\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"identity_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"locator\":null,\"payload\":\"{\\\"key\\\": {\\\"kind\\\": \\\"character\\\", \\\"namespace\\\": \\\"bangumi.character\\\", \\\"value\\\": \\\"975\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 975, \\\"role\\\": 1, \\\"infobox\\\": \\\"{{Infobox Crt\\\\r\\\\n|简体中文名=奥尔冈\\\\r\\\\n|声优=斧アツシ\\\\r\\\\n|性别=男（？）\\\\r\\\\n|生日=\\\\r\\\\n|血型=\\\\r\\\\n|身高=\\\\r\\\\n|体重=\\\\r\\\\n|BWH=\\\\r\\\\n}}\\\", \\\"summary\\\": \\\"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\\\", \\\"comments\\\": 0, \\\"collects\\\": 0}}\",\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"type\":\"character\"}],\"locator\":null,\"matched_by\":\"exact\",\"matched_documents\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"original\":\"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"オルゴン\"}],\"source_fields\":{},\"source_fields_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"source_id\":\"bangumi-complete-6a75aefb769a\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"descriptions\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\",\"original\":\"\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"探求\"}],\"entry_key\":{\"kind\":\"episode\",\"namespace\":\"bangumi.episode\",\"value\":\"975\"},\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\",\"identity_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\",\"locator\":null,\"payload\":\"{\\\"key\\\": {\\\"kind\\\": \\\"episode\\\", \\\"namespace\\\": \\\"bangumi.episode\\\", \\\"value\\\": \\\"975\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"id\\\": 975, \\\"description\\\": \\\"\\\", \\\"airdate\\\": \\\"\\\", \\\"disc\\\": 0, \\\"duration\\\": \\\"\\\", \\\"subject_id\\\": 903, \\\"sort\\\": 13, \\\"type\\\": 0}}\",\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"type\":\"episode\"}],\"locator\":null,\"matched_by\":\"exact\",\"matched_documents\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291\",\"original\":\"\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"探求\"}],\"source_fields\":{},\"sour...[truncated 15698 bytes]",
+      "stderr": ""
+    },
+    "ask_danbooru": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "ask",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "碧蓝航线:响 的 Danbooru tag 是什么"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.056,
+      "stdout": "{\"answer\":\"Source entity found; no verified tag mapping to danbooru.tag.\",\"candidates\":[{\"aliases\":[],\"citations\":[{\"evidence_id\":\"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\",\"source_id\":\"moegirl-complete-5072f7cf3e3e\"}],\"descriptions\":[],\"entry_key\":{\"kind\":\"character\",\"namespace\":\"moegirl.character\",\"value\":\"碧蓝航线:响\"},\"evidence_id\":\"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\",\"identity_evidence\":[{\"evidence_id\":\"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\",\"locator\":null,\"payload\":\"{\\\"key\\\": {\\\"kind\\\": \\\"character\\\", \\\"namespace\\\": \\\"moegirl.character\\\", \\\"value\\\": \\\"碧蓝航线:响\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"extra_processed\\\": {\\\"本名\\\": [\\\"响\\\"], \\\"别名\\\": [\\\"栀\\\", \\\"信赖\\\", \\\"\\\\\\\"不死鸟\\\\\\\"\\\", \\\"响爷\\\"], \\\"声优\\\": [], \\\"image\\\": [{\\\"alt\\\": \\\"P站ID：[https://www.pixiv.net/artworks/82354313 82354313] 作者：光太郎☆\\\", \\\"url\\\": \\\"File:BLHX_82354313_p0.jpg\\\"}], \\\"发色\\\": [\\\"灰\\\"], \\\"瞳色\\\": [\\\"红\\\"], \\\"萌点\\\": [\\\"长发\\\", \\\"白丝\\\", \\\"长筒袜\\\", \\\"过膝袜\\\", \\\"呆毛\\\", \\\"白发红眼\\\", \\\"超短裙\\\", \\\"露脐装\\\", \\\"绝对领域\\\", \\\"萝莉\\\", \\\"角\\\", \\\"怪力女\\\", \\\"元气\\\"], \\\"生日\\\": [null, 6, 16]}, \\\"raw_attributes\\\": [\\\"萝莉\\\", \\\"怪力女\\\", \\\"银发\\\", \\\"红瞳\\\", \\\"长发\\\", \\\"呆毛\\\", \\\"双角\\\", \\\"元气\\\", \\\"绝对领域\\\", \\\"露脐装\\\", \\\"白色过膝袜\\\"], \\\"raw_subject_categories\\\": [\\\"中国作品\\\", \\\"碧蓝航线\\\", \\\"碧蓝航线角色\\\", \\\"碧蓝航线舰船\\\", \\\"碧蓝航线换装主题\\\", \\\"碧蓝航线换装:新年和服\\\", \\\"碧蓝航线舰船稀有度\\\", \\\"碧蓝航线精锐舰船\\\", \\\"碧蓝航线舰船阵营\\\", \\\"碧蓝航线重樱舰船\\\", \\\"碧蓝航线舰种\\\", \\\"碧蓝航线驱逐\\\"], \\\"raw_cv_names\\\": [\\\"内田真礼\\\"], \\\"raw_gender\\\": \\\"female\\\"}}\",\"source_id\":\"moegirl-complete-5072f7cf3e3e\",\"status\":\"source_backed\",\"type\":\"character\"}],\"locator\":null,\"matched_by\":\"exact\",\"matched_documents\":[],\"source_fields\":{\"raw_attributes\":[\"萝莉\",\"怪力女\",\"银发\",\"红瞳\",\"长发\",\"呆毛\",\"双角\",\"元气\",\"绝对领域\",\"露脐装\",\"白色过膝袜\"],\"raw_cv_names\":[\"内田真礼\"],\"raw_gender\":\"female\",\"raw_subject_categories\":[\"中国作品\",\"碧蓝航线\",\"碧蓝航线角色\",\"碧蓝航线舰船\",\"碧蓝航线换装主题\",\"碧蓝航线换装:新年和服\",\"碧蓝航线舰船稀有度\",\"碧蓝航线精锐舰船\",\"碧蓝航线舰船阵营\",\"碧蓝航线重樱舰船\",\"碧蓝航线舰种\",\"碧蓝航线驱逐\"]},\"source_fields_evidence\":[{\"evidence_id\":\"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\",\"source_id\":\"moegirl-complete-5072f7cf3e3e\"}],\"source_id\":\"moegirl-complete-5072f7cf3e3e\"}],\"canonical\":{\"aliases\":[],\"citations\":[{\"evidence_id\":\"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\",\"source_id\":\"moegirl-complete-5072f7cf3e3e\"}],\"descriptions\":[],\"entry_key\":{\"kind\":\"character\",\"namespace\":\"moegirl.character\",\"value\":\"碧蓝航线:响\"},\"evidence_id\":\"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\",\"identity_evidence\":[{\"evidence_id\":\"moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:30759\",\"locator\":null,\"payload\":\"{\\\"key\\\": {\\\"kind\\\": \\\"character\\\", \\\"namespace\\\": \\\"moegirl.character\\\", \\\"value\\\": \\\"碧蓝航线:响\\\"}, \\\"status\\\": \\\"source_backed\\\", \\\"raw\\\": {\\\"extra_processed\\\": {\\\"本名\\\": [\\\"响\\\"], \\\"别名\\\": [\\\"栀\\\", \\\"信赖\\\", \\\"\\\\\\\"不死鸟\\\\\\\"\\\", \\\"响爷\\\"], \\\"声优\\\": [], \\\"image\\\": [{\\\"alt\\\": \\\"P站ID：[https://www.pixiv.net/artworks/82354313 82354313] 作者：光太郎☆\\\", \\\"url\\\": \\\"File:BLHX_82354313_p0.jpg\\\"}], \\\"发色\\\": [\\\"灰\\\"], \\\"瞳色\\\": [\\\"红\\\"], \\\"萌点\\\": [\\\"长发\\\", \\\"白丝\\\", \\\"长筒袜\\\", \\\"过膝袜\\\", \\\"呆毛\\\", \\\"白发红眼\\\", \\\"超短裙\\\", \\\"露脐装\\\", \\\"绝对领域\\\", \\\"萝莉\\\", \\\"角\\\", \\\"怪力女\\\", \\\"元气\\\"], \\\"生日\\\": [null, 6, 16]}, \\\"raw_attributes\\\": [\\\"萝莉\\\", \\\"怪力女\\\", \\\"银发\\\", \\\"红瞳\\\", \\\"长发\\\", \\\"呆毛\\\", \\\"双角\\\", \\\"元气\\\", \\\"绝对领域\\\", \\\"露脐装\\\", \\\"白色过膝袜\\\"], \\\"raw_subject_categories\\\": [\\\"中国作品\\\", \\\"碧蓝航线\\\", \\\"碧蓝航线角色\\\", \\\"碧蓝航线舰船\\\", \\\"碧蓝航线换装主题\\\", \\\"碧蓝航线换装:新年和服\\\", \\\"碧蓝航线舰船稀有度\\\", \\\"碧蓝航线精锐舰船\\\", \\\"碧蓝航线舰船阵营\\\", \\\"碧蓝航线重樱舰船\\\", \\\"碧蓝航线舰种\\\", \\\"碧蓝航线驱逐\\\"], \\\"raw_cv_names\\\": [\\\"内田真礼\\\"], \\\"raw_gender\\\": \\\"female\\\"}}\",\"source_id\":\"moegirl-complete-5072f7cf3e3e\",\"status\":\"source_backed\",\"type\":\"character\"}],\"locator\":null,\"matched_by\":\"exact\",\"matched_documents\":[],\"source_fields\":{\"raw_attributes\":[\"萝莉\",\"怪力女\",\"银发\",\"红瞳\",\"长发\",...[truncated 5819 bytes]",
+      "stderr": ""
+    },
+    "error_topk": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "search",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "one piece",
+        "--limit",
+        "0"
+      ],
+      "exit": 2,
+      "elapsed_s": 0.059,
+      "stdout": "",
+      "stderr": "{\"error\":\"ValueError\",\"message\":\"topk must be 1..100\"}\n"
+    },
+    "error_missing_db": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "lookup",
+        "D:\\SakuraTool\\SakuraKnowledge\\no_such.db",
+        "x"
+      ],
+      "exit": 2,
+      "elapsed_s": 0.046,
+      "stdout": "",
+      "stderr": "{\"error\":\"OperationalError\",\"message\":\"unable to open database file: D:\\\\SakuraTool\\\\SakuraKnowledge\\\\no_such.db\"}\n"
+    },
+    "error_unknown_op": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64\\sknow-rs.exe",
+        "frobnicate"
+      ],
+      "exit": 2,
+      "elapsed_s": 0.047,
+      "stdout": "",
+      "stderr": "{\"error\":\"ValueError\",\"message\":\"unknown command\"}\n"
+    }
+  },
+  "toolchain": {
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+    "gcc": "gcc (GCC) 16.2.0"
+  },
+  "manifest_path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P2\\p2-artifact-manifest.json",
+  "exit_code_problems": [],
+  "overall": "PASS",
+  "finished_at_utc": "2026-09-29T13:31:57Z"
+}
