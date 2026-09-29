@@ -1,0 +1,101 @@
+{
+  "artifact": "p2-delivery",
+  "stage": "P2 Rust read-only runtime + review remediation",
+  "overall_status": "NOT_READY / WAITING_REVIEW",
+  "shas": {
+    "P2_BASE": "abc3a8f",
+    "P2_BASE_note": "reviewer-base commit (Phase A+B+C); full prefix in git log",
+    "REFERENCE_FIX_SHA": "e5c4fd9",
+    "RUST_IMPLEMENTATION_SHA": "abc3a8f",
+    "remediation_commits": [
+      "7f529b1", "889ed9a", "685990d", "ac6988d", "8593d73", "a51688b"
+    ],
+    "SUBMISSION_SHA": "a51688b0d07fe797da3d593d08e809028b938dfa",
+    "SUBMISSION_SHA_note": "commit containing all remediation evidence; verified git ls-remote origin refs/heads/dev == this SHA at push time",
+    "ORIGIN_DEV_AT_SUBMISSION": "a51688b0d07fe797da3d593d08e809028b938dfa",
+    "ORIGIN_MAIN": "e4161b162784d634ea0b24450e84f3740b21fdaa",
+    "ORIGIN_MAIN_note": "untouched; default branch is dev"
+  },
+  "snapshot": {
+    "path": "build/snapshot-full-20bf5b3/knowledge.sqlite",
+    "sha256": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073",
+    "size_bytes": 21516320768,
+    "build_meta_snapshot": "7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c",
+    "contract_version": "2",
+    "search_text_version": "2",
+    "entries": 3734547,
+    "fts_documents": 1295638,
+    "verified_unchanged_by": [
+      "reports/P2/snapshot-compatibility-20bf5b3.json",
+      "reports/P2/p2-perf-20bf5b3.json",
+      "reports/P2/rust-parity-20bf5b3-v6.json"
+    ]
+  },
+  "artifacts": {
+    "wheel": {
+      "path": "dist/p2/sakura_knowledge-0.2.0-py3-none-any.whl",
+      "sha256": "46a09ca0d8a7f553d6e84f3faadd547ba124ce1d8a9afbd92ee3fff48969f5c8",
+      "tracked": false,
+      "note": "artifact kept on disk by .gitignore; hash manifest is the committed evidence"
+    },
+    "rust_binary": {
+      "distribution_path": "dist/p2/sknow-rs-0.2.0-win64/sknow-rs.exe",
+      "sha256": "a8f8cdb9f83e43cae891ace03f3ad2f12c98003da5d4d9f3388b9ac97aa0d800",
+      "tracked": false,
+      "outside_source_tree": true
+    }
+  },
+  "evidence": {
+    "A_reference": {
+      "commit": "e5c4fd9",
+      "receipts": [
+        "reports/P2/snapshot-compatibility-20bf5b3.json",
+        "tests/test_evidence.py"
+      ],
+      "notes": [
+        "occurrence semantics: per-dataset partition rows, frequency==raw.source_count, sample_count nullable (674,679 NULL / 0 set on the full snapshot)",
+        "source_fields bounded projection enforced; raw payload preserved in entry_evidence",
+        "dbstat NOT_AVAILABLE in this system's SQLite 3.50.4 build (recorded, not faked)",
+        "space: page_size 4096, page_count 5253008, freelist 725904"
+      ]
+    },
+    "B_parity": {
+      "table": "tools/parity_cases.py (151 locked cases)",
+      "harness": "tools/check_parity.py",
+      "latest_receipt": "reports/P2/rust-parity-20bf5b3-v6.json",
+      "earlier_receipt": "reports/P2/rust-parity-20bf5b3-v5.json",
+      "result": "150 EQUAL + S18 boundary; v6 overall FAIL (RUST_BUDGET_EXCEEDED, 25/25 attempts > 5s, attempt_trail recorded); v5 overall PASS (both runtimes over budget -> BUDGET_LIMITED_PARTIAL)",
+      "standing_statement": "S18 a's_wonderland is a Rust budget-boundary case (~1.4-5.5s SQL); semantic output equal whenever both runtimes complete; never counted as equality when Rust breaches the budget"
+    },
+    "C_delivery": {
+      "wheel_cli_receipt": "reports/P2/p2-wheel-cli-20bf5b3.json",
+      "wheel_cli_overall": "PASS",
+      "rust_distribution_receipt": "reports/P2/p2-wheel-cli-20bf5b3.json (rust_cli section) + reports/P2/p2-artifact-manifest.json",
+      "raw_bytes": "reports/P2/raw/wheel-cli/ (46 files, sha256-matched, -text via .gitattributes)",
+      "perf_receipt": "reports/P2/p2-perf-20bf5b3.json",
+      "perf_raw_samples": "reports/P2/raw/perf/p2-perf-samples.jsonl (1596 samples, sha256 in receipt)",
+      "perf_headline": "warm p50/p95 Rust 40/179ms vs Python 194/451ms end-to-end; budget failures kept as failure samples (S18 rust 6/6, python 4/6; S17 once each round 0; S01 python once round 0)"
+    }
+  },
+  "checks_at_submission": {
+    "pytest": "47 passed",
+    "ruff": "clean (src tests tools)",
+    "git_diff_check": "clean",
+    "cargo_test": "3/3 (release)",
+    "cargo_fmt": "clean"
+  },
+  "not_run": [
+    "Rust gold eval (ask-template quality vs held-out human expectations)",
+    "Pi Skill runtime integration",
+    "Full human source-fact review",
+    "SakuraPool integration",
+    "Live upstream refresh (frozen snapshot 20bf5b3 only)",
+    "AI annotation of the 674,679 tags"
+  ],
+  "constraints_honored": [
+    "main untouched (e4161b162784d634ea0b24450e84f3740b21fdaa)",
+    "no force-push, no amend, no rebase",
+    "snapshot bytes never modified (sha256 identical in every receipt)",
+    "every fix on a new commit with verified remote SHA"
+  ]
+}
