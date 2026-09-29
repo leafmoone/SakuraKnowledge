@@ -589,5 +589,11 @@
   },
   "snapshot_sha256_after": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073",
   "snapshot_unchanged": true,
-  "finished_at_utc": "2026-09-29T22:29:14Z"
+  "finished_at_utc": "2026-09-29T22:29:14Z",
+  "code_provenance": {
+    "git_head_at_run": "8593d736e1bd811e7bcdf19934cb638560ae1ad7",
+    "code_under_test": "working tree at run time = 8593d73 + uncommitted UsageError/UTF-8 changes later committed as a51688b; identical to the src/, rust/, tools/ tree of a51688b and 54e9167 (git diff a51688b 54e9167 -- src rust tools is empty)",
+    "build_baseline": "artifacts built from the run-time working tree (a51688b code); NOT rebuilt from any later commit",
+    "note": "code_sha records the git HEAD at execution time (run fact), not the code identity under test"
+  }
 }

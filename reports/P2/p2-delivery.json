@@ -4,17 +4,28 @@
   "overall_status": "NOT_READY / WAITING_REVIEW",
   "shas": {
     "P2_BASE": "abc3a8f",
-    "P2_BASE_note": "reviewer-base commit (Phase A+B+C); full prefix in git log",
+    "P2_BASE_note": "reviewer-base commit (Phase A+B+C)",
     "REFERENCE_FIX_SHA": "e5c4fd9",
     "RUST_IMPLEMENTATION_SHA": "abc3a8f",
     "remediation_commits": [
-      "7f529b1", "889ed9a", "685990d", "ac6988d", "8593d73", "a51688b"
+      "7f529b1", "889ed9a", "685990d", "ac6988d", "8593d73", "a51688b", "54e9167"
     ],
-    "SUBMISSION_SHA": "a51688b0d07fe797da3d593d08e809028b938dfa",
-    "SUBMISSION_SHA_note": "commit containing all remediation evidence; verified git ls-remote origin refs/heads/dev == this SHA at push time",
-    "ORIGIN_DEV_AT_SUBMISSION": "a51688b0d07fe797da3d593d08e809028b938dfa",
+    "evidence_commit": "a51688b0d07fe797da3d593d08e809028b938dfa",
+    "evidence_commit_note": "contains all remediation evidence (items 1-7)",
+    "delivery_commit": "54e91677573517dcd16af4cddca0c396ee5581e4",
+    "delivery_commit_note": "commit that added this p2-delivery.json; git diff a51688b..54e9167 touches only reports/P2/p2-delivery.json",
+    "ORIGIN_DEV_AT_DELIVERY": "54e91677573517dcd16af4cddca0c396ee5581e4",
+    "ORIGIN_DEV_AT_DELIVERY_note": "verified via git ls-remote origin refs/heads/dev at push time of 54e9167; the commit that fixes this binding (post-review) does not self-reference its own SHA - see reports/P2/p2-final-binding-receipt.json and the post-push ls-remote record",
     "ORIGIN_MAIN": "e4161b162784d634ea0b24450e84f3740b21fdaa",
     "ORIGIN_MAIN_note": "untouched; default branch is dev"
+  },
+  "code_provenance": {
+    "git_head_at_receipt_runs": "8593d736e1bd811e7bcdf19934cb638560ae1ad7",
+    "meaning": "the code_sha field in p2-wheel-cli-20bf5b3.json, p2-perf-20bf5b3.json and p2-artifact-manifest.json records the git HEAD at the moment each run executed (a fact of the run), NOT the identity of the code under test",
+    "code_under_test": "working tree at run time = commit 8593d73 + uncommitted UsageError/UTF-8 changes that were later committed as a51688b",
+    "identity_statement": "the code under test is exactly the src/, rust/, tools/ tree of a51688b and 54e9167; verified: git diff a51688b 54e9167 -- src rust tools is empty",
+    "build_baseline": "wheel 46a09ca0... and sknow-rs a8f8cdb9... were BUILT from the run-time working tree (a51688b code), not rebuilt from any later commit; no later commit re-built or modified these artifacts",
+    "no_false_binding": "no artifact is claimed to originate from 8593d73 as code; 8593d73 appears only as the run-time HEAD metadata"
   },
   "snapshot": {
     "path": "build/snapshot-full-20bf5b3/knowledge.sqlite",
@@ -32,17 +43,30 @@
     ]
   },
   "artifacts": {
+    "availability_model": {
+      "policy": "local-only artifacts + committed hash manifest",
+      "artifact_path_tracking": "dist/ is in .gitignore (0 tracked paths under dist/ in any commit); artifacts live on local disk only",
+      "reason_not_committed": "the execution item requires 'run the Rust release binary from outside the source tree; record argv/stdout/stderr/exit, sha256, toolchain, snapshot; independent distribution + hash manifest' - the committed deliverables are the run receipts and the hash manifest, not the binaries themselves. Committing ~2.4 MB executables / wheels into git was judged unnecessary when hash + rebuild recipe is available",
+      "rebuild": {
+        "wheel": "python -m build --wheel on tree a51688b (pyproject 0.2.0) reproduces sakura_knowledge-0.2.0-py3-none-any.whl (deterministic content for the same tree)",
+        "rust_binary": "cargo build --release on tree a51688b with rustc/cargo 1.98.1 stable-x86_64-pc-windows-gnu + GCC 16.2.0 (w64devkit) as linker; note: PE binaries are not byte-deterministic across builds, so the authoritative identity of the tested binary is the recorded sha256, not a rebuild claim"
+      },
+      "if_git_retrievability_required": "reviewer to confirm; if the binary itself must be retrievable from git, a small verifiable distribution object (or the exe under a compliance path) will be added in a separate explicit commit - not done preemptively"
+    },
     "wheel": {
-      "path": "dist/p2/sakura_knowledge-0.2.0-py3-none-any.whl",
+      "artifact_path": "dist/p2/sakura_knowledge-0.2.0-py3-none-any.whl",
+      "availability": "local-only",
       "sha256": "46a09ca0d8a7f553d6e84f3faadd547ba124ce1d8a9afbd92ee3fff48969f5c8",
       "tracked": false,
-      "note": "artifact kept on disk by .gitignore; hash manifest is the committed evidence"
+      "built_from_code": "a51688b tree (run-time HEAD was 8593d73)"
     },
     "rust_binary": {
       "distribution_path": "dist/p2/sknow-rs-0.2.0-win64/sknow-rs.exe",
+      "availability": "local-only",
       "sha256": "a8f8cdb9f83e43cae891ace03f3ad2f12c98003da5d4d9f3388b9ac97aa0d800",
       "tracked": false,
-      "outside_source_tree": true
+      "outside_source_tree": true,
+      "built_from_code": "a51688b tree (run-time HEAD was 8593d73)"
     }
   },
   "evidence": {
