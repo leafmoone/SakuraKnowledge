@@ -1,0 +1,8 @@
+usage: sknow-rs lookup DB QUERY [--kind K --namespace N] [--key]
+       sknow-rs search DB QUERY [--limit N | --topk N] [--kind K --namespace N]
+       sknow-rs related DB VALUE --kind K --namespace N [--relation R --limit N]
+       sknow-rs related DB KIND NAMESPACE VALUE [--relation R --kind DSTKIND --limit N]
+       sknow-rs ask DB QUERY [--kind K --namespace N --target-tag-namespace T]
+       sknow-rs inspect DB
+       sknow-rs runtime
+       sknow-rs -h | --help

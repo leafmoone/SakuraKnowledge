@@ -31,13 +31,47 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def run(cmd: list[str], env: dict | None = None) -> dict:
+RAW_DIR: Path | None = None
+PROBE = ("import sys,locale,json;print(json.dumps({'stdout_encoding':sys.stdout.encoding,"
+         "'utf8_mode':sys.flags.utf8_mode,'preferred':locale.getpreferredencoding(False),"
+         "'filesystem':sys.getfilesystemencoding()}))")
+
+
+def run(cmd: list[str], env: dict | None = None, tag: str = "") -> dict:
+    """Run with *bytes* capture. Decoding is strict UTF-8 and is itself
+    evidence: a decode failure or U+FFFD is recorded, never replaced."""
     t0 = time.monotonic()
-    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
-                       check=False, env=env)
-    return {"argv": cmd, "exit": p.returncode,
-            "elapsed_s": round(time.monotonic() - t0, 3),
-            "stdout": p.stdout, "stderr": p.stderr}
+    p = subprocess.run(cmd, capture_output=True, check=False, env=env)
+    rec: dict = {"argv": cmd, "exit": p.returncode,
+                 "elapsed_s": round(time.monotonic() - t0, 3)}
+    for name, data in (("stdout", p.stdout), ("stderr", p.stderr)):
+        rec[f"{name}_bytes"] = len(data)
+        rec[f"{name}_sha256"] = hashlib.sha256(data).hexdigest()
+        rec[f"{name}_replacement_char_bytes"] = data.count(bytes.fromhex("efbfbd"))
+        try:
+            text = data.decode("utf-8", errors="strict")
+            rec[f"{name}_utf8_strict"] = True
+        except UnicodeDecodeError as exc:
+            text = None
+            rec[f"{name}_utf8_strict"] = False
+            rec[f"{name}_utf8_error"] = str(exc)
+        if RAW_DIR is not None and tag:
+            raw = RAW_DIR / f"{tag}.{name}"
+            raw.write_bytes(data)
+            rec[f"{name}_raw_file"] = raw.name
+        if text is not None:
+            stripped = text.strip()
+            if stripped.startswith("{"):
+                try:
+                    rec[f"{name}_json"] = json.loads(stripped)
+                    rec[f"{name}_json_parses"] = True
+                except json.JSONDecodeError as exc:
+                    rec[f"{name}_json_parses"] = False
+                    rec[f"{name}_json_error"] = str(exc)
+                    rec[name] = text
+            else:
+                rec[name] = text
+    return rec
 
 
 def main() -> int:
@@ -49,7 +83,14 @@ def main() -> int:
     ap.add_argument("--dist", required=True)
     ap.add_argument("--venv", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--raw-dir", required=True,
+                    help="directory for verbatim stdout/stderr bytes")
     args = ap.parse_args()
+    global RAW_DIR
+    RAW_DIR = Path(args.raw_dir).resolve()
+    if RAW_DIR.exists():
+        shutil.rmtree(RAW_DIR)
+    RAW_DIR.mkdir(parents=True)
     db = Path(args.db).resolve()
     wheel = Path(args.wheel).resolve()
     rs_bin = Path(args.rs_bin).resolve()
@@ -100,6 +141,19 @@ def main() -> int:
     env = dict(os.environ)
     env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONUTF8"] = "1"
+    # explicit, *measured* encoding environment of the venv interpreter
+    probe = subprocess.run(
+        [str(vp), "-c", PROBE],
+        capture_output=True, check=False, env=env)
+    enc = json.loads(probe.stdout.decode("utf-8"))
+    rep["encoding_environment"] = {
+        "env": {"PYTHONIOENCODING": env["PYTHONIOENCODING"],
+                "PYTHONUTF8": env["PYTHONUTF8"]},
+        "measured_in_venv": enc,
+        "verified_utf8": enc["stdout_encoding"].lower().replace("-", "") == "utf8"
+        and enc["utf8_mode"] == 1,
+        "capture": "subprocess bytes; strict UTF-8 decode; no errors='replace'",
+    }
     sknow = [str(venv / "Scripts" / "sknow.exe")]
     commands = [
         ["help", sknow + ["--help"]],
@@ -118,11 +172,7 @@ def main() -> int:
     ]
     wheel_results = {}
     for name, cmd in commands:
-        r = run(cmd, env)
-        if len(r["stdout"]) > 4000:
-            r["stdout"] = r["stdout"][:4000] + f"...[truncated {len(r['stdout'])} bytes]"
-        if len(r["stderr"]) > 2000:
-            r["stderr"] = r["stderr"][:2000] + f"...[truncated {len(r['stderr'])} bytes]"
+        r = run(cmd, env, f"wheel.{name}")
         wheel_results[name] = r
     rep["wheel_cli"] = wheel_results
 
@@ -143,11 +193,8 @@ def main() -> int:
     }
     rust_results = {}
     for name, cmd in commands:
-        r = run([str(target) if c.endswith("sknow.exe") else c for c in cmd], env)
-        if len(r["stdout"]) > 4000:
-            r["stdout"] = r["stdout"][:4000] + f"...[truncated {len(r['stdout'])} bytes]"
-        if len(r["stderr"]) > 2000:
-            r["stderr"] = r["stderr"][:2000] + f"...[truncated {len(r['stderr'])} bytes]"
+        r = run([str(target) if c.endswith("sknow.exe") else c for c in cmd], env,
+                f"rust.{name}")
         rust_results[name] = r
     rep["rust_cli"] = rust_results
 
@@ -190,9 +237,57 @@ def main() -> int:
             if got != want:
                 problems.append({"side": side, "name": name,
                                  "want_exit": want, "got_exit": got})
-        if results.get("error_topk", {}).get("stdout", "").strip():
+        if results.get("error_topk", {}).get("stdout_bytes", 0) != 0:
             problems.append({"side": side, "name": "error_topk",
                              "kind": "stdout_must_be_empty"})
+        for name, r in results.items():
+            for stream in ("stdout", "stderr"):
+                if not r.get(f"{stream}_utf8_strict", False):
+                    problems.append({"side": side, "name": name, "stream": stream,
+                                     "kind": "not_strict_utf8"})
+                if r.get(f"{stream}_replacement_char_bytes", 0):
+                    problems.append({"side": side, "name": name, "stream": stream,
+                                     "kind": "contains_U+FFFD"})
+            if exp.get(name) == 0 and name not in ("help", "help_short")                     and not r.get("stdout_json_parses"):
+                problems.append({"side": side, "name": name,
+                                 "kind": "success_stdout_not_full_json"})
+            if exp.get(name) == 2 and not r.get("stderr_json_parses"):
+                problems.append({"side": side, "name": name,
+                                 "kind": "error_stderr_not_json"})
+
+    # Unicode cross-check: CLI JSON (decoded from bytes) must equal the
+    # in-process API result computed in *this* interpreter, for every
+    # non-ASCII-bearing query. This does not depend on any console.
+    sys.path.insert(0, str(ROOT / "src"))
+    from sakura_knowledge.api import Knowledge
+    from sakura_knowledge.model import EntryKey
+    unicode_checks = []
+    with Knowledge(str(db)) as k:
+        inproc = {
+            "lookup": k.lookup("975"),
+            "ask": k.ask("975 的标签是什么"),
+            "ask_danbooru": k.ask("碧蓝航线:响 的 Danbooru tag 是什么"),
+            "lookup_key": k.lookup(key=EntryKey("subject", "bangumi.subject", "1")),
+        }
+    for name, want in inproc.items():
+        want_nonascii = sorted({ch for ch in json.dumps(want, ensure_ascii=False)
+                                if ord(ch) > 0x7F})
+        for side, results in (("wheel", wheel_results), ("rust", rust_results)):
+            got = results.get(name, {}).get("stdout_json")
+            same = got is not None and all(
+                got.get(f) == want.get(f)
+                for f in ("entry_key", "canonical", "source_fields", "query",
+                          "status", "matched_by"))
+            unicode_checks.append({
+                "side": side, "name": name, "fields_equal_inprocess": same,
+                "distinct_nonascii_chars_expected": len(want_nonascii),
+                "sample_nonascii_escaped": ascii("".join(want_nonascii[:16]))})
+            if not same:
+                problems.append({"side": side, "name": name,
+                                 "kind": "unicode_fields_differ_from_inprocess_api"})
+    rep["unicode_crosscheck"] = unicode_checks
+    if not rep["encoding_environment"]["verified_utf8"]:
+        problems.append({"kind": "encoding_environment_not_verified_utf8"})
     rep["exit_code_problems"] = problems
     rep["overall"] = "PASS" if not problems else "FAIL"
     rep["finished_at_utc"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())

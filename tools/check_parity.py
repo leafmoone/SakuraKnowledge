@@ -143,28 +143,35 @@ def rust_argv(op: str, args: dict) -> list[str]:
 
 def run_rust_attempts(bin_path: Path, op: str, args: dict,
                       attempts: int = RUST_ATTEMPTS):
+    """Every attempt is recorded raw (exit, elapsed, stderr bytes as text).
+    A budget-exhausted case therefore carries its full failure trail."""
     cmd = [str(bin_path)] + rust_argv(op, args)
     last = None
+    trail = []
     for n in range(1, attempts + 1):
         t0 = time.monotonic()
-        p = subprocess.run(cmd, capture_output=True, text=True,
-                           encoding="utf-8", check=False)
+        p = subprocess.run(cmd, capture_output=True, check=False)
         el = round(time.monotonic() - t0, 3)
+        out = p.stdout.decode("utf-8", errors="strict")
+        errt = p.stderr.decode("utf-8", errors="strict")
+        trail.append({"attempt": n, "exit": p.returncode, "elapsed_s": el,
+                      "stdout_bytes": len(p.stdout), "stderr": errt.strip()})
         if p.returncode == 0:
-            body = json.loads(p.stdout) if p.stdout.strip() else {}
+            body = json.loads(out) if out.strip() else {}
             return {"value": body, "exit": 0, "attempts": n, "elapsed_s": el,
-                    "argv": cmd, "stderr": p.stderr.strip()}
+                    "argv": cmd, "stderr": errt.strip(), "attempt_trail": trail}
         try:
-            err = json.loads(p.stderr)
+            err = json.loads(errt)
         except (ValueError, TypeError):
-            err = {"raw": p.stderr.strip()}
+            err = {"raw": errt.strip()}
         if err.get("message") == "query_budget_exceeded":
             last = err
             continue
         return {"error": err, "exit": p.returncode, "attempts": n,
-                "elapsed_s": el, "argv": cmd, "stderr": p.stderr.strip()}
+                "elapsed_s": el, "argv": cmd, "stderr": errt.strip(),
+                "attempt_trail": trail}
     return {"error": last, "exit": 2, "attempts": attempts,
-            "budget_exhausted": True, "argv": cmd}
+            "budget_exhausted": True, "argv": cmd, "attempt_trail": trail}
 
 
 def diff(py_val, rs_val, path="$"):
@@ -403,8 +410,14 @@ def main() -> int:
                 # all retries while the Python reference completed; the
                 # reference value is verified against the locked
                 # expectation and the Rust budget failure is recorded.
+                # This is a Rust FAILURE on its own 5 s budget, not semantic
+                # equality: Rust produced no value to compare. The Python
+                # reference is still checked so the sample stays diagnosable.
                 problems += check_expect(py["value"], expect)
-                status = "EQUAL_PYTHON_VS_LOCKED_EXPECTED"
+                problems.append({"path": "$.rust", "kind": "rust_budget_exceeded",
+                                 "attempts": rs.get("attempts"),
+                                 "message": (rs.get("error") or {}).get("message")})
+                status = "RUST_BUDGET_EXCEEDED"
                 rust_budget_failures.append(
                     {"case_id": cid, "query": op_args.get("query"),
                      "rust_attempts": rs.get("attempts")})
@@ -450,8 +463,10 @@ def main() -> int:
                     if c["status"] == "BUDGET_LIMITED_PARTIAL")
     n_py_locked = sum(1 for c in report["cases"]
                       if c["status"] == "EQUAL_PYTHON_VS_LOCKED_EXPECTED")
+    n_rust_budget = sum(1 for c in report["cases"]
+                        if c["status"] == "RUST_BUDGET_EXCEEDED")
     n_bad = (len(report["cases"]) - n_equal - n_rust_locked
-             - n_py_locked - n_partial)
+             - n_py_locked - n_partial - n_rust_budget)
     report["summary"] = {
         "n_cases": N_CASES,
         "equal": n_equal,
@@ -462,14 +477,19 @@ def main() -> int:
         "python_reference_budget_failures": ref_budget_failures,
         "rust_reference_budget_failures": rust_budget_failures,
         "budget_limited_partial_cases": partial_budget,
-        "overall": "PASS" if n_bad == 0 else "FAIL",
+        "rust_budget_exceeded": n_rust_budget,
+        "semantic_equal_all_cases": n_equal == N_CASES,
+        # PASS only if every case is fully EQUAL-compared or covered by a
+        # documented partial with no Rust-side failure. A Rust budget
+        # failure is a failure sample, so overall is FAIL.
+        "overall": "PASS" if n_bad == 0 and n_rust_budget == 0 else "FAIL",
     }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
     print(json.dumps(report["summary"], ensure_ascii=False))
-    return 0 if n_bad == 0 else 1
+    return 0 if report["summary"]["overall"] == "PASS" else 1
 
 
 if __name__ == "__main__":
