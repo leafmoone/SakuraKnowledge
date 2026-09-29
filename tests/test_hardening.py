@@ -108,6 +108,53 @@ def test_bm25_ties_deduplicate_multiple_documents(tmp_path):
         assert not any("CORRELATED" in p for p in plan)
 
 
+def test_p2_ask_exact_identity_precedes_template_and_preserves_input(tmp_path):
+    exact = entity("page", "hero 的标签是什么", namespace="fixture", status="source_backed",
+                    docs=[doc("exact identity")])
+    subject = entity("character", "hero", namespace="fixture", status="source_backed")
+    out = tmp_path / "p2-ask"
+    build(fixture_manifest(tmp_path, [exact, subject]), out)
+    with Knowledge(out / "knowledge.sqlite") as api:
+        result = api.ask("hero 的标签是什么")
+    assert result["entry_key"] == exact["key"]
+    assert result["input_query"] == "hero 的标签是什么"
+    assert result["parsed_subject"] is None
+    assert result["query_template"] == "unsupported"
+
+
+def test_p2_search_exact_branch_honors_topk_and_reports_match_proof(tmp_path):
+    records = [entity("page", str(i), aliases=[{"text": "needle", "status":
+                "source_backed", "evidence_id": f"alias-{i}"}], docs=[doc("needle", f"doc-{i}")])
+               for i in range(3)]
+    out = tmp_path / "p2-search"
+    build(fixture_manifest(tmp_path, records), out)
+    with Knowledge(out / "knowledge.sqlite") as api:
+        result = api.search("needle", topk=1)
+    assert len(result["candidates"]) == 1
+    candidate = result["candidates"][0]
+    assert candidate["matched_by"] == "alias"
+    assert candidate["source_id"] == "fixture-v1"
+    assert candidate["evidence_id"] == "alias-0"
+    assert len(candidate["matched_documents"]) <= 3
+    assert all(len(d["original"]) <= 4000 for d in candidate["matched_documents"])
+
+
+def test_p2_moegirl_source_fields_are_bounded_and_cited(tmp_path):
+    record = entity("character", '"加特"', namespace="moegirl.character", status="source_backed",
+                    raw_attributes=["银发", "灰瞳"], raw_subject_categories=["第五人格"],
+                    raw_cv_names=["黑石稔"], raw_gender=None)
+    out = tmp_path / "p2-fields"
+    build(fixture_manifest(tmp_path, [record]), out)
+    with Knowledge(out / "knowledge.sqlite") as api:
+        result = api.lookup(key=record["key"])
+    fields = result["source_fields"]
+    assert fields["raw_attributes"] == ["银发", "灰瞳"]
+    assert fields["raw_subject_categories"] == ["第五人格"]
+    assert fields["raw_cv_names"] == ["黑石稔"]
+    assert fields["raw_gender"] is None
+    assert result["source_fields_evidence"] == result["citations"]
+
+
 def test_ask_templates_extract_subject_verbatim(tmp_path):
     from sakura_knowledge.api import parse_ask_template
     assert parse_ask_template("hero 的 Danbooru tag 是什么") == ("hero", "danbooru.tag")

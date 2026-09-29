@@ -1,4 +1,5 @@
 """Shared read-only API for the CLI and Skill."""
+import json
 import re
 import sqlite3
 import time
@@ -55,6 +56,29 @@ class Knowledge:
                 "canonical": None, "candidates": list(candidates), "descriptions": [],
                 "relations": [], "citations": [], "warnings": list(warnings)}
 
+    @staticmethod
+    def runtime_info():
+        return {"contract_version": CONTRACT_VERSION, "sqlite_version": sqlite3.sqlite_version,
+                "runtime": "python"}
+
+    def inspect(self):
+        self._budget()
+        page_size = self._execute("PRAGMA page_size").fetchone()[0]
+        page_count = self._execute("PRAGMA page_count").fetchone()[0]
+        freelist_count = self._execute("PRAGMA freelist_count").fetchone()[0]
+        try:
+            dbstat = self._execute("SELECT count(*) FROM dbstat").fetchone()[0]
+            dbstat_status = "available"
+        except sqlite3.OperationalError:
+            dbstat = None
+            dbstat_status = "unavailable"
+        meta = {r["key"]: r["value"] for r in self._execute(
+            "SELECT key,value FROM build_meta WHERE key IN ('contract_version','snapshot')")}
+        return {"snapshot": self.snapshot, "contract_version": meta.get("contract_version"),
+                "page_size": page_size, "page_count": page_count,
+                "freelist_count": freelist_count, "dbstat_pages": dbstat,
+                "dbstat_status": dbstat_status, "read_only": True}
+
     def _budget(self):
         self._deadline = time.monotonic() + 5
 
@@ -82,16 +106,32 @@ class Knowledge:
             f"ORDER BY source_id,evidence_id LIMIT 100", (row["id"], alias_text)).fetchall()
             if alias_text is not None else [])
         identities = self._execute(
-            f"SELECT source_id,evidence_id,status,type,locator FROM entry_evidence "
+            f"SELECT source_id,evidence_id,status,type,locator,payload FROM entry_evidence "
             f"WHERE entry_id=? AND status IN ({_ID}) "
             f"ORDER BY source_id,evidence_id LIMIT 100", (row["id"],)).fetchall()
         identity_proofs = aliases if alias_text is not None and alias_text != row["value"] else identities
+        fields = {}
+        for proof in identities:
+            try:
+                payload = json.loads(proof["payload"])
+                raw = payload.get("raw", payload)
+            except (TypeError, json.JSONDecodeError):
+                raw = {}
+            for name in ("raw_attributes", "raw_subject_categories", "raw_cv_names", "raw_gender"):
+                if name in raw:
+                    fields[name] = raw[name]
+        citations = [{"source_id": d["source_id"], "evidence_id": d["evidence_id"]}
+                     for d in identity_proofs]
         return {"entry_key": key, "locator": row["locator"],
                 "descriptions": [dict(d) for d in docs],
+                "matched_documents": [dict(d) for d in docs],
                 "aliases": [dict(a) for a in aliases],
                 "identity_evidence": [dict(d) for d in identities],
-                "citations": [{"source_id": d["source_id"], "evidence_id": d["evidence_id"]}
-                              for d in identity_proofs]}
+                "source_fields": fields, "source_fields_evidence": citations,
+                "matched_by": "exact" if alias_text is None or alias_text == row["value"] else "alias",
+                "source_id": identity_proofs[0]["source_id"] if identity_proofs else None,
+                "evidence_id": identity_proofs[0]["evidence_id"] if identity_proofs else None,
+                "citations": citations}
 
     def lookup(self, query=None, *, key=None, kind=None, namespace=None):
         self._budget()
@@ -123,11 +163,17 @@ class Knowledge:
         rows = [r for r, _ in paired]
         candidates = [c for _, c in paired]
         result = self.result(query, "not_found" if not rows else
-                             "found" if len(rows) == 1 else "ambiguous", candidates)
+                             "found" if len(rows) == 1 else "ambiguous", candidates[:100])
         if len(rows) == 1:
             result["entry_key"] = candidates[0]["entry_key"]
             result["canonical"] = candidates[0]
             result["descriptions"] = candidates[0]["descriptions"]
+            result["matched_documents"] = candidates[0]["matched_documents"]
+            result["source_fields"] = candidates[0]["source_fields"]
+            result["source_fields_evidence"] = candidates[0]["source_fields_evidence"]
+            result["matched_by"] = candidates[0]["matched_by"]
+            result["source_id"] = candidates[0]["source_id"]
+            result["evidence_id"] = candidates[0]["evidence_id"]
             result["citations"] = candidates[0]["citations"]
             if rows[0]["kind"] == "tag":
                 result["tag_key"] = {k: rows[0][k] for k in ("namespace", "value")}
@@ -142,6 +188,7 @@ class Knowledge:
         exact = self.lookup(query, kind=kind, namespace=namespace)
         compiled = match_query(query)
         if not compiled:
+            exact["candidates"] = exact["candidates"][:topk]
             if exact["status"] == "not_found":
                 exact["warnings"].append("too_short")
             return exact
@@ -149,10 +196,15 @@ class Knowledge:
         # represents its best score. Bound row scans, including duplicates from an
         # entry with many documents; never load unbounded query results into memory.
         rows = self._execute(
-            f"SELECT e.*,bm25(search_fts) AS score FROM search_fts "
+            f"SELECT e.*,bm25(search_fts) AS score, d.title AS matched_title, "
+            f"substr(d.original,1,4000) AS matched_original, "
+            f"length(d.original)>4000 AS matched_response_truncated, "
+            f"d.source_id AS matched_source_id, d.evidence_id AS matched_evidence_id "
+            f"FROM search_fts JOIN documents d ON d.id=search_fts.document_id "
             f"JOIN entries e ON e.id=search_fts.entry_id WHERE search_fts MATCH ? "
-            f"AND e.conflicted=0 AND EXISTS (SELECT 1 FROM entry_evidence v "
-            f"WHERE v.entry_id=e.id AND v.status IN ({_ID})) "
+            f"AND e.conflicted=0 AND d.status IN ({_TEXT}) AND EXISTS "
+            f"(SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id "
+            f"AND v.status IN ({_ID})) "
             f"AND (? IS NULL OR e.kind=?) AND (? IS NULL OR e.namespace=?) "
             f"ORDER BY score,e.kind,e.namespace,e.value,search_fts.rowid LIMIT 10001",
             (compiled, kind, kind, namespace, namespace))
@@ -168,7 +220,17 @@ class Knowledge:
                 break
             identity = (row["kind"], row["namespace"], row["value"])
             if identity not in seen:
-                candidates.append(self.describe(row))
+                candidate = self.describe(row)
+                candidate["matched_by"] = "fts"
+                candidate["score"] = row["score"]
+                candidate["matched_documents"] = [{
+                    "title": row["matched_title"], "original": row["matched_original"],
+                    "response_truncated": bool(row["matched_response_truncated"]),
+                    "source_id": row["matched_source_id"],
+                    "evidence_id": row["matched_evidence_id"]}]
+                candidate["source_id"] = row["matched_source_id"]
+                candidate["evidence_id"] = row["matched_evidence_id"]
+                candidates.append(candidate)
                 seen.add(identity)
             if len(candidates) >= topk:
                 break
@@ -218,6 +280,14 @@ class Knowledge:
         if target_tag_namespace is not None and (not isinstance(target_tag_namespace, str)
                                                  or not 1 <= len(target_tag_namespace) <= 256):
             raise ValueError("target_tag_namespace must contain 1..256 characters")
+        direct = self.lookup(query, kind=kind, namespace=namespace)
+        if direct["status"] == "found":
+            result = self._ask_resolved(query, kind=kind, namespace=namespace,
+                                        target_tag_namespace=target_tag_namespace)
+            result["input_query"] = query
+            result["parsed_subject"] = None
+            result["query_template"] = "unsupported"
+            return result
         parsed = parse_ask_template(query)
         if parsed is None:
             result = self._ask_resolved(query, kind=kind, namespace=namespace,
@@ -232,6 +302,8 @@ class Knowledge:
                 raise ValueError("introduce template cannot combine with target_tag_namespace")
             result = self._ask_resolved(subject, kind=kind, namespace=namespace,
                                         target_tag_namespace=None)
+            result["input_query"] = query
+            result["parsed_subject"] = subject
             result["query_template"] = "introduce"
             if result["status"] == "found":
                 result["answer"] = (f"Source entity {result['entry_key']['namespace']}"
@@ -244,15 +316,21 @@ class Knowledge:
                                  "target_tag_namespace conflicts")
             result = self._ask_resolved(subject, kind=kind, namespace=namespace,
                                         target_tag_namespace="danbooru.tag")
+            result["input_query"] = query
+            result["parsed_subject"] = subject
             result["query_template"] = "danbooru_tag"
             return result
         result = self._ask_resolved(subject, kind=kind, namespace=namespace,
                                     target_tag_namespace=target_tag_namespace)
+        result["input_query"] = query
+        result["parsed_subject"] = subject
         result["query_template"] = "tag"
         return result
 
     def _ask_resolved(self, query, *, kind=None, namespace=None, target_tag_namespace=None):
         result = self.lookup(query, kind=kind, namespace=namespace)
+        result["input_query"] = query
+        result["parsed_subject"] = None
         result["target_namespace"] = target_tag_namespace
         result["mapping_status"] = "unknown"
         if result["status"] == "not_found":
