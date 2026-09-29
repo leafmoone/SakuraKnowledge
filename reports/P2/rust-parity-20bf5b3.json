@@ -1,0 +1,324 @@
+{
+  "snapshot": "snapshot-full-20bf5b3",
+  "db_sha256": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073",
+  "rust_bin_sha256": "6fa0b6111cd08cc014ccd4ab37a7d71cc1c0f8666b5ef8f604a762957f1fed5e",
+  "python_git_sha": "e5c4fd9760ccf206b7a34d0c7a3fa09ab380753c",
+  "cases": [
+    {
+      "case_id": "L01",
+      "op": "lookup",
+      "args": {
+        "query": "975"
+      },
+      "python_status": "ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.088,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "L02",
+      "op": "lookup",
+      "args": {
+        "query": "975",
+        "kind": "character",
+        "namespace": "bangumi.character"
+      },
+      "python_status": "found",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.045,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "L03",
+      "op": "lookup",
+      "args": {
+        "query": "\"加特\""
+      },
+      "python_status": "found",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.058,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "L04",
+      "op": "lookup",
+      "args": {
+        "query": "ONE PIECE"
+      },
+      "python_status": "ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.05,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "L05",
+      "op": "lookup",
+      "args": {
+        "query": "10"
+      },
+      "python_status": "ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.163,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "L06",
+      "op": "lookup",
+      "args": {
+        "query": "definitely_missing_xyz_9271"
+      },
+      "python_status": "not_found",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.04,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "L07",
+      "op": "lookup_key",
+      "args": {
+        "kind": "character",
+        "namespace": "bangumi.character",
+        "value": "975"
+      },
+      "python_status": "found",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.04,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "L08",
+      "op": "lookup_key",
+      "args": {
+        "kind": "episode",
+        "namespace": "bangumi.episode",
+        "value": "1128648"
+      },
+      "python_status": "found",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.039,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "S01",
+      "op": "search",
+      "args": {
+        "query": "ONE PIECE",
+        "topk": 20
+      },
+      "python_status": "ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 15.897,
+      "python_budget_retries": 2,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "S02",
+      "op": "search",
+      "args": {
+        "query": "ONE PIECE",
+        "topk": 20,
+        "kind": "episode"
+      },
+      "python_status": "not_found",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.569,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "S03",
+      "op": "search",
+      "args": {
+        "query": "!!",
+        "topk": 20
+      },
+      "python_status": "ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.044,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "S04",
+      "op": "search",
+      "args": {
+        "query": "独",
+        "topk": 20
+      },
+      "python_status": "ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.044,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "S05",
+      "op": "search",
+      "args": {
+        "query": "孤独摇滚",
+        "topk": 5
+      },
+      "python_status": "ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 3.265,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "R01",
+      "op": "related",
+      "args": {
+        "kind": "character",
+        "namespace": "bangumi.character",
+        "value": "975",
+        "limit": 20
+      },
+      "python_status": "found",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.041,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "R02",
+      "op": "related",
+      "args": {
+        "kind": "character",
+        "namespace": "bangumi.character",
+        "value": "12393",
+        "limit": 20
+      },
+      "python_status": "found",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.042,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "R03",
+      "op": "related",
+      "args": {
+        "kind": "tag",
+        "namespace": "local.tag_aggregate",
+        "value": "akanbe",
+        "limit": 20
+      },
+      "python_status": "found",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.04,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "R04",
+      "op": "related",
+      "args": {
+        "kind": "character",
+        "namespace": "bangumi.character",
+        "value": "12393",
+        "relation": "identity_candidate",
+        "limit": 20
+      },
+      "python_status": "found",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.038,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "A01",
+      "op": "ask",
+      "args": {
+        "query": "975"
+      },
+      "python_status": "entity_ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.04,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "A02",
+      "op": "ask",
+      "args": {
+        "query": "加特 的标签是什么"
+      },
+      "python_status": "entity_found_tag_unmapped",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.04,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "A03",
+      "op": "ask",
+      "args": {
+        "query": "孤独摇滚 的 Danbooru tag 是什么"
+      },
+      "python_status": "entity_ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.039,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "A04",
+      "op": "ask",
+      "args": {
+        "query": "介绍一下 975"
+      },
+      "python_status": "entity_ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.04,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "A05",
+      "op": "ask",
+      "args": {
+        "query": "10",
+        "kind": "page",
+        "namespace": "danbooru.wiki"
+      },
+      "python_status": "entity_found_tag_unmapped",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.04,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "A06",
+      "op": "ask",
+      "args": {
+        "query": "!",
+        "kind": "tag",
+        "namespace": "local.tag_aggregate",
+        "target_tag_namespace": "danbooru.tag"
+      },
+      "python_status": "entity_found_tag_unmapped",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.042,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "A07",
+      "op": "ask",
+      "args": {
+        "query": "solo 的 Danbooru tag 是什么"
+      },
+      "python_status": "entity_ambiguous",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.051,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "A08",
+      "op": "ask",
+      "args": {
+        "query": "xyzzy 不支持的自由文本 9271"
+      },
+      "python_status": "unknown",
+      "rust_exit_code": 0,
+      "elapsed_s": 0.04,
+      "status": "EQUAL"
+    },
+    {
+      "case_id": "I01",
+      "op": "inspect",
+      "args": {},
+      "python_status": null,
+      "rust_exit_code": 0,
+      "elapsed_s": 5.087,
+      "status": "EQUAL"
+    }
+  ],
+  "overall": "PASS"
+}

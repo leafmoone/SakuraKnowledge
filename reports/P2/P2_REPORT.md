@@ -1,0 +1,95 @@
+# P2 Report — Rust read-only runtime and contract hardening
+
+Status: `P2 A/B/C DONE — WAITING_REVIEW`. No upstream data was refreshed; all
+evidence below is bound to the frozen local snapshot
+`build/snapshot-full-20bf5b3/knowledge.sqlite`
+(sha256 `4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073`).
+
+## Phase A — Python reference contract fixes (commit `e5c4fd9`)
+
+Three test-first regression tests were added to `tests/test_hardening.py`
+(ask exact-identity priority, search `topk` + hit evidence, Moegirl bounded
+`source_fields`) and `src/sakura_knowledge/api.py` was fixed to satisfy them:
+
+1. `ask` now resolves exact source identity **before** template parsing, so a
+   directly matching entity is never shadowed by a parsed subject.
+2. `search` honours `topk` on **every** branch (empty-FTS, FTS, exact-only)
+   and returns bounded per-hit document evidence.
+3. Moegirl raw fields are projected through a bounded `source_fields` set in
+   the API, with `source_fields_evidence` citations.
+
+Checks at `e5c4fd9`: `python -m pytest -q` → `37 passed`;
+`python -m ruff check src tests` → all checks passed; `git diff --check` clean.
+
+## Phase B — Rust read-only runtime (`rust/`)
+
+Single Cargo package `sakura-knowledge-runtime v0.2.0` (contract version `2`).
+Read-only SQLite via `rusqlite` (features `bundled`, `hooks`, `limits`),
+`serde`/`serde_json` for JSON, `unicode-normalization` for NFKC. No ORM, no
+async, no HTTP, no PyO3, no model, no service.
+
+| Item | Value |
+| --- | --- |
+| Toolchain | `stable-x86_64-pc-windows-gnu`; `rustc 1.98.1 (48a229cea 2026-09-01)`, `cargo 1.98.1` |
+| C linker | MinGW-w64 `x86_64-w64-mingw32-gcc (GCC) 16.2.0` (w64devkit at `C:\Users\PC\snknow-tools\w64devkit`) |
+| Build | `cargo build --release` → OK, `rust/target/release/sknow-rs.exe` |
+| Tests | `cargo test --release` → `3 passed; 0 failed` (tokenizer, ask templates, fixture lookup/search/related/ask) |
+| Lint | `cargo clippy --release --tests` → 0 warnings |
+| Format | `cargo fmt -- --check` clean |
+| Binary sha256 | `6fa0b6111cd08cc014ccd4ab37a7d71cc1c0f8666b5ef8f604a762957f1fed5e` |
+
+Contract fidelity (mirrors `api.py` / `model.py`):
+
+- Identity trust = `source_backed` only; text trust = `generated_from_evidence`
+  + `source_backed`. Candidate proofs are never silently promoted.
+- 5 s per-operation budget via progress handler; `SQLITE_LIMIT_LENGTH=2e6`;
+  connection opened with `SQLITE_OPEN_READ_ONLY`.
+- Bounded projections: documents ≤10 (4000-char truncation flag), aliases ≤100,
+  identity evidence ≤100, lookup candidates ≤101→100 (+ warning), FTS scan
+  ≤10000 (+ `search_document_scan_limit` warning), `topk`/`limit` 1..100.
+- Ask templates are the same bounded deterministic set
+  (`X 的 Danbooru tag 是什么`, `X 的标签是什么`, `介绍[一下] X`); everything
+  else is a direct entity name marked `unsupported`.
+- `inspect` reports snapshot id, contract version, page stats and dbstat
+  availability; `read_only: true`.
+
+## Phase C — Parity verification (`tools/check_parity.py`)
+
+Fixed evaluation set: 26 cases bound to the frozen snapshot
+(lookup by value/key, search incl. FTS-excluded episode namespace and
+too-short CJK, related incl. candidate-only exclusions, ask direct + all
+templates + target namespaces, inspect). The tool runs the Python reference
+API and the `sknow-rs` binary on identical inputs and compares the full JSON
+semantically (dict order-insensitive, list order-sensitive).
+
+- Report: `reports/P2/rust-parity-20bf5b3.json` — **overall PASS, 26/26 EQUAL**,
+  exit code 0.
+- Python reference git SHA at check time: `e5c4fd9760ccf206b7a34d0c7a3fa09ab380753c`.
+- Documented operational note (recorded in the report as
+  `python_budget_retries`): case `S01` (`search "ONE PIECE"`) required 2
+  retries on the **Python reference side only** because a cold 21.5 GB FTS
+  working set exceeds the reference's own 5 s per-operation budget before the
+  OS page cache is populated. This is a cache-warmup effect, not a contract
+  difference; the compared outputs were byte-identical once the reference
+  completed. The Rust side never required a retry.
+
+## Integrity
+
+- `knowledge.sqlite` sha256 after all P2 operations:
+  `4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073`
+  (identical to the pre-P2 value recorded in the parity report;
+  post-run receipt at
+  `build/snapshot-full-20bf5b3/knowledge.sqlite.post-p2.sha256`).
+- No snapshot, upstream, or P1 receipt files were modified in P2 except the
+  additive `reports/P2/` artifacts.
+
+## Explicit non-claims
+
+- `Pi Skill runtime integration`: **NOT_RUN**.
+- `SakuraPool integration`: **NOT_RUN**.
+- `Full human source-fact review`: **NOT_RUN**.
+- No live upstream refresh was performed; all results are from the frozen
+  local cut.
+- The 674,679-tag AI annotation has not been started.
+
+Overall project status remains `NOT_READY / WAITING_REVIEW`.

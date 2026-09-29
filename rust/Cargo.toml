@@ -1,0 +1,19 @@
+[package]
+name = "sakura-knowledge-runtime"
+version = "0.2.0"
+edition = "2021"
+license = "MIT"
+description = "Read-only Rust runtime for SakuraKnowledge snapshot queries"
+
+[lib]
+name = "sakura_knowledge_runtime"
+path = "src/lib.rs"
+
+[[bin]]
+name = "sknow-rs"
+path = "src/main.rs"
+
+[dependencies]
+rusqlite = { version = "0.31", features = ["bundled", "hooks", "limits"] }
+serde_json = "1"
+unicode-normalization = "0.1"
