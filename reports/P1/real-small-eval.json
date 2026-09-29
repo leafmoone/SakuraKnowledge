@@ -8,6 +8,27 @@
   "query_execution": "PYTHONPATH=src python <evaluation runner>; runner imported sakura_knowledge from src/sakura_knowledge against the frozen snapshot; executed after commit 3cad90c and before report commit 5fcd867",
   "binding_note": "Report-only binding correction. Case inputs, outputs, counts, and human judgements were not rerun or changed."
  },
+ "moegirl_structured_field_eval": {
+  "case_id": "MOE-STRUCT-01",
+  "snapshot": "build/snapshot-full-20bf5b3/knowledge.sqlite",
+  "query_code_sha": "3cad90cce7d415f21e470a222cf26a2c85da159b",
+  "normalized_input": "build/real-full-7afe7fb/moegirl.jsonl",
+  "normalized_line": 1,
+  "normalized_line_sha256": "60184d99cabc7570a0796a1ea723e0b95f2290f1ff82b6351d02b064431fecd0",
+  "entry_key": {"kind": "character", "namespace": "moegirl.character", "value": "\"加特\""},
+  "source_id": "moegirl-complete-5072f7cf3e3e",
+  "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:1",
+  "status": "source_backed",
+  "fields_equal_to_frozen_input": true,
+  "fields": {
+   "raw_attributes": ["社交恐惧症", "心理阴影", "银发", "灰瞳", "垂眼", "无口", "宠物相伴", "面具", "眼镜", "间谍", "科学家", "侦探"],
+   "raw_subject_categories": ["中国作品", "第五人格", "真理之下"],
+   "raw_cv_names": ["黑石稔", "内山昂辉"],
+   "raw_gender": null
+  },
+  "constraints_checked": ["no danbooru.tag conversion", "no character_of inference", "no Bangumi person join from CV names"],
+  "result": "PASS"
+ },
  "resolved_terms": {
   "E03_alias": "美坂栞",
   "E04_alias": "水樹奈々",

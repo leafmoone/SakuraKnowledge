@@ -19,7 +19,7 @@ History retained, never amended: `573947f` (first hardening), `7afe7fb` (source 
 - Reconciliation (machine-readable): `reports/P1/full-reconciliation-20bf5b3.json`. Key closures: Danbooru 79,947 converter unresolved − 952 byte-identical duplicate rows = 78,995; wiki links 1,022,285 − 24,445 duplicates = 997,840 (24,445 + 952 = 25,397 duplicate lines); tag_wiki 193,494 candidate lines = 2 × 96,747 byte-identical pairs (frozen `tag_evidence` table itself stores each candidate twice; dataset_id is NULL in all rows; no dataset/evidence/locator lost); missing_endpoint 15,901 = Bangumi 15,892 (credit_person 7,749 / subject_relation 7,304 / features_character 832 / character_relation 7; endpoints absent from the same archive cut, checked ID-scheme consistent) + mapping 9 (bangumi character IDs absent from cut).
 - Query performance on the 21.5 GB snapshot (`build/query-perf-20bf5b3.json`, 5 reps/workload, per-op 5 s budget): **0 budget failures**. p50/p95 ms: local-tag ask 0.037/0.047, ask with danbooru target 0.038/0.043, exact-key lookup 0.062/0.069, value lookup 0.038/0.045, alias lookup 0.062/0.068, 2-char alias search 0.52/0.54 and 0.80/0.80, English search 16.6/18.2, high-degree related (subject 975, 2,017 trusted outgoing links) limit 100 5.6/6.1 and limit 10 4.4/4.5, page-without-tag ask 0.077/0.079. ORDER BY/GROUP BY temp B-trees remain a documented spill risk at larger fan-out; nothing claims constant memory.
   - **Receipt defect, disclosed (P2, report-only correction):** the two CJK rows were measured with mixed ASCII+CJK alias terms `\u0030\u4eba` (0人) and `\u0030\u53f7` (0号) — the v1 receipt file itself stores correct UTF-8; only the console rendering was mojibake — and its timestamps were second-precision local time, so started_at equals completed_at because the whole suite ran in under a second. The terms above are recovered from the v1 receipt bytes (archived at `build/query-perf-20bf5b3.v1-defective.json`); per instruction the workload was **not** re-measured and no times or terms were invented. These rows therefore evidence 2-char alias search, not pure-CJK prose search. Independent reviewer cross-check on the same snapshot: `search('孤独摇滚')` = 499.9 ms, `found`, 20 candidates, all with citations. `tools/measure_queries.py` was fixed for future receipts (sub-second UTC ISO times, deterministic pure-CJK term filter, `ensure_ascii=True`).
-- Wheel: offline `python -m build --wheel --no-isolation` from `3cad90c` produced `build/wheel-fix-3cad90c/sakura_knowledge-0.1.1-py3-none-any.whl` (SHA256 `e0041b73eac3e37009fb6680f2b06b84bdf1cea5fbb12e3b05770b36dc9082d7`, 23,026 bytes). Fresh venv `build/isolated-fix-3cad90c`, `pip install --no-index --no-deps`, executed outside the source tree with PYTHONPATH unset: package is under site-packages, version 0.1.1, wheel/source API hashes match after CRLF/LF normalization; template ask, local identity, and unsupported-query behavior all passed against the frozen snapshot. Corrected API smoke EXIT 0; CLI was not invoked in this corrected run.
+- Wheel CLI smoke receipt: `reports/P1/cli-wheel-smoke-3cad90c.json`. Using the already-built wheel in `build/isolated-fix-3cad90c`, outside the source tree, with `PYTHONIOENCODING=utf-8` and no traceback: `sknow --help`, real Moegirl lookup, and the requested Danbooru ask all exited 0 with empty stderr. The ask template and `target_namespace=danbooru.tag` were correct, but the real result was `entity_ambiguous` before target mapping, not `target_unmapped`; `tag_key=null`, and no tag was fabricated. Therefore `CLI_WHEEL_SMOKE=NOT_READY`, not acceptance PASS evidence.
 
 ## What the data says (not acceptance language)
 
@@ -29,11 +29,13 @@ History retained, never amended: `573947f` (first hardening), `7afe7fb` (source 
 
 ## Mandatory gaps / follow-up
 
-- `real_small_evaluation`: PASS_CONTRACT_RECONCILIATION — 26/26 human-checked cases in `reports/P1/real-small-eval.json`; this is a small real-data behavior check, not a full-database factual review.
+- `real_small_evaluation`: PASS — 26/26 contract cases remain unchanged in `reports/P1/real-small-eval.json`; this is a small real-data behavior check, not a full-database factual review.
+- `MOEGIRL_STRUCTURED_FIELD_EVAL`: PASS — `moegirl.character/"加特"` fields `raw_attributes`, `raw_subject_categories`, `raw_cv_names`, and `raw_gender` match normalized line 1 and snapshot payload exactly; no Danbooru tag, `character_of`, or Bangumi person inference.
 - `pi_skill_integration`: NOT_RUN (Skill file updated; actual Pi runtime never exercised).
 - `human_fact_review`: NOT_RUN; no model synthesis used.
 - High-fan-out ORDER BY temp-B-tree spill and O(F) index-set memory at scales beyond the tested node are documented risks, not measured at that scale.
 - Trust split audit: snapshot has 0 `generated_from_evidence` rows, 0 entries with generated-only trusted evidence, 0 generated aliases without identity evidence, and 0 verified `entity_tag` edges; no 21.5GB rebuild was required. Full counts are in `reports/P1/trust-stats-20bf5b3.json`.
+- `FULL_REBUILD_PERFORMED=NO`: current work uses the fixed snapshot only.
 - Remote repository: private `https://github.com/leafmoone/SakuraKnowledge`; final SHA verification is recorded after the report commit. Main branch not touched.
 
 ## Final status
@@ -49,9 +51,11 @@ History retained, never amended: `573947f` (first hardening), `7afe7fb` (source 
 - HUMAN_FACT_REVIEW: NOT_RUN
 - ASK_TEMPLATES: PASS (bounded deterministic Chinese templates, verbatim subject extraction, unsupported warning)
 - IDENTITY_TEXT_TRUST_SPLIT: PASS (identity source_backed only; text allows generated_from_evidence)
-- REAL_SMALL_EVALUATION: PASS_CONTRACT_RECONCILIATION (26/26)
-- REMOTE_DEV_VERIFIED: PENDING_FINAL_PUSH
+- REAL_SMALL_EVALUATION: PASS (26/26 unchanged)
+- MOEGIRL_STRUCTURED_FIELD_EVAL: PASS
+- CLI_WHEEL_SMOKE: NOT_READY (commands exit 0, requested ask is entity_ambiguous rather than target_unmapped)
+- REMOTE_DEV_VERIFIED: pending final push verification
 - MAIN_MODIFIED: NO
 - SAKURAPOOL_MODIFIED: NO
-- P1_RESULT: NOT_READY (awaiting reviewer sign-off on `3cad90c` + Pi skill runtime integration and human source-fact review)
+- P1_RESULT: NOT_READY (CLI real-question acceptance is blocked by source ambiguity; Pi runtime and human source-fact review remain NOT_RUN)
 - STOP_STATE: WAITING_REVIEW

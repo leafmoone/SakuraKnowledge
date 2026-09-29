@@ -21,7 +21,14 @@
   "wheel_size_bytes": 23026,
   "wheel_build": {"command": "python -m build --wheel --no-isolation --outdir build/wheel-fix-3cad90c", "result": "PASS", "note": "offline, local setuptools; an earlier isolated `python -m build` attempt failed on PyPI network timeout for setuptools>=68 and is retained as NOT used"},
   "wheel_isolated_test": {"venv": "build/isolated-fix-3cad90c", "install": "pip install --no-index --no-deps <wheel>", "python": "3.14", "package_file": "build/isolated-fix-3cad90c/Lib/site-packages/sakura_knowledge/api.py", "api_hash_in_wheel_normalized": "cc1feb8b64d61446dd617f65f4199dd3ca506d925c85e2a7cb49d9922a97668c", "api_hash_git_blob_normalized": "cc1feb8b64d61446dd617f65f4199dd3ca506d925c85e2a7cb49d9922a97668c", "full_snapshot_template_ask": "found / local_identity_only / query_template=tag", "full_snapshot_ask_local_tag": "found / local_identity_only", "full_snapshot_ask_target_danbooru": "not re-run in this wheel smoke; prior fixed snapshot result entity_found_tag_unmapped / target_unmapped / tag_key=null", "unsupported_template": "unknown / query_template=unsupported / unsupported_query_template", "cli_sknow_exit": "not invoked in corrected smoke; API smoke exit 0", "result": "PASS", "note": "executed outside the source tree with PYTHONPATH unset; raw hash differs only because Git blob is LF and checkout/wheel is CRLF; normalized bytes match"},
-  "engine_tests": {"command": "python -m pytest -q", "passed": 34, "seconds": 1.82, "result": "PASS", "new_coverage": ["ask template parsing/routing/conflicts/verbatim subjects/unsupported warning", "identity vs text trust and generated-only gates"]},
+  "engine_tests": {"command": "python -m pytest -q", "passed": 34, "result": "PASS", "new_coverage": ["ask template parsing/routing/conflicts/verbatim subjects/unsupported warning", "identity vs text trust and generated-only gates"]},
+  "FULL_REBUILD_PERFORMED": "NO",
+  "REAL_SMALL_EVALUATION": {"status": "PASS", "case_count": 26, "receipt": "reports/P1/real-small-eval.json", "query_code_sha": "3cad90cce7d415f21e470a222cf26a2c85da159b", "snapshot": "build/snapshot-full-20bf5b3/knowledge.sqlite"},
+  "MOEGIRL_STRUCTURED_FIELD_EVAL": {"status": "PASS", "receipt": "reports/P1/real-small-eval.json#moegirl_structured_field_eval", "key": "moegirl.character/\\\"加特\\\"", "source_id": "moegirl-complete-5072f7cf3e3e", "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:1", "all_four_fields_match_frozen_jsonl": true},
+  "CLI_WHEEL_SMOKE": {"status": "NOT_READY", "receipt": "reports/P1/cli-wheel-smoke-3cad90c.json", "all_commands_exit_zero": true, "ask_query_template": "danbooru_tag", "ask_status": "entity_ambiguous", "mapping_status": "entity_ambiguous", "tag_key": null, "note": "CLI executed without traceback, but requested real question did not reach target_unmapped because source entity matches are ambiguous; do not count as acceptance PASS"},
+  "PI_SKILL_INTEGRATION": "NOT_RUN",
+  "HUMAN_FACT_REVIEW": "NOT_RUN",
+  "manifest_sha256_full": "7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c",
   "lint": {"command": "python -m ruff check src tests tools", "result": "PASS"},
   "real_build": {
     "command": "python -m sakura_knowledge.cli build build/real-full-7afe7fb/manifest.json build/snapshot-full-20bf5b3",
@@ -53,5 +60,5 @@
   "knowledge_gap_danbooru_native_tags": "no native danbooru.tag identities exist in the audited local sources; local.tag_aggregate hits never imply danbooru.tag; ask() reports this as target_unmapped rather than guessing",
   "pi_skill_integration": "NOT_RUN",
   "human_fact_review": "NOT_RUN",
-  "p1_status": "NOT_READY_FOR_FINAL_ACCEPTANCE: implementation, trust separation, templates, 26-case real-data contract evaluation, full fixed-input pipeline, and corrected wheel smoke pass; remaining gaps are Pi skill runtime integration, human source-fact review, remote final SHA recording, and reviewer sign-off"
+  "p1_status": "NOT_READY: 26-case evaluation and Moegirl structured fields pass; wheel CLI commands execute, but the requested Danbooru question is entity_ambiguous rather than target_unmapped. Pi runtime and full human fact review remain NOT_RUN."
 }

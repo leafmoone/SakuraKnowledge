@@ -1,0 +1,18 @@
+{
+  "wheel": "build/wheel-fix-3cad90c/sakura_knowledge-0.1.1-py3-none-any.whl",
+  "wheel_sha256": "e0041b73eac3e37009fb6680f2b06b84bdf1cea5fbb12e3b05770b36dc9082d7",
+  "venv": "build/isolated-fix-3cad90c",
+  "working_directory": "C:\\Users\\PC",
+  "source_tree_outside": true,
+  "pythonpath_unset": true,
+  "encoding": "PYTHONIOENCODING=utf-8",
+  "snapshot": "build/snapshot-full-20bf5b3/knowledge.sqlite",
+  "commands": {
+    "help": {"command": "PYTHONIOENCODING=utf-8 isolated-fix-3cad90c/Scripts/sknow.exe --help", "exit": 0, "stdout": "build/cli-final-3cad90c-help.stdout.txt", "stderr": "build/cli-final-3cad90c-help.stderr.txt", "stderr_empty": true},
+    "lookup_moegirl_character": {"command": "PYTHONIOENCODING=utf-8 isolated-fix-3cad90c/Scripts/sknow.exe lookup build/snapshot-full-20bf5b3/knowledge.sqlite \\\"加特\\\" --kind character --namespace moegirl.character", "exit": 0, "stdout": "build/cli-final-3cad90c-lookup.stdout.json", "stderr": "build/cli-final-3cad90c-lookup.stderr.txt", "stderr_empty": true, "status": "found", "entry_key": {"kind": "character", "namespace": "moegirl.character", "value": "\\\"加特\\\""}},
+    "ask_danbooru_template": {"command": "PYTHONIOENCODING=utf-8 isolated-fix-3cad90c/Scripts/sknow.exe ask build/snapshot-full-20bf5b3/knowledge.sqlite \\\"孤独摇滚 的 Danbooru tag 是什么\\\"", "exit": 0, "stdout": "build/cli-final-3cad90c-ask.stdout.json", "stderr": "build/cli-final-3cad90c-ask.stderr.txt", "stderr_empty": true, "query_template": "danbooru_tag", "target_namespace": "danbooru.tag", "status": "entity_ambiguous", "mapping_status": "entity_ambiguous", "tag_key": null, "acceptance": "NOT_READY: real input is ambiguous before target mapping; no tag was fabricated"}
+  },
+  "result": "NOT_READY",
+  "limitation": "All commands executed successfully and emitted JSON, but the requested real question resolves to multiple source entities in this snapshot; it does not produce target_unmapped. CLI smoke is therefore not PASS acceptance evidence.",
+  "traceback": false
+}
