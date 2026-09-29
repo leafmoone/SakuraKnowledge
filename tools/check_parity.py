@@ -301,6 +301,8 @@ def run_cli_case(op: str, args: dict, expect: dict, bin_path: Path) -> dict:
             if got != want:
                 problems.append({"path": f"$.stderr_{key}.{jkey}", "kind": "expect",
                                  "want": want, "got": got})
+        if expect.get("stdout_empty") and proc.stdout.strip():
+            problems.append({"path": f"$.stdout_{key}", "kind": "must_be_empty"})
     entry["problems"] = problems
     entry["status"] = "EQUAL" if not problems else "MISMATCH"
     return entry

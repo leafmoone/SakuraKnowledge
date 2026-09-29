@@ -170,9 +170,14 @@ def main() -> int:
         ["error_missing_db", sknow + ["lookup", str(ROOT / "no_such.db"), "x"]],
         ["error_unknown_op", sknow + ["frobnicate"]],
     ]
+    # code-page independence: run under an explicit GBK console encoding;
+    # the CLI must still emit strict UTF-8 bytes (it reconfigures stdout)
+    gbk_env = dict(env, PYTHONIOENCODING="gbk")
+    commands.append(("gbk_env_lookup", sknow + ["lookup", str(db), "975"], gbk_env))
     wheel_results = {}
-    for name, cmd in commands:
-        r = run(cmd, env, f"wheel.{name}")
+    for item in commands:
+        name, cmd = item[0], item[1]
+        r = run(cmd, item[2] if len(item) > 2 else env, f"wheel.{name}")
         wheel_results[name] = r
     rep["wheel_cli"] = wheel_results
 
@@ -192,7 +197,10 @@ def main() -> int:
         "source_sha256_matches": sha256(target) == sha256(rs_bin),
     }
     rust_results = {}
-    for name, cmd in commands:
+    for item in commands:
+        name, cmd = item[0], item[1]
+        if name == "gbk_env_lookup":
+            continue  # rust stdout is already code-page independent
         r = run([str(target) if c.endswith("sknow.exe") else c for c in cmd], env,
                 f"rust.{name}")
         rust_results[name] = r
@@ -227,12 +235,14 @@ def main() -> int:
     # ---------------- expectations -----------------------------------------
     exp = {
         "help": 0, "help_short": 0, "lookup": 0, "lookup_key": 0, "search": 0,
-        "related": 0, "ask": 0, "ask_danbooru": 0,
+        "related": 0, "ask": 0, "ask_danbooru": 0, "gbk_env_lookup": 0,
         "error_topk": 2, "error_missing_db": 2, "error_unknown_op": 2,
     }
     problems = []
     for side, results in (("wheel", wheel_results), ("rust", rust_results)):
         for name, want in exp.items():
+            if name not in results:
+                continue  # not part of this runtime's command matrix
             got = results.get(name, {}).get("exit")
             if got != want:
                 problems.append({"side": side, "name": name,
@@ -254,6 +264,11 @@ def main() -> int:
             if exp.get(name) == 2 and not r.get("stderr_json_parses"):
                 problems.append({"side": side, "name": name,
                                  "kind": "error_stderr_not_json"})
+        uo = (results.get("error_unknown_op", {}).get("stderr_json") or {})
+        if uo.get("error") != "UsageError":
+            problems.append({"side": side, "name": "error_unknown_op",
+                             "kind": "usage_error_type", "want": "UsageError",
+                             "got": uo.get("error")})
 
     # Unicode cross-check: CLI JSON (decoded from bytes) must equal the
     # in-process API result computed in *this* interpreter, for every

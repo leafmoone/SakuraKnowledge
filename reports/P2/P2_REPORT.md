@@ -1,6 +1,7 @@
 # P2 Report — Rust read-only runtime and contract hardening
 
-Status: `P2 A/B/C DONE — WAITING_REVIEW`. No upstream data was refreshed; all
+Status: `P2 A/B/C DONE + review remediation — WAITING_REVIEW`.
+See "Review remediation (items 1–7)" below. No upstream data was refreshed; all
 evidence below is bound to the frozen local snapshot
 `build/snapshot-full-20bf5b3/knowledge.sqlite`
 (sha256 `4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073`).
@@ -92,4 +93,60 @@ semantically (dict order-insensitive, list order-sensitive).
   local cut.
 - The 674,679-tag AI annotation has not been started.
 
-Overall project status remains `NOT_READY / WAITING_REVIEW`.
+## Review remediation (items 1–7, post-`abc3a8f`)
+
+Commits: `7f529b1` (151-case parity), `889ed9a` (read-only compat receipt +
+A-evidence tests), `685990d` (wheel 0.2.0 + dist + sknow-rs CLI surface),
+`ac6988d` (byte-level UTF-8 evidence + strict S18 classification),
+`8593d73` (`.gitattributes -text` for raw evidence).
+
+1. **Parity v2 table, 151 locked cases** — `tools/parity_cases.py`
+   (values mined from the real snapshot, locked in-repo). Latest receipts
+   `rust-parity-20bf5b3-v5.json` / `v6.json` (same binary `a8f8cdb9…`):
+   150 EQUAL in both; S18 `a's_wonderland` is the only non-EQUAL case and
+   its classification depends on machine state at run time:
+   - v5: both runtimes over budget → `BUDGET_LIMITED_PARTIAL` (documented,
+     PASS);
+   - v6: Rust 25/25 over budget, Python ok → `RUST_BUDGET_EXCEEDED`
+     (every attempt in `attempt_trail`) → overall **FAIL**, exit 1.
+   A Rust budget failure is never counted as equality; the standing,
+   reproducible statement is: **S18 is a Rust budget-boundary case
+   (~1.4–5.5 s SQL), semantic output equal whenever both complete.**
+2. **Docs + delivery JSON** — `docs/STAGE_STATUS.md`,
+   `docs/runtime-contract.md`, `docs/rust-migration.md`,
+   `reports/P2/p2-delivery.json`.
+3. **Wheel 0.2.0, isolated venv** — `p2-wheel-cli-20bf5b3.json` (overall
+   PASS): fresh `--without-pip` venv, `pip install --no-index` the wheel,
+   12-command matrix incl. `gbk_env_lookup` (code-page independence).
+   All streams strict UTF-8, 0 U+FFFD bytes, success stdout full-JSON,
+   error stderr JSON (`UsageError`), in-process Unicode cross-check 8/8.
+   Verbatim bytes under `reports/P2/raw/wheel-cli/` (sha256-matched).
+4. **sknow-rs distribution outside source tree** —
+   `dist/p2/sknow-rs-0.2.0-win64/sknow-rs.exe` (sha256 `a8f8cdb9…`,
+   manifest `p2-artifact-manifest.json`); same matrix, all PASS.
+5. **Read-only compatibility** — `snapshot-compatibility-20bf5b3.json`
+   (PASS; sha256 identical before/after; write attempt blocked; Rust
+   `SQLITE_OPEN_READ_ONLY`; required columns verified; inspect error path
+   both runtimes). `dbstat`: **NOT_AVAILABLE** in this system's SQLite —
+   recorded, not faked.
+6. **Performance, raw** — `p2-perf-20bf5b3.json` +
+   `reports/P2/raw/perf/p2-perf-samples.jsonl` (1,596 end-to-end CLI
+   samples, no retries, 120 s hard bound, sha256 of samples file in the
+   receipt). Warm p50/p95: Rust 40/179 ms vs Python 194/451 ms
+   (interpreter start dominates Python). Budget failures are failure
+   samples: S18 Rust 6/6 rounds and Python 4/6; S17 once each on round 0;
+   S01 Python once on round 0 (cold cache).
+7. **A-evidence + error-contract unification** — `tests/test_evidence.py`
+   (occurrence dataset partition, nullable `sample_count`, invalid
+   frequency rejected-not-published, `source_fields` bounded projection,
+   read-only write blocking, CLI `UsageError` JSON contract);
+   `sakura_knowledge.cli` reconfigures stdout/stderr to UTF-8 (GBK console
+   no longer raises `UnicodeEncodeError`); Rust usage errors now emit
+   `UsageError` JSON (was free text). Parity cases E15/E16 lock the new
+   contract.
+
+Checks at remediation: `python -m pytest -q` → 47 passed; ruff clean;
+`git diff --check` clean; `cargo test --release` 3/3; `cargo fmt --check`
+clean.
+
+## Explicit non-claims

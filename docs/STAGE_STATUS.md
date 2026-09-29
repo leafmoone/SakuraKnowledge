@@ -1,0 +1,65 @@
+# Stage Status (SakuraKnowledge)
+
+As of the P2 submission (see `reports/P2/p2-delivery.json` for SHAs).
+
+## Stage matrix
+
+| Stage | Scope | Status | Evidence |
+|---|---|---|---|
+| P1 build | Full 4-source snapshot (bangumi archive, moegirl, mapping, danbooru + tag_wiki) | DONE | `reports/P1/full-reconciliation-20bf5b3.json`, snapshot sha256 `4c5ebae1…`, verify EXIT 0 |
+| P1 quality | Query performance, reconciliation, trust split | DONE | `reports/P1/` receipts |
+| P2 A | Reference fixes (trust split, ask templates, identity boundary) | DONE | commit `e5c4fd9` |
+| P2 B/C | Rust runtime + CLI + 26-case parity | DONE (replaced by v2/v4/v6 151-case parity) | commits `abc3a8f`, `7f529b1` |
+| P2 review remediation | Parity 151, compat receipt, wheel/dist, perf, docs | IN PROGRESS — this document set | `reports/P2/` receipts below |
+
+## P2 review remediation — item status
+
+1. **151-case parity** — `reports/P2/rust-parity-20bf5b3-v6.json`: 150 EQUAL + S18
+   `RUST_BUDGET_EXCEEDED` (Rust 25/25 attempts > 5 s budget; every attempt
+   recorded in `attempt_trail`). Honest result: overall **FAIL**, exit 1.
+   The Rust reference is budget-boundary on `a's_wonderland` — not a
+   semantic mismatch, but not PASS either.
+2. **Docs + delivery JSON** — this file, `runtime-contract.md`,
+   `rust-migration.md`, `reports/P2/p2-delivery.json`.
+3. **Wheel 0.2.0 in isolated venv** — `reports/P2/p2-wheel-cli-20bf5b3.json`:
+   fresh `--without-pip` venv, `pip --no-index` install, 11-command matrix
+   incl. a GBK-console sample (code-page independence), all strict UTF-8
+   (0 U+FFFD), success stdout parses as full JSON, error stderr is JSON
+   (`UsageError` contract on both runtimes), in-process Unicode cross-check
+   8/8. overall PASS.
+4. **sknow-rs outside source tree** — binary copied to
+   `dist/p2/sknow-rs-0.2.0-win64/`, same matrix, hash manifest
+   `reports/P2/p2-artifact-manifest.json`, binary sha256 `a8f8cdb9…`.
+5. **Read-only snapshot compatibility** —
+   `reports/P2/snapshot-compatibility-20bf5b3.json`: sha256 identical
+   before/after, python write attempt blocked, Rust `SQLITE_OPEN_READ_ONLY`
+   inspect ok, required columns verified, inspect error path both runtimes.
+   **dbstat: NOT AVAILABLE** in this system's SQLite build (recorded, not
+   faked).
+6. **Performance** — `reports/P2/p2-perf-20bf5b3.json` + raw JSONL
+   `reports/P2/raw/perf/p2-perf-samples.jsonl` (1,596 end-to-end CLI
+   samples, no retries, 120 s hard bound). Rust p50 ≈ 40–45 ms vs Python
+   ≈ 190–240 ms (interpreter start dominates). Budget failures are failure
+   samples: S18 rust 6/6 rounds, python 4/6; S17 once each on round 0;
+   S01 python once on round 0.
+7. **A-evidence** — `tests/test_evidence.py` (occurrence dataset partition,
+   nullable `sample_count`, invalid frequency rejected-not-published,
+   `source_fields` bounded projection, read-only write blocking); CLI
+   UTF-8 reconfiguration fix in `sakura_knowledge.cli.main` (GBK console
+   no longer raises `UnicodeEncodeError`).
+
+## NOT_RUN (explicit)
+
+- Rust gold eval (ask-template quality on held-out human-expected set) —
+  not run; templates verified by parity only.
+- Pi Skill runtime integration — not run.
+- Full human source-fact review — not run.
+- SakuraPool integration — not run.
+- Live upstream refresh — not run; everything above is on the frozen
+  snapshot `20bf5b3`.
+
+## Environment of record
+
+- Windows, gnu toolchain rustc/cargo 1.98.1, GCC 16.2.0 (w64devkit).
+- Python 3.14.5, SQLite 3.50.4 (FTS5 yes; **dbstat no**).
+- Machine: see `reports/P2/p2-perf-20bf5b3.json` `host`.

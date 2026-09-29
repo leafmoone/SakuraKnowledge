@@ -1,13 +1,13 @@
 {
-  "started_at_utc": "2026-09-29T13:48:33Z",
+  "started_at_utc": "2026-09-29T17:44:24Z",
   "snapshot": {
     "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
     "sha256": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073"
   },
-  "code_sha": "685990d3c6039b8fae49a7bd52e3bcf0ce97c867",
+  "code_sha": "8593d736e1bd811e7bcdf19934cb638560ae1ad7",
   "wheel": {
     "path": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sakura_knowledge-0.2.0-py3-none-any.whl",
-    "sha256": "726c58f72ab1130a7fdb2e7ad2cd8157caecad1abe100a239a367f06ebb7999f"
+    "sha256": "46a09ca0d8a7f553d6e84f3faadd547ba124ce1d8a9afbd92ee3fff48969f5c8"
   },
   "venv_created": {
     "cmd": [
@@ -52,7 +52,7 @@
         "--help"
       ],
       "exit": 0,
-      "elapsed_s": 0.451,
+      "elapsed_s": 0.316,
       "stdout_bytes": 234,
       "stdout_sha256": "0d42515bc89af02fbe6c44d52addb6e6c1dc3bc44f3a24cfa35fce9f4930c14a",
       "stdout_replacement_char_bytes": 0,
@@ -72,7 +72,7 @@
         "-h"
       ],
       "exit": 0,
-      "elapsed_s": 0.255,
+      "elapsed_s": 0.27,
       "stdout_bytes": 234,
       "stdout_sha256": "0d42515bc89af02fbe6c44d52addb6e6c1dc3bc44f3a24cfa35fce9f4930c14a",
       "stdout_replacement_char_bytes": 0,
@@ -94,7 +94,7 @@
         "975"
       ],
       "exit": 0,
-      "elapsed_s": 0.272,
+      "elapsed_s": 0.282,
       "stdout_bytes": 24664,
       "stdout_sha256": "6d56319c22c935f84e403cd8cded06dfc5a6e9b70a4bcb2c93de49bd9776664a",
       "stdout_replacement_char_bytes": 0,
@@ -364,7 +364,7 @@
         "bangumi.subject"
       ],
       "exit": 0,
-      "elapsed_s": 0.354,
+      "elapsed_s": 0.293,
       "stdout_bytes": 12995,
       "stdout_sha256": "9a7acdb65a5342a04d01099cf08b9f6c8bf9f49753b3ea589ac63be7bb66b305",
       "stdout_replacement_char_bytes": 0,
@@ -560,7 +560,7 @@
         "10"
       ],
       "exit": 0,
-      "elapsed_s": 1.481,
+      "elapsed_s": 0.975,
       "stdout_bytes": 25930,
       "stdout_sha256": "21f9d3258e83aaa656d38210e9aa2a29667c7703b4d92705737bac727390059e",
       "stdout_replacement_char_bytes": 0,
@@ -1179,7 +1179,7 @@
         "10"
       ],
       "exit": 0,
-      "elapsed_s": 0.362,
+      "elapsed_s": 0.275,
       "stdout_bytes": 15383,
       "stdout_sha256": "e996926f80703200185a567a169ed07405e9a603eba52e66f96810d55138a57d",
       "stdout_replacement_char_bytes": 0,
@@ -1413,7 +1413,7 @@
         "975 的标签是什么"
       ],
       "exit": 0,
-      "elapsed_s": 0.25,
+      "elapsed_s": 0.363,
       "stdout_bytes": 24893,
       "stdout_sha256": "14e3ec325afd42acd820555990fed20a20f5803fa7cf84428a8a3186855cf766",
       "stdout_replacement_char_bytes": 0,
@@ -1684,7 +1684,7 @@
         "碧蓝航线:响 的 Danbooru tag 是什么"
       ],
       "exit": 0,
-      "elapsed_s": 0.252,
+      "elapsed_s": 0.43,
       "stdout_bytes": 7572,
       "stdout_sha256": "30221cc38a5a389da40a258257ed33ea7c1e647c5850c35b44aef4808885efa6",
       "stdout_replacement_char_bytes": 0,
@@ -1918,7 +1918,7 @@
         "0"
       ],
       "exit": 2,
-      "elapsed_s": 0.38,
+      "elapsed_s": 0.279,
       "stdout_bytes": 0,
       "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_replacement_char_bytes": 0,
@@ -1944,7 +1944,7 @@
         "x"
       ],
       "exit": 2,
-      "elapsed_s": 0.253,
+      "elapsed_s": 0.269,
       "stdout_bytes": 0,
       "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_replacement_char_bytes": 0,
@@ -1975,19 +1975,288 @@
       "stdout_utf8_strict": true,
       "stdout_raw_file": "wheel.error_unknown_op.stdout",
       "stdout": "",
-      "stderr_bytes": 234,
-      "stderr_sha256": "641e6f162be315020254dc7bc2b554afd5bcace28662e5d7c3dd337b5efec904",
+      "stderr_bytes": 185,
+      "stderr_sha256": "ffde6e7dfc8ed8eb29412102dfaf2aff9c411748d3a2a368223ee140aa31066a",
       "stderr_replacement_char_bytes": 0,
       "stderr_utf8_strict": true,
       "stderr_raw_file": "wheel.error_unknown_op.stderr",
-      "stderr": "usage: sknow [-h] {inspect,sources,build,verify,lookup,search,related,ask} ...\r\nsknow: error: argument command: invalid choice: 'frobnicate' (choose from 'inspect', 'sources', 'build', 'verify', 'lookup', 'search', 'related', 'ask')\r\n"
+      "stderr_json": {
+        "error": "UsageError",
+        "message": "sknow: argument command: invalid choice: 'frobnicate' (choose from 'inspect', 'sources', 'build', 'verify', 'lookup', 'search', 'related', 'ask')"
+      },
+      "stderr_json_parses": true
+    },
+    "gbk_env_lookup": {
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p2-venv\\Scripts\\sknow.exe",
+        "lookup",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+        "975"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.282,
+      "stdout_bytes": 24664,
+      "stdout_sha256": "6d56319c22c935f84e403cd8cded06dfc5a6e9b70a4bcb2c93de49bd9776664a",
+      "stdout_replacement_char_bytes": 0,
+      "stdout_utf8_strict": true,
+      "stdout_raw_file": "wheel.gbk_env_lookup.stdout",
+      "stdout_json": {
+        "contract_version": "2",
+        "snapshot": "7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c",
+        "query": "975",
+        "status": "ambiguous",
+        "entry_key": null,
+        "tag_key": null,
+        "canonical": null,
+        "candidates": [
+          {
+            "entry_key": {
+              "kind": "character",
+              "namespace": "bangumi.character",
+              "value": "975"
+            },
+            "locator": null,
+            "descriptions": [
+              {
+                "title": "オルゴン",
+                "original": "真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。",
+                "response_truncated": 0,
+                "search_text_truncated": 0,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993",
+                "status": "source_backed"
+              }
+            ],
+            "matched_documents": [
+              {
+                "title": "オルゴン",
+                "original": "真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。",
+                "response_truncated": 0,
+                "search_text_truncated": 0,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993",
+                "status": "source_backed"
+              }
+            ],
+            "aliases": [],
+            "identity_evidence": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993",
+                "status": "source_backed",
+                "type": "character",
+                "locator": null,
+                "payload": "{\"key\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"975\"}, \"status\": \"source_backed\", \"raw\": {\"id\": 975, \"role\": 1, \"infobox\": \"{{Infobox Crt\\r\\n|简体中文名=奥尔冈\\r\\n|声优=斧アツシ\\r\\n|性别=男（？）\\r\\n|生日=\\r\\n|血型=\\r\\n|身高=\\r\\n|体重=\\r\\n|BWH=\\r\\n}}\", \"summary\": \"真名为“千征令”的红世魔王，为红世使徒邪恶组织“化妆舞会”之成员，外表为穿戴绿色帽子及大披风的隐形客。贝露佩欧露直属部下，极度傲慢，受不了侮辱。使用自在法构成的队伍“军团”作战。作战被维奈利用作阻挡“万条巧手”的工具，最终被“虹天剑”一刀砍杀。似乎曾经与梅利希姆在过去交手。炎色为铜绿。\", \"comments\": 0, \"collects\": 0}}"
+              }
+            ],
+            "source_fields": {},
+            "source_fields_evidence": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993"
+              }
+            ],
+            "matched_by": "exact",
+            "source_id": "bangumi-complete-6a75aefb769a",
+            "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993",
+            "citations": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:690993"
+              }
+            ]
+          },
+          {
+            "entry_key": {
+              "kind": "episode",
+              "namespace": "bangumi.episode",
+              "value": "975"
+            },
+            "locator": null,
+            "descriptions": [
+              {
+                "title": "探求",
+                "original": "",
+                "response_truncated": 0,
+                "search_text_truncated": 0,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291",
+                "status": "source_backed"
+              }
+            ],
+            "matched_documents": [
+              {
+                "title": "探求",
+                "original": "",
+                "response_truncated": 0,
+                "search_text_truncated": 0,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291",
+                "status": "source_backed"
+              }
+            ],
+            "aliases": [],
+            "identity_evidence": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291",
+                "status": "source_backed",
+                "type": "episode",
+                "locator": null,
+                "payload": "{\"key\": {\"kind\": \"episode\", \"namespace\": \"bangumi.episode\", \"value\": \"975\"}, \"status\": \"source_backed\", \"raw\": {\"id\": 975, \"description\": \"\", \"airdate\": \"\", \"disc\": 0, \"duration\": \"\", \"subject_id\": 903, \"sort\": 13, \"type\": 0}}"
+              }
+            ],
+            "source_fields": {},
+            "source_fields_evidence": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291"
+              }
+            ],
+            "matched_by": "exact",
+            "source_id": "bangumi-complete-6a75aefb769a",
+            "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291",
+            "citations": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:1015291"
+              }
+            ]
+          },
+          {
+            "entry_key": {
+              "kind": "person",
+              "namespace": "bangumi.person",
+              "value": "975"
+            },
+            "locator": null,
+            "descriptions": [
+              {
+                "title": "Edward Elmer Smith",
+                "original": "アメリカのSF作家で、《レンズマン》シリーズや《スカイラーク》シリーズで知られている。「スペースオペラの父」と呼ばれることもある。通称はE・E・スミス、ドク・スミスなど。家族からはテッドと呼ばれていた。ドーナツやペイストリー用の粉を専門とする食品工学者でもあった。",
+                "response_truncated": 0,
+                "search_text_truncated": 0,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:912980",
+                "status": "source_backed"
+              }
+            ],
+            "matched_documents": [
+              {
+                "title": "Edward Elmer Smith",
+                "original": "アメリカのSF作家で、《レンズマン》シリーズや《スカイラーク》シリーズで知られている。「スペースオペラの父」と呼ばれることもある。通称はE・E・スミス、ドク・スミスなど。家族からはテッドと呼ばれていた。ドーナツやペイストリー用の粉を専門とする食品工学者でもあった。",
+                "response_truncated": 0,
+                "search_text_truncated": 0,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:912980",
+                "status": "source_backed"
+              }
+            ],
+            "aliases": [],
+            "identity_evidence": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:912980",
+                "status": "source_backed",
+                "type": "person",
+                "locator": null,
+                "payload": "{\"key\": {\"kind\": \"person\", \"namespace\": \"bangumi.person\", \"value\": \"975\"}, \"status\": \"source_backed\", \"raw\": {\"id\": 975, \"type\": 1, \"career\": [\"producer\"], \"infobox\": \"{{Infobox Crt\\r\\n|简体中文名= 爱德华·艾默·史密斯\\r\\n|别名={\\r\\n[第二中文名|]\\r\\n[英文名|E. E. Smith]\\r\\n[日文名|E・E・スミス]\\r\\n[纯假名|エドワード・エルマー・スミス]\\r\\n[罗马字|]\\r\\n[昵称|]\\r\\n}\\r\\n|性别= 男\\r\\n|生日= 1890年5月2日\\r\\n|血型= \\r\\n|身高= \\r\\n|体重= \\r\\n|BWH= \\r\\n|引用来源={\\r\\n}\\r\\n|卒日= 1965年8月31日\\r\\n}}\", \"summary\": \"アメリカのSF作家で、《レンズマン》シリーズや《スカイラーク》シリーズで知られている。「スペースオペラの父」と呼ばれることもある。通称はE・E・スミス、ドク・スミスなど。家族からはテッドと呼ばれていた。ドーナツやペイストリー用の粉を専門とする食品工学者でもあった。\", \"comments\": 0, \"collects\": 3}}"
+              }
+            ],
+            "source_fields": {},
+            "source_fields_evidence": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:912980"
+              }
+            ],
+            "matched_by": "exact",
+            "source_id": "bangumi-complete-6a75aefb769a",
+            "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:912980",
+            "citations": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:912980"
+              }
+            ]
+          },
+          {
+            "entry_key": {
+              "kind": "subject",
+              "namespace": "bangumi.subject",
+              "value": "975"
+            },
+            "locator": null,
+            "descriptions": [
+              {
+                "title": "ONE PIECE",
+                "original": "有个男人，他拥有世界上一切财富、名望和权势，他就是「海盗王」高路德•罗杰。 他在临死前说过这样一句话，让全世界的人都奔向大海： 「想要我的财宝吗？想要的话就拿去吧……！你们去找吧！我把世界上的一切都放在那里了」。 后来世界上的人们将这个宝藏称作“大秘宝”（One Piece），许多人为了争夺大秘宝One Piece，无数海盗扬起旗帜，互相斗争，后来就形成了「大海盗时代」。 主角蒙奇•D•路飞在遥远的路途上找寻着志同道合的伙伴，携手共进「伟大航线」，目标则是当上「海盗王」。 航海王是一个依靠彼此坚毅的友情最终获得胜利，伙伴们一起朝着梦想扬帆努力的冒险故事。\r\n\r\n\r\n\r\n[简介原文]\r\n世は大海賊時代ー\r\n前人未踏の世界一周を果たした海の覇者\r\n〝海賊王〟ゴール・D・ロジャー。\r\n\r\n富、名声、力、かつてこの世の全てを手に入れたという彼が、死に際に放った一言が、世界をゆるがせた。\r\n\r\n『おれの財宝か？ 欲しけりゃくれてやるぜ…\r\n探してみろ この世の全てを そこに置いてきた』\r\n\r\nその言葉は大きなうねりを生み、多くの猛者たちを海へと駆り立てた。\r\n\r\n〝海賊王〟が遺した〝ひとつなぎの大秘宝(ワンピース)〟をめぐり、\r\nある者は野望を抱き、ある者はロマンを求めて、海賊たちは信念の旗の下に戦い、名を上げていく。\r\n\r\n波乱と冒険に満ちたそんな時代に、\r\n1人の少年モンキー・D・ルフィが〝海賊王〟をめざして、大海原へ乗り出した!\r\n\r\n数々の冒険の中で仲間を増やし、成長していくルフィ。\r\nルフィを船長とする海賊〝麦わらの一味〟は、〝ひとつなぎの大秘宝(ワンピース)〟をめざし、航海を続ける!!",
+                "response_truncated": 0,
+                "search_text_truncated": 0,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:889",
+                "status": "source_backed"
+              }
+            ],
+            "matched_documents": [
+              {
+                "title": "ONE PIECE",
+                "original": "有个男人，他拥有世界上一切财富、名望和权势，他就是「海盗王」高路德•罗杰。 他在临死前说过这样一句话，让全世界的人都奔向大海： 「想要我的财宝吗？想要的话就拿去吧……！你们去找吧！我把世界上的一切都放在那里了」。 后来世界上的人们将这个宝藏称作“大秘宝”（One Piece），许多人为了争夺大秘宝One Piece，无数海盗扬起旗帜，互相斗争，后来就形成了「大海盗时代」。 主角蒙奇•D•路飞在遥远的路途上找寻着志同道合的伙伴，携手共进「伟大航线」，目标则是当上「海盗王」。 航海王是一个依靠彼此坚毅的友情最终获得胜利，伙伴们一起朝着梦想扬帆努力的冒险故事。\r\n\r\n\r\n\r\n[简介原文]\r\n世は大海賊時代ー\r\n前人未踏の世界一周を果たした海の覇者\r\n〝海賊王〟ゴール・D・ロジャー。\r\n\r\n富、名声、力、かつてこの世の全てを手に入れたという彼が、死に際に放った一言が、世界をゆるがせた。\r\n\r\n『おれの財宝か？ 欲しけりゃくれてやるぜ…\r\n探してみろ この世の全てを そこに置いてきた』\r\n\r\nその言葉は大きなうねりを生み、多くの猛者たちを海へと駆り立てた。\r\n\r\n〝海賊王〟が遺した〝ひとつなぎの大秘宝(ワンピース)〟をめぐり、\r\nある者は野望を抱き、ある者はロマンを求めて、海賊たちは信念の旗の下に戦い、名を上げていく。\r\n\r\n波乱と冒険に満ちたそんな時代に、\r\n1人の少年モンキー・D・ルフィが〝海賊王〟をめざして、大海原へ乗り出した!\r\n\r\n数々の冒険の中で仲間を増やし、成長していくルフィ。\r\nルフィを船長とする海賊〝麦わらの一味〟は、〝ひとつなぎの大秘宝(ワンピース)〟をめざし、航海を続ける!!",
+                "response_truncated": 0,
+                "search_text_truncated": 0,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:889",
+                "status": "source_backed"
+              }
+            ],
+            "aliases": [],
+            "identity_evidence": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:889",
+                "status": "source_backed",
+                "type": "subject",
+                "locator": null,
+                "payload": "{\"key\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"975\"}, \"status\": \"source_backed\", \"raw\": {\"id\": 975, \"type\": 2, \"infobox\": \"{{Infobox animanga/TVAnime\\r\\n|中文名= 航海王\\r\\n|别名={\\r\\n[ワンピース]\\r\\n[海贼王]\\r\\n}\\r\\n|话数= 1155\\r\\n|放送开始= 1999年10月20日\\r\\n|放送星期= 星期三→星期日（64话起）\\r\\n|官方网站= http://www.toei-anim.co.jp/tv/onep/\\r\\n|在线播放平台= \\r\\n|播放电视台= フジテレビ\\r\\n|其他电视台= \\r\\n|播放结束= 2025年12月28日\\r\\n|导演= \\r\\n|音乐= 田中公平、浜口史郎\\r\\n|链接={\\r\\n}\\r\\n|其他= 2024年10月13日-2025年4月5日期间停播；1123话起改为周日23：15播出。\\r\\n|Copyright= \\r\\n|原作= 尾田栄一郎（集英社「週刊少年ジャンプ」連載）\\r\\n|企画= フジテレビ - 鈴木吉弘(1-47)→金田耕司(48-106)→熊谷剛(107-132)→松崎容子(133-240)→涉谷謙太郎(241-368)→情野誠人(369-604、612-614)→髙木明梨須(591-652)→狩野雄太(653-985)、江花松樹(986-1030)、日高峻(1031-) / 東映アニメーション - 清水慎治(1-228)→梅澤淳稔(229-298)→浅間陽介(279-368)→柴田宏明(369-530、927-1063)、櫻田博之(531-734、854-926)、小山弘起(683-853)、寺本知資(1014-1045、1089)、小池隆太(1064-)、赤堀哲嗣(1139-)\\r\\n|制片人= 寺本知資(1046-1088)、橋本信太郎(1089)、小林美姫(1089)\\r\\n|宣传制片人= 小林美姫(1074-1088)\\r\\n|系列监督= 宇田鋼之介(1-278)、志水淳児(131-159)→境宗久(244-372)→宮元宏彰(352-679)→深澤敏則(663-891)→長峯達也(780-782、892-1122)、暮田公平(892-1030)、小牧文(892-961)、伊藤聡伺(780-782、962-)、小山保徳(1031-)、松實航(1123-)\\r\\n|系列构成= 武上純希（1-195）→上坂浩彦（196-798）→米村正二（799-1029、1031-）、田中仁(1030)\\r\\n|脚本= 武上純希、島田満、橋本裕志、菅良幸、山口亮太、上坂浩彦、古賀直樹\\r\\n|人物设定= 小泉昇（1-425）→久田和也（385-891）→松田翠（780-782、892-）\\r\\n|作画监督= 小泉昇、井上榮作、近藤優次、高木雅之、久田和也、井手武生、舘直樹、真庭秀明、橫山健次、袴田裕二、松下清志、木下勇喜、杉本光司、石塚勝海、島貫正弘、小林ゆかり、鈴木伸一、山室直儀、瀧川和男、飯飼一幸、村上直紀\\r\\n|美术监督= 本間禎章(892-894、897-)、吉池隆司(895-896)、黄国威(1031-)\\r\\n|色彩设计= 塚田劭（1-312）→堀田哲平（313-）、永井留美子(926-1122)\\r\\n|制作= フジテレビ、東映アニメーション、ASATSU-DK→ADK [ アサツー ディ・ケイ ] →ADKエモーションズ（非クレジット）\\r\\n|原画= 森佳祐、志田直俊、太田晃博、林祐己、馬越嘉彦、Vincent Chansard、石塚勝海、涂泳策、谭钧文、大西亮、渡邊巧大、小島崇史、杉田柊、三木達也、前並武志、西野武志、黒崎隼人、高嶋宏之、藤沢研一、山本健、橋本敬史、小澤和則、重次創太、渡部尭皓、Bahi JD、Chris、Rondeseo、Mitchell Gonzales、Vercreek、FASTO[飯塚健太]、史涓生、羊廷牧、孙猛、章超、鴨川浩、小松英司、新井淳、高瀬健一、杉薗朗子、楡木哲郎、荒平隆晴、冨田与四一、小泉昇、東出太、椅子汰、前田義宏、すて、おだし、すしお、堀尾鉱、古川博之、神谷智大\\r\\n|主题歌演出= OP：きただにひろし（1、15、22、26）、Folder5（2）、ザ・ベイビースターズ（3）、Bon-Bon Blanco（4）、BOYSTYLE（5）、D-51（6）、7人の麦わら海賊団（7）、タッキー&翼（8）、5050（9）、東方神起[동방신기]（10、11）、矢口真里とストローハット（12）、The ROOTLESS（13）、安室奈美恵（14、20）、新里宏太（16）、AAA（17）、GENERATIONS from EXILE TRIBE（18）、氣志團ときただにひろし（19）、V6（21）、Da-iCE（23）、I Don't Like Mondays.（24）、SEKAI NO OWARI（25）、GRe4N BOYZ （27）/ED：大槻真希[大槻マキ]（1、2）、TOMATO CUBE（3）、推定少女（4）、AI-SACHI（5）、The Kaleidoscope（6）、上原多香子（7）、Janne Da Arc（8）、Ruppina（9、10）、ZZ（11）、shela（12）、イクタ☆アイコ（13）、タッキー&翼（14）、エイジアエンジニア（15）、TRIPLANE（16）、東方神起[동방신기]（17）、デリカテッセン（18）、Chilli Beans.（19）、muque（21）\\r\\n|制作管理= 製作担当→ラインプロデューサー：樋口宗久(1-115)→藤岡和実(40-302)、坂本憲生知(270-298)→松坂一光(303-425)→黒木耕次郎(426-584)→稲垣哲雄(579-692)→吉田智哉(693-961)→赤堀哲嗣(807-1138)、時田隼人(1123-)；製作デスク：直田宏隆(1123-1136)、青木太生(1123-)、白石彩夏(1123-)\\r\\n|制作管理助理= 製作担当補佐：黒木耕次郎(395-425)\\r\\n|副人物设定= 髙木雅之[高木雅之](892-894)、太田朝子、高橋成美\\r\\n|美术设计= 吉池隆司\\r\\n|摄影监督= 大西弘悟(730-891)→千葉秀樹(892-894、897-917)→保坂友哉(918-1138)、石山智之(1014)、石津剛志(1123-) / 撮影監修：和田尚之(892-1138)→保坂友哉(1139-)\\r\\n|摄影监督助理= 小島千幸(892-986)→小川庵(987-)、石津剛志(1046-1122)\\r\\n|剪辑= 福光伸一(1-203)→後藤正浩(204-345)→牧信公(346-)→吉田公紀(1089) / 編集助手：牧信公(323-345) / OP剪辑：神谷雄貴\\r\\n|助理制片人= アシスタントプロデューサ→プロデューサー補：フジテレビ - 出樋昌稔(653-741)→古川周 / 東映アニメーション - 鷲尾天(1-64)→山岡英仁(169-189)→小原康平(241-253、TVSP4)→寺本知資(653-672、994-1013)→小山弘起(668-682)→橋本信太郎(935-1004)→泉圭祐(1043-1115)→和田陸、田路功樹(1123-)\\r\\n|広報= 為永佐知男(1-79)→北野あすか(80-126)→正岡高子(127-278)→遠藤恵(279-408)→田中杏子(409-460)→瀬田裕幸(461-482)→熊谷知子(483-652)→山本麻未子(653-734、1011-1030)→清田美智子(735-757)→太田真紀子(758-891)→瀬川ネリ(892-1010)、北村桃子(1031-1070)→ 竹田恵理子(1071)→小山雅浩（フジテレビ）、加藤美穂子(-882)→小林美姫(883-)、中台郁美\\r\\n|音效= 新井秀徳（フィズサウンドクリエイション→JetSoundEngine）\\r\\n|选曲= 神保直史（オーディオ・タナカ→美星）、佐藤恭野(542、590)\\r\\n|录音= 二宮健治(1-230)→渡辺絵里奈(231-780、782-)、藤村聡(781)\\r\\n|录音工作室= タバック(1-721、882-)、スリーエススタジオ [ スワラ・プロ ] (722-881)\\r\\n|音响= 音響制作：タバック(722-881)\\r\\n|制作协力= 東映(1-806)\\r\\n|总作画监督= 久田和也(575-782)→市川慶一(783-894、897-)、松田翠(780-782、899-)、涂泳策(1033-)\\r\\n}}\", \"platform\": 1, \"summary\": \"有个男人，他拥有世界上一切财富、名望和权势，他就是「海盗王」高路德•罗杰。 他在临死前说过这样一句话，让全世界的人都奔向大海： 「想要我的财宝吗？想要的话就拿去吧……！你们去找吧！我把世界上的一切都放在那里了」。 后来世界上的人们将这个宝藏称作“大秘宝”（One Piece），许多人为了争夺大秘宝One Piece，无数海盗扬起旗帜，互相斗争，后来就形成了「大海盗时代」。 主角蒙奇•D•路飞在遥远的路途上找寻着志同道合的伙伴，携手共进「伟大航线」，目标则是当上「海盗王」。 航海王是一个依靠彼此坚毅的友情最终获得胜利，伙伴们一起朝着梦想扬帆努力的冒险故事。\\r\\n\\r\\n\\r\\n\\r\\n[简介原文]\\r\\n世は大海賊時代ー\\r\\n前人未踏の世界一周を果たした海の覇者\\r\\n〝海賊王〟ゴール・D・ロジャー。\\r\\n\\r\\n富、名声、力、かつてこの世の全てを手に入れたという彼が、死に際に放った一言が、世界をゆるがせた。\\r\\n\\r\\n『おれの財宝か？ 欲しけりゃくれてやるぜ…\\r\\n探してみろ この世の全てを そこに置いてきた』\\r\\n\\r\\nその言葉は大きなうねりを生み、多くの猛者たちを海へと駆り立てた。\\r\\n\\r\\n〝海賊王〟が遺した〝ひとつなぎの大秘宝(ワンピース)〟をめぐり、\\r\\nある者は野望を抱き、ある者はロマンを求めて、海賊たちは信念の旗の下に戦い、名を上げていく。\\r\\n\\r\\n波乱と冒険に満ちたそんな時代に、\\r\\n1人の少年モンキー・D・ルフィが〝海賊王〟をめざして、大海原へ乗り出した!\\r\\n\\r\\n数々の冒険の中で仲間を増やし、成長していくルフィ。\\r\\nルフィを船長とする海賊〝麦わらの一味〟は、〝ひとつなぎの大秘宝(ワンピース)〟をめざし、航海を続ける!!\", \"nsfw\": false, \"tags\": [{\"name\": \"ONEPIECE\", \"count\": 9282}, {\"name\": \"海贼王\", \"count\": 9063}, {\"name\": \"热血\", \"count\": 5030}, {\"name\": \"尾田榮一郎\", \"count\": 3768}, {\"name\": \"梦想\", \"count\": 2997}, {\"name\": \"JUMP\", \"count\": 2651}, {\"name\": \"热血系\", \"count\": 2491}, {\"name\": \"路飞\", \"count\": 2433}, {\"name\": \"民工\", \"count\": 2421}, {\"name\": \"集英社\", \"count\": 786}, {\"name\": \"TV\", \"count\": 741}], \"meta_tags\": [\"TV\", \"日本\", \"漫画改\", \"战斗\", \"冒险\", \"少年向\"], \"score\": 8.3, \"score_details\": {\"1\": 96, \"2\": 45, \"3\": 43, \"4\": 110, \"5\": 356, \"6\": 958, \"7\": 2369, \"8\": 3881, \"9\": 2854, \"10\": 4044}, \"rank\": 105, \"date\": \"1999-10-20\", \"favorite\": {\"wish\": 2147, \"done\": 11367, \"doing\": 16162, \"on_hold\": 4343, \"dropped\": 1548}, \"series\": false}}"
+              }
+            ],
+            "source_fields": {},
+            "source_fields_evidence": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:889"
+              }
+            ],
+            "matched_by": "exact",
+            "source_id": "bangumi-complete-6a75aefb769a",
+            "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:889",
+            "citations": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:889"
+              }
+            ]
+          }
+        ],
+        "descriptions": [],
+        "relations": [],
+        "citations": [],
+        "warnings": []
+      },
+      "stdout_json_parses": true,
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_replacement_char_bytes": 0,
+      "stderr_utf8_strict": true,
+      "stderr_raw_file": "wheel.gbk_env_lookup.stderr",
+      "stderr": ""
     }
   },
   "rust_distribution": {
     "source_tree_binary": "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\release\\sknow-rs.exe",
     "distribution_dir": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p2\\sknow-rs-0.2.0-win64",
     "outside_source_tree": true,
-    "binary_sha256": "c897c093b5299ae99bd5938dc306a81828e5a390d0ccfd01e51f97e6287c9e0b",
+    "binary_sha256": "a8f8cdb9f83e43cae891ace03f3ad2f12c98003da5d4d9f3388b9ac97aa0d800",
     "source_sha256_matches": true
   },
   "rust_cli": {
@@ -1997,7 +2266,7 @@
         "--help"
       ],
       "exit": 0,
-      "elapsed_s": 0.209,
+      "elapsed_s": 0.206,
       "stdout_bytes": 472,
       "stdout_sha256": "413b32928c4bdd611ef0c544beff34cfeb8514ae3c5bc2e164243e9f18dba738",
       "stdout_replacement_char_bytes": 0,
@@ -2017,7 +2286,7 @@
         "-h"
       ],
       "exit": 0,
-      "elapsed_s": 0.047,
+      "elapsed_s": 0.058,
       "stdout_bytes": 472,
       "stdout_sha256": "413b32928c4bdd611ef0c544beff34cfeb8514ae3c5bc2e164243e9f18dba738",
       "stdout_replacement_char_bytes": 0,
@@ -2039,7 +2308,7 @@
         "975"
       ],
       "exit": 0,
-      "elapsed_s": 0.058,
+      "elapsed_s": 0.054,
       "stdout_bytes": 24417,
       "stdout_sha256": "3f598ea41500858bdccdc3bb0ef03a2b94be57515c2e6b64e75fd3eda90024cc",
       "stdout_replacement_char_bytes": 0,
@@ -2309,7 +2578,7 @@
         "bangumi.subject"
       ],
       "exit": 0,
-      "elapsed_s": 0.056,
+      "elapsed_s": 0.049,
       "stdout_bytes": 12823,
       "stdout_sha256": "9946c46d0014b5e5c6b46039bf2eee8721cff0c60f694cbbf2ddef030c319338",
       "stdout_replacement_char_bytes": 0,
@@ -2505,7 +2774,7 @@
         "10"
       ],
       "exit": 0,
-      "elapsed_s": 0.189,
+      "elapsed_s": 0.171,
       "stdout_bytes": 25285,
       "stdout_sha256": "21278744656a3ca37208b2e03a2645838334b72fb50d3cda130f384b9cd54257",
       "stdout_replacement_char_bytes": 0,
@@ -3124,7 +3393,7 @@
         "10"
       ],
       "exit": 0,
-      "elapsed_s": 0.056,
+      "elapsed_s": 0.065,
       "stdout_bytes": 15155,
       "stdout_sha256": "80943adf3bde119ca51578a36618bcdbe9f3f82ff214f3699af842867c115234",
       "stdout_replacement_char_bytes": 0,
@@ -3358,7 +3627,7 @@
         "975 的标签是什么"
       ],
       "exit": 0,
-      "elapsed_s": 0.058,
+      "elapsed_s": 0.051,
       "stdout_bytes": 24634,
       "stdout_sha256": "bf1a43a276e3ce35e824cb972f48a39d74731de7b693e7029aa5c51c456bd190",
       "stdout_replacement_char_bytes": 0,
@@ -3629,7 +3898,7 @@
         "碧蓝航线:响 的 Danbooru tag 是什么"
       ],
       "exit": 0,
-      "elapsed_s": 0.055,
+      "elapsed_s": 0.049,
       "stdout_bytes": 7339,
       "stdout_sha256": "69add9441f851f0d075cf7f0a58f01591c91fa314202bb0601124bfd7e72891e",
       "stdout_replacement_char_bytes": 0,
@@ -3863,7 +4132,7 @@
         "0"
       ],
       "exit": 2,
-      "elapsed_s": 0.056,
+      "elapsed_s": 0.048,
       "stdout_bytes": 0,
       "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_replacement_char_bytes": 0,
@@ -3889,7 +4158,7 @@
         "x"
       ],
       "exit": 2,
-      "elapsed_s": 0.047,
+      "elapsed_s": 0.077,
       "stdout_bytes": 0,
       "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_replacement_char_bytes": 0,
@@ -3913,21 +4182,21 @@
         "frobnicate"
       ],
       "exit": 2,
-      "elapsed_s": 0.048,
+      "elapsed_s": 0.047,
       "stdout_bytes": 0,
       "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "stdout_replacement_char_bytes": 0,
       "stdout_utf8_strict": true,
       "stdout_raw_file": "rust.error_unknown_op.stdout",
       "stdout": "",
-      "stderr_bytes": 51,
-      "stderr_sha256": "1c3b076f3d8c3640341f24e9921f77e416f8fec58be45ee699d79a5667fcdc06",
+      "stderr_bytes": 165,
+      "stderr_sha256": "b80a95af4ef04c73c75699d45fe192abb98f51bb78c5b072e195815370a96d05",
       "stderr_replacement_char_bytes": 0,
       "stderr_utf8_strict": true,
       "stderr_raw_file": "rust.error_unknown_op.stderr",
       "stderr_json": {
-        "error": "ValueError",
-        "message": "unknown command"
+        "error": "UsageError",
+        "message": "sknow-rs: argument command: invalid choice: 'frobnicate' (choose from 'lookup', 'search', 'related', 'ask', 'inspect', 'runtime')"
       },
       "stderr_json_parses": true
     }
@@ -3996,13 +4265,7 @@
       "sample_nonascii_escaped": "'\\u2026\\u3000\\u3001\\u3002\\u300a\\u300b\\u4e00\\u4e09\\u4e0a\\u4e16\\u4e2d\\u4e8b\\u4ea7\\u4eb2\\u4eba\\u4eca'"
     }
   ],
-  "exit_code_problems": [
-    {
-      "side": "wheel",
-      "name": "error_unknown_op",
-      "kind": "error_stderr_not_json"
-    }
-  ],
-  "overall": "FAIL",
-  "finished_at_utc": "2026-09-29T13:49:15Z"
+  "exit_code_problems": [],
+  "overall": "PASS",
+  "finished_at_utc": "2026-09-29T17:45:03Z"
 }

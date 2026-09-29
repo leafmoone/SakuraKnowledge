@@ -24,15 +24,20 @@ const USAGE: &str = "usage: sknow-rs lookup DB QUERY [--kind K --namespace N] [-
        sknow-rs runtime
        sknow-rs -h | --help";
 
-fn usage() -> ExitCode {
-    eprintln!("{USAGE}");
+/// Usage errors follow the same contract as the Python CLI:
+/// {"error": "UsageError", "message": "..."} on stderr, empty stdout, exit 2.
+fn usage_error(message: &str) -> ExitCode {
+    eprintln!(
+        "{}",
+        serde_json::json!({"error": "UsageError", "message": format!("sknow-rs: {message}")})
+    );
     ExitCode::from(2)
 }
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.is_empty() {
-        return usage();
+        return usage_error("the following arguments are required: command");
     }
     if matches!(args[0].as_str(), "-h" | "--help") {
         println!("{USAGE}");
@@ -60,21 +65,21 @@ fn main() -> ExitCode {
                     opt.kind = Some(v.clone());
                     i += 1;
                 }
-                None => return usage(),
+                None => return usage_error(&format!("argument {a}: expected a value")),
             },
             "--namespace" => match rest.get(i + 1) {
                 Some(v) => {
                     opt.namespace = Some(v.clone());
                     i += 1;
                 }
-                None => return usage(),
+                None => return usage_error(&format!("argument {a}: expected a value")),
             },
             "--relation" => match rest.get(i + 1) {
                 Some(v) => {
                     opt.relation = Some(v.clone());
                     i += 1;
                 }
-                None => return usage(),
+                None => return usage_error(&format!("argument {a}: expected a value")),
             },
             "--limit" => match rest.get(i + 1).and_then(|v| v.parse().ok()) {
                 Some(v) => {
@@ -82,14 +87,14 @@ fn main() -> ExitCode {
                     opt.limit_given = true;
                     i += 1;
                 }
-                None => return usage(),
+                None => return usage_error(&format!("argument {a}: expected a value")),
             },
             "--topk" => match rest.get(i + 1).and_then(|v| v.parse().ok()) {
                 Some(v) => {
                     opt.topk = v;
                     i += 1;
                 }
-                None => return usage(),
+                None => return usage_error(&format!("argument {a}: expected a value")),
             },
             "--key" => opt.key = true,
             "--target-tag-namespace" => match rest.get(i + 1) {
@@ -97,14 +102,23 @@ fn main() -> ExitCode {
                     opt.target = Some(v.clone());
                     i += 1;
                 }
-                None => return usage(),
+                None => return usage_error(&format!("argument {a}: expected a value")),
             },
-            _ if a.starts_with("--") => return usage(),
+            _ if a.starts_with("--") => {
+                return usage_error(&format!("unrecognized arguments: {a}"))
+            }
             _ => pos.push(a),
         }
         i += 1;
     }
 
+    const COMMANDS: [&str; 6] = ["lookup", "search", "related", "ask", "inspect", "runtime"];
+    if !COMMANDS.contains(&cmd.as_str()) {
+        return usage_error(&format!(
+            "argument command: invalid choice: '{cmd}' (choose from {})",
+            COMMANDS.map(|c| format!("'{c}'")).join(", ")
+        ));
+    }
     let result: Result<serde_json::Value, Error> = (|| match cmd.as_str() {
         "lookup" => {
             let (db, query) = two_pos(&pos)?;

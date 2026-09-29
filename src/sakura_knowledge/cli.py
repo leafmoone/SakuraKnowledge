@@ -34,8 +34,31 @@ def check_latest(output):
     return result
 
 
+class UsageError(Exception):
+    """Malformed command line (unknown command, bad option, missing arg)."""
+
+
+class _JsonArgumentParser(argparse.ArgumentParser):
+    """argparse with the CLI error contract: usage errors never print
+    free text; main() reports them as {"error": "UsageError", ...} on
+    stderr with exit 2. -h/--help still print usage to stdout, exit 0."""
+
+    def error(self, message):
+        raise UsageError(f"{self.prog}: {message}")
+
+
 def main(argv=None):
-    parser = argparse.ArgumentParser(prog="sknow")
+    # Output must be verbatim UTF-8 JSON independent of the console code
+    # page (Windows gbk consoles would otherwise raise UnicodeEncodeError
+    # on non-ASCII values such as "・"). errors="replace" keeps the
+    # process alive even for exotic streams; the JSON payload itself uses
+    # ensure_ascii=False so real text stays byte-visible.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError, OSError):
+            pass
+    parser = _JsonArgumentParser(prog="sknow")
     sub = parser.add_subparsers(dest="command", required=True)
     inspect = sub.add_parser("inspect")
     inspect.add_argument("manifest")
@@ -63,7 +86,12 @@ def main(argv=None):
             command.add_argument("--limit", type=int, default=20)
         if name == "related":
             command.add_argument("--relation")
-    args = parser.parse_args(argv)
+    try:
+        args = parser.parse_args(argv)
+    except UsageError as exc:
+        print(json.dumps({"error": "UsageError", "message": str(exc)}, ensure_ascii=False),
+              file=sys.stderr)
+        return 2
     try:
         if args.command == "sources":
             result = check_latest(args.output)

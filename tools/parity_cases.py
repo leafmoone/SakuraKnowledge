@@ -163,8 +163,8 @@ CASES: list[tuple[str, str, dict, dict, str]] = [
     ('S22', 'search', {'query': '"白"', 'topk': 10}, {'status': 'found', 'warnings': [], 'n_candidates': 1, 'entry_key': {'kind': 'character', 'namespace': 'moegirl.character', 'value': '"白"'}, 'matched_by': 'exact', 'n_relations': 0, 'first_candidate_key': {'kind': 'character', 'namespace': 'moegirl.character', 'value': '"白"'}, 'first_candidate_matched_by': 'exact'}, 'value'),
     ('S23', 'search', {'query': '"加特"', 'topk': 10}, {'status': 'found', 'warnings': [], 'n_candidates': 10, 'entry_key': {'kind': 'character', 'namespace': 'moegirl.character', 'value': '"加特"'}, 'matched_by': 'exact', 'n_relations': 0, 'first_candidate_key': {'kind': 'character', 'namespace': 'moegirl.character', 'value': '"加特"'}, 'first_candidate_matched_by': 'exact'}, 'value'),
     ('E14', 'cli_key_missing', {'argv_py': ['lookup', 'DB', '975', '--key'], 'argv_rs': ['lookup', 'DB', '975', '--key']}, {'exit_py': 2, 'exit_rs': 2, 'stderr_py_error': 'ValueError', 'stderr_py_message': 'exact key requires --kind and --namespace', 'stderr_rs_error': 'ValueError', 'stderr_rs_message': 'exact key requires --kind and --namespace'}, 'cli'),
-    ('E15', 'cli_unknown_op', {'argv_py': ['frobnicate'], 'argv_rs': ['frobnicate']}, {'exit_py': 2, 'exit_rs': 2}, 'cli'),
-    ('E16', 'cli_missing_db', {'argv_py': ['lookup'], 'argv_rs': ['lookup']}, {'exit_py': 2, 'exit_rs': 2}, 'cli'),
+    ('E15', 'cli_unknown_op', {'argv_py': ['frobnicate'], 'argv_rs': ['frobnicate']}, {'exit_py': 2, 'exit_rs': 2, 'stderr_py_error': 'UsageError', 'stderr_rs_error': 'UsageError', 'stdout_empty': True}, 'cli'),
+    ('E16', 'cli_missing_db', {'argv_py': ['lookup'], 'argv_rs': ['lookup']}, {'exit_py': 2, 'exit_rs': 2, 'stderr_py_error': 'UsageError', 'stderr_rs_error': 'UsageError', 'stdout_empty': True}, 'cli'),
     ('E17', 'open_missing_db', {'argv_py': ['lookup', 'DB_MISSING', 'x'], 'argv_rs': ['lookup', 'DB_MISSING', 'x']}, {'exit_py': 2, 'exit_rs': 2, 'stderr_py_error': 'OperationalError', 'stderr_rs_error': 'OperationalError'}, 'runtime_error'),
 ]
 

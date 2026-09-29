@@ -155,3 +155,25 @@ def test_readonly_open_blocks_writes(tmp_path):
         with pytest.raises(sqlite3.OperationalError):
             api.conn.execute("INSERT INTO build_meta VALUES ('x','y')")
     assert digest(db) == before
+
+
+@pytest.mark.parametrize("argv", [["frobnicate"], [], ["search", "db.sqlite"],
+                                  ["search", "db.sqlite", "q", "--limit"],
+                                  ["lookup", "db.sqlite", "q", "--bogus"]])
+def test_cli_usage_error_is_json(argv, capsys):
+    from sakura_knowledge.cli import main
+    assert main(argv) == 2
+    out, err = capsys.readouterr()
+    assert out == ""
+    body = json.loads(err)
+    assert body["error"] == "UsageError"
+    assert body["message"].startswith("sknow")
+
+
+def test_cli_help_still_stdout_exit_0(capsys):
+    from sakura_knowledge.cli import main
+    with pytest.raises(SystemExit) as exc:
+        main(["--help"])
+    assert exc.value.code == 0
+    out, err = capsys.readouterr()
+    assert out.startswith("usage: sknow") and err == ""
