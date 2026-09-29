@@ -102,7 +102,7 @@ fn main() -> ExitCode {
                 match (opt.kind.clone(), opt.namespace.clone()) {
                     (Some(k), Some(n)) => Ok(rt.lookup_key(&k, &n, query)?),
                     _ => Err(Error::Invalid(
-                        "--key requires --kind and --namespace".into(),
+                        "exact key requires --kind and --namespace".into(),
                     )),
                 }
             } else {
@@ -158,21 +158,21 @@ fn main() -> ExitCode {
 
     match result {
         Ok(v) => {
-            println!("{}", serde_json::to_string_pretty(&v).unwrap());
+            println!("{}", serde_json::to_string(&v).unwrap());
             ExitCode::SUCCESS
         }
-        Err(Error::Invalid(m)) => {
-            eprintln!(
-                "{}",
-                serde_json::json!({"error": "validation", "message": m})
-            );
-            ExitCode::from(1)
-        }
         Err(e) => {
-            eprintln!(
-                "{}",
-                serde_json::json!({"error": "runtime", "message": e.to_string()})
-            );
+            // Mirror the Python CLI contract: {"error": "<ExceptionType>",
+            // "message": "..."} on stderr, exit code 2.
+            let (typ, message) = match &e {
+                Error::Invalid(m) => ("ValueError", m.clone()),
+                Error::Budget => ("ValueError", "query_budget_exceeded".to_string()),
+                Error::Sql(rusqlite::Error::SqliteFailure(_, Some(m))) => {
+                    ("OperationalError", m.clone())
+                }
+                Error::Sql(other) => ("OperationalError", format!("SQLite error: {other}")),
+            };
+            eprintln!("{}", serde_json::json!({"error": typ, "message": message}));
             ExitCode::from(2)
         }
     }

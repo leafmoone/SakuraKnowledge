@@ -157,6 +157,21 @@ fn key_of(kind: &str, namespace: &str, value: &str) -> Value {
     json!({"kind": kind, "namespace": namespace, "value": value})
 }
 
+/// Mirror of the Python `EntryKey` validation (model.py).
+fn validate_key(kind: &str, namespace: &str, value: &str) -> Result<()> {
+    if !matches!(
+        kind,
+        "subject" | "character" | "person" | "episode" | "page" | "tag"
+    ) || namespace.is_empty()
+    {
+        return Err(Error::Invalid("invalid EntryKey".into()));
+    }
+    if value.is_empty() || namespace.chars().count() > 1024 || value.chars().count() > 1024 {
+        return Err(Error::Invalid("invalid EntryKey length".into()));
+    }
+    Ok(())
+}
+
 impl Runtime {
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
         let conn = Connection::open_with_flags(path, OpenFlags::SQLITE_OPEN_READ_ONLY)?;
@@ -484,6 +499,7 @@ impl Runtime {
 
     pub fn lookup_key(&mut self, kind: &str, namespace: &str, value: &str) -> Result<Value> {
         Self::install_budget(&self.conn);
+        validate_key(kind, namespace, value)?;
         let sql = format!(
             "SELECT e.id,e.kind,e.namespace,e.value,e.locator FROM entries e
              WHERE e.kind=?1 AND e.namespace=?2 AND e.value=?3
@@ -671,6 +687,7 @@ impl Runtime {
         if !(1..=100).contains(&limit) {
             return Err(Error::Invalid("limit must be 1..100".into()));
         }
+        validate_key(kind, namespace, value)?;
         let mut result = self.lookup_key(kind, namespace, value)?;
         if result["status"] != json!("found") {
             return Ok(result);
@@ -932,63 +949,139 @@ impl Runtime {
 
 // ------------------------------------------------------------- ask template
 
-/// Bounded deterministic templates, mirroring the Python reference regexes.
-/// Python `.+?` requires at least one character; `\s*` in the templates means
-/// zero or more ASCII whitespace characters. Returns the verbatim subject and
-/// mode (`danbooru.tag`, `tag`, `introduce`); anything else returns None.
+// ------------------------------------------------------------- ask template
+
+/// Bounded deterministic templates — a faithful port of the Python
+/// reference regexes (api.py):
+///   danbooru: ^(?P<x>.+?)\s*的\s*danbooru\s*tag\s*是什么\s*[？?。.\s]*$   (IGNORECASE)
+///   tag:      ^(?P<x>.+?)\s*的\s*标签\s*是什么\s*[？?。.\s]*$
+///   introduce:^介绍(?:一下)?\s*(?P<x>.+?)\s*[？?。.\s]*$
+/// Try order: danbooru, tag, introduce. `.+?` is lazy: the subject is the
+/// shortest prefix whose remainder matches; the returned subject is
+/// whitespace-stripped and must be non-empty.
+fn is_trail(c: char) -> bool {
+    matches!(c, '？' | '?' | '。' | '.') || is_ws(c)
+}
+
+fn template_subject(query: &[char], mid: &[&str]) -> Option<String> {
+    // mid: ordered literal words between the subject and the fixed tail,
+    // each preceded by ws*; the fixed tail is "是什么" + [？?。.\s]*.
+    let tail: Vec<char> = "是什么".chars().collect();
+    let n = query.len();
+    // Try subject end positions from the left (lazy .+? => shortest subject).
+    for end in 1..n {
+        let rest = &query[end..];
+        // rest must match: ws* <mid words with ws* between> 是什么 [？?。.\s]*
+        let mut i = 0;
+        while i < rest.len() && is_ws(rest[i]) {
+            i += 1;
+        }
+        let mut ok = true;
+        for &word in mid {
+            let wc: Vec<char> = word.chars().collect();
+            if rest.len().saturating_sub(i) < wc.len() {
+                ok = false;
+                break;
+            }
+            for (a, b) in rest[i..i + wc.len()].iter().zip(wc.iter()) {
+                let la: String = a.to_lowercase().collect();
+                let lb: String = b.to_lowercase().collect();
+                if la != lb {
+                    ok = false;
+                    break;
+                }
+            }
+            if !ok {
+                break;
+            }
+            i += wc.len();
+            while i < rest.len() && is_ws(rest[i]) {
+                i += 1;
+            }
+        }
+        if !ok || rest.len().saturating_sub(i) < tail.len() {
+            continue;
+        }
+        for (a, b) in rest[i..i + tail.len()].iter().zip(tail.iter()) {
+            if a != b {
+                ok = false;
+                break;
+            }
+        }
+        if !ok {
+            continue;
+        }
+        let mut j = i + tail.len();
+        while j < rest.len() && is_trail(rest[j]) {
+            j += 1;
+        }
+        if j != rest.len() {
+            continue;
+        }
+        let subject: String = query[..end].iter().collect();
+        let stripped = subject.trim();
+        if !stripped.is_empty() {
+            return Some(stripped.to_string());
+        }
+    }
+    None
+}
+
 pub fn parse_ask_template(query: &str) -> Option<(String, String)> {
     if query.is_empty() || query.chars().count() > MAX_QUERY_CHARS {
         return None;
     }
     let chars: Vec<char> = query.chars().collect();
-    let lower: Vec<char> = chars
-        .iter()
-        .map(|c| c.to_lowercase().collect::<String>().chars().next().unwrap())
-        .collect();
-
-    // First "的" splits the subject (Python `^(.+?)的` is non-greedy).
-    if let Some(pos) = lower.iter().position(|&c| c == '的') {
-        let mut i = pos + 1;
-        while i < lower.len() && is_ws(lower[i]) {
-            i += 1;
-        }
-        let rest: String = lower[i..].iter().collect();
-        let mode = if rest == "danbooru tag 是什么" || rest == "danbooru  tag 是什么" {
-            Some("danbooru.tag")
-        } else if rest == "标签是什么" {
-            Some("tag")
-        } else {
-            None
-        };
-        if let Some(mode) = mode {
-            let mut end = pos;
-            while end > 0 && is_ws(chars[end - 1]) {
-                end -= 1;
-            }
-            if end > 0 {
-                let subject: String = chars[..end].iter().collect();
-                return Some((subject, mode.to_string()));
-            }
-        }
+    // danbooru: <x> \s* 的 \s* danbooru \s* tag \s* 是什么 [tail]
+    if let Some(subject) = template_subject(&chars, &["的", "danbooru", "tag"]) {
+        return Some((subject, "danbooru.tag".to_string()));
     }
-
-    // "介绍 X" / "介绍一下 X"
-    for prefix in ["介绍一下", "介绍"] {
-        let pc: Vec<char> = prefix.chars().collect();
-        if lower.len() >= pc.len() && lower[..pc.len()] == pc {
-            let mut i = pc.len();
-            while i < lower.len() && is_ws(lower[i]) {
+    // tag: <x> \s* 的 \s* 标签 \s* 是什么 [tail]
+    if let Some(subject) = template_subject(&chars, &["的", "标签"]) {
+        return Some((subject, "tag".to_string()));
+    }
+    // introduce: 介绍 (一下)? \s* <x> [tail]
+    // The optional 一下 group is greedy with backtracking: try with it
+    // first, then without it (mirrors Python re semantics).
+    let intro: Vec<char> = "介绍".chars().collect();
+    let youxia: Vec<char> = "一下".chars().collect();
+    if chars.len() >= intro.len() && chars[..intro.len()] == intro {
+        let starts: [usize; 2] = [
+            if chars.len() >= intro.len() + youxia.len()
+                && chars[intro.len()..intro.len() + youxia.len()] == youxia
+            {
+                intro.len() + youxia.len()
+            } else {
+                usize::MAX
+            },
+            intro.len(),
+        ];
+        for start in starts {
+            if start == usize::MAX {
+                continue;
+            }
+            let mut i = start;
+            while i < chars.len() && is_ws(chars[i]) {
                 i += 1;
             }
-            let mut end = lower.len();
-            while end > i
-                && (is_ws(lower[end - 1]) || matches!(lower[end - 1], '？' | '?' | '。' | '.'))
-            {
-                end -= 1;
+            if i >= chars.len() {
+                continue;
             }
-            if end > i {
-                let subject: String = lower[i..end].iter().collect();
-                return Some((subject, "introduce".to_string()));
+            // x: shortest prefix of chars[i..] whose remainder is all [？?。.\s]
+            let rest = &chars[i..];
+            let mut cut = None;
+            for e in 1..=rest.len() {
+                if rest[e..].iter().all(|&c| is_trail(c)) {
+                    cut = Some(e);
+                    break;
+                }
+            }
+            if let Some(e) = cut {
+                let subject: String = rest[..e].iter().collect();
+                let stripped = subject.trim();
+                if !stripped.is_empty() {
+                    return Some((stripped.to_string(), "introduce".to_string()));
+                }
             }
         }
     }
