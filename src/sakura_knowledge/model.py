@@ -10,7 +10,13 @@ _MAX_QUERY_TOKENS = 256
 
 STATUSES = frozenset({"source_backed", "generated_from_evidence", "unverified_draft",
                       "no_reference", "conflict", "failed"})
-TRUSTED = frozenset({"source_backed", "generated_from_evidence"})
+# Identity resolution (exact keys, value/alias resolution, ask targets) accepts
+# only evidence anchored to the source. Future reviewed-identity statuses are
+# added here deliberately, never by default.
+IDENTITY_TRUSTED = frozenset({"source_backed"})
+# Descriptions and FTS may additionally use trusted-producer generated text.
+TEXT_TRUSTED = frozenset({"source_backed", "generated_from_evidence"})
+TRUSTED = TEXT_TRUSTED  # historical name, kept for compatibility
 GROUPS = ("common_tags", "anime_pictures_1_noncommon", "bangumi_1_noncommon",
           "gamecg_5m_noncommon", "konachan_1_noncommon", "yande_1_noncommon",
           "zerochan_1_noncommon")

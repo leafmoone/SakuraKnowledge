@@ -1,0 +1,1123 @@
+{
+ "scope": "Small human-checked evaluation on the FROZEN 20bf5b3 snapshot. 26 cases selected by hand from real snapshot values; expected_behavior states the contract, not a guessed fact. This is a small reconciliation, NOT a full-database factual review and NOT human fact review of the sources.",
+ "snapshot": "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+ "snapshot_binding": {
+  "builder_sha": "20bf5b315e47f1c7038af06307424bb734efcc10",
+  "manifest_sha256": "7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c",
+  "query_code_sha": "pending-fix-commit"
+ },
+ "resolved_terms": {
+  "E03_alias": "美坂栞",
+  "E04_alias": "水樹奈々",
+  "E05_mg_char": "\"加特\"",
+  "E20_cjk2": "!!"
+ },
+ "cases": {
+  "E01": {
+   "case_id": "E01",
+   "query": "lookup key subject 975",
+   "query_mode": "lookup",
+   "expected_behavior": "found: source-backed subject key lookup with citation",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "subject",
+    "namespace": "bangumi.subject",
+    "value": "975"
+   },
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "975"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:889"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:889"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E02": {
+   "case_id": "E02",
+   "query": "lookup alias 'ONE PIECE'",
+   "query_mode": "lookup",
+   "expected_behavior": "ambiguous: alias 'ONE PIECE' shared by 3 subjects; no silent pick",
+   "actual_status": "ambiguous",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "149890"
+    },
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "3510"
+    },
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "975"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": "Ambiguity is correct behaviour: three distinct subjects share the English title alias."
+  },
+  "E03": {
+   "case_id": "E03",
+   "query": "lookup bangumi character alias '美坂栞'",
+   "query_mode": "lookup",
+   "expected_behavior": "found: bangumi character resolved by its CJK alias with source citation",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "character",
+    "namespace": "bangumi.character",
+    "value": "1000"
+   },
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "character",
+     "namespace": "bangumi.character",
+     "value": "1000"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:691007"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:691007"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E04": {
+   "case_id": "E04",
+   "query": "lookup bangumi person alias '水樹奈々'",
+   "query_mode": "lookup",
+   "expected_behavior": "found: bangumi person (CV) resolved by CJK alias with source citation",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "person",
+    "namespace": "bangumi.person",
+    "value": "1"
+   },
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "person",
+     "namespace": "bangumi.person",
+     "value": "1"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:912029"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:912029"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E05": {
+   "case_id": "E05",
+   "query": "lookup moegirl character '\"加特\"'",
+   "query_mode": "lookup",
+   "expected_behavior": "found: moegirl character resolved; identity citation present, description only if source-backed exists",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "character",
+    "namespace": "moegirl.character",
+    "value": "\"加特\""
+   },
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "character",
+     "namespace": "moegirl.character",
+     "value": "\"加特\""
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "moegirl-complete-5072f7cf3e3e",
+     "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:1"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "moegirl-complete-5072f7cf3e3e",
+     "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:1"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": "moegirl value keeps its stored quoted form; 0 descriptions because no source-backed document attached to this record slice."
+  },
+  "E06": {
+   "case_id": "E06",
+   "query": "lookup danbooru page alias 'my_ocs_art'",
+   "query_mode": "lookup",
+   "expected_behavior": "found: danbooru wiki page resolved by other_names alias",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "page",
+    "namespace": "danbooru.wiki",
+    "value": "10"
+   },
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "page",
+     "namespace": "danbooru.wiki",
+     "value": "10"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "danbooru-complete-a26a3829dd42",
+     "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:1"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "danbooru-complete-a26a3829dd42",
+     "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:1"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E07": {
+   "case_id": "E07",
+   "query": "ask local tag 'solo' (no target)",
+   "query_mode": "ask",
+   "expected_behavior": "found + mapping_status=local_identity_only; explicitly NOT a danbooru.tag",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "tag",
+    "namespace": "local.tag_aggregate",
+    "value": "solo"
+   },
+   "tag_key": {
+    "namespace": "local.tag_aggregate",
+    "value": "solo"
+   },
+   "mapping_status": "local_identity_only",
+   "query_template": "unsupported",
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "tag",
+     "namespace": "local.tag_aggregate",
+     "value": "solo"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "tag_wiki-complete-a2eb055c578d",
+     "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:136755"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "tag_wiki-complete-a2eb055c578d",
+     "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:136755"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E08": {
+   "case_id": "E08",
+   "query": "ask local tag 'solo' target danbooru.tag",
+   "query_mode": "ask",
+   "expected_behavior": "entity_found_tag_unmapped + target_unmapped + tag_key=null (no native danbooru.tag identities exist)",
+   "actual_status": "entity_found_tag_unmapped",
+   "entry_key": {
+    "kind": "tag",
+    "namespace": "local.tag_aggregate",
+    "value": "solo"
+   },
+   "tag_key": null,
+   "mapping_status": "target_unmapped",
+   "query_template": "unsupported",
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "tag",
+     "namespace": "local.tag_aggregate",
+     "value": "solo"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "tag_wiki-complete-a2eb055c578d",
+     "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:136755"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "tag_wiki-complete-a2eb055c578d",
+     "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:136755"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E09": {
+   "case_id": "E09",
+   "query": "ask template 'akanbe 的标签是什么'",
+   "query_mode": "ask_template",
+   "expected_behavior": "subject 'akanbe' is ambiguous between local.tag_aggregate and danbooru.wiki page; no cross-namespace inference",
+   "actual_status": "entity_ambiguous",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": "entity_ambiguous",
+   "query_template": "tag",
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "page",
+     "namespace": "danbooru.wiki",
+     "value": "5438"
+    },
+    {
+     "kind": "tag",
+     "namespace": "local.tag_aggregate",
+     "value": "akanbe"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": "Demonstrates the danbooru/local namespace separation on a real shared spelling."
+  },
+  "E10": {
+   "case_id": "E10",
+   "query": "related subject 975 limit 20",
+   "query_mode": "related",
+   "expected_behavior": "native credit_person relations (CV) with per-edge proof; limit honored",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "subject",
+    "namespace": "bangumi.subject",
+    "value": "975"
+   },
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "975"
+    }
+   ],
+   "relations_sample": [
+    {
+     "dst": {
+      "kind": "person",
+      "namespace": "bangumi.person",
+      "value": "1000"
+     },
+     "relation": "credit_person",
+     "method": "bangumi.Archive:subject-persons",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:2743361",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"975\"}, \"dst\": {\"kind\": \"person\", \"namespace\": \"bangumi.person\", \"value\": \"1000\"}, \"relation\": \"credit_person\", \"method\": \"bangumi.Archive:subject-persons\", \"verification_status\": \"native\", \"raw\": {\"person_id\": 1000, \"subject_id\": 975, \"position\": 3, \"appear_eps\": \"\"}}"
+    },
+    {
+     "dst": {
+      "kind": "person",
+      "namespace": "bangumi.person",
+      "value": "10033"
+     },
+     "relation": "credit_person",
+     "method": "bangumi.Archive:subject-persons",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:2743434",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"975\"}, \"dst\": {\"kind\": \"person\", \"namespace\": \"bangumi.person\", \"value\": \"10033\"}, \"relation\": \"credit_person\", \"method\": \"bangumi.Archive:subject-persons\", \"verification_status\": \"native\", \"raw\": {\"person_id\": 10033, \"subject_id\": 975, \"position\": 20, \"appear_eps\": \"\"}}"
+    },
+    {
+     "dst": {
+      "kind": "person",
+      "namespace": "bangumi.person",
+      "value": "10033"
+     },
+     "relation": "credit_person",
+     "method": "bangumi.Archive:subject-persons",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:2743435",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"975\"}, \"dst\": {\"kind\": \"person\", \"namespace\": \"bangumi.person\", \"value\": \"10033\"}, \"relation\": \"credit_person\", \"method\": \"bangumi.Archive:subject-persons\", \"verification_status\": \"native\", \"raw\": {\"person_id\": 10033, \"subject_id\": 975, \"position\": 14, \"appear_eps\": \"\"}}"
+    },
+    {
+     "dst": {
+      "kind": "person",
+      "namespace": "bangumi.person",
+      "value": "10062"
+     },
+     "relation": "credit_person",
+     "method": "bangumi.Archive:subject-persons",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:2743436",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"975\"}, \"dst\": {\"kind\": \"person\", \"namespace\": \"bangumi.person\", \"value\": \"10062\"}, \"relation\": \"credit_person\", \"method\": \"bangumi.Archive:subject-persons\", \"verification_status\": \"native\", \"raw\": {\"person_id\": 10062, \"subject_id\": 975, \"position\": 33, \"appear_eps\": \"\"}}"
+    },
+    {
+     "dst": {
+      "kind": "person",
+      "namespace": "bangumi.person",
+      "value": "100677"
+     },
+     "relation": "credit_person",
+     "method": "bangumi.Archive:subject-persons",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:2744089",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"975\"}, \"dst\": {\"kind\": \"person\", \"namespace\": \"bangumi.person\", \"value\": \"100677\"}, \"relation\": \"credit_person\", \"method\": \"bangumi.Archive:subject-persons\", \"verification_status\": \"native\", \"raw\": {\"person_id\": 100677, \"subject_id\": 975, \"position\": 21, \"appear_eps\": \"\"}}"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:889"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:889"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E11": {
+   "case_id": "E11",
+   "query": "related subject 4 features_character",
+   "query_mode": "related",
+   "expected_behavior": "native features_character relations visible",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "subject",
+    "namespace": "bangumi.subject",
+    "value": "4"
+   },
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "4"
+    }
+   ],
+   "relations_sample": [
+    {
+     "dst": {
+      "kind": "character",
+      "namespace": "bangumi.character",
+      "value": "63419"
+     },
+     "relation": "features_character",
+     "method": "bangumi.Archive:subject-characters",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:5832688",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"4\"}, \"dst\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"63419\"}, \"relation\": \"features_character\", \"method\": \"bangumi.Archive:subject-characters\", \"verification_status\": \"native\", \"raw\": {\"character_id\": 63419, \"subject_id\": 4, \"type\": 1, \"order\": 0}}"
+    },
+    {
+     "dst": {
+      "kind": "character",
+      "namespace": "bangumi.character",
+      "value": "63420"
+     },
+     "relation": "features_character",
+     "method": "bangumi.Archive:subject-characters",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:5832685",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"4\"}, \"dst\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"63420\"}, \"relation\": \"features_character\", \"method\": \"bangumi.Archive:subject-characters\", \"verification_status\": \"native\", \"raw\": {\"character_id\": 63420, \"subject_id\": 4, \"type\": 1, \"order\": 0}}"
+    },
+    {
+     "dst": {
+      "kind": "character",
+      "namespace": "bangumi.character",
+      "value": "63421"
+     },
+     "relation": "features_character",
+     "method": "bangumi.Archive:subject-characters",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:5832689",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"4\"}, \"dst\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"63421\"}, \"relation\": \"features_character\", \"method\": \"bangumi.Archive:subject-characters\", \"verification_status\": \"native\", \"raw\": {\"character_id\": 63421, \"subject_id\": 4, \"type\": 1, \"order\": 0}}"
+    },
+    {
+     "dst": {
+      "kind": "character",
+      "namespace": "bangumi.character",
+      "value": "63422"
+     },
+     "relation": "features_character",
+     "method": "bangumi.Archive:subject-characters",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:5832686",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"4\"}, \"dst\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"63422\"}, \"relation\": \"features_character\", \"method\": \"bangumi.Archive:subject-characters\", \"verification_status\": \"native\", \"raw\": {\"character_id\": 63422, \"subject_id\": 4, \"type\": 1, \"order\": 0}}"
+    },
+    {
+     "dst": {
+      "kind": "character",
+      "namespace": "bangumi.character",
+      "value": "64273"
+     },
+     "relation": "features_character",
+     "method": "bangumi.Archive:subject-characters",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:5832690",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"subject\", \"namespace\": \"bangumi.subject\", \"value\": \"4\"}, \"dst\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"64273\"}, \"relation\": \"features_character\", \"method\": \"bangumi.Archive:subject-characters\", \"verification_status\": \"native\", \"raw\": {\"character_id\": 64273, \"subject_id\": 4, \"type\": 1, \"order\": 0}}"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:2"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:2"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E12": {
+   "case_id": "E12",
+   "query": "related character 12393 (mapping candidate must not appear)",
+   "query_mode": "related",
+   "expected_behavior": "candidate identity_candidate (moegirl mapping) NOT surfaced; only native edges",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "character",
+    "namespace": "bangumi.character",
+    "value": "12393"
+   },
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "character",
+     "namespace": "bangumi.character",
+     "value": "12393"
+    }
+   ],
+   "relations_sample": [
+    {
+     "dst": {
+      "kind": "character",
+      "namespace": "bangumi.character",
+      "value": "12392"
+     },
+     "relation": "character_relation",
+     "method": "bangumi.Archive:person-relations",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:6571727",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"12393\"}, \"dst\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"12392\"}, \"relation\": \"character_relation\", \"method\": \"bangumi.Archive:person-relations\", \"verification_status\": \"native\", \"raw\": {\"person_type\": \"crt\", \"person_id\": 12393, \"related_person_id\": 12392, \"relation_type\": 2002, \"spoiler\": false, \"ended\": false}}"
+    },
+    {
+     "dst": {
+      "kind": "character",
+      "namespace": "bangumi.character",
+      "value": "42677"
+     },
+     "relation": "character_relation",
+     "method": "bangumi.Archive:person-relations",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:6571728",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"12393\"}, \"dst\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"42677\"}, \"relation\": \"character_relation\", \"method\": \"bangumi.Archive:person-relations\", \"verification_status\": \"native\", \"raw\": {\"person_type\": \"crt\", \"person_id\": 12393, \"related_person_id\": 42677, \"relation_type\": 2012, \"spoiler\": false, \"ended\": false}}"
+    },
+    {
+     "dst": {
+      "kind": "character",
+      "namespace": "bangumi.character",
+      "value": "55538"
+     },
+     "relation": "character_relation",
+     "method": "bangumi.Archive:person-relations",
+     "verification_status": "native",
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:6571729",
+     "payload": "{\"record_type\": \"link\", \"src\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"12393\"}, \"dst\": {\"kind\": \"character\", \"namespace\": \"bangumi.character\", \"value\": \"55538\"}, \"relation\": \"character_relation\", \"method\": \"bangumi.Archive:person-relations\", \"verification_status\": \"native\", \"raw\": {\"person_type\": \"crt\", \"person_id\": 12393, \"related_person_id\": 55538, \"relation_type\": 2006, \"spoiler\": true, \"ended\": false}}"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:701489"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:701489"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": "Full snapshot contains identity_candidate for this character (see E22); related() correctly shows none of it."
+  },
+  "E13": {
+   "case_id": "E13",
+   "query": "related local tag akanbe (wiki_match_candidate must not appear)",
+   "query_mode": "related",
+   "expected_behavior": "tag identity found; wiki_match_candidate edges NOT surfaced",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "tag",
+    "namespace": "local.tag_aggregate",
+    "value": "akanbe"
+   },
+   "tag_key": {
+    "namespace": "local.tag_aggregate",
+    "value": "akanbe"
+   },
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "tag",
+     "namespace": "local.tag_aggregate",
+     "value": "akanbe"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "tag_wiki-complete-a2eb055c578d",
+     "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:3063"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "tag_wiki-complete-a2eb055c578d",
+     "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:3063"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E14": {
+   "case_id": "E14",
+   "query": "lookup '10' unfiltered (ambiguous expected)",
+   "query_mode": "lookup",
+   "expected_behavior": "ambiguous: numeric value shared across namespaces",
+   "actual_status": "ambiguous",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "character",
+     "namespace": "bangumi.character",
+     "value": "10"
+    },
+    {
+     "kind": "character",
+     "namespace": "moegirl.character",
+     "value": "I零"
+    },
+    {
+     "kind": "character",
+     "namespace": "moegirl.character",
+     "value": "伊灵"
+    },
+    {
+     "kind": "character",
+     "namespace": "moegirl.character",
+     "value": "杠琴子"
+    },
+    {
+     "kind": "episode",
+     "namespace": "bangumi.episode",
+     "value": "10"
+    },
+    {
+     "kind": "episode",
+     "namespace": "bangumi.episode",
+     "value": "1116500"
+    },
+    {
+     "kind": "episode",
+     "namespace": "bangumi.episode",
+     "value": "1169038"
+    },
+    {
+     "kind": "episode",
+     "namespace": "bangumi.episode",
+     "value": "1274565"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E15": {
+   "case_id": "E15",
+   "query": "lookup 'definitely_missing_xyz_9271'",
+   "query_mode": "lookup",
+   "expected_behavior": "not_found",
+   "actual_status": "not_found",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E16": {
+   "case_id": "E16",
+   "query": "ask template 孤独摇滚 danbooru",
+   "query_mode": "ask_template",
+   "expected_behavior": "孤独摇滚 alias hits episode + danbooru.wiki page => entity_ambiguous; no danbooru.tag invented",
+   "actual_status": "entity_ambiguous",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": "entity_ambiguous",
+   "query_template": "danbooru_tag",
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "episode",
+     "namespace": "bangumi.episode",
+     "value": "1128648"
+    },
+    {
+     "kind": "page",
+     "namespace": "danbooru.wiki",
+     "value": "115615"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": "Real question from the review; the snapshot resolves the alias to two entities, so the honest answer is entity_ambiguous, not a tag."
+  },
+  "E17": {
+   "case_id": "E17",
+   "query": "ask template 介绍一下 975",
+   "query_mode": "ask_template",
+   "expected_behavior": "介绍一下 975 => entity_ambiguous across 4 bangumi kinds",
+   "actual_status": "entity_ambiguous",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": "entity_ambiguous",
+   "query_template": "introduce",
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "character",
+     "namespace": "bangumi.character",
+     "value": "975"
+    },
+    {
+     "kind": "episode",
+     "namespace": "bangumi.episode",
+     "value": "975"
+    },
+    {
+     "kind": "person",
+     "namespace": "bangumi.person",
+     "value": "975"
+    },
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "975"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E18": {
+   "case_id": "E18",
+   "query": "lookup key episode 1128648 (孤独摇滚 alias)",
+   "query_mode": "lookup",
+   "expected_behavior": "found: episode key lookup works while episode FTS stays off",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "episode",
+    "namespace": "bangumi.episode",
+    "value": "1128648"
+   },
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "episode",
+     "namespace": "bangumi.episode",
+     "value": "1128648"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:2098630"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:2098630"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E19": {
+   "case_id": "E19",
+   "query": "search 'ONE PIECE'",
+   "query_mode": "search",
+   "expected_behavior": "ranked candidates, each with citation",
+   "actual_status": "ambiguous",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "149890"
+    },
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "3510"
+    },
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "975"
+    },
+    {
+     "kind": "page",
+     "namespace": "danbooru.wiki",
+     "value": "31339"
+    },
+    {
+     "kind": "page",
+     "namespace": "danbooru.wiki",
+     "value": "14407"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E20": {
+   "case_id": "E20",
+   "query": "search CJK 2-char '!!'",
+   "query_mode": "search",
+   "expected_behavior": "term '!!' (deterministic 2-char alias term; filter flaw disclosed) resolves to page + local tag",
+   "actual_status": "ambiguous",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "page",
+     "namespace": "danbooru.wiki",
+     "value": "32204"
+    },
+    {
+     "kind": "tag",
+     "namespace": "local.tag_aggregate",
+     "value": "!!"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": "The deterministic term filter (length 2, no ASCII alnum) selected '!!'; disclosed, not relabeled as CJK."
+  },
+  "E21": {
+   "case_id": "E21",
+   "query": "ask page 10 danbooru.wiki (no verified tag)",
+   "query_mode": "ask",
+   "expected_behavior": "entity_found_tag_unmapped: page identity with no verified tag",
+   "actual_status": "entity_found_tag_unmapped",
+   "entry_key": {
+    "kind": "page",
+    "namespace": "danbooru.wiki",
+    "value": "10"
+   },
+   "tag_key": null,
+   "mapping_status": "unmapped",
+   "query_template": "unsupported",
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "page",
+     "namespace": "danbooru.wiki",
+     "value": "10"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "danbooru-complete-a26a3829dd42",
+     "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:1"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "danbooru-complete-a26a3829dd42",
+     "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:1"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": "No verified entity_tag edges exist anywhere in this cut (0 in snapshot), so unmapped is the only truthful answer."
+  },
+  "E22": {
+   "case_id": "E22",
+   "query": "related character 12393 relation identity_candidate",
+   "query_mode": "related",
+   "expected_behavior": "identity_candidate query returns no relations (candidates are not verified)",
+   "actual_status": "found",
+   "entry_key": {
+    "kind": "character",
+    "namespace": "bangumi.character",
+    "value": "12393"
+   },
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "character",
+     "namespace": "bangumi.character",
+     "value": "12393"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:701489"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "bangumi-complete-6a75aefb769a",
+     "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:701489"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E23": {
+   "case_id": "E23",
+   "query": "search 'ONE PIECE' kind episode (episodes excluded from FTS)",
+   "query_mode": "search",
+   "expected_behavior": "kind=episode search returns not_found: episodes excluded from FTS by design",
+   "actual_status": "not_found",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": null,
+   "query_template": null,
+   "warnings": [],
+   "candidates": [],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E24": {
+   "case_id": "E24",
+   "query": "ask '975' direct name unfiltered",
+   "query_mode": "ask",
+   "expected_behavior": "unfiltered '975' => entity_ambiguous, direct-name compatibility",
+   "actual_status": "entity_ambiguous",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": "entity_ambiguous",
+   "query_template": "unsupported",
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "character",
+     "namespace": "bangumi.character",
+     "value": "975"
+    },
+    {
+     "kind": "episode",
+     "namespace": "bangumi.episode",
+     "value": "975"
+    },
+    {
+     "kind": "person",
+     "namespace": "bangumi.person",
+     "value": "975"
+    },
+    {
+     "kind": "subject",
+     "namespace": "bangumi.subject",
+     "value": "975"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": ""
+  },
+  "E25": {
+   "case_id": "E25",
+   "query": "ask local tag '!' target danbooru.tag (knowledge gap)",
+   "query_mode": "ask",
+   "expected_behavior": "local tag '!' with danbooru target => target_unmapped, null tag_key: honest knowledge gap",
+   "actual_status": "entity_found_tag_unmapped",
+   "entry_key": {
+    "kind": "tag",
+    "namespace": "local.tag_aggregate",
+    "value": "!"
+   },
+   "tag_key": null,
+   "mapping_status": "target_unmapped",
+   "query_template": "unsupported",
+   "warnings": [],
+   "candidates": [
+    {
+     "kind": "tag",
+     "namespace": "local.tag_aggregate",
+     "value": "!"
+    }
+   ],
+   "relations_sample": [],
+   "evidence": [
+    {
+     "source_id": "tag_wiki-complete-a2eb055c578d",
+     "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1"
+    }
+   ],
+   "citations": [
+    {
+     "source_id": "tag_wiki-complete-a2eb055c578d",
+     "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1"
+    }
+   ],
+   "human_judgement": "pass",
+   "notes": "Same reason as E21 for the '!' tag."
+  },
+  "E26": {
+   "case_id": "E26",
+   "query": "ask unsupported free text",
+   "query_mode": "ask",
+   "expected_behavior": "unsupported free text => unknown + unsupported_query_template warning; never a guess",
+   "actual_status": "unknown",
+   "entry_key": null,
+   "tag_key": null,
+   "mapping_status": "unknown",
+   "query_template": "unsupported",
+   "warnings": [
+    "unsupported_query_template"
+   ],
+   "candidates": [],
+   "relations_sample": [],
+   "evidence": [],
+   "citations": [],
+   "human_judgement": "pass",
+   "notes": ""
+  }
+ }
+}

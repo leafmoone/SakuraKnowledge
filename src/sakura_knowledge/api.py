@@ -1,10 +1,34 @@
 """Shared read-only API for the CLI and Skill."""
+import re
 import sqlite3
 import time
 
 from . import CONTRACT_VERSION
-from .model import EntryKey, match_query
+from .model import IDENTITY_TRUSTED, TEXT_TRUSTED, EntryKey, match_query
 from .storage import readonly
+
+_ID = ", ".join(f"'{s}'" for s in sorted(IDENTITY_TRUSTED))
+_TEXT = ", ".join(f"'{s}'" for s in sorted(TEXT_TRUSTED))
+
+# Bounded, deterministic natural-language templates. The subject X is taken
+# verbatim (inner punctuation, brackets and underscores are never normalized);
+# only surrounding whitespace is stripped. Parsing is separate from lookup.
+_ASK_DANBOORU = re.compile(
+    r"^(?P<x>.+?)\s*的\s*danbooru\s*tag\s*是什么\s*[？?。.\s]*$", re.IGNORECASE)
+_ASK_TAG = re.compile(r"^(?P<x>.+?)\s*的\s*标签\s*是什么\s*[？?。.\s]*$")
+_ASK_INTRODUCE = re.compile(r"^介绍(?:一下)?\s*(?P<x>.+?)\s*[？?。.\s]*$")
+
+
+def parse_ask_template(query):
+    """Return (subject, mode) for a supported template, else None."""
+    if not isinstance(query, str) or not 1 <= len(query) <= 4096:
+        raise ValueError("query must contain 1..4096 characters")
+    for pattern, mode in ((_ASK_DANBOORU, "danbooru.tag"),
+                          (_ASK_TAG, "tag"), (_ASK_INTRODUCE, "introduce")):
+        match = pattern.fullmatch(query)
+        if match and match.group("x").strip():
+            return match.group("x").strip(), mode
+    return None
 
 
 class Knowledge:
@@ -44,22 +68,23 @@ class Knowledge:
 
     def describe(self, row, alias_text=None):
         key = EntryKey(row["kind"], row["namespace"], row["value"]).as_dict()
+        # Descriptions are TEXT_TRUSTED; identity proofs are IDENTITY_TRUSTED.
         docs = self._execute(
-            "SELECT title,substr(original,1,4000) AS original, "
-            "length(original)>4000 AS response_truncated, "
-            "json_extract(payload,'$.search_text_truncated') AS search_text_truncated, "
-            "source_id,evidence_id,status FROM documents WHERE entry_id=? "
-            "AND status IN ('source_backed','generated_from_evidence') ORDER BY id LIMIT 10",
+            f"SELECT title,substr(original,1,4000) AS original, "
+            f"length(original)>4000 AS response_truncated, "
+            f"json_extract(payload,'$.search_text_truncated') AS search_text_truncated, "
+            f"source_id,evidence_id,status FROM documents WHERE entry_id=? "
+            f"AND status IN ({_TEXT}) ORDER BY id LIMIT 10",
             (row["id"],)).fetchall()
         aliases = (self._execute(
-            "SELECT text,source_id,evidence_id,status FROM aliases WHERE entry_id=? AND text=? "
-            "AND status IN ('source_backed','generated_from_evidence') "
-            "ORDER BY source_id,evidence_id LIMIT 100", (row["id"], alias_text)).fetchall()
+            f"SELECT text,source_id,evidence_id,status FROM aliases WHERE entry_id=? AND text=? "
+            f"AND status IN ({_ID}) "
+            f"ORDER BY source_id,evidence_id LIMIT 100", (row["id"], alias_text)).fetchall()
             if alias_text is not None else [])
         identities = self._execute(
-            "SELECT source_id,evidence_id,status,type,locator FROM entry_evidence "
-            "WHERE entry_id=? AND status IN ('source_backed','generated_from_evidence') "
-            "ORDER BY source_id,evidence_id LIMIT 100", (row["id"],)).fetchall()
+            f"SELECT source_id,evidence_id,status,type,locator FROM entry_evidence "
+            f"WHERE entry_id=? AND status IN ({_ID}) "
+            f"ORDER BY source_id,evidence_id LIMIT 100", (row["id"],)).fetchall()
         identity_proofs = aliases if alias_text is not None and alias_text != row["value"] else identities
         return {"entry_key": key, "locator": row["locator"],
                 "descriptions": [dict(d) for d in docs],
@@ -70,9 +95,10 @@ class Knowledge:
 
     def lookup(self, query=None, *, key=None, kind=None, namespace=None):
         self._budget()
+        # Identity resolution: source-anchored evidence only; a generated
+        # alias alone can never resolve an identity.
         trusted = ("e.conflicted=0 AND EXISTS (SELECT 1 FROM entry_evidence v "
-                   "WHERE v.entry_id=e.id AND v.status IN "
-                   "('source_backed','generated_from_evidence'))")
+                   f"WHERE v.entry_id=e.id AND v.status IN ({_ID}))")
         if key is not None:
             if isinstance(key, dict):
                 key = EntryKey(**key)
@@ -84,10 +110,9 @@ class Knowledge:
             if not isinstance(query, str) or not query or len(query) > 4096:
                 raise ValueError("query must contain 1..4096 characters")
             rows = self._execute(
-                "SELECT DISTINCT e.* FROM entries e WHERE (e.value=? OR e.id IN "
-                "(SELECT entry_id FROM aliases WHERE text=? AND status IN "
-                "('source_backed','generated_from_evidence'))) "
-                "AND (? IS NULL OR e.kind=?) AND (? IS NULL OR e.namespace=?) "
+                f"SELECT DISTINCT e.* FROM entries e WHERE (e.value=? OR e.id IN "
+                f"(SELECT entry_id FROM aliases WHERE text=? AND status IN ({_ID}))) "
+                f"AND (? IS NULL OR e.kind=?) AND (? IS NULL OR e.namespace=?) "
                 f"AND {trusted} ORDER BY e.kind,e.namespace,e.value LIMIT 101",
                 (query, query, kind, kind, namespace, namespace)).fetchall()
         paired = [(r, self.describe(r, query if key is None and query != r["value"]
@@ -124,13 +149,12 @@ class Knowledge:
         # represents its best score. Bound row scans, including duplicates from an
         # entry with many documents; never load unbounded query results into memory.
         rows = self._execute(
-            "SELECT e.*,bm25(search_fts) AS score FROM search_fts "
-            "JOIN entries e ON e.id=search_fts.entry_id WHERE search_fts MATCH ? "
-            "AND e.conflicted=0 AND EXISTS (SELECT 1 FROM entry_evidence v "
-            "WHERE v.entry_id=e.id AND v.status IN "
-            "('source_backed','generated_from_evidence')) "
-            "AND (? IS NULL OR e.kind=?) AND (? IS NULL OR e.namespace=?) "
-            "ORDER BY score,e.kind,e.namespace,e.value,search_fts.rowid LIMIT 10001",
+            f"SELECT e.*,bm25(search_fts) AS score FROM search_fts "
+            f"JOIN entries e ON e.id=search_fts.entry_id WHERE search_fts MATCH ? "
+            f"AND e.conflicted=0 AND EXISTS (SELECT 1 FROM entry_evidence v "
+            f"WHERE v.entry_id=e.id AND v.status IN ({_ID})) "
+            f"AND (? IS NULL OR e.kind=?) AND (? IS NULL OR e.namespace=?) "
+            f"ORDER BY score,e.kind,e.namespace,e.value,search_fts.rowid LIMIT 10001",
             (compiled, kind, kind, namespace, namespace))
         candidates = exact["candidates"][:topk]
         seen = {(c["entry_key"]["kind"], c["entry_key"]["namespace"],
@@ -165,13 +189,13 @@ class Knowledge:
         if base["status"] != "found":
             return base
         rows = self._execute(
-            "SELECT l.*,d.kind,d.namespace,d.value FROM links l JOIN entries s ON s.id=l.src "
-            "JOIN entries d ON d.id=l.dst WHERE s.kind=? AND s.namespace=? AND s.value=? "
-            "AND l.verification_status IN ('native','redirect','verified') AND d.conflicted=0 "
-            "AND EXISTS (SELECT 1 FROM entry_evidence v WHERE v.entry_id=d.id "
-            "AND v.status IN ('source_backed','generated_from_evidence')) "
-            "AND (? IS NULL OR l.relation=?) AND (? IS NULL OR d.kind=?) "
-            "ORDER BY l.relation,d.kind,d.namespace,d.value,l.id LIMIT ?",
+            f"SELECT l.*,d.kind,d.namespace,d.value FROM links l JOIN entries s ON s.id=l.src "
+            f"JOIN entries d ON d.id=l.dst WHERE s.kind=? AND s.namespace=? AND s.value=? "
+            f"AND l.verification_status IN ('native','redirect','verified') AND d.conflicted=0 "
+            f"AND EXISTS (SELECT 1 FROM entry_evidence v WHERE v.entry_id=d.id "
+            f"AND v.status IN ({_ID})) "
+            f"AND (? IS NULL OR l.relation=?) AND (? IS NULL OR d.kind=?) "
+            f"ORDER BY l.relation,d.kind,d.namespace,d.value,l.id LIMIT ?",
             (*key.parts(), relation, relation, kind, kind, limit)).fetchall()
         base["relations"] = [{"dst": EntryKey(r["kind"], r["namespace"], r["value"]).as_dict(),
                               "relation": r["relation"], "method": r["method"],
@@ -185,11 +209,49 @@ class Knowledge:
 
         namespace filters source entities only. Spelling, wiki titles and candidate
         links do not confer membership in a requested target namespace.
+        A small set of deterministic Chinese templates ("X 的 Danbooru tag 是什么",
+        "X 的标签是什么", "介绍一下 X") is parsed first; anything else is treated
+        as a direct entity name (existing API behaviour) and marked
+        unsupported when it resolves to nothing.
         """
         self._budget()
         if target_tag_namespace is not None and (not isinstance(target_tag_namespace, str)
                                                  or not 1 <= len(target_tag_namespace) <= 256):
             raise ValueError("target_tag_namespace must contain 1..256 characters")
+        parsed = parse_ask_template(query)
+        if parsed is None:
+            result = self._ask_resolved(query, kind=kind, namespace=namespace,
+                                        target_tag_namespace=target_tag_namespace)
+            result["query_template"] = "unsupported"
+            if result["status"] == "unknown":
+                result["warnings"].append("unsupported_query_template")
+            return result
+        subject, mode = parsed
+        if mode == "introduce":
+            if target_tag_namespace is not None:
+                raise ValueError("introduce template cannot combine with target_tag_namespace")
+            result = self._ask_resolved(subject, kind=kind, namespace=namespace,
+                                        target_tag_namespace=None)
+            result["query_template"] = "introduce"
+            if result["status"] == "found":
+                result["answer"] = (f"Source entity {result['entry_key']['namespace']}"
+                                    f"/{result['entry_key']['value']}; see descriptions "
+                                    "and citations for source-backed text.")
+            return result
+        if mode == "danbooru.tag":
+            if target_tag_namespace not in (None, "danbooru.tag"):
+                raise ValueError("template implies target danbooru.tag; explicit "
+                                 "target_tag_namespace conflicts")
+            result = self._ask_resolved(subject, kind=kind, namespace=namespace,
+                                        target_tag_namespace="danbooru.tag")
+            result["query_template"] = "danbooru_tag"
+            return result
+        result = self._ask_resolved(subject, kind=kind, namespace=namespace,
+                                    target_tag_namespace=target_tag_namespace)
+        result["query_template"] = "tag"
+        return result
+
+    def _ask_resolved(self, query, *, kind=None, namespace=None, target_tag_namespace=None):
         result = self.lookup(query, kind=kind, namespace=namespace)
         result["target_namespace"] = target_tag_namespace
         result["mapping_status"] = "unknown"
@@ -223,13 +285,13 @@ class Knowledge:
         # verified link could point to a second target. Group all eligible
         # edges, then fetch at most two *distinct* trusted target identities.
         identities = self._execute(
-            "SELECT d.namespace,d.value,MIN(l.id) AS proof_id FROM links l "
-            "JOIN entries d ON d.id=l.dst WHERE l.src=? AND l.relation='entity_tag' "
-            "AND l.verification_status='verified' AND d.kind='tag' AND d.conflicted=0 "
-            "AND (? IS NULL OR d.namespace=?) AND EXISTS "
-            "(SELECT 1 FROM entry_evidence v WHERE v.entry_id=d.id "
-            "AND v.status IN ('source_backed','generated_from_evidence')) "
-            "GROUP BY d.namespace,d.value ORDER BY d.namespace,d.value LIMIT 2",
+            f"SELECT d.namespace,d.value,MIN(l.id) AS proof_id FROM links l "
+            f"JOIN entries d ON d.id=l.dst WHERE l.src=? AND l.relation='entity_tag' "
+            f"AND l.verification_status='verified' AND d.kind='tag' AND d.conflicted=0 "
+            f"AND (? IS NULL OR d.namespace=?) AND EXISTS "
+            f"(SELECT 1 FROM entry_evidence v WHERE v.entry_id=d.id "
+            f"AND v.status IN ({_ID})) "
+            f"GROUP BY d.namespace,d.value ORDER BY d.namespace,d.value LIMIT 2",
             (src_id, target_tag_namespace, target_tag_namespace)).fetchall()
         for identity in identities:
             proof = self._execute(
@@ -248,7 +310,7 @@ class Knowledge:
         elif len(identities) > 1:
             result["status"] = "tag_ambiguous"
             result["mapping_status"] = "target_ambiguous" if target_tag_namespace else "ambiguous"
-            result["answer"] = "Multiple verified tag mappings; no target selected."
+            result["answer"] = "Multiple verified tag mappings; no tag selected."
         else:
             result["status"] = "entity_found_tag_unmapped"
             result["mapping_status"] = "target_unmapped" if target_tag_namespace else "unmapped"

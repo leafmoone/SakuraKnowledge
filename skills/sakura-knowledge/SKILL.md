@@ -8,6 +8,7 @@ Use the independent `sknow` executable. Do not call SakuraPool or edit global Pi
 - Exact entity: `sknow lookup DATABASE VALUE --key --kind character --namespace bangumi.character`
 - Search: `sknow search DATABASE QUERY --limit 20`
 - Outgoing relations: `sknow related DATABASE VALUE --kind character --namespace bangumi.character`
+- Chinese templates (parsed deterministically, X taken verbatim): `sknow ask DATABASE "孤独摇滚 的 Danbooru tag 是什么"`, `sknow ask DATABASE "X 的标签是什么"`, `sknow ask DATABASE "介绍一下 X"`. The Danbooru template asks specifically for a `danbooru.tag` target; anything unparsable falls back to a direct entity name and, when nothing matches, reports `unknown` + `unsupported_query_template` instead of guessing.
 - Inspect a source-local tag: `sknow ask DATABASE EXACT_NAME --kind tag --namespace local.tag_aggregate`
 - Request a **Danbooru target tag** for that same source identity: `sknow ask DATABASE EXACT_NAME --kind tag --namespace local.tag_aggregate --target-tag-namespace danbooru.tag`
 

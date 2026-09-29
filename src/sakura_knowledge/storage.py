@@ -15,7 +15,7 @@ from contextlib import closing
 from pathlib import Path
 
 from . import CONTRACT_VERSION, SEARCH_TEXT_VERSION
-from .model import GROUPS, STATUSES, TRUSTED, EntryKey, search_text
+from .model import GROUPS, IDENTITY_TRUSTED, STATUSES, TEXT_TRUSTED, EntryKey, search_text
 
 SCHEMA = """
 PRAGMA foreign_keys=ON;
@@ -237,7 +237,9 @@ def insert_record(conn, record, source, line, index_episodes):
         for field in ("type", "locator") if record.get(field) is not None)
     if conflict:
         conn.execute("UPDATE entries SET conflicted=1 WHERE id=?", (eid,))
-    supporting = any(item.get("status", "no_reference") in TRUSTED
+    # A generated-only record never upgrades the entry to source_backed by
+    # default: identity support requires source-anchored material.
+    supporting = any(item.get("status", "no_reference") in IDENTITY_TRUSTED
                      for group in ("aliases", "documents") for item in record.get(group, []))
     status = record.get("status", "source_backed" if supporting else "no_reference")
     if status not in STATUSES:
@@ -260,14 +262,14 @@ def insert_record(conn, record, source, line, index_episodes):
         original = doc.get("original", "")
         searchable = doc.get("title", "") + " " + original
         limited = searchable[:100_000]
-        text = search_text(limited) if status in TRUSTED else ""
+        text = search_text(limited) if status in TEXT_TRUSTED else ""
         cur = conn.execute("INSERT INTO documents(entry_id,title,original,search_text,language,"
                            "status,source_id,evidence_id,payload) VALUES(?,?,?,?,?,?,?,?,?)",
                            (eid, doc.get("title", ""), original, text, doc.get("language"),
                             status, sid, ref, json.dumps({**doc, "search_text_truncated":
-                                status in TRUSTED and len(searchable) > 100_000},
+                                status in TEXT_TRUSTED and len(searchable) > 100_000},
                                 ensure_ascii=False)))
-        if status in TRUSTED and (record["key"]["kind"] != "episode" or index_episodes):
+        if status in TEXT_TRUSTED and (record["key"]["kind"] != "episode" or index_episodes):
             conn.execute("INSERT INTO search_fts VALUES(?,?,?)", (text, cur.lastrowid, eid))
     for occurrence in record.get("occurrences", []):
         if occurrence["group"] not in GROUPS:

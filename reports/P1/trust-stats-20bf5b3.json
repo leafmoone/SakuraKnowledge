@@ -1,0 +1,21 @@
+{
+ "evidence_status": {
+  "no_reference": 615737,
+  "source_backed": 3720322,
+  "unverified_draft": 73377
+ },
+ "alias_status": {
+  "source_backed": 3995098
+ },
+ "document_status": {
+  "no_reference": 601512,
+  "source_backed": 2994086,
+  "unverified_draft": 73377
+ },
+ "generated_evidence_rows": 0,
+ "entries_with_only_generated_trusted_evidence": 0,
+ "entries_with_generated_alias_and_no_identity_evidence": 0,
+ "entries_with_only_generated_alias_or_doc": 0,
+ "verified_entity_tag_edges": 0,
+ "elapsed_s": 25.42
+}

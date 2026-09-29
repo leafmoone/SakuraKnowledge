@@ -108,6 +108,114 @@ def test_bm25_ties_deduplicate_multiple_documents(tmp_path):
         assert not any("CORRELATED" in p for p in plan)
 
 
+def test_ask_templates_extract_subject_verbatim(tmp_path):
+    from sakura_knowledge.api import parse_ask_template
+    assert parse_ask_template("hero 的 Danbooru tag 是什么") == ("hero", "danbooru.tag")
+    assert parse_ask_template("hero 的 danbooru tag 是什么？") == ("hero", "danbooru.tag")
+    assert parse_ask_template("hero 的标签是什么") == ("hero", "tag")
+    assert parse_ask_template("介绍一下 hero") == ("hero", "introduce")
+    assert parse_ask_template("介绍 hero。") == ("hero", "introduce")
+    assert parse_ask_template("a_b (x) 的标签是什么") == ("a_b (x)", "tag")
+    assert parse_ask_template("  的标签是什么") is None
+    assert parse_ask_template("hero") is None
+
+    safe = entity("tag", "safe", namespace="danbooru.tag", status="source_backed")
+    hero = entity("character", "hero", namespace="bangumi.character", status="source_backed")
+    punct = entity("character", "a_b (x)", namespace="bangumi.character",
+                   status="source_backed")
+    twins = [entity(k, "twin", namespace=f"ns{n}", status="source_backed")
+             for n, k in enumerate(("character", "person"))]
+    link = {"record_type": "link", "src": hero["key"], "dst": safe["key"],
+            "relation": "entity_tag", "method": "fixture", "verification_status": "verified"}
+    out = tmp_path / "tpl"
+    build(fixture_manifest(tmp_path, [safe, hero, punct, *twins, link]), out)
+    with Knowledge(out / "knowledge.sqlite") as api:
+        danbooru = api.ask("hero 的 Danbooru tag 是什么")
+        assert danbooru["query_template"] == "danbooru_tag"
+        assert danbooru["target_namespace"] == "danbooru.tag"
+        assert danbooru["mapping_status"] == "target_verified"
+        assert danbooru["tag_key"] == {"namespace": "danbooru.tag", "value": "safe"}
+        generic = api.ask("hero 的标签是什么")
+        assert generic["query_template"] == "tag"
+        assert generic["mapping_status"] == "verified"
+        intro = api.ask("介绍一下 hero")
+        assert intro["query_template"] == "introduce"
+        assert intro["entry_key"] == {"kind": "character", "namespace": "bangumi.character",
+                                       "value": "hero"}
+        # Punctuation/bracket/underscore subject resolves verbatim: the entity
+        # is found, and (having no verified tag link) the honest ask answer is
+        # entity_found_tag_unmapped with the exact entry key retained.
+        verbatim = api.ask("a_b (x) 的标签是什么")
+        assert verbatim["status"] == "entity_found_tag_unmapped"
+        assert verbatim["entry_key"] == {"kind": "character",
+                                          "namespace": "bangumi.character",
+                                          "value": "a_b (x)"}
+        unknown = api.ask("ghost 的标签是什么")
+        assert unknown["status"] == "unknown" and unknown["query_template"] == "tag"
+        ambiguous = api.ask("twin 的标签是什么")
+        assert ambiguous["status"] == "entity_ambiguous"
+        freeform = api.ask("what is hero doing today")
+        assert freeform["query_template"] == "unsupported"
+        assert freeform["status"] == "unknown"
+        assert "unsupported_query_template" in freeform["warnings"]
+        direct = api.ask("hero", kind="character")
+        assert direct["status"] == "found" and direct["query_template"] == "unsupported"
+        assert direct["entry_key"]["value"] == "hero"
+        with pytest.raises(ValueError, match="conflicts"):
+            api.ask("hero 的 Danbooru tag 是什么",
+                    target_tag_namespace="local.tag_aggregate")
+        with pytest.raises(ValueError, match="introduce"):
+            api.ask("介绍一下 hero", target_tag_namespace="danbooru.tag")
+    # The anime title question must not hardcode any tag: absent entity -> unknown.
+    with Knowledge(out / "knowledge.sqlite") as api:
+        assert api.ask("孤独摇滚 的 Danbooru tag 是什么")["status"] == "unknown"
+
+
+def test_identity_trust_separated_from_text_trust(tmp_path):
+    generated_doc = entity("character", "gen", status="source_backed",
+                           docs=[{"title": "g", "original": "generated text here",
+                                  "status": "generated_from_evidence",
+                                  "evidence_id": "g1"}])
+    generated_alias = entity("character", "genalias", status="source_backed",
+                             aliases=[{"text": "genonly", "status":
+                                        "generated_from_evidence", "evidence_id": "a1"}])
+    generated_identity = entity("character", "genonly", status="generated_from_evidence",
+                                docs=[{"title": "d", "original": "draft body",
+                                       "status": "generated_from_evidence",
+                                       "evidence_id": "d1"}])
+    weak_tag = entity("tag", "weak", namespace="danbooru.tag", status="no_reference")
+    hero = entity("character", "hero5", namespace="bangumi.character",
+                  status="source_backed")
+    generated_tag = entity("tag", "t5", namespace="danbooru.tag",
+                           status="generated_from_evidence",
+                           docs=[{"title": "t", "original": "t body",
+                                  "status": "generated_from_evidence",
+                                  "evidence_id": "t1"}])
+    verified = {"record_type": "link", "src": hero["key"], "dst": generated_tag["key"],
+                "relation": "entity_tag", "method": "fixture",
+                "verification_status": "verified"}
+    out = tmp_path / "trust"
+    build(fixture_manifest(tmp_path, [generated_doc, generated_alias, generated_identity,
+                                      weak_tag, hero, generated_tag, verified]), out)
+    with Knowledge(out / "knowledge.sqlite") as api:
+        # 1. source identity + generated text: resolvable, generated doc described
+        found = api.lookup("gen")
+        assert found["status"] == "found"
+        assert found["descriptions"][0]["status"] == "generated_from_evidence"
+        # generated text is searchable
+        assert api.search("generated")["status"] == "found"
+        # 2. generated alias alone never resolves
+        assert api.lookup("genonly")["status"] == "not_found"
+        # 3. generated-only identity never auto-resolves
+        assert api.lookup(key=EntryKey("character", "fixture", "genonly"))["status"] == \
+            "not_found"
+        # 4. no_reference/candidate-grade material is not identity
+        assert api.ask("weak", kind="tag")["status"] == "unknown"
+        # 5. verified link to a non-trusted (generated-only) target does not map
+        assert api.ask("hero5", target_tag_namespace="danbooru.tag")["mapping_status"] \
+            == "target_unmapped"
+
+
 def test_target_cardinality_ignores_link_display_cap_and_untrusted_edges(tmp_path):
     hero = entity("character", "hero", status="source_backed")
     a = entity("tag", "a", namespace="danbooru.tag", status="source_backed")
