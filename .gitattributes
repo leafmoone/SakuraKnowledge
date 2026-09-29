@@ -1,0 +1,2 @@
+# Raw evidence must be byte-verbatim: no EOL normalization, no diff text.
+reports/P2/raw/** -text -diff
