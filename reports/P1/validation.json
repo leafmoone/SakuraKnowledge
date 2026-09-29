@@ -5,7 +5,7 @@
   "BASE_REVIEW_SHA": "302fd111e80b0b6b9047789bd79680f48dd1a476",
   "FIX_IMPLEMENTATION_SHA": "3cad90cce7d415f21e470a222cf26a2c85da159b",
   "FIX_SUBMISSION_SHA": "3cad90cce7d415f21e470a222cf26a2c85da159b",
-  "REMOTE_DEV_SHA": "pending_final_report_push_verification",
+  "REMOTE_DEV_SHA": "5fcd8678b43d652a2d403acad4706b9da3c4b78d",
   "manifest_sha256": "7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c",
   "snapshot": "build/snapshot-full-20bf5b3/knowledge.sqlite",
   "snapshot_size_bytes": 21516320768,

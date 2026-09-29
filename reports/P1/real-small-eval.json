@@ -4,7 +4,9 @@
  "snapshot_binding": {
   "builder_sha": "20bf5b315e47f1c7038af06307424bb734efcc10",
   "manifest_sha256": "7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c",
-  "query_code_sha": "pending-fix-commit"
+  "query_code_sha": "3cad90cce7d415f21e470a222cf26a2c85da159b",
+  "query_execution": "PYTHONPATH=src python <evaluation runner>; runner imported sakura_knowledge from src/sakura_knowledge against the frozen snapshot; executed after commit 3cad90c and before report commit 5fcd867",
+  "binding_note": "Report-only binding correction. Case inputs, outputs, counts, and human judgements were not rerun or changed."
  },
  "resolved_terms": {
   "E03_alias": "美坂栞",
