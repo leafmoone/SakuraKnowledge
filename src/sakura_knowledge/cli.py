@@ -120,7 +120,7 @@ def main(argv=None):
                     if args.command == "search":
                         options["topk"] = args.limit
                     result = getattr(knowledge, args.command)(args.query, **options)
-        print(json.dumps(result, ensure_ascii=False))
+        print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
         return 1 if result.get("ok") is False or result.get("status") == "failed" else 0
     except (OSError, ValueError, TypeError, KeyError, sqlite3.Error, json.JSONDecodeError) as exc:
         print(json.dumps({"error": type(exc).__name__, "message": str(exc)}, ensure_ascii=False),

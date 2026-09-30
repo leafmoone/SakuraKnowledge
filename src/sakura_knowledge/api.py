@@ -146,6 +146,9 @@ class Knowledge:
             f"source_id,evidence_id,status FROM documents WHERE entry_id=? "
             f"AND status IN ({_TEXT}) ORDER BY id LIMIT 10",
             (row["id"],)).fetchall()
+        docs = [{**dict(d), "response_truncated": bool(d["response_truncated"]),
+                 "search_text_truncated": (None if d["search_text_truncated"] is None else
+                                           bool(d["search_text_truncated"]))} for d in docs]
         aliases = (self._execute(
             f"SELECT text,source_id,evidence_id,status FROM aliases WHERE entry_id=? AND text=? "
             f"AND status IN ({_ID}) "

@@ -8,7 +8,8 @@ use rusqlite::{params, Connection, OpenFlags};
 use serde_json::{json, Value};
 use std::path::Path;
 use std::time::{Duration, Instant};
-use unicode_normalization::UnicodeNormalization;
+mod response;
+mod unicode16;
 
 pub const CONTRACT_VERSION: &str = "2";
 const ID_STATUSES: &str = "'source_backed'";
@@ -68,14 +69,13 @@ fn is_cjk_kana(c: char) -> bool {
 }
 
 fn is_ws(c: char) -> bool {
-    matches!(c, ' ' | '\t' | '\n' | '\r')
+    c.is_whitespace() || matches!(c, '\u{1c}'..='\u{1f}')
 }
 
 /// Same lexing as the Python reference: NFKC + casefold; CJK/kana runs become
 /// overlapping bigrams, other word runs stay whole (max 256 chars).
 fn lex(text: &str) -> Vec<String> {
-    let normalized = text.nfkc().to_string();
-    let lower: Vec<char> = normalized.to_lowercase().chars().collect();
+    let lower: Vec<char> = unicode16::normalize_fold(text).chars().collect();
     let mut out = Vec::new();
     let mut i = 0;
     while i < lower.len() {
@@ -88,9 +88,9 @@ fn lex(text: &str) -> Vec<String> {
             for j in 0..word.len().saturating_sub(1) {
                 out.push([word[j], word[j + 1]].iter().collect());
             }
-        } else if lower[i].is_alphanumeric() {
+        } else if unicode16::is_alnum(lower[i]) {
             let start = i;
-            while i < lower.len() && (lower[i].is_alphanumeric() || is_cjk_kana(lower[i])) {
+            while i < lower.len() && (unicode16::is_alnum(lower[i]) || is_cjk_kana(lower[i])) {
                 i += 1;
             }
             let word: String = lower[start..i].iter().collect();
@@ -139,6 +139,7 @@ pub struct Runtime {
 fn base(query: &Value, snapshot: &str, status: &str) -> Value {
     json!({
         "contract_version": CONTRACT_VERSION,
+        "response_version": response::VERSION,
         "snapshot": snapshot,
         "query": query,
         "status": status,
@@ -184,6 +185,74 @@ impl Runtime {
                 |r| r.get::<_, String>(0),
             )
             .map_err(|_| Error::Invalid("not a SakuraKnowledge snapshot".into()))?;
+        for key in ["contract_version", "search_text_version"] {
+            let version: Option<String> = conn
+                .query_row("SELECT value FROM build_meta WHERE key=?", [key], |r| {
+                    r.get(0)
+                })
+                .ok();
+            if version.as_deref() != Some("2") {
+                return Err(Error::Invalid(format!(
+                    "unsupported {key}: {}",
+                    version.as_deref().unwrap_or("None")
+                )));
+            }
+        }
+        for (table, names) in [
+            ("entries", "id kind namespace value locator conflicted"),
+            (
+                "entry_evidence",
+                "id entry_id source_id evidence_id status type locator payload",
+            ),
+            ("aliases", "id entry_id text source_id evidence_id status"),
+            (
+                "documents",
+                "id entry_id title original status source_id evidence_id payload",
+            ),
+            (
+                "links",
+                "id src dst relation method verification_status source_id evidence_id payload",
+            ),
+            ("search_fts", "text document_id entry_id"),
+        ] {
+            let mut stmt = conn.prepare(&format!("PRAGMA table_info({table})"))?;
+            let cols = stmt
+                .query_map([], |r| r.get::<_, String>(1))?
+                .collect::<std::result::Result<Vec<_>, _>>()?;
+            let mut missing: Vec<_> = names
+                .split_whitespace()
+                .filter(|name| !cols.iter().any(|c| c == name))
+                .collect();
+            missing.sort();
+            if !missing.is_empty() {
+                return Err(Error::Invalid(format!(
+                    "invalid snapshot schema: {table} missing {}",
+                    missing.join(",")
+                )));
+            }
+        }
+        let definition: String = conn.query_row(
+            "SELECT sql FROM sqlite_master WHERE name='search_fts'",
+            [],
+            |r| r.get(0),
+        )?;
+        if !definition.to_lowercase().contains("using fts5") {
+            return Err(Error::Invalid(
+                "invalid snapshot schema: search_fts is not FTS5".into(),
+            ));
+        }
+        conn.prepare("SELECT rowid FROM search_fts WHERE search_fts MATCH ? LIMIT 0")?
+            .query(["runtime_capability_probe"])?
+            .next()?;
+        let json_probe: i64 =
+            conn.query_row("SELECT json_extract('{\"probe\":1}', '$.probe')", [], |r| {
+                r.get(0)
+            })?;
+        if json_probe != 1 || snapshot.is_empty() {
+            return Err(Error::Invalid(
+                "invalid snapshot capability or identity".into(),
+            ));
+        }
         Ok(Runtime { conn, snapshot })
     }
 
@@ -200,7 +269,9 @@ impl Runtime {
     pub fn runtime_info() -> Value {
         json!({"contract_version": CONTRACT_VERSION,
                "runtime": "rust",
-               "sqlite_version": "bundled (libsqlite3-sys)"})
+               "sqlite_version": rusqlite::version(),
+               "unicode_version": unicode16::VERSION,
+               "normalization_library_unicode": format!("{:?}", unicode_normalization::UNICODE_VERSION)})
     }
 
     pub fn inspect(&mut self) -> Result<Value> {
@@ -259,24 +330,12 @@ impl Runtime {
         } else {
             Vec::new()
         };
-        let (identities, payloads) = self.fetch_evidence(id)?;
-        let mut fields = serde_json::Map::new();
-        for payload in &payloads {
-            let parsed: Value = serde_json::from_str(payload).unwrap_or(Value::Null);
-            let raw = parsed.get("raw").unwrap_or(&parsed);
-            if let Some(obj) = raw.as_object() {
-                for name in [
-                    "raw_attributes",
-                    "raw_subject_categories",
-                    "raw_cv_names",
-                    "raw_gender",
-                ] {
-                    if let Some(v) = obj.get(name) {
-                        fields.insert(name.to_string(), v.clone());
-                    }
-                }
-            }
-        }
+        let (mut identities, mut payloads) = self.fetch_evidence(id)?;
+        let identities_truncated = identities.len() > 100;
+        identities.truncate(100);
+        payloads.truncate(100);
+        let (fields, field_evidence, field_truncated) =
+            response::observations(&identities, &payloads)?;
         let use_alias_proofs = matches!(alias_text, Some(t) if t != value);
         let proofs: Vec<Value> = if use_alias_proofs {
             aliases.clone()
@@ -298,8 +357,10 @@ impl Runtime {
             "matched_documents": docs,
             "aliases": aliases,
             "identity_evidence": identities,
-            "source_fields": Value::Object(fields),
-            "source_fields_evidence": citations,
+            "source_fields": fields,
+            "source_fields_evidence": field_evidence,
+            "source_fields_truncated": field_truncated,
+            "identity_evidence_truncated": identities_truncated,
             "matched_by": if use_alias_proofs { "alias" } else { "exact" },
             "source_id": first.as_ref().and_then(|f| f.get("source_id").cloned()).unwrap_or(Value::Null),
             "evidence_id": first.as_ref().and_then(|f| f.get("evidence_id").cloned()).unwrap_or(Value::Null),
@@ -357,7 +418,7 @@ impl Runtime {
         let sql = format!(
             "SELECT source_id,evidence_id,status,type,locator,payload FROM entry_evidence
              WHERE entry_id=? AND status IN ({ID_STATUSES})
-             ORDER BY source_id,evidence_id LIMIT 100"
+             ORDER BY source_id,evidence_id LIMIT 101"
         );
         let mut stmt = self.conn.prepare(&sql)?;
         let rows = stmt.query_map([id], |r| {
@@ -375,8 +436,7 @@ impl Runtime {
         for row in rows {
             let (sid, eid, status, typ, loc, payload) = row?;
             ids.push(json!({"source_id": sid, "evidence_id": eid,
-                            "status": status, "type": typ, "locator": loc,
-                            "payload": payload}));
+                            "status": status, "type": typ, "locator": loc}));
             payloads.push(payload);
         }
         Ok((ids, payloads))
@@ -412,6 +472,7 @@ impl Runtime {
         result["matched_documents"] = c["matched_documents"].clone();
         result["source_fields"] = c["source_fields"].clone();
         result["source_fields_evidence"] = c["source_fields_evidence"].clone();
+        result["source_fields_truncated"] = c["source_fields_truncated"].clone();
         result["matched_by"] = c["matched_by"].clone();
         result["source_id"] = c["source_id"].clone();
         result["evidence_id"] = c["evidence_id"].clone();
@@ -494,7 +555,7 @@ impl Runtime {
                 .unwrap()
                 .push(json!("candidate_limit_reached"));
         }
-        Ok(result)
+        response::bound_response(result)
     }
 
     pub fn lookup_key(&mut self, kind: &str, namespace: &str, value: &str) -> Result<Value> {
@@ -544,7 +605,7 @@ impl Runtime {
                 Self::apply_found(&mut result, c, kind);
             }
         }
-        Ok(result)
+        response::bound_response(result)
     }
 
     pub fn search(
@@ -568,7 +629,7 @@ impl Runtime {
                     .unwrap()
                     .push(json!("too_short"));
             }
-            return Ok(exact);
+            return response::bound_response(exact);
         }
         let sql = format!(
             "SELECT e.id,e.kind,e.namespace,e.value,
@@ -672,7 +733,7 @@ impl Runtime {
                 .unwrap()
                 .push(json!("search_document_scan_limit"));
         }
-        Ok(exact)
+        response::bound_response(exact)
     }
 
     pub fn related(
@@ -690,7 +751,7 @@ impl Runtime {
         validate_key(kind, namespace, value)?;
         let mut result = self.lookup_key(kind, namespace, value)?;
         if result["status"] != json!("found") {
-            return Ok(result);
+            return response::bound_response(result);
         }
         let sql = format!(
             "SELECT d.kind,d.namespace,d.value,l.relation,l.method,
@@ -723,7 +784,7 @@ impl Runtime {
             relations.push(r?);
         }
         result["relations"] = json!(relations);
-        Ok(result)
+        response::bound_response(result)
     }
 
     // ---------------------------------------------------------------- ask
@@ -734,8 +795,12 @@ impl Runtime {
         kind: Option<&str>,
         namespace: Option<&str>,
         target: Option<&str>,
+        resolved: Option<Value>,
     ) -> Result<Value> {
-        let mut result = self.lookup(query, kind, namespace)?;
+        let mut result = match resolved {
+            Some(value) => value,
+            None => self.lookup(query, kind, namespace)?,
+        };
         result["input_query"] = json!(query);
         result["parsed_subject"] = Value::Null;
         result["target_namespace"] = target.map(|t| json!(t)).unwrap_or(Value::Null);
@@ -743,13 +808,13 @@ impl Runtime {
         if result["status"] == json!("not_found") {
             result["status"] = json!("unknown");
             result["answer"] = json!("No reliable exact source entity match.");
-            return Ok(result);
+            return response::bound_response(result);
         }
         if result["status"] == json!("ambiguous") {
             result["status"] = json!("entity_ambiguous");
             result["mapping_status"] = json!("entity_ambiguous");
             result["answer"] = json!("Multiple source entity matches; specify a source key.");
-            return Ok(result);
+            return response::bound_response(result);
         }
 
         let source_tag = result.get("tag_key").cloned().unwrap_or(Value::Null);
@@ -774,7 +839,7 @@ impl Runtime {
                 "Exact tag identity in {}; no cross-namespace mapping inferred.",
                 ns.as_str().unwrap_or("?")
             ));
-            return Ok(result);
+            return response::bound_response(result);
         }
 
         result["tag_key"] = Value::Null;
@@ -861,7 +926,7 @@ impl Runtime {
                 "Source entity found; no verified tag mapping in any namespace.".to_string()
             });
         }
-        Ok(result)
+        response::bound_response(result)
     }
 
     pub fn ask(
@@ -880,18 +945,18 @@ impl Runtime {
         }
         Self::install_budget(&self.conn);
         let direct = self.lookup(query, kind, namespace)?;
-        if direct["status"] == json!("found") {
-            let mut result = self.ask_resolved(query, kind, namespace, target)?;
+        if direct["status"] == json!("found") || direct["status"] == json!("ambiguous") {
+            let mut result = self.ask_resolved(query, kind, namespace, target, Some(direct))?;
             result["input_query"] = json!(query);
             result["parsed_subject"] = Value::Null;
             result["query_template"] = json!("unsupported");
-            return Ok(result);
+            return response::bound_response(result);
         }
         let parsed = parse_ask_template(query);
         let (subject, mode) = match parsed {
             Some(p) => p,
             None => {
-                let mut result = self.ask_resolved(query, kind, namespace, target)?;
+                let mut result = self.ask_resolved(query, kind, namespace, target, Some(direct))?;
                 result["query_template"] = json!("unsupported");
                 if result["status"] == json!("unknown") {
                     result["warnings"]
@@ -899,7 +964,7 @@ impl Runtime {
                         .unwrap()
                         .push(json!("unsupported_query_template"));
                 }
-                return Ok(result);
+                return response::bound_response(result);
             }
         };
         match mode.as_str() {
@@ -909,7 +974,17 @@ impl Runtime {
                         "introduce template cannot combine with target_tag_namespace".into(),
                     ));
                 }
-                let mut result = self.ask_resolved(&subject, kind, namespace, None)?;
+                let mut result = self.lookup(&subject, kind, namespace)?;
+                result["mapping_status"] = json!("not_requested");
+                result["target_namespace"] = Value::Null;
+                if result["status"] == json!("not_found") {
+                    result["status"] = json!("unknown");
+                    result["answer"] = json!("No reliable exact source entity match.");
+                } else if result["status"] == json!("ambiguous") {
+                    result["status"] = json!("entity_ambiguous");
+                    result["answer"] =
+                        json!("Multiple source entity matches; specify a source key.");
+                }
                 result["input_query"] = json!(query);
                 result["parsed_subject"] = json!(subject);
                 result["query_template"] = json!("introduce");
@@ -917,10 +992,10 @@ impl Runtime {
                     let key = &result["entry_key"];
                     result["answer"] = json!(format!(
                         "Source entity {}/{}; see descriptions and citations for source-backed text.",
-                        key["namespace"], key["value"]
+                        key["namespace"].as_str().unwrap_or(""), key["value"].as_str().unwrap_or("")
                     ));
                 }
-                Ok(result)
+                response::bound_response(result)
             }
             "danbooru.tag" => {
                 if matches!(target, Some(t) if t != "danbooru.tag") {
@@ -930,18 +1005,18 @@ impl Runtime {
                     ));
                 }
                 let mut result =
-                    self.ask_resolved(&subject, kind, namespace, Some("danbooru.tag"))?;
+                    self.ask_resolved(&subject, kind, namespace, Some("danbooru.tag"), None)?;
                 result["input_query"] = json!(query);
                 result["parsed_subject"] = json!(subject);
                 result["query_template"] = json!("danbooru_tag");
-                Ok(result)
+                response::bound_response(result)
             }
             _ => {
-                let mut result = self.ask_resolved(&subject, kind, namespace, target)?;
+                let mut result = self.ask_resolved(&subject, kind, namespace, target, None)?;
                 result["input_query"] = json!(query);
                 result["parsed_subject"] = json!(subject);
                 result["query_template"] = json!("tag");
-                Ok(result)
+                response::bound_response(result)
             }
         }
     }
@@ -1067,21 +1142,10 @@ pub fn parse_ask_template(query: &str) -> Option<(String, String)> {
             if i >= chars.len() {
                 continue;
             }
-            // x: shortest prefix of chars[i..] whose remainder is all [？?。.\s]
-            let rest = &chars[i..];
-            let mut cut = None;
-            for e in 1..=rest.len() {
-                if rest[e..].iter().all(|&c| is_trail(c)) {
-                    cut = Some(e);
-                    break;
-                }
-            }
-            if let Some(e) = cut {
-                let subject: String = rest[..e].iter().collect();
-                let stripped = subject.trim();
-                if !stripped.is_empty() {
-                    return Some((stripped.to_string(), "introduce".to_string()));
-                }
+            let subject: String = chars[i..].iter().collect();
+            let stripped = subject.trim();
+            if !stripped.is_empty() && !stripped.contains('\n') {
+                return Some((stripped.to_string(), "introduce".to_string()));
             }
         }
     }
@@ -1103,6 +1167,32 @@ mod tests {
     }
 
     #[test]
+    fn unicode16_complete_examples() {
+        for (input, expected) in [
+            (
+                "Straße STRASSE ẞ SS",
+                vec!["strasse", "strasse", "ss", "ss"],
+            ),
+            ("Σ σ ς", vec!["σ", "σ", "σ"]),
+            ("İ i\u{307}", vec!["i", "i"]),
+            ("ＡＢＣ ｶﾀｶﾅ", vec!["abc", "カタ", "タカ", "カナ"]),
+            ("中文日本", vec!["中文", "文日", "日本"]),
+            ("a\u{a0}b\u{2003}c", vec!["a", "b", "c"]),
+            ("a中文 中文a", vec!["a中文", "中文", "a"]),
+            ("e\u{301} 𐐀", vec!["é", "𐐨"]),
+        ] {
+            assert_eq!(tokens(input).unwrap(), expected);
+        }
+        assert!(tokens(&"a".repeat(257)).unwrap().is_empty());
+        assert!(tokens(&" ".repeat(4097)).is_err());
+        assert!(tokens(&"a ".repeat(257)).is_err());
+        assert_eq!(
+            match_query("Straße STRASSE ς").unwrap(),
+            "\"strasse\" OR \"σ\""
+        );
+    }
+
+    #[test]
     fn templates_parse() {
         assert_eq!(
             parse_ask_template("solo 的 Danbooru tag 是什么"),
@@ -1118,6 +1208,14 @@ mod tests {
         );
         assert_eq!(parse_ask_template(" 的标签是什么"), None);
         assert_eq!(parse_ask_template("hero"), None);
+        assert_eq!(
+            parse_ask_template("介绍一下 name."),
+            Some(("name.".into(), "introduce".into()))
+        );
+        assert_eq!(
+            parse_ask_template("介绍一下 name_(x)"),
+            Some(("name_(x)".into(), "introduce".into()))
+        );
     }
 
     fn build_fixture(path: &Path) {
@@ -1142,6 +1240,7 @@ mod tests {
              CREATE VIRTUAL TABLE search_fts USING fts5(text, document_id UNINDEXED, entry_id UNINDEXED);
              INSERT INTO build_meta VALUES('snapshot','fixture-test');
              INSERT INTO build_meta VALUES('contract_version','2');
+             INSERT INTO build_meta VALUES('search_text_version','2');
              INSERT INTO entries(id,kind,namespace,value,locator) VALUES
                (1,'character','fixture','hero','line:1'),
                (2,'character','fixture','hero2','line:2'),
@@ -1173,7 +1272,10 @@ mod tests {
         let v = rt.lookup("hero", None, None).unwrap();
         assert_eq!(v["status"], "found");
         assert_eq!(v["entry_key"]["value"], "hero");
-        assert_eq!(v["source_fields"]["raw_attributes"][0], "hair");
+        assert_eq!(
+            v["source_fields"]["raw_attributes"][0]["value"],
+            json!(["hair"])
+        );
         assert_eq!(v["source_fields_evidence"][0]["evidence_id"], "e-ev-1");
 
         let v = rt.lookup("the hero", None, None).unwrap();
@@ -1198,6 +1300,17 @@ mod tests {
         assert_eq!(v["query_template"], "tag");
         assert_eq!(v["parsed_subject"], "hero");
 
+        let intro = rt.ask("介绍一下 hero2", None, None, None).unwrap();
+        assert_eq!(intro["status"], "found");
+        assert_eq!(intro["mapping_status"], "not_requested");
+        assert_eq!(intro["relations"], json!([]));
+        assert_eq!(
+            intro["answer"],
+            "Source entity fixture/hero2; see descriptions and citations for source-backed text."
+        );
+        assert!(rt
+            .ask("介绍一下 hero2", None, None, Some("danbooru.tag"))
+            .is_err());
         let v = rt.ask("hero", None, None, None).unwrap();
         assert_eq!(v["query_template"], "unsupported");
         assert_eq!(v["input_query"], "hero");

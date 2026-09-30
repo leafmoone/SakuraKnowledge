@@ -154,14 +154,14 @@ fn main() -> ExitCode {
                     }
                 };
                 let mut rt = Runtime::open(pos[0].clone())?;
-                return Ok(rt.related(
+                return rt.related(
                     &kind,
                     &namespace,
                     &pos[1],
                     opt.relation.as_deref(),
                     None,
                     opt.limit,
-                )?);
+                );
             }
             if pos.len() < 4 {
                 return Err(Error::Invalid(
