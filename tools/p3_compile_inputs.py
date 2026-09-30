@@ -164,6 +164,21 @@ def main():
             reference=proof('multilingual_name',tagreceipt,'wiki:'+wid,wiki_id=wiki['id'],language='unknown',text=text)
             lookup.append({**native,'name':text,'matched_by':'wiki_name','evidence_id':'wiki:'+wid+':name:'+text,
                            'evidence_chain':native['evidence_chain']+[reference]})
+    # Canonical aliases were assessed before Wiki cut comparison. Preserve the
+    # terminal's actual quarantine on every canonical projection, without adding
+    # a compatible edge or changing the original alias steps/outgoing scopes.
+    quarantines_by_target={}
+    for record in lookup:
+        if record['matched_by']=='native_exact' and record['target'] is not None:
+            refs=[ref for ref in record['evidence_chain'] if ref['role']=='wiki_association_quarantined']
+            if refs:
+                quarantines_by_target[tuple(record['target'][k] for k in ('kind','namespace','value'))]=refs
+    for record in lookup:
+        if record['canonical_status']=='canonical' and record['target'] is not None:
+            target_key=tuple(record['target'][k] for k in ('kind','namespace','value'))
+            for ref in quarantines_by_target.get(target_key,[]):
+                if ref not in record['evidence_chain']:
+                    record['evidence_chain'].append(dict(ref))
     all_records=native_records+lookup
     lines(args.out/'native.jsonl',all_records)
     # Preserve every old record whose full identity or source-backed alias matches

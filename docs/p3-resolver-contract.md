@@ -57,7 +57,12 @@ actual indexed native wiki_tag edge, plus both old and live cut references (old
 normalized source ID/hash/line, matching updated_at/body/name digests, official raw
 SHA/IDs). Response chain includes these proofs and the actual edge/document IDs.
 Changed Wiki versions return no description and retain a quarantine proof with the
-unequal dates; native existence remains independent. Empty/generic role names or
+unequal dates on every canonical route (native, official aliases including all
+intermediate inputs, and verified entity_tag target canonicalization). After Wiki
+cut comparison, the compiler copies only the terminal's actual quarantine refs to
+canonical projections with the same typed target, deduplicated; original directed
+steps/scopes remain unchanged. This is not a compatible Wiki association and does
+not enable conflicting descriptions. Native existence remains independent. Empty/generic role names or
 wiki_key alone do not establish a description's identity association.
 Implication is not alias. Generated/draft/name-only/candidate evidence creates no
 native tag or verified entity mapping. Local aggregate remains local.tag_aggregate.
