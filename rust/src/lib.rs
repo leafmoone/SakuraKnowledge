@@ -289,7 +289,11 @@ impl Runtime {
         let result = call(self);
         self.operation_depth -= 1;
         self.check_deadline()?;
-        result
+        if self.operation_depth == 0 {
+            result.and_then(|value| response::bound_response(value, self.deadline))
+        } else {
+            result
+        }
     }
 
     pub fn inspect(&mut self) -> Result<Value> {

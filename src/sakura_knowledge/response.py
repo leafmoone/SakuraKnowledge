@@ -4,6 +4,7 @@ Fields are observations, never a merged fact. Absent fields are absent;
 explicit null and empty arrays remain observations with their original type.
 """
 import json
+import math
 
 RESPONSE_VERSION = "3"
 FIELD_NAMES = ("raw_attributes", "raw_subject_categories", "raw_cv_names", "raw_gender")
@@ -13,6 +14,23 @@ TEXT_CHARS = 256
 ARRAY_ITEMS = 16
 NESTING_DEPTH = 4
 RESPONSE_BYTES = 524288
+
+
+def projected_integer(lexeme):
+    """Never construct unbounded bigints; overflow marker stays a small integer.
+
+    JSON's scanner validates syntax before this callback. The marker is outside
+    the response integer domain, so bounded_value emits null/truncated/present.
+    No process-global digits limit is changed, including for ignored raw fields.
+    """
+    if len(lexeme) > 20:
+        return 2**64
+    value = int(lexeme)
+    return value if -(2**63) <= value <= 2**64-1 else 2**64
+
+
+def invalid_constant(lexeme):
+    raise ValueError(f"invalid evidence JSON constant: {lexeme}")
 
 
 def encoded_size(value):
@@ -43,6 +61,8 @@ def bounded_value(value, depth=0, check=lambda: None):
         if encoded_size(out) > VALUE_BYTES:
             return None, True
         return out, truncated
+    if isinstance(value, float) and not math.isfinite(value):
+        return None, True
     # Interoperable JSON integer domain; raw source bytes stay in storage.
     if isinstance(value, int) and not isinstance(value, bool) and not -(2**63) <= value <= 2**64 - 1:
         return None, True
@@ -54,7 +74,8 @@ def source_observations(identities, check=lambda: None):
     truncated_fields = set()
     for proof in identities:
         check()
-        payload = json.loads(proof["payload"])
+        payload = json.loads(proof["payload"], parse_int=projected_integer,
+                             parse_constant=invalid_constant)
         raw = payload.get("raw", payload)
         if not isinstance(raw, dict):
             continue

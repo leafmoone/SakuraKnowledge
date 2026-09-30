@@ -119,13 +119,23 @@ fn projected(raw: &str, depth: usize, deadline: Instant) -> Result<(Value, bool)
             (out, changed)
         });
     }
-    if (raw.starts_with('-') || raw.starts_with(|c: char| c.is_ascii_digit()))
-        && (raw.len() > 2048
-            || (!raw.contains(['.', 'e', 'E'])
-                && raw.parse::<i64>().is_err()
-                && raw.parse::<u64>().is_err()))
-    {
-        return Ok((Value::Null, true));
+    if raw.starts_with('-') || raw.starts_with(|c: char| c.is_ascii_digit()) {
+        // RawValue has already validated JSON syntax. Source spelling is not
+        // the projected-value budget: long finite decimals/exponents normalize.
+        if raw.contains(['.', 'e', 'E']) {
+            let number = raw
+                .parse::<f64>()
+                .map_err(|_| Error::Invalid("invalid evidence JSON number".into()))?;
+            check(deadline)?;
+            return Ok(if number.is_finite() {
+                (json!(number), false)
+            } else {
+                (Value::Null, true)
+            });
+        }
+        if raw.parse::<i64>().is_err() && raw.parse::<u64>().is_err() {
+            return Ok((Value::Null, true));
+        }
     }
     let value: Value = serde_json::from_str(raw).map_err(json_error)?;
     check(deadline)?;
@@ -229,15 +239,39 @@ pub fn bound_response(mut value: Value, deadline: Instant) -> Result<Value> {
     let mut total = checked_size(&value, deadline)?;
     while total > RESPONSE_BYTES {
         check(deadline)?;
+        // Inspect has no candidate/warning arrays. Its identity is irreducible.
+        let can_drop = value
+            .get("candidates")
+            .and_then(Value::as_array)
+            .is_some_and(|v| v.len() > 1)
+            || value
+                .get("relations")
+                .and_then(Value::as_array)
+                .is_some_and(|v| !v.is_empty());
+        if !can_drop {
+            return Err(Error::Invalid("response_budget_exceeded".into()));
+        }
+        if value.get("warnings").is_none() {
+            value["warnings"] = json!([]);
+            total = checked_size(&value, deadline)?;
+        }
         let warnings = value["warnings"].as_array_mut().unwrap();
         if !warnings.contains(&json!("response_budget_truncated")) {
             total += size(&json!("response_budget_truncated")) + usize::from(!warnings.is_empty());
             warnings.push(json!("response_budget_truncated"));
         }
-        if value["candidates"].as_array().unwrap().len() > 1 {
+        if value
+            .get("candidates")
+            .and_then(Value::as_array)
+            .is_some_and(|v| v.len() > 1)
+        {
             let removed = value["candidates"].as_array_mut().unwrap().pop().unwrap();
             total -= checked_size(&removed, deadline)? + 1;
-        } else if !value["relations"].as_array().unwrap().is_empty() {
+        } else if value
+            .get("relations")
+            .and_then(Value::as_array)
+            .is_some_and(|v| !v.is_empty())
+        {
             let items = value["relations"].as_array_mut().unwrap();
             let removed = items.pop().unwrap();
             total -= checked_size(&removed, deadline)? + usize::from(!items.is_empty());
