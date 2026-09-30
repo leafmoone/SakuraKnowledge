@@ -1,0 +1,21 @@
+{
+  "head": "0aa46a57b1dcb4ac9a04a3c3ba49b97234ea616d",
+  "working_tree": "?? reports/P3/full-authorized-attempt.json\n?? reports/P3/full-authorized-build-command.json\n?? reports/P3/full-authorized-check-pytest.json\n?? reports/P3/full-authorized-check-release.json\n?? reports/P3/full-authorized-check-ruff.json\n?? reports/P3/full-authorized-gate.json\n?? reports/P3/full-authorized-process-inspection-exact.json\n?? reports/P3/full-authorized-process-inspection.json\n?? reports/P3/full-authorized-venv-create.json\n?? reports/P3/full-authorized-venv-install.json\n?? reports/P3/full-authorized-wheel-build.json\n?? tools/p3_full_stop_audit.py\n?? tools/p3_full_stop_bind.py\n",
+  "argv": [
+    "python",
+    "tools/p3_full_stop_audit.py"
+  ],
+  "exit": 1,
+  "elapsed_s": 37.695874699857086,
+  "status": "FAIL",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "VHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOg0KICBGaWxlICJEOlxTYWt1cmFUb29sXFNha3VyYUtub3dsZWRnZVx0b29sc1xwM19mdWxsX3N0b3BfYXVkaXQucHkiLCBsaW5lIDEyNCwgaW4gPG1vZHVsZT4NCiAgICBpZiBfX25hbWVfXz09J19fbWFpbl9fJzptYWluKCkNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB+fn5+Xl4NCiAgRmlsZSAiRDpcU2FrdXJhVG9vbFxTYWt1cmFLbm93bGVkZ2VcdG9vbHNccDNfZnVsbF9zdG9wX2F1ZGl0LnB5IiwgbGluZSA3OSwgaW4gbWFpbg0KICAgIHI9cmVjZWlwdCgnY2hlY2stJytuYW1lKTthc3NlcnQgclsnaGVhZCddPT1CVUlMRF9TSEEgYW5kIHJbJ2V4aXQnXT09MA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXg0KQXNzZXJ0aW9uRXJyb3INCg==",
+  "stderr_sha256": "52efdd8abb4b39a1b193cd19e3afee9f1e080d11beadccdbce2307707d8f4de6",
+  "stderr": "Traceback (most recent call last):\r\n  File \"D:\\SakuraTool\\SakuraKnowledge\\tools\\p3_full_stop_audit.py\", line 124, in <module>\r\n    if __name__=='__main__':main()\r\n                            ~~~~^^\r\n  File \"D:\\SakuraTool\\SakuraKnowledge\\tools\\p3_full_stop_audit.py\", line 79, in main\r\n    r=receipt('check-'+name);assert r['head']==BUILD_SHA and r['exit']==0\r\n                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nAssertionError\r\n"
+}

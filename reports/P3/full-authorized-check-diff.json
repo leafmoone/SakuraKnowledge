@@ -1,0 +1,22 @@
+{
+  "head": "0aa46a57b1dcb4ac9a04a3c3ba49b97234ea616d",
+  "working_tree": "?? reports/P3/full-authorized-attempt.json\n?? reports/P3/full-authorized-build-command.json\n?? reports/P3/full-authorized-check-delivery-ruff.json\n?? reports/P3/full-authorized-check-pytest.json\n?? reports/P3/full-authorized-check-release.json\n?? reports/P3/full-authorized-check-ruff.json\n?? reports/P3/full-authorized-gate.json\n?? reports/P3/full-authorized-process-inspection-exact.json\n?? reports/P3/full-authorized-process-inspection.json\n?? reports/P3/full-authorized-stop-audit-command.json\n?? reports/P3/full-authorized-venv-create.json\n?? reports/P3/full-authorized-venv-install.json\n?? reports/P3/full-authorized-wheel-build.json\n?? tools/p3_full_stop_audit.py\n?? tools/p3_full_stop_bind.py\n",
+  "argv": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.047605899861082435,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

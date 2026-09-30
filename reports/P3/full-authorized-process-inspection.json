@@ -1,0 +1,23 @@
+{
+  "head": "0aa46a57b1dcb4ac9a04a3c3ba49b97234ea616d",
+  "working_tree": "?? reports/P3/full-authorized-attempt.json\n?? reports/P3/full-authorized-build-command.json\n?? reports/P3/full-authorized-check-pytest.json\n?? reports/P3/full-authorized-check-release.json\n?? reports/P3/full-authorized-check-ruff.json\n?? reports/P3/full-authorized-gate.json\n?? reports/P3/full-authorized-venv-create.json\n?? reports/P3/full-authorized-venv-install.json\n?? reports/P3/full-authorized-wheel-build.json\n?? tools/p3_full_P2_compat.py\n?? tools/p3_full_acceptance.py\n?? tools/p3_full_delivery.py\n",
+  "argv": [
+    "powershell.exe",
+    "-NoProfile",
+    "-Command",
+    "$ErrorActionPreference=\"Stop\"; [Console]::OutputEncoding=[System.Text.UTF8Encoding]::new($false); @(Get-CimInstance Win32_Process | Where-Object { $_.Name -eq \"python.exe\" -and $_.CommandLine -match \"p3_full_candidate|p3-full-authorized\" } | Select-Object ProcessId,ParentProcessId,Name,CommandLine) | ConvertTo-Json -Depth 3"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.3313821000047028,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "ew0KICAgICJQcm9jZXNzSWQiOiAgNjE1MjQsDQogICAgIlBhcmVudFByb2Nlc3NJZCI6ICA0OTIyNCwNCiAgICAiTmFtZSI6ICAicHl0aG9uLmV4ZSIsDQogICAgIkNvbW1hbmRMaW5lIjogICJDOlxcVXNlcnNcXFBDXFxBcHBEYXRhXFxMb2NhbFxcUHl0aG9uXFxweXRob25jb3JlLTMuMTQtNjRcXHB5dGhvbi5leGUgdG9vbHMvcmVjb3JkX2NoZWNrLnB5IC0tb3V0IHJlcG9ydHMvUDMvZnVsbC1hdXRob3JpemVkLXByb2Nlc3MtaW5zcGVjdGlvbi5qc29uIC0tIHBvd2Vyc2hlbGwuZXhlIC1Ob1Byb2ZpbGUgLUNvbW1hbmQgXCIkRXJyb3JBY3Rpb25QcmVmZXJlbmNlPVxcXCJTdG9wXFxcIjsgW0NvbnNvbGVdOjpPdXRwdXRFbmNvZGluZz1bU3lzdGVtLlRleHQuVVRGOEVuY29kaW5nXTo6bmV3KCRmYWxzZSk7IEAoR2V0LUNpbUluc3RhbmNlIFdpbjMyX1Byb2Nlc3MgfCBXaGVyZS1PYmplY3QgeyAkXy5OYW1lIC1lcSBcXFwicHl0aG9uLmV4ZVxcXCIgLWFuZCAkXy5Db21tYW5kTGluZSAtbWF0Y2ggXFxcInAzX2Z1bGxfY2FuZGlkYXRlfHAzLWZ1bGwtYXV0aG9yaXplZFxcXCIgfSB8IFNlbGVjdC1PYmplY3QgUHJvY2Vzc0lkLFBhcmVudFByb2Nlc3NJZCxOYW1lLENvbW1hbmRMaW5lKSB8IENvbnZlcnRUby1Kc29uIC1EZXB0aCAzXCIiDQp9DQo=",
+  "stdout_sha256": "1aa27fe1686f9efe39ea631701e69b21211e67de1b049b75e480bc2993da4b83",
+  "stdout": "{\r\n    \"ProcessId\":  61524,\r\n    \"ParentProcessId\":  49224,\r\n    \"Name\":  \"python.exe\",\r\n    \"CommandLine\":  \"C:\\\\Users\\\\PC\\\\AppData\\\\Local\\\\Python\\\\pythoncore-3.14-64\\\\python.exe tools/record_check.py --out reports/P3/full-authorized-process-inspection.json -- powershell.exe -NoProfile -Command \\\"$ErrorActionPreference=\\\\\\\"Stop\\\\\\\"; [Console]::OutputEncoding=[System.Text.UTF8Encoding]::new($false); @(Get-CimInstance Win32_Process | Where-Object { $_.Name -eq \\\\\\\"python.exe\\\\\\\" -and $_.CommandLine -match \\\\\\\"p3_full_candidate|p3-full-authorized\\\\\\\" } | Select-Object ProcessId,ParentProcessId,Name,CommandLine) | ConvertTo-Json -Depth 3\\\"\"\r\n}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

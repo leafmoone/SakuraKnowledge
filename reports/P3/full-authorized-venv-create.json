@@ -1,0 +1,23 @@
+{
+  "head": "0aa46a57b1dcb4ac9a04a3c3ba49b97234ea616d",
+  "working_tree": "?? reports/P3/full-authorized-attempt.json\n?? reports/P3/full-authorized-check-release.json\n?? reports/P3/full-authorized-gate.json\n?? reports/P3/full-authorized-wheel-build.json\n",
+  "argv": [
+    "python",
+    "-m",
+    "venv",
+    "dist/p3-full-0aa46a5/venv"
+  ],
+  "exit": 0,
+  "elapsed_s": 6.168910299893469,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

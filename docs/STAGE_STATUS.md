@@ -1,13 +1,14 @@
 # Stage Status (SakuraKnowledge)
 
-## Current authorized P3 — FULL_CANDIDATE_EXECUTION_AUTHORIZED / pending actual gates
+## Current authorized P3 — NOT_READY / WAITING_REVIEW (formal attempt failed; STOP)
 
 - P1/P2: **CLOSED_AND_MERGED**. P2 fixed review `894dc6a73bfd42f18cc7648e8ab7481aae211ab1`
   APPROVE / NO_BLOCKING_FINDINGS within authorized Windows targeted/artifact scope.
 - P3_BASE and immutable main: `894dc6a73bfd42f18cc7648e8ab7481aae211ab1`.
   Actual fetch and independent ls-remote verified initial main/dev equality, clean
   single worktree; ordinary switch to dev. Reviewed scoped resolver implementation approved;
-  fullsnapshot readiness awaits the newly authorized one-shot build and validations.
+  fullsnapshot readiness failed at the newly authorized sole formal build timeout;
+  scoped resolver approval remains closed and is not fullsnapshot approval.
 - P3 resolver/necessary new runtime capability: **Rust only**. Existing Python
   P2 public API/CLI frozen; Python additions restricted to ETL/audit/independent oracle.
 - Scope: frozen native tags/active aliases/Wiki evidence and trusted entity names,
@@ -43,13 +44,22 @@
   Candidate100/human0 unchanged; no guessing names, promoting candidates, fabricated
   positives or changes to resolver/tag_decisions safety. Historical REQUIRED gate
   failures remain factual under their former policy, not relabeled PASS.
-- Formal fullsnapshot: pending actual noncoverage gates and one authorized build.
-  `tools/p3_full_candidate.py` rehashes original five normalized groups plus scoped
-  P3records, old21.5GB, clean code/pilot55/old151/disk/newoutput; exclusive persistent
-  attempt cap1. Any failure STOP. Normal builder new independent singleSQLite,
-  no overlay/postbuildpatch/retry/oldVACUUM/online supplement. Read-only validation,
-  frozen fullgold/old151 compatibility with predeclared new-data differences,
-  actualFULLsnapshot dualperformance, freshartifacts/sevenchecks/binding required.
+- Formal fullsnapshot gate actually READY (all recorded mandatory noncoverage gates
+  true): originalfive+scopedSHA/old21.5GB/pilot/gold55/old151/cleanSHA/disk/newoutput,
+  fixed `0aa46a57b1dcb4ac9a04a3c3ba49b97234ea616d`. Exactly **ATTEMPTS1 / MAX1**.
+  Normalbuilder interrupted by our omitted `record_check.py` timeoutoverride:
+  default300s hostdeadline, outerexit124/childexitnull, **FAIL_HOST_TIMEOUT**.
+  Output not published; .sknow-z7dkmnsi SQLite/WAL/SHM/.inputs and outputlock preserved.
+  Exact processaudit no residualbuilder; old21.5GB rehash unchanged. No retry/resume/
+  alternatepath/attemptreset/overlay/postpatch/VACUUM/newGET/human. Root confirmedSTOP.
+- FULLsnapshot integrity/projections/runtime/gold/old151compatibility/performance
+  **BLOCKED / NOT_RUN** (no published validated candidate); PILOT evidence cannot
+  substitute. Fresh0aaartifacts/checkreceipts and stoppedpartial/failure/bytebinding
+  collected only. Currentruff cleanupPASS distinct from originalPERF402FAIL receipt;
+  both auditfailure and original300s timeout remain unchanged. See
+  `reports/P3/FULL_AUTHORIZED_STOP_REPORT.md` and `full-authorized-*`.
+  Overall NOT_READY / WAITING_REVIEW; optionalverified0 legal, failedbuild is blocker.
+  Only new explicit user authorization could permit further formalexecution.
 - Old151 and seven Windows checks are recorded in `reports/P3/`; independent
   new artifacts and pilot-only dual-mode performance are not full-build acceptance.
 - Existing P1/P2 reports/receipts and published 21.5GB snapshot remain immutable.

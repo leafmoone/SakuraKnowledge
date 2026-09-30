@@ -1,0 +1,28 @@
+{
+  "head": "0aa46a57b1dcb4ac9a04a3c3ba49b97234ea616d",
+  "working_tree": "?? reports/P3/full-authorized-attempt.json\n?? reports/P3/full-authorized-gate.json\n",
+  "argv": [
+    "cargo",
+    "build",
+    "--manifest-path",
+    "dist/p3-full-0aa46a5/source/rust/Cargo.toml",
+    "--locked",
+    "--release",
+    "--examples",
+    "--bin",
+    "sknow-rs"
+  ],
+  "exit": 0,
+  "elapsed_s": 65.13082870002836,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "ICAgQ29tcGlsaW5nIHZlcnNpb25fY2hlY2sgdjAuOS41CiAgIENvbXBpbGluZyB6ZXJvY29weSB2MC44LjU5CiAgIENvbXBpbGluZyBmaW5kLW1zdmMtdG9vbHMgdjAuMS4xNAogICBDb21waWxpbmcgc2hsZXggdjIuMC4xCiAgIENvbXBpbGluZyBjZmctaWYgdjEuMC41CiAgIENvbXBpbGluZyB2Y3BrZyB2MC4yLjE1CiAgIENvbXBpbGluZyBwa2ctY29uZmlnIHYwLjMuMzQKICAgQ29tcGlsaW5nIG9uY2VfY2VsbCB2MS4yMS40CiAgIENvbXBpbGluZyBzZXJkZV9jb3JlIHYxLjAuMjI5CiAgIENvbXBpbGluZyB6bWlqIHYxLjAuMjMKICAgQ29tcGlsaW5nIHNlcmRlX2pzb24gdjEuMC4xNTEKICAgQ29tcGlsaW5nIHRpbnl2ZWMgdjEuMTMuMwogICBDb21waWxpbmcgc21hbGx2ZWMgdjEuMTYuMgogICBDb21waWxpbmcgbWVtY2hyIHYyLjguMwogICBDb21waWxpbmcgaXRvYSB2MS4wLjE4CiAgIENvbXBpbGluZyBmYWxsaWJsZS1pdGVyYXRvciB2MC4zLjAKICAgQ29tcGlsaW5nIGZhbGxpYmxlLXN0cmVhbWluZy1pdGVyYXRvciB2MC4xLjkKICAgQ29tcGlsaW5nIGJpdGZsYWdzIHYyLjEzLjIKICAgQ29tcGlsaW5nIGFoYXNoIHYwLjguMTIKICAgQ29tcGlsaW5nIHVuaWNvZGUtbm9ybWFsaXphdGlvbiB2MC4xLjI1CiAgIENvbXBpbGluZyBjYyB2MS41LjEKICAgQ29tcGlsaW5nIGxpYnNxbGl0ZTMtc3lzIHYwLjI4LjAKICAgQ29tcGlsaW5nIGhhc2hicm93biB2MC4xNC41CiAgIENvbXBpbGluZyBoYXNobGluayB2MC45LjEKICAgQ29tcGlsaW5nIHJ1c3FsaXRlIHYwLjMxLjAKICAgQ29tcGlsaW5nIHNha3VyYS1rbm93bGVkZ2UtcnVudGltZSB2MC4yLjAgKEQ6XFNha3VyYVRvb2xcU2FrdXJhS25vd2xlZGdlXGRpc3RccDMtZnVsbC0wYWE0NmE1XHNvdXJjZVxydXN0KQogICAgRmluaXNoZWQgYHJlbGVhc2VgIHByb2ZpbGUgW29wdGltaXplZF0gdGFyZ2V0KHMpIGluIDFtIDA0cwo=",
+  "stderr_sha256": "608a7560a7489006461ed2e30d79ce291690558aa9c28317e2966ef871a743d3",
+  "stderr": "   Compiling version_check v0.9.5\n   Compiling zerocopy v0.8.59\n   Compiling find-msvc-tools v0.1.14\n   Compiling shlex v2.0.1\n   Compiling cfg-if v1.0.5\n   Compiling vcpkg v0.2.15\n   Compiling pkg-config v0.3.34\n   Compiling once_cell v1.21.4\n   Compiling serde_core v1.0.229\n   Compiling zmij v1.0.23\n   Compiling serde_json v1.0.151\n   Compiling tinyvec v1.13.3\n   Compiling smallvec v1.16.2\n   Compiling memchr v2.8.3\n   Compiling itoa v1.0.18\n   Compiling fallible-iterator v0.3.0\n   Compiling fallible-streaming-iterator v0.1.9\n   Compiling bitflags v2.13.2\n   Compiling ahash v0.8.12\n   Compiling unicode-normalization v0.1.25\n   Compiling cc v1.5.1\n   Compiling libsqlite3-sys v0.28.0\n   Compiling hashbrown v0.14.5\n   Compiling hashlink v0.9.1\n   Compiling rusqlite v0.31.0\n   Compiling sakura-knowledge-runtime v0.2.0 (D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-full-0aa46a5\\source\\rust)\n    Finished `release` profile [optimized] target(s) in 1m 04s\n"
+}
