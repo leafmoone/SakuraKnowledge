@@ -1,0 +1,10 @@
+{
+  "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+  "size_bytes": 21516320768,
+  "sha256": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073",
+  "expected_sha256": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073",
+  "unchanged": true,
+  "hash_s": 22.355219000019133,
+  "mode": "read-only byte hash after repaired validation/performance/artifact CLI",
+  "full_snapshot_rebuilt": false
+}

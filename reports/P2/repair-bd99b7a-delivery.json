@@ -1,0 +1,375 @@
+{
+  "P1_PHASE_STATE": "CLOSED_AND_MERGED",
+  "P2_AUTHORIZED_BASE": "e4161b162784d634ea0b24450e84f3740b21fdaa",
+  "REPAIR_BASE_SHA": "bd99b7a09d4ca765922e161411cf0598ae449192",
+  "REFERENCE_FIX_SHA": "199af7595fa60a5af9d8e5daa9fc80be1e382d5d",
+  "IMPLEMENTATION_SHA": "199af7595fa60a5af9d8e5daa9fc80be1e382d5d",
+  "ARTIFACT_SOURCE_SHA": "eac2c9685e81ab33c0ff1390dfc29ae179456611",
+  "submission_binding": "Final submission SHA and independently verified origin/dev SHA reported after normal push; not self-referentially inserted into this committed file. Remote mismatch blocks review.",
+  "P2_RESULT": "READY_FOR_REVIEW",
+  "STOP_STATE": "WAITING_REVIEW",
+  "external_review": "NOT_RUN on this submission; not accepted/merged",
+  "SEMANTIC_ASSERTIONS": "108 pytest passed including independent fixtures and enabled Rust integration; Rust4 tests passed",
+  "PARITY_ACTUALLY_COMPARED": 135,
+  "PARITY_NOT_COMPARED": 16,
+  "PARITY_ERROR_CONTRACT_VERIFIED": 16,
+  "S18_ATTEMPTS_SUCCESSES_TIMEOUTS": {
+    "formal_v3_per_runtime": [
+      1,
+      1,
+      0
+    ],
+    "perf_v2_per_runtime_per_mode_measured": [
+      30,
+      30,
+      0
+    ],
+    "perf_v2_per_runtime_per_mode_warmup": [
+      1,
+      1,
+      0
+    ],
+    "historical_failures": "Retained v1/v2 formal and perf-v1; perf-v1 PythonCLI search failed invalid argv, not runtime budget"
+  },
+  "FULL_SNAPSHOT_REBUILT": false,
+  "MAIN_MODIFIED": false,
+  "P3_STARTED": false,
+  "items": {
+    "R1_5S_QUERY_BUDGET": {
+      "status": "PASS",
+      "implementation": [
+        "src/sakura_knowledge/api.py",
+        "src/sakura_knowledge/search.py",
+        "rust/src/lib.rs",
+        "rust/src/search.rs"
+      ],
+      "tests": [
+        "test_search_repair.py",
+        "test_rust_repair.py"
+      ],
+      "receipts": [
+        "repair-bd99b7a-s18-python-before.json",
+        "repair-bd99b7a-s18-rust-before.json",
+        "repair-bd99b7a-s18-after.json",
+        "repair-bd99b7a-s02-diagnosis.json",
+        "repair-bd99b7a-parity-v3.json",
+        "repair-bd99b7a-perf-verification.json"
+      ],
+      "evidence_scope": "Actual frozen snapshot query execution; OR/topk10/5s retained; scan truncation cannot PASS"
+    },
+    "R2_UNICODE_CASEFOLD": {
+      "status": "PASS",
+      "implementation": [
+        "rust/src/unicode16.rs",
+        "rust/src/unicode16_data.rs",
+        "tools/generate_unicode16.py"
+      ],
+      "tests": [
+        "test_unicode_tokens_and_match_independent",
+        "test_direct_unicode_tokens_and_match",
+        "test_unicode_nonempty_fts_full_json"
+      ],
+      "receipts": [
+        "repair-bd99b7a-check-pytest.json",
+        "repair-bd99b7a-unicode-data-check.json"
+      ],
+      "evidence_scope": "Independent token/MATCH expectations and nonempty synthetic FTS; UCD16, not human fact review"
+    },
+    "R3_INTRO_AND_PUNCTUATION": {
+      "status": "PASS",
+      "implementation": [
+        "src/sakura_knowledge/api.py",
+        "rust/src/lib.rs"
+      ],
+      "tests": [
+        "test_repair_semantics.py",
+        "test_introduction_independent_then_full_json"
+      ],
+      "receipts": [
+        "repair-bd99b7a-check-pytest.json",
+        "repair-bd99b7a-parity-v3.json"
+      ],
+      "evidence_scope": "Synthetic assertions first, frozen full JSON comparison separate"
+    },
+    "R4_OCCURRENCE_SEMANTICS": {
+      "status": "PASS",
+      "implementation": [
+        "src/sakura_knowledge/adapters.py",
+        "src/sakura_knowledge/storage.py"
+      ],
+      "tests": [
+        "test_occurrence_dataset_partition_and_nullable_sample_count",
+        "test_common_partition_is_not_a_dataset"
+      ],
+      "receipts": [
+        "repair-bd99b7a-occurrence-audit.json",
+        "repair-bd99b7a-check-pytest.json"
+      ],
+      "evidence_scope": "Bounded frozen seven-table audit; real adapter normalization/build fixture; common behavior synthetic because real table empty. No Rust ingestion adapter, runtime read-only. Legacy production snapshot unchanged"
+    },
+    "R5_SOURCE_FIELD_PROVENANCE_AND_BOUNDS": {
+      "status": "PASS",
+      "implementation": [
+        "src/sakura_knowledge/response.py",
+        "src/sakura_knowledge/api.py",
+        "rust/src/response.rs",
+        "rust/src/lib.rs"
+      ],
+      "tests": [
+        "test_field_observations_keep_conflicts_and_actual_provenance",
+        "test_field_value_and_observation_bounds",
+        "test_rust_observations_conflicts_null_empty_and_bounds"
+      ],
+      "receipts": [
+        "repair-bd99b7a-check-pytest.json",
+        "repair-bd99b7a-parity-v3.json"
+      ],
+      "evidence_scope": "Synthetic multi-source evidence conflicts/null/empty/missing/bounds and full frozen response comparison, not fact verification"
+    },
+    "R6_RUNTIME_OPEN_CONTRACT": {
+      "status": "PASS",
+      "implementation": [
+        "src/sakura_knowledge/api.py",
+        "rust/src/lib.rs"
+      ],
+      "tests": [
+        "test_open_rejects_unknown_version_and_closes",
+        "test_open_rejects_broken_schema",
+        "test_rust_rejects_unknown_versions",
+        "test_rust_rejects_broken_schema"
+      ],
+      "receipts": [
+        "repair-bd99b7a-check-pytest.json",
+        "repair-bd99b7a-snapshot-final.json"
+      ],
+      "evidence_scope": "Lightweight version/schema/FTS/JSON gate plus byte-identity after validation; no full integrity scan at open"
+    },
+    "HARNESS_STATUS_AND_TIMEOUT_RULES": {
+      "status": "PASS",
+      "implementation": [
+        "tools/check_parity.py",
+        "tools/parity_policy.py"
+      ],
+      "tests": [
+        "tests/test_parity_harness.py (17 tests including eight required categories)"
+      ],
+      "receipts": [
+        "repair-bd99b7a-check-pytest.json",
+        "repair-bd99b7a-parity-v3.json"
+      ],
+      "evidence_scope": "135 values actually compared,16 only error contracts; complete bytes/hashes/exit,15s host limit separate from5s inner limit"
+    },
+    "INDEPENDENT_EXPECTED_BEHAVIOR": {
+      "status": "PASS",
+      "implementation": [
+        "tests/test_repair_semantics.py",
+        "tests/test_search_repair.py",
+        "tests/test_rust_repair.py",
+        "tools/parity_repair_expected.py"
+      ],
+      "tests": [
+        "Independent semantic assertions plus cross-runtime fixtures"
+      ],
+      "receipts": [
+        "repair-bd99b7a-independent-expected-v1.json",
+        "repair-bd99b7a-check-pytest.json"
+      ],
+      "evidence_scope": "Original151 inputs unchanged. Explicit introduction/punctuation/inspect expected deltas, no missing output substitution"
+    },
+    "FULL_JSON_PARITY": {
+      "status": "PASS",
+      "implementation": [
+        "tools/check_parity.py"
+      ],
+      "tests": [
+        "151 original cases; zero retries"
+      ],
+      "receipts": [
+        "repair-bd99b7a-parity-v3.json"
+      ],
+      "evidence_scope": "135 complete recursive JSON comparisons+16 expected error contracts, no timeouts; v1/v2 FAIL preserved"
+    },
+    "IN_PROCESS_AND_CLI_PERFORMANCE": {
+      "status": "PASS",
+      "implementation": [
+        "tools/measure_repair_perf.py",
+        "tools/bench_reused.py",
+        "rust/examples/bench_reused.rs"
+      ],
+      "tests": [
+        "8 workloads x2 runtimes x2 modes x30 measured; fixed excluded warmups"
+      ],
+      "receipts": [
+        "repair-bd99b7a-perf-v2.json",
+        "repair-bd99b7a-perf-verification.json",
+        "repair-bd99b7a-environment.json"
+      ],
+      "evidence_scope": "960 measured+32warmups; all succeed;496 full JSON paired outputs;RSS sampled maxima not precise peaks;perf-v1 tool argv failure preserved"
+    },
+    "FINAL_CHECK_MATRIX": {
+      "status": "PASS",
+      "implementation": [
+        "tools/record_check.py"
+      ],
+      "tests": [
+        "pytest108",
+        "ruff",
+        "diff",
+        "cargo fmt",
+        "cargo test4",
+        "clippy -Dwarnings",
+        "cargo release locked"
+      ],
+      "receipts": [
+        "repair-bd99b7a-check-pytest.json",
+        "repair-bd99b7a-check-ruff.json",
+        "repair-bd99b7a-check-diff.json",
+        "repair-bd99b7a-check-fmt.json",
+        "repair-bd99b7a-check-rust-test.json",
+        "repair-bd99b7a-check-clippy.json",
+        "repair-bd99b7a-check-release.json"
+      ],
+      "evidence_scope": "All seven commands real exit0, raw streams retained; Rust integration explicitly enabled in pytest"
+    },
+    "ARTIFACT_PROVENANCE": {
+      "status": "PASS",
+      "implementation": [
+        "tools/check_repair_artifacts.py"
+      ],
+      "tests": [
+        "offline fresh venv install",
+        "8 external-source paired CLI JSON plus help/argument errors"
+      ],
+      "receipts": [
+        "repair-bd99b7a-artifact-manifest.json",
+        "repair-bd99b7a-artifact-cli.json",
+        "repair-bd99b7a-venv-create.json",
+        "repair-bd99b7a-venv-bootstrap.json",
+        "repair-bd99b7a-venv-install.json"
+      ],
+      "evidence_scope": "Clean source SHA eac2c96, incremental locked Rust build; local-only artifacts, not downloadable via Git; original dist/p2 untouched"
+    }
+  },
+  "receipt_index": {
+    "repair-bd99b7a-artifact-cli.json": {
+      "sha256": "d7ba678fda8059f268a149e3f746f992c8c8ebb87a6af33268b713cd0e9ab0a1",
+      "size_bytes": 450770
+    },
+    "repair-bd99b7a-artifact-manifest.json": {
+      "sha256": "6eca8b8d35eb13bb81dba3d24045ec85784e89eaa5b8bc6b9374b53d928b11d1",
+      "size_bytes": 4552
+    },
+    "repair-bd99b7a-check-clippy.json": {
+      "sha256": "ce73b86ec7416b62752915f4516a8cafb4145b7b92816072e16eeda5809f87c6",
+      "size_bytes": 1292
+    },
+    "repair-bd99b7a-check-diff.json": {
+      "sha256": "16d273d43a47dcf2a3c02f6ff3a07b164075686de9c922a8e5f958b8c4b5a721",
+      "size_bytes": 867
+    },
+    "repair-bd99b7a-check-fmt.json": {
+      "sha256": "2e7d04c6f1ecde3632eec8c383a444f1d4000d9ab330d987902685db7a1d81f9",
+      "size_bytes": 986
+    },
+    "repair-bd99b7a-check-pytest.json": {
+      "sha256": "89983d5dd62fac37d34b1b13e9cdbf67e6e9ca867d8da596be46411de5da309c",
+      "size_bytes": 1216
+    },
+    "repair-bd99b7a-check-release.json": {
+      "sha256": "3449b358b735fbdaba51c61767b3b285379507c795c9d9777f8615db0039ef60",
+      "size_bytes": 1275
+    },
+    "repair-bd99b7a-check-ruff.json": {
+      "sha256": "03455b45c6acfba400391482b72365b96bbb2fcd5426db5b2fd2609393e5c927",
+      "size_bytes": 922
+    },
+    "repair-bd99b7a-check-rust-test.json": {
+      "sha256": "20cd385d637c851ffe9446d053d41190874ed205572513ea5a7b953691c6e50d",
+      "size_bytes": 3170
+    },
+    "repair-bd99b7a-environment.json": {
+      "sha256": "81fa77ff8d66678630200723e5410d3e6324df6a4d146d6379c70b50594b6858",
+      "size_bytes": 1026
+    },
+    "repair-bd99b7a-independent-expected-v1.json": {
+      "sha256": "bc059f9d73deff35aa535c034968cae36216e975a2b40b491928e0ea2559cb57",
+      "size_bytes": 1184
+    },
+    "repair-bd99b7a-occurrence-audit.json": {
+      "sha256": "79e1226c888869daf5289227ad51664cd029771badd4c7b48bc345e844153fed",
+      "size_bytes": 1970
+    },
+    "repair-bd99b7a-parity-v1.json": {
+      "sha256": "84d7d324f8a37e5f599be804244d7ea477e6232abf9347de38af106820a05b63",
+      "size_bytes": 18513244
+    },
+    "repair-bd99b7a-parity-v2.json": {
+      "sha256": "0d770994a5046d9fd28b09c644c17743363a730833a0ba044ad9a58b4a7ed021",
+      "size_bytes": 18513661
+    },
+    "repair-bd99b7a-parity-v3.json": {
+      "sha256": "2e6fd8bd43ad14f90aae8fd0d1cc84e3255affe82520a3fed9fdbfc428e73d2e",
+      "size_bytes": 18514558
+    },
+    "repair-bd99b7a-perf-v1.json": {
+      "sha256": "d1441b26bc840c963f81e3dda06d7899b04c2b085373fcf72b33a8f9ff284390",
+      "size_bytes": 30259451
+    },
+    "repair-bd99b7a-perf-v2.json": {
+      "sha256": "88c7d865d810a60aed8b970ecd6c18ca08bdc0857081b2c8046197ca7b9fb11a",
+      "size_bytes": 34444802
+    },
+    "repair-bd99b7a-perf-verification.json": {
+      "sha256": "136c9830de4c1be8b298514746f8c3794a789fefd5913915ac00768fc7b293f5",
+      "size_bytes": 8364
+    },
+    "repair-bd99b7a-s02-diagnosis.json": {
+      "sha256": "d100975da44b8fb90c71c3413734d789c98b64cf0c5e6c697e285e3a6e8ea161",
+      "size_bytes": 1287
+    },
+    "repair-bd99b7a-s18-after.json": {
+      "sha256": "0f21c9bcd1001a4d411ce13a700fa44364e9b8a5292e7843bb1d95c8dfe36a38",
+      "size_bytes": 120333
+    },
+    "repair-bd99b7a-s18-python-before.json": {
+      "sha256": "621c5846a959e8976d1410f7cd3b440e3116b0075ded6370813047deddc36300",
+      "size_bytes": 1888
+    },
+    "repair-bd99b7a-s18-rust-before.json": {
+      "sha256": "5ee45fc82809cf252f3258087d71ecae9d4004186d752a8d701014b1d2bf2b1c",
+      "size_bytes": 1178
+    },
+    "repair-bd99b7a-snapshot-final.json": {
+      "sha256": "9c0679124d8b253605be93cd75305b1b77e987f7266c2b58986a1cec4b6e345a",
+      "size_bytes": 473
+    },
+    "repair-bd99b7a-venv-bootstrap.json": {
+      "sha256": "074f377e52e4e71f7c26cb65fc21a02e056c381238bcaa0c7a9bf8e9255c25bf",
+      "size_bytes": 1743
+    },
+    "repair-bd99b7a-venv-create.json": {
+      "sha256": "ec066482034dff3e97980f35a0e8632446f066cad8aea90fb3d4ee57efd7ce3a",
+      "size_bytes": 1163
+    },
+    "repair-bd99b7a-venv-install.json": {
+      "sha256": "cf20e51250ec92370d2b024f413f18fa61487be67459f3462d13bc97df56d647",
+      "size_bytes": 1760
+    }
+  },
+  "NOT_RUN": [
+    "Linux actual runtime",
+    "Pi Skill runtime integration",
+    "full human source-fact review",
+    "dbstat whole-file scan",
+    "SakuraPool integration",
+    "online upstream refresh",
+    "674679-tag AI annotation"
+  ],
+  "limitations": [
+    "Windows host-specific performance; no disk-cold claim",
+    "Python Unicode acceptance tested on CPython3.14 UCD16, not every Python>=3.11",
+    "Artifacts local-only in ignored dist; reviewer needs file transfer or local rebuild for binary access",
+    "Fixture success does not establish upstream facts",
+    "No production snapshot migration or index changes; historical legacy frequency remains uninterpreted"
+  ]
+}

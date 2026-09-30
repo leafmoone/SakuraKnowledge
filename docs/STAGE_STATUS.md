@@ -1,6 +1,31 @@
 # Stage Status (SakuraKnowledge)
 
-As of the P2 submission (see `reports/P2/p2-delivery.json` for SHAs).
+## Current directed repair — READY_FOR_REVIEW / WAITING_REVIEW
+
+Current evidence: `reports/P2/repair-bd99b7a-delivery.json` (R1–R6 and all gates).
+This is implementation/validation readiness, **not external review approval**.
+Final submission/origin SHA is verified after the normal dev push; main is not merged.
+
+- Final Python/Rust implementation: `199af7595fa60a5af9d8e5daa9fc80be1e382d5d`.
+- Clean artifact source: `eac2c9685e81ab33c0ff1390dfc29ae179456611`.
+- Formal parity v3: 151/151 accepted, **135 actual full JSON comparisons + 16
+  expected-error contracts**, no retries/timeouts. Repaired v1/v2 failures retained.
+- Independent and integration pytest: 108 passed; Rust: 4 passed; full seven-command
+  check matrix exit 0. Synthetic expected behavior is separate from real-source facts.
+- Performance v2: 960 measured successes + 32 excluded fixed warmups; 8 workloads,
+  2 runtimes, reused-connection API and independent CLI, 30 measured per group.
+  Perf v1 remains FAIL because its Python search CLI used invalid `--topk`; v2 fixes
+  the measurement to `--limit`, without changing runtime or artifact bytes.
+- New wheel/standalone Rust: source-external validation 8 paired full JSON cases,
+  help/errors and verified UTF-8 pass. New artifacts are **local-only**, not Git downloads.
+- Frozen snapshot SHA remains `4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073`.
+- P1 CLOSED_AND_MERGED; no snapshot rebuild, main changes, Pool or P3 work.
+- Linux, Pi runtime, full human fact review, dbstat scan and upstream refresh NOT_RUN.
+
+## Historical submission below — not the current conclusion
+
+The following records the earlier submission (`reports/P2/p2-delivery.json`).
+Its claims and failed receipts are retained as historical context, not current acceptance.
 
 ## Stage matrix
 

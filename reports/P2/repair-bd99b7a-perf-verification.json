@@ -1,0 +1,334 @@
+{
+  "receipt": "reports/P2/repair-bd99b7a-perf-v2.json",
+  "sha256": "88c7d865d810a60aed8b970ecd6c18ca08bdc0857081b2c8046197ca7b9fb11a",
+  "bytes": 34444802,
+  "records": 992,
+  "measured": 960,
+  "warmups": 32,
+  "full_json_pairs_including_warmup": 496,
+  "raw_stream_hashes_verified": 996,
+  "all_exit_zero": true,
+  "summary": [
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "exact",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.00024369987659156322,
+      "p95_s": 0.0005222999025136232
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "alias",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.00019970000721514225,
+      "p95_s": 0.000372299924492836
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "ambiguous",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0006027000490576029,
+      "p95_s": 0.001076800050213933
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "missing",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 8.070003241300583e-05,
+      "p95_s": 0.00013049994595348835
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "fts_cjk",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.023650099989026785,
+      "p95_s": 0.03178329998627305
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "S18",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.32811619993299246,
+      "p95_s": 0.39371569990180433
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "introduce",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0005259998142719269,
+      "p95_s": 0.0008680999744683504
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "tag_unmapped",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.00035779993049800396,
+      "p95_s": 0.0007264998275786638
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "exact",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0002597,
+      "p95_s": 0.0004464
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "alias",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0002247,
+      "p95_s": 0.0003758
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "ambiguous",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0006718,
+      "p95_s": 0.0013568
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "missing",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0001055,
+      "p95_s": 0.0001857
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "fts_cjk",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0219147,
+      "p95_s": 0.0283128
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "S18",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.2581251,
+      "p95_s": 0.2860418
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "introduce",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0005317,
+      "p95_s": 0.0010392
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "tag_unmapped",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0004011,
+      "p95_s": 0.0007763
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "exact",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.13441139995120466,
+      "p95_s": 0.25652589998207986
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "alias",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.13632280007004738,
+      "p95_s": 0.2494965000078082
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "ambiguous",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.1369650000706315,
+      "p95_s": 0.2430690999608487
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "missing",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.13707369985058904,
+      "p95_s": 0.24687939998693764
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "fts_cjk",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.15676709986291826,
+      "p95_s": 0.2641658999491483
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "S18",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.3649708000011742,
+      "p95_s": 0.4022230999544263
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "introduce",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.13741560000926256,
+      "p95_s": 0.24809769983403385
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "tag_unmapped",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.13670979999005795,
+      "p95_s": 0.2500593999866396
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "exact",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.037778599886223674,
+      "p95_s": 0.05016089999116957
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "alias",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.037362700095400214,
+      "p95_s": 0.043419199995696545
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "ambiguous",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0386077999137342,
+      "p95_s": 0.044393999967724085
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "missing",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.03737700008787215,
+      "p95_s": 0.0439240001142025
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "fts_cjk",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.055392200127243996,
+      "p95_s": 0.0675961000379175
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "S18",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.22742670006118715,
+      "p95_s": 0.2627902999520302
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "introduce",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.038566399831324816,
+      "p95_s": 0.045783699955791235
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "tag_unmapped",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.03757670009508729,
+      "p95_s": 0.04572140006348491
+    }
+  ],
+  "status": "PASS"
+}

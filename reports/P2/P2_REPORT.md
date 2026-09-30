@@ -1,6 +1,57 @@
 # P2 Report — Rust read-only runtime and contract hardening
 
-Status: `P2 A/B/C DONE + review remediation — WAITING_REVIEW`.
+## Current directed repair: READY_FOR_REVIEW / WAITING_REVIEW
+
+Authoritative new delivery: [`repair-bd99b7a-delivery.json`](repair-bd99b7a-delivery.json).
+External acceptance remains NOT_RUN; do not merge main or start P3.
+
+Final Python/Rust implementation `199af7595fa60a5af9d8e5daa9fc80be1e382d5d`;
+clean build source `eac2c9685e81ab33c0ff1390dfc29ae179456611`.
+Submission/origin SHA is independently verified after push, not embedded
+self-referentially into this report. New artifact paths and hashes are in
+`repair-bd99b7a-artifact-manifest.json`; binaries remain local-only.
+
+| Gate | Actual evidence/result |
+|---|---|
+| Harness | Independent status, no retries, timeout/partial cannot PASS; 17 tests |
+| R1 | Lightweight rank/ID selection, selected text only, exact skip, unified deadline; EXPLAIN and before/after receipts |
+| R2 | Complete generated Unicode16 casefold; direct tokens/MATCH + nonempty FTS fixture |
+| R3 | Introduction does not query tags; original ambiguity first; literal punctuation |
+| R4 | Actual adapter separates source coverage, dataset membership and partition; sample_count null; frozen bounded audit + build fixture |
+| R5 | Per-source field observations cite actual evidence; null/empty/missing and conflicts retained; explicit bounds |
+| R6 | Actual versions/schema/FTS/JSON gates; fail closes; no implicit snapshot writes |
+| Full parity | v3 **151/151: 135 value comparisons + 16 expected-error contracts**, zero retries/timeouts |
+| Checks | pytest **108**, Rust **4**, ruff/diff/fmt/clippy/release all exit0 |
+| Performance | v2 **960/960 measured successes**, 32 excluded warmups; 496 paired full JSON outputs; all 996 raw stream hashes verified |
+| Artifact CLI | Fresh offline wheel installation; source-external 8 paired full JSON responses + help/validation errors; measured UTF-8 |
+| Snapshot | Post-validation SHA unchanged, 21,516,320,768 bytes |
+
+S18 measured p50/p95 (seconds), 30 attempts per cell, all successful:
+
+| Mode | Python | Rust |
+|---|---|---|
+| Reused object/connection API | 0.3281 / 0.3937 | 0.2581 / 0.2860 |
+| Independent CLI | 0.3650 / 0.4022 | 0.2274 / 0.2628 |
+
+No claim of a universal speedup: some tiny reused-connection operations are slower
+in Rust. Independent process runs are not disk-cold. RSS is a sampled observed
+maximum, not a precise allocation measurement.
+
+**Failures retained:** repaired formal v1 148/151 and v2 150/151 FAIL; v3 follows
+actual query-plan/CLI/inspect fixes. Perf v1 FAIL is preserved: the measurement
+script used Rust's `--topk` for Python, whose CLI uses `--limit`. Perf v2 is a new
+complete fixed-script run, not filtered retries. Older P2 v1–v6/raw also unchanged.
+
+**Boundaries:** fixture success is not human source-fact verification. Common-tag
+membership behavior is synthetic because the audited frozen common table is empty.
+Legacy snapshot frequency is not relabeled as sample_count. No full snapshot
+rebuild, index change, upstream refresh, P1 modification, main merge or Pool/P3 work.
+Linux runtime, Pi integration, full human review, dbstat scan and Pool integration
+remain NOT_RUN. Unicode acceptance is tested on CPython3.14/UCD16, not all Python versions.
+
+## Historical submission below — superseded, retained for traceability
+
+Historical status: `P2 A/B/C DONE + review remediation — WAITING_REVIEW`.
 See "Review remediation (items 1–7)" below. No upstream data was refreshed; all
 evidence below is bound to the frozen local snapshot
 `build/snapshot-full-20bf5b3/knowledge.sqlite`
