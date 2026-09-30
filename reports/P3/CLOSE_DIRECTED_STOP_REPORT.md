@@ -144,6 +144,17 @@ old shared `reports/P3/raw/` content-addressed bytes are locally protected (oldc
 independentraw wording is historicalinconsistent; no claim it was used). Historical report
 blob equality is checked against442cad. This report does not declare these pending
 operations complete before their receipts and final verification exist.
+
+First binderprepare on evidencecommit8e2015a failedexit1 before creating binding:
+`changed frozen input: docs/p3-full-coverage-contract.md`. An evidence-only correction
+of that document's historicalrawdirectory wording collided with its frozen sourceproof.
+Preserve this actualFAIL in `close-bind-preparation-failure.json` (tool transcript,
+complete binary stdout/stderr/elapsed NOT_AVAILABLE). Restore original9931B/SHA
+`5bc715866da36d4e9d51602ab2b35f627bdf38104b1a9bbd17a4136adec68d55` in a new
+ordinary commit; both gold/P2 sourceproof match, no amend/reset/refreeze. The wording
+discrepancy remains explained here, not by mutating frozenproof. Re-executing only
+hash/Git binder after that restoration is evidence closure, not I/J/queryretry.
+
 Verified0OPTIONAL/candidate100/human0 remain, no guessed identities/mapping promotion.
 Linux/Pi/Poolruntime/live refresh/full human factreview NOT_RUN. Aisolatedrepair never
 merged. **NOT_READY / WAITING_REVIEW; approvalNONE for this fixed submission**.
