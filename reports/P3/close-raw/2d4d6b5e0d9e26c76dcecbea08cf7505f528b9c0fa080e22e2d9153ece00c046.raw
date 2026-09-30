@@ -1,0 +1,19 @@
+    Checking sakura-knowledge-runtime v0.2.0 (D:\SakuraTool\SakuraKnowledge\rust)
+error: items after a test module
+   --> src\main.rs:337:1
+    |
+337 | mod profile_tests {
+    | ^^^^^^^^^^^^^^^^^
+...
+361 | fn two_pos(pos: &[String]) -> Result<(&String, &str), Error> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+369 | fn _unused_path() -> PathBuf {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#items_after_test_module
+    = note: `-D clippy::items-after-test-module` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::items_after_test_module)]`
+    = help: move the items to before the test module was defined
+
+error: could not compile `sakura-knowledge-runtime` (bin "sknow-rs" test) due to 1 previous error

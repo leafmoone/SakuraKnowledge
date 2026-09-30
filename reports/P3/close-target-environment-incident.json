@@ -1,0 +1,21 @@
+{
+  "status": "RECORDED_EXCEPTION",
+  "actual_tool_event": "bash_938b72c0",
+  "argv_sequence": [
+    ["python","-m","ruff","check","src","tests","tools"],
+    ["cargo","fmt","--manifest-path","rust/Cargo.toml"],
+    ["cargo","test","--manifest-path","rust/Cargo.toml","--locked"],
+    ["cargo","build","--manifest-path","rust/Cargo.toml","--release","--locked","--examples","--bin","sknow-rs"]
+  ],
+  "observed_results": {"ruff":"FAIL: 9 errors, original acceptance BLE001/TRY004 plus new diagnostic re.S lint", "Rust_fixture_tests":"7 PASS, cargo test exit0", "main_tests":"0", "doc_tests":"0", "release":"exit0"},
+  "observed_build_log_paths": ["D:\\SakuraTool\\SakuraPool-P4-work\\rust-target\\debug\\deps\\sakura_knowledge_runtime-a09264ea7da0608d.exe","D:\\SakuraTool\\SakuraPool-P4-work\\rust-target\\debug\\deps\\sknow_rs-e0e251dd9fa50e02.exe"],
+  "observed_cargo_duration_s": {"test_compile":22.97,"release_compile":63},
+  "inherited_CARGO_TARGET_DIR": "D:/SakuraTool/SakuraPool-P4-work/rust-target",
+  "SAKURAPOOL_MODIFIED": "YES_BUILD_ARTIFACTS_ONLY",
+  "SAKURAPOOL_BUILD_ARTIFACTS_WRITTEN": true,
+  "SAKURAPOOL_SOURCE_MODIFIED": "No source edits performed by this controller; not independently auditing external repository contents",
+  "raw_boundary": "Actual tool output transcribed here, no claim of a locally saved complete raw-stream archive or unobserved release filename/hash.",
+  "mitigation": "Subsequent build/test commands explicitly set CARGO_TARGET_DIR to Knowledge/rust/target or each clean artifact archive's own rust/target and assert resolved target containment before execution; no global configuration changed.",
+  "preservation": "No cleanup, further access or modification of external Pool artifacts authorized. Not Pool integration. Initial fixtures not relabeled as isolated under Knowledge.",
+  "formal_FULL_query_executed_by_incident": false
+}

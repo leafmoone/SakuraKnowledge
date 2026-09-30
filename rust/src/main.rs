@@ -1,8 +1,11 @@
 //! sknow-rs CLI: read-only query surface over a published snapshot.
 
 use sakura_knowledge_runtime::{Error, Runtime, TagOptions};
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::path::PathBuf;
 use std::process::ExitCode;
+use std::time::{Duration, Instant};
 
 struct Opt {
     kind: Option<String>,
@@ -154,6 +157,7 @@ fn main() -> ExitCode {
     if matches!(cmd.as_str(), "lookup" | "search" | "ask") && pos.len() < 2 {
         return usage_error("database and query are required");
     }
+    let mut profile_error: Option<String> = None;
     let result: Result<serde_json::Value, Error> = (|| match cmd.as_str() {
         "resolve-tag" => {
             let (db, query) = two_pos(&pos)?;
@@ -185,10 +189,41 @@ fn main() -> ExitCode {
         }
         "search" => {
             let (db, query) = two_pos(&pos)?;
+            // Optional audit sink is reserved before the single query, never overwritten.
+            // No directories are created and default CLI stdout/errors remain unchanged.
+            let mut sink = match std::env::var_os("SKNOW_SEARCH_PROFILE_OUT") {
+                Some(path) => Some(
+                    OpenOptions::new()
+                        .write(true)
+                        .create_new(true)
+                        .open(path)
+                        .map_err(|e| {
+                            Error::Invalid(format!("search profile sink reservation failed: {e}"))
+                        })?,
+                ),
+                None => None,
+            };
             let mut rt = Runtime::open(db)?;
             // Python CLI surface: `search --limit N` is the result cap.
             let topk = if opt.limit_given { opt.limit } else { opt.topk };
-            Ok(rt.search(query, topk, opt.kind.as_deref(), opt.namespace.as_deref())?)
+            let started = Instant::now();
+            let result = rt.search(query, topk, opt.kind.as_deref(), opt.namespace.as_deref());
+            if let Some(file) = sink.as_mut() {
+                let profile = serde_json::json!({
+                    "profile": rt.last_search_profile,
+                    "query_invocations": 1,
+                    "query_elapsed_s": started.elapsed().as_secs_f64(),
+                    "query_succeeded": result.is_ok(),
+                    "query_error": result.as_ref().err().map(ToString::to_string),
+                });
+                let written = write_profile(file, &profile);
+                if let Err(error) = written {
+                    profile_error = Some(format!("search profile write failed: {error}"));
+                } else if started.elapsed() > Duration::from_secs(5) {
+                    profile_error = Some("search profile exceeded query budget".into());
+                }
+            }
+            result
         }
         "related" => {
             if pos.len() == 2 {
@@ -260,10 +295,20 @@ fn main() -> ExitCode {
         _ => Err(Error::Invalid("unknown command".into())),
     })();
 
+    if let Some(message) = &profile_error {
+        eprintln!(
+            "{}",
+            serde_json::json!({"error":"ProfileError", "message":message})
+        );
+    }
     match result {
         Ok(v) => {
             println!("{}", serde_json::to_string(&v).unwrap());
-            ExitCode::SUCCESS
+            if profile_error.is_some() {
+                ExitCode::from(2)
+            } else {
+                ExitCode::SUCCESS
+            }
         }
         Err(e) => {
             // Mirror the Python CLI contract: {"error": "<ExceptionType>",
@@ -282,6 +327,12 @@ fn main() -> ExitCode {
     }
 }
 
+fn write_profile(sink: &mut impl Write, profile: &serde_json::Value) -> std::io::Result<()> {
+    let bytes = serde_json::to_vec(profile).map_err(std::io::Error::other)?;
+    sink.write_all(&bytes)?;
+    sink.flush()
+}
+
 fn two_pos(pos: &[String]) -> Result<(&String, &str), Error> {
     match (pos.first(), pos.get(1)) {
         (Some(d), Some(q)) => Ok((d, q.as_str())),
@@ -292,4 +343,29 @@ fn two_pos(pos: &[String]) -> Result<(&String, &str), Error> {
 #[allow(dead_code)]
 fn _unused_path() -> PathBuf {
     PathBuf::new()
+}
+
+#[cfg(test)]
+mod profile_tests {
+    use super::*;
+
+    #[test]
+    fn profile_write_failure_is_reported_not_hidden() {
+        struct Fail;
+        impl Write for Fail {
+            fn write(&mut self, _: &[u8]) -> std::io::Result<usize> {
+                Err(std::io::Error::other("injected sink failure"))
+            }
+            fn flush(&mut self) -> std::io::Result<()> {
+                Ok(())
+            }
+        }
+        assert!(write_profile(&mut Fail, &serde_json::json!({"query_invocations":1})).is_err());
+        let mut bytes = Vec::new();
+        write_profile(&mut bytes, &serde_json::json!({"query_invocations":1})).unwrap();
+        assert_eq!(
+            serde_json::from_slice::<serde_json::Value>(&bytes).unwrap()["query_invocations"],
+            1
+        );
+    }
 }

@@ -6,3 +6,5 @@ reports/P2/review-b754-*.json -text -diff
 # New P3 receipts and replay decisions bind exact committed bytes.
 reports/P3/*.json -text -diff
 reports/P3/*.jsonl -text -diff
+# A-L new raw streams are stored once and committed byte-verbatim.
+reports/P3/close-raw/** -text -diff

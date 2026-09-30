@@ -88,7 +88,7 @@ def capture(argv):
     start = time.perf_counter()
     try:
         rec = parity.capture(argv, timeout_s=15)
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - retain any case failure in the evidence receipt
         rec = {'argv': argv, 'exit': None, 'elapsed_s': time.perf_counter() - start,
                'outer_timeout': False, 'timeout': False, 'attempted': 1,
                'succeeded': 0, 'other_error': 1,
@@ -284,7 +284,7 @@ def freeze_gold(db):
                     row['problems'].extend(source_checks(value, expected))
                     if case.get('category') is not None:
                         row['category_source_anchor'] = native_ref
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 - retain any case failure in the evidence receipt
                 row['problems'].append({'kind': type(exc).__name__, 'message': str(exc)})
             row['passed'] = not row['problems']
             report['cases'].append(row)
@@ -388,7 +388,7 @@ def freeze_p2(db):
                                                                    row['historical_expect'])
                         if row['historical_behavior']['status'] == 'UNEXPLAINED_FAIL':
                             row['problems'].append({'kind': 'non_predeclared_data_difference'})
-                    except Exception as exc:
+                    except Exception as exc:  # noqa: BLE001 - retain any case failure in the evidence receipt
                         row['problems'].append({'kind': type(exc).__name__, 'message': str(exc)})
                 row['passed'] = not row['problems']
             report['cases'].append(row)
@@ -435,7 +435,7 @@ def validate_frozen(report, count, db):
                 raise ValueError('missing historical error contract')
             continue
         if not isinstance(frozen_value(ref), dict):
-            raise ValueError('invalid frozen full JSON')
+            raise TypeError('invalid frozen full JSON')
 
 
 def acceptance_gate(db, binary, phase):
@@ -547,7 +547,7 @@ def accept(db, binary, phase):
         record = {'case_id': row.get('id', row.get('case_id')), 'rust': rec}
         try:
             record.update(compare_gold(rec, value, row) if phase == 'gold' else compare_p2(rec, value, row))
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - retain any case failure in the evidence receipt
             record.update(passed=False, status='FAIL', problems=[{'kind': type(exc).__name__, 'message': str(exc)}])
         if phase == 'gold':
             record['historical_behavior_problems'] = source_checks(value, row['original_expected'])
@@ -559,7 +559,7 @@ def accept(db, binary, phase):
     for ref in (marker['gold'], marker['P2'], marker['db'], marker['binary']):
         try:
             check_binding(ref)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - retain any case failure in the evidence receipt
             report['preservation_problems'].append(str(exc))
     passed = sum(r['passed'] for r in report['records'])
     report.update(attempted=len(report['records']), passed=passed,
@@ -594,7 +594,7 @@ def main():
                 raise FileExistsError(path)
             try:
                 results.append(runner(db))
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 - retain any case failure in the evidence receipt
                 if not path.exists():
                     write_report(path, {'status': 'STOP', 'policy': POLICY, 'cases': [],
                                         'problems': [{'kind': type(exc).__name__, 'message': str(exc)}]})
@@ -606,7 +606,7 @@ def main():
         phase = 'gold' if args.accept_gold else 'P2'
         try:
             good = accept(db, binary.resolve(), phase)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - retain any case failure in the evidence receipt
             failure = REPORTS / ('full-retry1-' + phase + '-accept-STOP.json')
             if not failure.exists():
                 write_report(failure, {'status': 'STOP', 'policy': POLICY, 'records': [],

@@ -1,0 +1,37 @@
+{
+  "status": "FAIL",
+  "head": "442cad073a693653bc6cbb3e4fd8a49ddaf52d0d",
+  "working_tree_at_start": " M .gitattributes\n M rust/examples/bench_resolver.rs\n M rust/src/lib.rs\n M rust/src/main.rs\n M tools/p3_retry1_acceptance.py\n?? reports/P3/close-diagnosis-command.json\n?? reports/P3/close-diagnosis.json\n?? reports/P3/close-preconditions.json\n?? reports/P3/close-prep-fmt.json\n?? reports/P3/close-prep-profile-tests.json\n?? reports/P3/close-prep-release.json\n?? reports/P3/close-prep-ruff.json\n?? reports/P3/close-prep-rust-test.json\n?? reports/P3/close-raw/\n?? reports/P3/close-target-environment-incident.json\n?? tests/test_close_search_profile.py\n?? tools/p3_close_artifacts.py\n?? tools/p3_close_check.py\n?? tools/p3_close_diagnose.py\n?? tools/p3_close_validate.py\n",
+  "argv": [
+    "cargo",
+    "clippy",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--all-targets",
+    "--locked",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit": 101,
+  "elapsed_s": 1.426375200000166,
+  "retries": 0,
+  "stdout": {
+    "path": "reports/P3/close-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "stderr": {
+    "path": "reports/P3/close-raw/2d4d6b5e0d9e26c76dcecbea08cf7505f528b9c0fa080e22e2d9153ece00c046.raw",
+    "sha256": "2d4d6b5e0d9e26c76dcecbea08cf7505f528b9c0fa080e22e2d9153ece00c046",
+    "bytes": 871
+  },
+  "environment": {
+    "PYTHONUTF8": "1",
+    "PYTHONIOENCODING": "utf-8",
+    "CARGO_TARGET_DIR": "D:/SakuraTool/SakuraKnowledge/rust/target",
+    "SKNOW_RS_TEST_BIN": "D:/SakuraTool/SakuraKnowledge/rust/target/release/sknow-rs.exe"
+  },
+  "resolved_target": "D:\\SakuraTool\\SakuraKnowledge\\rust\\target",
+  "target_inside_authorized_root": true
+}

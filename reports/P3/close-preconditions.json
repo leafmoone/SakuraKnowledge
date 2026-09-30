@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "baseline_HEAD_origin_dev": "442cad073a693653bc6cbb3e4fd8a49ddaf52d0d",
+  "main_origin_main": "894dc6a73bfd42f18cc7648e8ab7481aae211ab1",
+  "FULL_initial_whole_hash": {
+    "path": "build/p3-full-authorized-retry1/knowledge.sqlite",
+    "bytes": 21718736896,
+    "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
+    "actual_tool_event": "python_7461522d"
+  },
+  "preserved_cancelled_prep": [
+    {"original_path":"tests/test_p3_retry1_delivery.py","destination":"build/p3-retry1-cancelled-prep/test_p3_retry1_delivery.py","bytes":13686,"sha256":"25ae21124524b525ddc506b0d04fb2d594153b0006b5733a2254ad1e3837fce9","move_verified":true},
+    {"original_path":"tools/p3_retry1_bind.py","destination":"build/p3-retry1-cancelled-prep/p3_retry1_bind.py","bytes":10167,"sha256":"3dd3bd9b7da0b162897d8108d6ac596068b8c1b0991f04a016cc721a9aa2ff79","move_verified":true},
+    {"original_path":"tools/p3_retry1_delivery.py","destination":"build/p3-retry1-cancelled-prep/p3_retry1_delivery.py","bytes":49757,"sha256":"644df89dd8243f61553826d92672efaa7b3b2a56da621be718687177a1e5ab7f","move_verified":true}
+  ],
+  "relocation_policy": "All destinations checked absent before moving. Original basenames retained. Destination ignored. No unfinished tools repaired, deleted or staged.",
+  "authorization": "Root relayed direct user A-L execution authorization and minimum opt-in same-invocation profile sink scope. This controller subsequently received user '继续'. Root transcription is not a signed user-event archive.",
+  "third_snapshot_build": "PROHIBITED",
+  "Python_public_changes": "PROHIBITED_EXCEPT_PROVEN_CONTRACT_BUG",
+  "budget_s": 5,
+  "historical_failures": "PRESERVE",
+  "WAL_A_repair_applied": false
+}

@@ -4,7 +4,7 @@
 //! identity trust is `source_backed` only; text trust additionally allows
 //! `generated_from_evidence`. No models, no services, no writes.
 
-use rusqlite::{params, Connection, OpenFlags};
+use rusqlite::{params, Connection, OpenFlags, OptionalExtension};
 use serde_json::{json, Value};
 use std::path::Path;
 use std::time::{Duration, Instant};
@@ -727,6 +727,22 @@ impl Runtime {
             return response::bound_response(exact, self.deadline);
         }
 
+        // The builder omits episode FTS only under this explicit false flag.
+        // Keep exact/alias hits and short-query warnings. Unknown metadata cannot justify skipping.
+        if kind == Some("episode") {
+            let indexed: Option<String> = self
+                .conn
+                .query_row(
+                    "SELECT value FROM build_meta WHERE key='index_episodes'",
+                    [],
+                    |row| row.get(0),
+                )
+                .optional()?;
+            if indexed.as_deref() == Some("false") {
+                self.last_search_profile["fts_skipped_kind_not_indexed"] = json!(true);
+                return response::bound_response(exact, self.deadline);
+            }
+        }
         let mut candidates = exact["candidates"]
             .as_array()
             .cloned()
@@ -1389,6 +1405,76 @@ mod tests {
             json!("unsupported")
         );
         assert_eq!(rt.operation_depth, 0);
+        drop(rt);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn episode_index_contract_preserves_exact_alias_and_other_kinds() {
+        let dir = std::env::temp_dir().join("sknow-rs-episode-index-contract");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("fixture.sqlite");
+        build_fixture(&path);
+        let conn = Connection::open(&path).unwrap();
+        conn.execute_batch(
+            "INSERT INTO build_meta VALUES('index_episodes','false');
+             INSERT INTO entries(id,kind,namespace,value,locator) VALUES(4,'episode','fixture','episode-key','line:4');
+             INSERT INTO entry_evidence VALUES(4,4,'s','e-ep','source_backed','entity','line:4','{}');
+             INSERT INTO aliases VALUES(4,4,'episode alias','s','e-ep-alias','source_backed');
+             INSERT INTO documents VALUES(4,4,'Episode','episode needle','episode needle','en','source_backed','s','e-ep-doc','{}');",
+        ).unwrap();
+        drop(conn);
+        let mut rt = Runtime::open(&path).unwrap();
+        for query in ["episode-key", "episode alias"] {
+            let lookup = rt.lookup(query, Some("episode"), None).unwrap();
+            let found = rt.search(query, 20, Some("episode"), None).unwrap();
+            assert_eq!(found, lookup);
+            assert_eq!(found["status"], "found");
+            assert_eq!(rt.last_search_profile["fts_skipped_kind_not_indexed"], true);
+            assert_eq!(rt.last_search_profile["scanned_rows"], 0);
+        }
+        for query in ["unknown phrase", "needle", "completely different"] {
+            let value = rt.search(query, 20, Some("episode"), None).unwrap();
+            assert_eq!(value["status"], "not_found");
+            assert!(value["candidates"].as_array().unwrap().is_empty());
+            assert_eq!(rt.last_search_profile["fts_skipped_kind_not_indexed"], true);
+        }
+        let other = rt.search("second", 20, Some("character"), None).unwrap();
+        assert_eq!(other["candidates"][0]["matched_by"], "fts");
+        assert!(rt
+            .last_search_profile
+            .get("fts_skipped_kind_not_indexed")
+            .is_none());
+        drop(rt);
+        let conn = Connection::open(&path).unwrap();
+        conn.execute_batch(
+            "UPDATE build_meta SET value='true' WHERE key='index_episodes';
+                            INSERT INTO search_fts VALUES('episode needle',4,4);",
+        )
+        .unwrap();
+        drop(conn);
+        let mut rt = Runtime::open(&path).unwrap();
+        let value = rt.search("needle", 20, Some("episode"), None).unwrap();
+        assert_eq!(value["status"], "found");
+        assert_eq!(value["candidates"][0]["matched_by"], "fts");
+        assert!(rt
+            .last_search_profile
+            .get("fts_skipped_kind_not_indexed")
+            .is_none());
+        drop(rt);
+        let conn = Connection::open(&path).unwrap();
+        conn.execute("DELETE FROM build_meta WHERE key='index_episodes'", [])
+            .unwrap();
+        drop(conn);
+        let mut rt = Runtime::open(&path).unwrap();
+        assert_eq!(
+            rt.search("needle", 20, Some("episode"), None).unwrap()["status"],
+            "found"
+        );
+        assert!(rt
+            .last_search_profile
+            .get("fts_skipped_kind_not_indexed")
+            .is_none());
         drop(rt);
         std::fs::remove_file(path).unwrap();
     }

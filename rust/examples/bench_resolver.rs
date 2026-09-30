@@ -10,17 +10,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let case: Value = serde_json::from_str(&line?)?;
         let query = case["query"].as_str().ok_or("query required")?;
         let started = Instant::now();
-        let result = runtime.resolve_tag(
-            query,
-            TagOptions {
-                target_namespace: Some("danbooru.tag"),
-                category: case["category"].as_i64(),
-                kind: case["kind"].as_str(),
-                namespace: case["namespace"].as_str(),
-                key: case["exact"].as_bool().unwrap_or(false),
-                limit: case["limit"].as_u64().unwrap_or(20) as u32,
-            },
-        );
+        let result = if case["op"] == "search" {
+            runtime.search(
+                query,
+                case["topk"].as_u64().unwrap_or(20) as u32,
+                case["kind"].as_str(),
+                case["namespace"].as_str(),
+            )
+        } else {
+            runtime.resolve_tag(
+                query,
+                TagOptions {
+                    target_namespace: Some("danbooru.tag"),
+                    category: case["category"].as_i64(),
+                    kind: case["kind"].as_str(),
+                    namespace: case["namespace"].as_str(),
+                    key: case["exact"].as_bool().unwrap_or(false),
+                    limit: case["limit"].as_u64().unwrap_or(20) as u32,
+                },
+            )
+        };
         let seconds = started.elapsed().as_secs_f64();
         let out = match result {
             Ok(value) => json!({"case_id":case["id"],"elapsed_s":seconds,"value":value}),
