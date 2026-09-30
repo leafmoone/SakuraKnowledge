@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "head": "9d7bd507c62f20ca4d41b26ba7df55ae4e6d8102",
+  "working_tree_at_start": "?? reports/P3/close-artifacts.json\n?? reports/P3/close-raw/4439454f131cd6923b2a7e3bb71b6bc467e11719d758df4639e5305cabef95b9.raw\n?? reports/P3/close-raw/66c7fed947efdedbb8295aadea4d867fed2e992b994f19b98d3b250a64a3052d.raw\n?? reports/P3/close-raw/701ecdb567574119d7b7aceb5bcc52b8b31a89e9ebc49ee518f4e94f87f8cca2.raw\n",
+  "argv": [
+    "python",
+    "tools/p3_close_validate.py",
+    "S02"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.4995450000001256,
+  "retries": 0,
+  "stdout": {
+    "path": "reports/P3/close-raw/702d236c32acbbd1ddde58fce6b11f02f970265bfb7b452ae52a1b9e207d5a24.raw",
+    "sha256": "702d236c32acbbd1ddde58fce6b11f02f970265bfb7b452ae52a1b9e207d5a24",
+    "bytes": 36
+  },
+  "stderr": {
+    "path": "reports/P3/close-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "environment": {
+    "PYTHONUTF8": "1",
+    "PYTHONIOENCODING": "utf-8",
+    "CARGO_TARGET_DIR": "D:/SakuraTool/SakuraKnowledge/rust/target",
+    "SKNOW_RS_TEST_BIN": null
+  },
+  "resolved_target": "D:\\SakuraTool\\SakuraKnowledge\\rust\\target",
+  "target_inside_authorized_root": true
+}

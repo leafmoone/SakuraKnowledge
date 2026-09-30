@@ -1,6 +1,32 @@
 # Stage Status (SakuraKnowledge)
 
-## Current authorized P3 retry1 — NOT_READY / STOP (P2 S02 budget failure)
+## Current A-L directed closure — NOT_READY / STOP (G42 performance warmup budget failure)
+
+- Fixed runtime/artifact source `9d7bd507c62f20ca4d41b26ba7df55ae4e6d8102`.
+  Only explicit index_episodes=false plus kind=episode skips FTS after exact/alias
+  and too-short handling; same5s budget/Python public API unchanged. Opt-in create-new
+  profile records one invocation, never overwrites files or queries twice.
+- New source-external release/wheel/installed12modules built once from clean commit.
+  S02 actual exit0/0.1970192s, profile4.3481ms/skiptrue/scanned0; new FULL P2151/151
+  PASS (135fullvalues+16errorcontracts), installed Python151/151, no timeouts/retries.
+- FULL two-mode fixed15cases30samples:900/900 measured PASS;29/30warmupsPASS.
+  **Overall FAIL**: reused_connection G42 warmup -1 internal budget exceeded at
+  5.0000352s. No sample dropped/retried or budget raised. Rootcause remains unknown.
+- New code FULL55/J external environment/help validation **NOT_RUN after I FAIL**.
+  Old9dfa55/55 is historical only, not substituted as new-code success.
+- K seven actual commands at fixed code all exit0:pytest324PASS/Rust7+1PASS/
+  Ruff/fmt/diff/clippy/release. Receipts preserve exactflags/env and earlier FAIL.
+- Snapshot not rebuilt or patched. Original/retrybuild attempts remain total2.
+  Verified entity_tag0 remains OPTIONAL_COVERAGE; candidate100/human0 unchanged.
+- Exception: initial preparatory cargo inherited external target and wrote Pool build
+  artifacts. **SAKURAPOOL_MODIFIED=YES_BUILD_ARTIFACTS_ONLY**, no Pool source edit
+  performed; no global config change or cleanup. All later cargo targets confined.
+- Three cancelled preparation files safely moved/hash-verified to ignored
+  `build/p3-retry1-cancelled-prep/`; original content/names preserved, not product.
+- See `reports/P3/CLOSE_DIRECTED_STOP_REPORT.md`, `close-*.json` and newly committed
+  `close-raw/`. New STOP fixed-SHA review is requested only after normal dev push.
+
+## Historical retry1 STOP — NOT_READY (P2 S02 budget failure, approved STOP evidence only)
 
 - Retry1 build code: `9dfa610640eca1e32b6da89f78f3d4aff6062adf`.
   The independently authorized retry1 completed once, wrapper exit0 in

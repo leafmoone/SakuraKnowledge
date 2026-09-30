@@ -1,0 +1,465 @@
+{"id": "G01", "query": "hatsune_miku", "round": -1, "warmup": true}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": -1, "warmup": true}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": -1, "warmup": true}
+{"id": "G37", "query": "ぼ喜多", "round": -1, "warmup": true}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": -1, "warmup": true}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": -1, "warmup": true}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": -1, "warmup": true}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": -1, "warmup": true}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": -1, "warmup": true}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": -1, "warmup": true}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": -1, "warmup": true}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": -1, "warmup": true}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": -1, "warmup": true}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": -1, "warmup": true}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": -1, "warmup": true}
+{"id": "G01", "query": "hatsune_miku", "round": 0, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 0, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 0, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 0, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 0, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 0, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 0, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 0, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 0, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 0, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 0, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 0, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 0, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 0, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 0, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 1, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 1, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 1, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 1, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 1, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 1, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 1, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 1, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 1, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 1, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 1, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 1, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 1, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 1, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 1, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 2, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 2, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 2, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 2, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 2, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 2, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 2, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 2, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 2, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 2, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 2, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 2, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 2, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 2, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 2, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 3, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 3, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 3, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 3, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 3, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 3, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 3, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 3, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 3, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 3, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 3, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 3, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 3, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 3, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 3, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 4, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 4, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 4, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 4, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 4, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 4, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 4, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 4, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 4, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 4, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 4, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 4, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 4, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 4, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 4, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 5, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 5, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 5, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 5, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 5, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 5, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 5, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 5, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 5, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 5, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 5, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 5, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 5, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 5, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 5, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 6, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 6, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 6, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 6, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 6, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 6, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 6, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 6, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 6, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 6, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 6, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 6, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 6, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 6, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 6, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 7, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 7, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 7, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 7, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 7, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 7, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 7, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 7, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 7, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 7, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 7, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 7, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 7, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 7, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 7, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 8, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 8, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 8, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 8, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 8, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 8, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 8, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 8, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 8, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 8, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 8, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 8, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 8, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 8, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 8, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 9, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 9, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 9, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 9, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 9, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 9, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 9, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 9, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 9, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 9, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 9, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 9, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 9, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 9, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 9, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 10, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 10, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 10, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 10, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 10, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 10, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 10, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 10, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 10, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 10, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 10, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 10, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 10, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 10, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 10, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 11, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 11, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 11, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 11, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 11, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 11, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 11, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 11, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 11, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 11, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 11, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 11, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 11, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 11, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 11, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 12, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 12, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 12, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 12, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 12, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 12, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 12, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 12, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 12, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 12, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 12, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 12, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 12, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 12, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 12, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 13, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 13, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 13, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 13, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 13, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 13, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 13, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 13, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 13, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 13, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 13, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 13, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 13, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 13, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 13, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 14, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 14, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 14, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 14, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 14, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 14, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 14, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 14, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 14, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 14, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 14, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 14, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 14, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 14, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 14, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 15, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 15, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 15, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 15, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 15, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 15, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 15, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 15, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 15, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 15, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 15, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 15, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 15, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 15, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 15, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 16, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 16, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 16, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 16, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 16, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 16, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 16, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 16, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 16, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 16, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 16, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 16, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 16, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 16, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 16, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 17, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 17, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 17, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 17, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 17, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 17, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 17, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 17, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 17, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 17, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 17, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 17, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 17, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 17, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 17, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 18, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 18, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 18, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 18, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 18, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 18, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 18, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 18, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 18, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 18, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 18, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 18, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 18, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 18, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 18, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 19, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 19, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 19, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 19, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 19, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 19, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 19, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 19, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 19, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 19, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 19, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 19, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 19, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 19, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 19, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 20, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 20, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 20, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 20, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 20, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 20, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 20, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 20, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 20, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 20, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 20, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 20, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 20, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 20, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 20, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 21, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 21, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 21, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 21, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 21, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 21, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 21, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 21, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 21, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 21, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 21, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 21, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 21, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 21, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 21, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 22, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 22, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 22, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 22, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 22, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 22, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 22, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 22, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 22, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 22, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 22, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 22, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 22, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 22, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 22, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 23, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 23, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 23, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 23, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 23, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 23, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 23, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 23, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 23, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 23, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 23, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 23, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 23, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 23, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 23, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 24, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 24, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 24, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 24, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 24, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 24, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 24, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 24, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 24, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 24, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 24, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 24, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 24, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 24, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 24, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 25, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 25, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 25, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 25, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 25, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 25, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 25, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 25, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 25, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 25, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 25, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 25, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 25, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 25, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 25, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 26, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 26, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 26, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 26, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 26, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 26, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 26, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 26, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 26, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 26, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 26, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 26, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 26, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 26, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 26, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 27, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 27, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 27, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 27, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 27, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 27, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 27, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 27, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 27, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 27, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 27, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 27, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 27, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 27, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 27, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 28, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 28, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 28, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 28, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 28, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 28, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 28, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 28, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 28, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 28, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 28, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 28, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 28, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 28, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 28, "warmup": false}
+{"id": "G01", "query": "hatsune_miku", "round": 29, "warmup": false}
+{"id": "G21", "query": "后藤一里", "script_group": "Chinese-characters; language field remains unknown", "round": 29, "warmup": false}
+{"id": "G36", "query": "puella_magi_madoka_magica", "round": 29, "warmup": false}
+{"id": "G37", "query": "ぼ喜多", "round": 29, "warmup": false}
+{"id": "G42", "query": "初音未来", "kind": "character", "namespace": "moegirl.character", "exact": true, "round": 29, "warmup": false}
+{"id": "G43", "query": "hatsune_miku", "kind": "tag", "namespace": "local.tag_aggregate", "exact": true, "round": 29, "warmup": false}
+{"id": "G44", "query": "puella_magi_madoka_magica", "category": 4, "round": 29, "warmup": false}
+{"id": "G45", "query": "5655", "kind": "page", "namespace": "danbooru.wiki", "exact": true, "round": 29, "warmup": false}
+{"id": "G51", "query": "265", "kind": "subject", "namespace": "bangumi.subject", "exact": true, "source_expectation": {"candidate_id": "candidate:1", "candidate_status": "candidate", "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1", "dst": {"kind": "tag", "namespace": "danbooru.tag", "value": "neon_genesis_evangelion"}}, "round": 29, "warmup": false}
+{"id": "G52", "query": "初音未来", "kind": "character", "round": 29, "warmup": false}
+{"id": "G53", "query": "haruhi_suzumiya", "source_expectation": {"scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec", "inactive_alias_ids": [312]}, "round": 29, "warmup": false}
+{"id": "G54", "query": "soryu_asuka_langley", "source_expectation": {"scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196", "inactive_alias_ids": [3950]}, "round": 29, "warmup": false}
+{"id": "G55", "query": "ijichi_nijika", "source_expectation": {"quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649", "wiki_id": "151534"}, "round": 29, "warmup": false}
+{"query": "ONE PIECE", "topk": 20, "kind": "episode", "id": "S02", "op": "search", "round": 29, "warmup": false}
+{"query": "a's_wonderland", "topk": 10, "id": "S18", "op": "search", "round": 29, "warmup": false}

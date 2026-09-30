@@ -82,8 +82,12 @@ Root separately authorizes `tools/p3_full_candidate_retry1.py` with
 - `reports/P3/full-retry1-gate.json`, `full-retry1-attempt.json`, `full-retry1-build.json`;
 - `build/p3-full-retry1-manifest.json`;
 - `build/p3-full-authorized-retry1` (normal atomic, single-SQLite publication);
-- command/test receipts under `reports/P3/full-retry1-*`, raw captures in
-  `reports/P3/full-retry1-raw/` (never the old raw directory).
+- command/test receipts under `reports/P3/full-retry1-*`. The original authorization
+  named `reports/P3/full-retry1-raw/` (never the old raw directory), but actual retry1
+  execution used content-addressed shared `reports/P3/raw/`; that historical discrepancy
+  remains, and the original paths/bytes are preserved rather than relabeled or moved.
+  The later directed A-L closure uses newly committed `reports/P3/close-raw/`; this
+  correction does not retroactively claim retry1 used its originally specified directory.
 
 Only record_check, the new runner, their tests, this authorization document and
 current retry1 reports may differ from the previous submission. No src, Rust,

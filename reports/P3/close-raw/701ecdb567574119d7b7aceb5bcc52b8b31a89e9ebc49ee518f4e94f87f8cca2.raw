@@ -1,0 +1,9 @@
+Processing .\dist\p3-close-9d7bd507\source
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: sakura-knowledge
+  Building wheel for sakura-knowledge (pyproject.toml): started
+  Building wheel for sakura-knowledge (pyproject.toml): finished with status 'done'
+  Created wheel for sakura-knowledge: filename=sakura_knowledge-0.2.0-py3-none-any.whl size=33641 sha256=84c34d2bcd93e9bd0e484a938e0d2a0158092ddd63852e0dc0c0dc8a36604b6b
+  Stored in directory: C:\Users\PC\AppData\Local\Temp\pip-ephem-wheel-cache-ixk6exvs\wheels\fb\e0\09\41280e3118a6c186a290248afd603439000f809a3cf28d06ed
+Successfully built sakura-knowledge

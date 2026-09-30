@@ -1,0 +1,5 @@
+   Compiling sakura-knowledge-runtime v0.2.0 (D:\SakuraTool\SakuraKnowledge\rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.03s
+     Running unittests src\lib.rs (rust/target\debug\deps\sakura_knowledge_runtime-a09264ea7da0608d.exe)
+     Running unittests src\main.rs (rust/target\debug\deps\sknow_rs-e0e251dd9fa50e02.exe)
+   Doc-tests sakura_knowledge_runtime
