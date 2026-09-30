@@ -1,0 +1,28 @@
+{
+  "head": "7393d601a6d95432f41da243395ed5d3e0a2fda1",
+  "working_tree": "?? reports/P3/review-cf807-after-fixture-final.json\n?? reports/P3/review-cf807-after-fixture-v1.json\n?? reports/P3/review-cf807-before.json\n?? reports/P3/review-cf807-candidates.jsonl\n?? reports/P3/review-cf807-collector-before-corrected.json\n?? reports/P3/review-cf807-collector-before.json\n?? reports/P3/review-cf807-debug-acceptance-command.json\n?? reports/P3/review-cf807-debug-acceptance.json\n?? reports/P3/review-cf807-decisions.jsonl\n?? reports/P3/review-cf807-final-candidates.jsonl\n?? reports/P3/review-cf807-final-decisions.jsonl\n?? reports/P3/review-cf807-final-input-compilation-command.json\n?? reports/P3/review-cf807-final-input-compilation.json\n?? reports/P3/review-cf807-final-pilot-build-command.json\n?? reports/P3/review-cf807-final-source_manifest.json\n?? reports/P3/review-cf807-freeze-gold-command.json\n?? reports/P3/review-cf807-input-compilation-command.json\n?? reports/P3/review-cf807-input-compilation.json\n?? reports/P3/review-cf807-pilot-build-command.json\n?? reports/P3/review-cf807-real-gold.json\n?? reports/P3/review-cf807-source_manifest.json\n",
+  "argv": [
+    "cargo",
+    "build",
+    "--manifest-path",
+    "dist/p3-review-7393d60/source/rust/Cargo.toml",
+    "--locked",
+    "--release",
+    "--examples",
+    "--bin",
+    "sknow-rs"
+  ],
+  "exit": 0,
+  "elapsed_s": 75.39940689993091,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "ICAgQ29tcGlsaW5nIHZlcnNpb25fY2hlY2sgdjAuOS41CiAgIENvbXBpbGluZyB6ZXJvY29weSB2MC44LjU5CiAgIENvbXBpbGluZyBmaW5kLW1zdmMtdG9vbHMgdjAuMS4xNAogICBDb21waWxpbmcgc2hsZXggdjIuMC4xCiAgIENvbXBpbGluZyBvbmNlX2NlbGwgdjEuMjEuNAogICBDb21waWxpbmcgcGtnLWNvbmZpZyB2MC4zLjM0CiAgIENvbXBpbGluZyB2Y3BrZyB2MC4yLjE1CiAgIENvbXBpbGluZyBjZmctaWYgdjEuMC41CiAgIENvbXBpbGluZyB6bWlqIHYxLjAuMjMKICAgQ29tcGlsaW5nIHNlcmRlX2NvcmUgdjEuMC4yMjkKICAgQ29tcGlsaW5nIHNlcmRlX2pzb24gdjEuMC4xNTEKICAgQ29tcGlsaW5nIGZhbGxpYmxlLWl0ZXJhdG9yIHYwLjMuMAogICBDb21waWxpbmcgdGlueXZlYyB2MS4xMy4zCiAgIENvbXBpbGluZyBmYWxsaWJsZS1zdHJlYW1pbmctaXRlcmF0b3IgdjAuMS45CiAgIENvbXBpbGluZyBiaXRmbGFncyB2Mi4xMy4yCiAgIENvbXBpbGluZyBpdG9hIHYxLjAuMTgKICAgQ29tcGlsaW5nIHNtYWxsdmVjIHYxLjE2LjIKICAgQ29tcGlsaW5nIG1lbWNociB2Mi44LjMKICAgQ29tcGlsaW5nIGFoYXNoIHYwLjguMTIKICAgQ29tcGlsaW5nIGNjIHYxLjUuMQogICBDb21waWxpbmcgdW5pY29kZS1ub3JtYWxpemF0aW9uIHYwLjEuMjUKICAgQ29tcGlsaW5nIGxpYnNxbGl0ZTMtc3lzIHYwLjI4LjAKICAgQ29tcGlsaW5nIGhhc2hicm93biB2MC4xNC41CiAgIENvbXBpbGluZyBoYXNobGluayB2MC45LjEKICAgQ29tcGlsaW5nIHJ1c3FsaXRlIHYwLjMxLjAKICAgQ29tcGlsaW5nIHNha3VyYS1rbm93bGVkZ2UtcnVudGltZSB2MC4yLjAgKEQ6XFNha3VyYVRvb2xcU2FrdXJhS25vd2xlZGdlXGRpc3RccDMtcmV2aWV3LTczOTNkNjBcc291cmNlXHJ1c3QpCiAgICBGaW5pc2hlZCBgcmVsZWFzZWAgcHJvZmlsZSBbb3B0aW1pemVkXSB0YXJnZXQocykgaW4gMW0gMTVzCg==",
+  "stderr_sha256": "283b48ac966c577f8162d8de33863a1af85e3dd427812f31b370fee90960a315",
+  "stderr": "   Compiling version_check v0.9.5\n   Compiling zerocopy v0.8.59\n   Compiling find-msvc-tools v0.1.14\n   Compiling shlex v2.0.1\n   Compiling once_cell v1.21.4\n   Compiling pkg-config v0.3.34\n   Compiling vcpkg v0.2.15\n   Compiling cfg-if v1.0.5\n   Compiling zmij v1.0.23\n   Compiling serde_core v1.0.229\n   Compiling serde_json v1.0.151\n   Compiling fallible-iterator v0.3.0\n   Compiling tinyvec v1.13.3\n   Compiling fallible-streaming-iterator v0.1.9\n   Compiling bitflags v2.13.2\n   Compiling itoa v1.0.18\n   Compiling smallvec v1.16.2\n   Compiling memchr v2.8.3\n   Compiling ahash v0.8.12\n   Compiling cc v1.5.1\n   Compiling unicode-normalization v0.1.25\n   Compiling libsqlite3-sys v0.28.0\n   Compiling hashbrown v0.14.5\n   Compiling hashlink v0.9.1\n   Compiling rusqlite v0.31.0\n   Compiling sakura-knowledge-runtime v0.2.0 (D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-review-7393d60\\source\\rust)\n    Finished `release` profile [optimized] target(s) in 1m 15s\n"
+}

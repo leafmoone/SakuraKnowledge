@@ -1,0 +1,28 @@
+{
+  "head": "cf807c1a5179ce4b451b9a85870b6684d2dccaf3",
+  "working_tree": " M docs/p3-resolver-contract.md\n M rust/src/resolver.rs\n M tests/test_p3_resolver.py\n M tools/p3_accept_resolver.py\n M tools/p3_acquire_native.py\n M tools/p3_check_artifacts.py\n M tools/p3_compile_inputs.py\n M tools/p3_measure_resolver.py\n M tools/p3_resolver_oracle.py\n?? reports/P3/review-cf807-after-fixture-v1.json\n?? reports/P3/review-cf807-before.json\n?? reports/P3/review-cf807-candidates.jsonl\n?? reports/P3/review-cf807-collector-before-corrected.json\n?? reports/P3/review-cf807-collector-before.json\n?? reports/P3/review-cf807-decisions.jsonl\n?? reports/P3/review-cf807-final-candidates.jsonl\n?? reports/P3/review-cf807-final-decisions.jsonl\n?? reports/P3/review-cf807-final-input-compilation-command.json\n?? reports/P3/review-cf807-final-input-compilation.json\n?? reports/P3/review-cf807-final-source_manifest.json\n?? reports/P3/review-cf807-freeze-gold-command.json\n?? reports/P3/review-cf807-input-compilation-command.json\n?? reports/P3/review-cf807-input-compilation.json\n?? reports/P3/review-cf807-pilot-build-command.json\n?? reports/P3/review-cf807-real-gold.json\n?? reports/P3/review-cf807-source_manifest.json\n?? tests/test_p3_collector_cf807.py\n?? tests/test_p3_review_cf807.py\n?? tools/p3_review_cf807_gold.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_p3_review_cf807.py",
+    "tests/test_p3_collector_cf807.py",
+    "tests/test_p3_resolver.py",
+    "tests/test_p3_proofs.py",
+    "-q",
+    "--tb=short"
+  ],
+  "exit": 0,
+  "elapsed_s": 4.362029999960214,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KNDcgcGFzc2VkIGluIDMuNjhzDQo=",
+  "stdout_sha256": "583822c4dedb2fdf8c48d8a0c462db9160e97464d4e29e879631857a38233c61",
+  "stdout": "...............................................                          [100%]\r\n47 passed in 3.68s\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

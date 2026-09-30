@@ -1,0 +1,3085 @@
+{
+  "protocol": "55 raw/input expected cases declared before repaired runtime acceptance; existing50preserved in oldfile",
+  "raw_native_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8",
+  "target_manifest_sha256": "8e911e9946c08dcfd2efad3cefc8c256ec8e6ff8f7607e4b20e71c65b9e48989",
+  "cases": [
+    {
+      "id": "G01",
+      "query": "hatsune_miku",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "hatsune_miku"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hatsune_miku"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5655"
+            },
+            "tag_id": 385430,
+            "wiki_id": 5655,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hatsune_miku"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5655"
+            },
+            "old_updated_at": "2026-09-09T09:38:21.678-04:00",
+            "live_updated_at": "2026-09-09T09:38:21.678-04:00",
+            "body_sha256": "dd9ca8fd67623289d0acdde161d26a01215cad5f7b7e3c4693a388014f5d27bd"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5655"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hatsune_miku"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5655"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hatsune_miku"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G02",
+      "query": "hakurei_reimu",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "hakurei_reimu"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hakurei_reimu"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6109"
+            },
+            "tag_id": 12239,
+            "wiki_id": 6109,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hakurei_reimu"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6109"
+            },
+            "old_updated_at": "2026-05-11T19:39:41.593-04:00",
+            "live_updated_at": "2026-05-11T19:39:41.593-04:00",
+            "body_sha256": "2028dd2a28312209eac145ce69fce595ef14a3748dc8ca75bfd3bf417239c5d8"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6109"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hakurei_reimu"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6109"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hakurei_reimu"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G03",
+      "query": "kirisame_marisa",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "kirisame_marisa"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kirisame_marisa"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6103"
+            },
+            "tag_id": 12242,
+            "wiki_id": 6103,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kirisame_marisa"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6103"
+            },
+            "old_updated_at": "2026-01-02T22:15:51.187-05:00",
+            "live_updated_at": "2026-01-02T22:15:51.187-05:00",
+            "body_sha256": "540f993bc8d54595ff2711c998f41cb7bc2611c03c57fe555988914c6cdfe326"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6103"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kirisame_marisa"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6103"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kirisame_marisa"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G04",
+      "query": "rem_(re:zero)",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "rem_(re:zero)"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "rem_(re:zero)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "75903"
+            },
+            "tag_id": 1333465,
+            "wiki_id": 75903,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "rem_(re:zero)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "75903"
+            },
+            "old_updated_at": "2026-01-06T08:56:57.068-05:00",
+            "live_updated_at": "2026-01-06T08:56:57.068-05:00",
+            "body_sha256": "ab6ad752946829d191ea8aae4cc4d15afc3d4c67cd066de5e831a8ae48af9f87"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "75903"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "rem_(re:zero)"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "75903"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "rem_(re:zero)"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G05",
+      "query": "ram_(re:zero)",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "ram_(re:zero)"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ram_(re:zero)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "77896"
+            },
+            "tag_id": 1333601,
+            "wiki_id": 77896,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ram_(re:zero)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "77896"
+            },
+            "old_updated_at": "2026-06-17T19:05:50.108-04:00",
+            "live_updated_at": "2026-06-17T19:05:50.108-04:00",
+            "body_sha256": "604b32bdf00a498ddbea108003a5c1c79cc02bf73c3018719b83c0f6d0b5bcd4"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "77896"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ram_(re:zero)"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "77896"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ram_(re:zero)"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G06",
+      "query": "gotoh_hitori",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "gotoh_hitori"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "gotoh_hitori"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115616"
+            },
+            "tag_id": 1964304,
+            "wiki_id": 115616,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "gotoh_hitori"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115616"
+            },
+            "old_updated_at": "2026-06-20T01:19:40.398-04:00",
+            "live_updated_at": "2026-06-20T01:19:40.398-04:00",
+            "body_sha256": "564dd24d5e8cdbfaeb5d96dfa6c86e700044204a1815cb42e52fe65e6e39e156"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115616"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "gotoh_hitori"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115616"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "gotoh_hitori"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G07",
+      "query": "bocchi_the_rock!",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "bocchi_the_rock!"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "bocchi_the_rock!"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115615"
+            },
+            "tag_id": 1587881,
+            "wiki_id": 115615,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "bocchi_the_rock!"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115615"
+            },
+            "old_updated_at": "2026-08-24T12:32:34.392-04:00",
+            "live_updated_at": "2026-08-24T12:32:34.392-04:00",
+            "body_sha256": "53253cbc28acc2a6a3d512bafe9fbcf350e173ca0379b7fb81c72436cc227e8e"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115615"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "bocchi_the_rock!"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115615"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "bocchi_the_rock!"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G08",
+      "query": "ijichi_nijika",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "ijichi_nijika"
+        },
+        "matched_by": "native_exact",
+        "descriptions_empty": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_association_quarantined",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ijichi_nijika"
+            },
+            "reason": "mixed_cut_version_conflict",
+            "old_updated_at": "2025-10-10T23:56:21.498-04:00",
+            "live_updated_at": "2026-09-28T06:07:17.277-04:00",
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          }
+        ]
+      },
+      "source_expectation": {
+        "quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649",
+        "wiki_id": "151534"
+      }
+    },
+    {
+      "id": "G09",
+      "query": "kita_ikuyo",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "kita_ikuyo"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kita_ikuyo"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "151533"
+            },
+            "tag_id": 1782917,
+            "wiki_id": 151533,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kita_ikuyo"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "151533"
+            },
+            "old_updated_at": "2025-10-10T23:54:39.961-04:00",
+            "live_updated_at": "2025-10-10T23:54:39.961-04:00",
+            "body_sha256": "8e4033c2daa5aeb2b849b856b4d46718625854194c427565c96624d09e696285"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "151533"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kita_ikuyo"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "151533"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kita_ikuyo"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G10",
+      "query": "ayanami_rei",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "ayanami_rei"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ayanami_rei"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "3605"
+            },
+            "tag_id": 8327,
+            "wiki_id": 3605,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ayanami_rei"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "3605"
+            },
+            "old_updated_at": "2025-11-25T16:10:39.687-05:00",
+            "live_updated_at": "2025-11-25T16:10:39.687-05:00",
+            "body_sha256": "bebc2df3cf03973c296193a23512de666412053d53f54a5fcd4e891fcc784574"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "3605"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ayanami_rei"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "3605"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ayanami_rei"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G11",
+      "query": "souryuu_asuka_langley",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "souryuu_asuka_langley"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "souryuu_asuka_langley"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "12272"
+            },
+            "tag_id": 475833,
+            "wiki_id": 12272,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "souryuu_asuka_langley"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "12272"
+            },
+            "old_updated_at": "2026-09-18T19:14:51.366-04:00",
+            "live_updated_at": "2026-09-18T19:14:51.366-04:00",
+            "body_sha256": "53807697e13cd1ab9160020c193b3c639ceb45ba8823ef4786d77cb25f18eff1"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "12272"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "souryuu_asuka_langley"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "12272"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "souryuu_asuka_langley"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G12",
+      "query": "suzumiya_haruhi",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "suzumiya_haruhi"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "suzumiya_haruhi"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "3613"
+            },
+            "tag_id": 9466,
+            "wiki_id": 3613,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "suzumiya_haruhi"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "3613"
+            },
+            "old_updated_at": "2026-09-16T14:13:21.972-04:00",
+            "live_updated_at": "2026-09-16T14:13:21.972-04:00",
+            "body_sha256": "baab04fb61f5e917639a6e2ec4d59c34cfd744ed59e54c6c4211596d9cffaf32"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "3613"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "suzumiya_haruhi"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "3613"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "suzumiya_haruhi"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G13",
+      "query": "kaname_madoka",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "kaname_madoka"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "tag_id": 592925,
+            "wiki_id": 25531,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "old_updated_at": "2026-09-03T18:41:07.712-04:00",
+            "live_updated_at": "2026-09-03T18:41:07.712-04:00",
+            "body_sha256": "dc463551a2f272c22b1b263129adbcd7ab7b094d887a1469a3aaedc3f4107895"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G14",
+      "query": "akemi_homura",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "akemi_homura"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "akemi_homura"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25530"
+            },
+            "tag_id": 592924,
+            "wiki_id": 25530,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "akemi_homura"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25530"
+            },
+            "old_updated_at": "2026-09-18T18:47:20.563-04:00",
+            "live_updated_at": "2026-09-18T18:47:20.563-04:00",
+            "body_sha256": "857d1e98d562300a6255f582520705a83111fca7dbccda95650a881a7bf6e12d"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25530"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "akemi_homura"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25530"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "akemi_homura"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G15",
+      "query": "sakura_miku",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "sakura_miku"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "sakura_miku"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "17209"
+            },
+            "tag_id": 543959,
+            "wiki_id": 17209,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "sakura_miku"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "17209"
+            },
+            "old_updated_at": "2026-07-10T11:14:49.982-04:00",
+            "live_updated_at": "2026-07-10T11:14:49.982-04:00",
+            "body_sha256": "3203c4a5264d5df43fab66348f96dd0889ed444f9d79eed780bc2d4434119da5"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "17209"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "sakura_miku"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "17209"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "sakura_miku"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G16",
+      "query": "megurine_luka",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "megurine_luka"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "megurine_luka"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "9797"
+            },
+            "tag_id": 457810,
+            "wiki_id": 9797,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "megurine_luka"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "9797"
+            },
+            "old_updated_at": "2026-08-25T13:16:14.984-04:00",
+            "live_updated_at": "2026-08-25T13:16:14.984-04:00",
+            "body_sha256": "4d8741103ac26a06f787ec37b3cb80cff7fdfb2b6f1a720912dfd727c5128af2"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "9797"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "megurine_luka"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "9797"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "megurine_luka"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G17",
+      "query": "kagamine_rin",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "kagamine_rin"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_rin"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5809"
+            },
+            "tag_id": 390427,
+            "wiki_id": 5809,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_rin"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5809"
+            },
+            "old_updated_at": "2026-08-29T22:03:28.219-04:00",
+            "live_updated_at": "2026-08-29T22:03:28.219-04:00",
+            "body_sha256": "e447e36a0cf934cbcea1e51165d3a30220adc86fdc5e9f64db80f5bca5386c70"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5809"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_rin"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5809"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_rin"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G18",
+      "query": "kagamine_len",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "kagamine_len"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_len"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6526"
+            },
+            "tag_id": 393597,
+            "wiki_id": 6526,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_len"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6526"
+            },
+            "old_updated_at": "2026-08-01T10:50:07.263-04:00",
+            "live_updated_at": "2026-08-01T10:50:07.263-04:00",
+            "body_sha256": "ce1aa2b855c5dd7d7faa3e1923d78d1b943e27879d6fed5c03d1241348d7ea8d"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6526"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_len"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6526"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_len"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G19",
+      "query": "artoria_pendragon_(fate)",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "artoria_pendragon_(fate)"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "artoria_pendragon_(fate)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "88644"
+            },
+            "tag_id": 1478495,
+            "wiki_id": 88644,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "artoria_pendragon_(fate)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "88644"
+            },
+            "old_updated_at": "2025-12-17T05:38:40.633-05:00",
+            "live_updated_at": "2025-12-17T05:38:40.633-05:00",
+            "body_sha256": "238780fe7b41b0a503179ac2e3060edbfe0433ad5786f082f95eec3ae4053d21"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "88644"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "artoria_pendragon_(fate)"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "88644"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "artoria_pendragon_(fate)"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G20",
+      "query": "tohsaka_rin",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "tohsaka_rin"
+        },
+        "matched_by": "native_exact",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "tohsaka_rin"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "22310"
+            },
+            "tag_id": 465646,
+            "wiki_id": 22310,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "tohsaka_rin"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "22310"
+            },
+            "old_updated_at": "2026-08-20T22:38:28.875-04:00",
+            "live_updated_at": "2026-08-20T22:38:28.875-04:00",
+            "body_sha256": "cf01eb2ad50ca3ef7a72538db9fec1b3158adeba5ac2ade287d61b8b3db7c6b4"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "22310"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "tohsaka_rin"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "22310"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "tohsaka_rin"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G21",
+      "query": "后藤一里",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "gotoh_hitori"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "gotoh_hitori"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115616"
+            },
+            "tag_id": 1964304,
+            "wiki_id": 115616,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "gotoh_hitori"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115616"
+            },
+            "old_updated_at": "2026-06-20T01:19:40.398-04:00",
+            "live_updated_at": "2026-06-20T01:19:40.398-04:00",
+            "body_sha256": "564dd24d5e8cdbfaeb5d96dfa6c86e700044204a1815cb42e52fe65e6e39e156"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115616"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "gotoh_hitori"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115616"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "gotoh_hitori"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G22",
+      "query": "喜多郁代",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "kita_ikuyo"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kita_ikuyo"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "151533"
+            },
+            "tag_id": 1782917,
+            "wiki_id": 151533,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kita_ikuyo"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "151533"
+            },
+            "old_updated_at": "2025-10-10T23:54:39.961-04:00",
+            "live_updated_at": "2025-10-10T23:54:39.961-04:00",
+            "body_sha256": "8e4033c2daa5aeb2b849b856b4d46718625854194c427565c96624d09e696285"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "151533"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kita_ikuyo"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "151533"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kita_ikuyo"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G23",
+      "query": "孤独摇滚",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "bocchi_the_rock!"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "bocchi_the_rock!"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115615"
+            },
+            "tag_id": 1587881,
+            "wiki_id": 115615,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "bocchi_the_rock!"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115615"
+            },
+            "old_updated_at": "2026-08-24T12:32:34.392-04:00",
+            "live_updated_at": "2026-08-24T12:32:34.392-04:00",
+            "body_sha256": "53253cbc28acc2a6a3d512bafe9fbcf350e173ca0379b7fb81c72436cc227e8e"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115615"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "bocchi_the_rock!"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "115615"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "bocchi_the_rock!"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G24",
+      "query": "阿尔托莉雅",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "artoria_pendragon_(fate)"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "artoria_pendragon_(fate)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "88644"
+            },
+            "tag_id": 1478495,
+            "wiki_id": 88644,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "artoria_pendragon_(fate)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "88644"
+            },
+            "old_updated_at": "2025-12-17T05:38:40.633-05:00",
+            "live_updated_at": "2025-12-17T05:38:40.633-05:00",
+            "body_sha256": "238780fe7b41b0a503179ac2e3060edbfe0433ad5786f082f95eec3ae4053d21"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "88644"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "artoria_pendragon_(fate)"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "88644"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "artoria_pendragon_(fate)"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G25",
+      "query": "拉姆",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "ram_(re:zero)"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ram_(re:zero)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "77896"
+            },
+            "tag_id": 1333601,
+            "wiki_id": 77896,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ram_(re:zero)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "77896"
+            },
+            "old_updated_at": "2026-06-17T19:05:50.108-04:00",
+            "live_updated_at": "2026-06-17T19:05:50.108-04:00",
+            "body_sha256": "604b32bdf00a498ddbea108003a5c1c79cc02bf73c3018719b83c0f6d0b5bcd4"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "77896"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ram_(re:zero)"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "77896"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ram_(re:zero)"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G26",
+      "query": "雷姆",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "rem_(re:zero)"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "rem_(re:zero)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "75903"
+            },
+            "tag_id": 1333465,
+            "wiki_id": 75903,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "rem_(re:zero)"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "75903"
+            },
+            "old_updated_at": "2026-01-06T08:56:57.068-05:00",
+            "live_updated_at": "2026-01-06T08:56:57.068-05:00",
+            "body_sha256": "ab6ad752946829d191ea8aae4cc4d15afc3d4c67cd066de5e831a8ae48af9f87"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "75903"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "rem_(re:zero)"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "75903"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "rem_(re:zero)"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G27",
+      "query": "鹿目圆",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "kaname_madoka"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "tag_id": 592925,
+            "wiki_id": 25531,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "old_updated_at": "2026-09-03T18:41:07.712-04:00",
+            "live_updated_at": "2026-09-03T18:41:07.712-04:00",
+            "body_sha256": "dc463551a2f272c22b1b263129adbcd7ab7b094d887a1469a3aaedc3f4107895"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G28",
+      "query": "晓美焰",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "akemi_homura"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "akemi_homura"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25530"
+            },
+            "tag_id": 592924,
+            "wiki_id": 25530,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "akemi_homura"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25530"
+            },
+            "old_updated_at": "2026-09-18T18:47:20.563-04:00",
+            "live_updated_at": "2026-09-18T18:47:20.563-04:00",
+            "body_sha256": "857d1e98d562300a6255f582520705a83111fca7dbccda95650a881a7bf6e12d"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25530"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "akemi_homura"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25530"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "akemi_homura"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G29",
+      "query": "魔法少女小圆",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "mahou_shoujo_madoka_magica"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "mahou_shoujo_madoka_magica"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "24793"
+            },
+            "tag_id": 592923,
+            "wiki_id": 24793,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "mahou_shoujo_madoka_magica"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "24793"
+            },
+            "old_updated_at": "2026-08-16T17:46:04.186-04:00",
+            "live_updated_at": "2026-08-16T17:46:04.186-04:00",
+            "body_sha256": "114c2e51ab54aed9fce03fa52362a76eb71e271941b3fa6e75680038437ed44e"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "24793"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "mahou_shoujo_madoka_magica"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "24793"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "mahou_shoujo_madoka_magica"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G30",
+      "query": "樱初音",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "sakura_miku"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "sakura_miku"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "17209"
+            },
+            "tag_id": 543959,
+            "wiki_id": 17209,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "sakura_miku"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "17209"
+            },
+            "old_updated_at": "2026-07-10T11:14:49.982-04:00",
+            "live_updated_at": "2026-07-10T11:14:49.982-04:00",
+            "body_sha256": "3203c4a5264d5df43fab66348f96dd0889ed444f9d79eed780bc2d4434119da5"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "17209"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "sakura_miku"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "17209"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "sakura_miku"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G31",
+      "query": "远坂凛",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "tohsaka_rin"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "tohsaka_rin"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "22310"
+            },
+            "tag_id": 465646,
+            "wiki_id": 22310,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "tohsaka_rin"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "22310"
+            },
+            "old_updated_at": "2026-08-20T22:38:28.875-04:00",
+            "live_updated_at": "2026-08-20T22:38:28.875-04:00",
+            "body_sha256": "cf01eb2ad50ca3ef7a72538db9fec1b3158adeba5ac2ade287d61b8b3db7c6b4"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "22310"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "tohsaka_rin"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "22310"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "tohsaka_rin"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G32",
+      "query": "巡音流歌",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "megurine_luka"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "megurine_luka"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "9797"
+            },
+            "tag_id": 457810,
+            "wiki_id": 9797,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "megurine_luka"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "9797"
+            },
+            "old_updated_at": "2026-08-25T13:16:14.984-04:00",
+            "live_updated_at": "2026-08-25T13:16:14.984-04:00",
+            "body_sha256": "4d8741103ac26a06f787ec37b3cb80cff7fdfb2b6f1a720912dfd727c5128af2"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "9797"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "megurine_luka"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "9797"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "megurine_luka"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G33",
+      "query": "镜音连",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "kagamine_len"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_len"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6526"
+            },
+            "tag_id": 393597,
+            "wiki_id": 6526,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_len"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6526"
+            },
+            "old_updated_at": "2026-08-01T10:50:07.263-04:00",
+            "live_updated_at": "2026-08-01T10:50:07.263-04:00",
+            "body_sha256": "ce1aa2b855c5dd7d7faa3e1923d78d1b943e27879d6fed5c03d1241348d7ea8d"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6526"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_len"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "6526"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_len"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G34",
+      "query": "镜音铃",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "kagamine_rin"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_rin"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5809"
+            },
+            "tag_id": 390427,
+            "wiki_id": 5809,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_rin"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5809"
+            },
+            "old_updated_at": "2026-08-29T22:03:28.219-04:00",
+            "live_updated_at": "2026-08-29T22:03:28.219-04:00",
+            "body_sha256": "e447e36a0cf934cbcea1e51165d3a30220adc86fdc5e9f64db80f5bca5386c70"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5809"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_rin"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5809"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kagamine_rin"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G35",
+      "query": "初音未来",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "hatsune_miku"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hatsune_miku"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5655"
+            },
+            "tag_id": 385430,
+            "wiki_id": 5655,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hatsune_miku"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5655"
+            },
+            "old_updated_at": "2026-09-09T09:38:21.678-04:00",
+            "live_updated_at": "2026-09-09T09:38:21.678-04:00",
+            "body_sha256": "dd9ca8fd67623289d0acdde161d26a01215cad5f7b7e3c4693a388014f5d27bd"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5655"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hatsune_miku"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5655"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "hatsune_miku"
+            }
+          }
+        ]
+      },
+      "script_group": "Chinese-characters; language field remains unknown"
+    },
+    {
+      "id": "G36",
+      "query": "puella_magi_madoka_magica",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "mahou_shoujo_madoka_magica"
+        },
+        "matched_by": "official_alias",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "mahou_shoujo_madoka_magica"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "24793"
+            },
+            "tag_id": 592923,
+            "wiki_id": 24793,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "mahou_shoujo_madoka_magica"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "24793"
+            },
+            "old_updated_at": "2026-08-16T17:46:04.186-04:00",
+            "live_updated_at": "2026-08-16T17:46:04.186-04:00",
+            "body_sha256": "114c2e51ab54aed9fce03fa52362a76eb71e271941b3fa6e75680038437ed44e"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "24793"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "mahou_shoujo_madoka_magica"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "24793"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "mahou_shoujo_madoka_magica"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G37",
+      "query": "ぼ喜多",
+      "expected": {
+        "status": "tag_ambiguous",
+        "tag_key": null,
+        "candidates": [
+          {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "gotoh_hitori"
+          },
+          {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "kita_ikuyo"
+          }
+        ]
+      }
+    },
+    {
+      "id": "G38",
+      "query": "madohomu",
+      "expected": {
+        "status": "tag_ambiguous",
+        "tag_key": null,
+        "candidates": [
+          {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "akemi_homura"
+          },
+          {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "kaname_madoka"
+          }
+        ]
+      }
+    },
+    {
+      "id": "G39",
+      "query": "镜音リンレン",
+      "expected": {
+        "status": "tag_ambiguous",
+        "tag_key": null,
+        "candidates": [
+          {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "kagamine_len"
+          },
+          {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "kagamine_rin"
+          }
+        ]
+      }
+    },
+    {
+      "id": "G40",
+      "query": "鏡音",
+      "expected": {
+        "status": "tag_ambiguous",
+        "tag_key": null,
+        "candidates": [
+          {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "kagamine_len"
+          },
+          {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "kagamine_rin"
+          }
+        ]
+      }
+    },
+    {
+      "id": "G41",
+      "query": "ネギトロ",
+      "expected": {
+        "status": "tag_ambiguous",
+        "tag_key": null,
+        "candidates": [
+          {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "hatsune_miku"
+          },
+          {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "megurine_luka"
+          }
+        ]
+      }
+    },
+    {
+      "id": "G42",
+      "query": "初音未来",
+      "expected": {
+        "status": "entity_found_tag_unmapped",
+        "tag_key": null
+      },
+      "kind": "character",
+      "namespace": "moegirl.character",
+      "exact": true
+    },
+    {
+      "id": "G43",
+      "query": "hatsune_miku",
+      "expected": {
+        "status": "entity_found_tag_unmapped",
+        "tag_key": null
+      },
+      "kind": "tag",
+      "namespace": "local.tag_aggregate",
+      "exact": true
+    },
+    {
+      "id": "G44",
+      "query": "puella_magi_madoka_magica",
+      "expected": {
+        "status": "not_found",
+        "tag_key": null
+      },
+      "category": 4
+    },
+    {
+      "id": "G45",
+      "query": "5655",
+      "expected": {
+        "status": "entity_found_tag_unmapped",
+        "tag_key": null
+      },
+      "kind": "page",
+      "namespace": "danbooru.wiki",
+      "exact": true
+    },
+    {
+      "id": "G46",
+      "query": "hatsune_miku",
+      "expected": {
+        "status": "not_found",
+        "tag_key": null
+      },
+      "kind": "character",
+      "namespace": "moegirl.character",
+      "exact": true
+    },
+    {
+      "id": "G47",
+      "query": "151534",
+      "expected": {
+        "status": "entity_found_tag_unmapped",
+        "tag_key": null
+      },
+      "kind": "page",
+      "namespace": "danbooru.wiki",
+      "exact": true
+    },
+    {
+      "id": "G48",
+      "query": "konpaku_youmu",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "konpaku_youmu"
+        },
+        "matched_by": "native_exact",
+        "descriptions_empty": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_association_quarantined",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "konpaku_youmu"
+            },
+            "reason": "mixed_cut_version_conflict",
+            "old_updated_at": "2026-04-07T07:38:23.104-04:00",
+            "live_updated_at": "2026-09-28T19:53:56.332-04:00",
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          }
+        ]
+      },
+      "source_expectation": {
+        "quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649",
+        "wiki_id": "7644"
+      }
+    },
+    {
+      "id": "G49",
+      "query": "hatsune_miku",
+      "expected": {
+        "status": "not_found",
+        "tag_key": null
+      },
+      "category": 3
+    },
+    {
+      "id": "G50",
+      "query": "madoka_kaname",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "kaname_madoka"
+        },
+        "matched_by": "wiki_name",
+        "description": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_tag_link",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "tag_id": 592925,
+            "wiki_id": 25531,
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          },
+          {
+            "role": "wiki_cut_compatibility",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            },
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "old_updated_at": "2026-09-03T18:41:07.712-04:00",
+            "live_updated_at": "2026-09-03T18:41:07.712-04:00",
+            "body_sha256": "dc463551a2f272c22b1b263129adbcd7ab7b094d887a1469a3aaedc3f4107895"
+          },
+          {
+            "role": "wiki_association_edge",
+            "src": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "dst": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            }
+          },
+          {
+            "role": "description",
+            "wiki_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "25531"
+            },
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "kaname_madoka"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "G51",
+      "query": "265",
+      "expected": {
+        "status": "entity_found_tag_unmapped",
+        "tag_key": null,
+        "descriptions_empty": true
+      },
+      "kind": "subject",
+      "namespace": "bangumi.subject",
+      "exact": true,
+      "source_expectation": {
+        "candidate_id": "candidate:1",
+        "candidate_status": "candidate",
+        "queue_sha256": "0ffd1afc130ae1612b229994def53048ecd3bc804f33814495991a50d1c312b1",
+        "dst": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "neon_genesis_evangelion"
+        }
+      }
+    },
+    {
+      "id": "G52",
+      "query": "初音未来",
+      "expected": {
+        "status": "entity_ambiguous",
+        "tag_key": null,
+        "candidates": [
+          {
+            "kind": "character",
+            "namespace": "moegirl.character",
+            "value": "初音未来"
+          },
+          {
+            "kind": "character",
+            "namespace": "moegirl.character",
+            "value": "松方结"
+          },
+          {
+            "kind": "character",
+            "namespace": "moegirl.character",
+            "value": "珐露珊"
+          },
+          {
+            "kind": "character",
+            "namespace": "moegirl.character",
+            "value": "阴阳师手游:丑时之女"
+          }
+        ],
+        "descriptions_empty": true
+      },
+      "kind": "character"
+    },
+    {
+      "id": "G53",
+      "query": "haruhi_suzumiya",
+      "expected": {
+        "status": "canonical_unknown",
+        "tag_key": null,
+        "descriptions_empty": true,
+        "unresolved_reasons": [
+          {
+            "name": "haruhi_suzumiya",
+            "matched_by": "official_alias",
+            "reason": "missing_native_terminal"
+          }
+        ],
+        "evidence_assertions": [
+          {
+            "role": "canonical_scope",
+            "evidence_id": "scope:haruhi_suzumiya",
+            "raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec"
+          }
+        ]
+      },
+      "source_expectation": {
+        "scope_raw_sha256": "8a5ebd5ffff49ff5e9f34e5bab7855cbd792caa72c0d4734ff3501e1ba0f7eec",
+        "inactive_alias_ids": [
+          312
+        ]
+      }
+    },
+    {
+      "id": "G54",
+      "query": "soryu_asuka_langley",
+      "expected": {
+        "status": "canonical_unknown",
+        "tag_key": null,
+        "descriptions_empty": true,
+        "unresolved_reasons": [
+          {
+            "name": "soryu_asuka_langley",
+            "matched_by": "official_alias",
+            "reason": "missing_native_terminal"
+          }
+        ],
+        "evidence_assertions": [
+          {
+            "role": "canonical_scope",
+            "evidence_id": "scope:soryu_asuka_langley",
+            "raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196"
+          }
+        ]
+      },
+      "source_expectation": {
+        "scope_raw_sha256": "4e50c0bcfc8dad4f23157064a0c8552727bcb275662c18bfbd2a5bb42d28d196",
+        "inactive_alias_ids": [
+          3950
+        ]
+      }
+    },
+    {
+      "id": "G55",
+      "query": "ijichi_nijika",
+      "expected": {
+        "status": "resolved",
+        "tag_key": {
+          "kind": "tag",
+          "namespace": "danbooru.tag",
+          "value": "ijichi_nijika"
+        },
+        "matched_by": "native_exact",
+        "descriptions_empty": true,
+        "evidence_assertions": [
+          {
+            "role": "wiki_association_quarantined",
+            "tag_key": {
+              "kind": "tag",
+              "namespace": "danbooru.tag",
+              "value": "ijichi_nijika"
+            },
+            "reason": "mixed_cut_version_conflict",
+            "old_updated_at": "2025-10-10T23:56:21.498-04:00",
+            "live_updated_at": "2026-09-28T06:07:17.277-04:00",
+            "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8"
+          }
+        ]
+      },
+      "source_expectation": {
+        "quarantine_report_sha256": "886f1b494934e58aa23bf92030b12589f6c36aaa23d723d338db4772c346b649",
+        "wiki_id": "151534"
+      }
+    }
+  ],
+  "limitations": [
+    "50scoped queries, not fullsource recall or universal name ownership",
+    "15Chinese-script positive names from officialWiki under proven nativeidentity; not humantranslations",
+    "2changed Wiki versions quarantined; native direct stillexists, no oldWiki identity upgrade",
+    "No verified entity_tag real positives: cross-source ID/link evidence missing; these remain unmapped",
+    "inactive official aliases never redirect; G50 separately resolves via explicit compatibleWiki name"
+  ],
+  "verified_entity_tag_positives": 0,
+  "chinese_positive_denominator": 15,
+  "parent_gold_sha256": "314d9dd16642de8eb70ee405d9bfbe1b52a454c5fbde62685241890565738cc5",
+  "review_baseline": "cf807c1a5179ce4b451b9a85870b6684d2dccaf3",
+  "added_real_coverage": [
+    "candidate-only actualBGM265",
+    "entity_ambiguous fourcharacterkeys",
+    "two missing native terminals",
+    "two changedWiki explicitemptydescriptions+quarantineproof"
+  ],
+  "new_upstream_GETs": 0
+}

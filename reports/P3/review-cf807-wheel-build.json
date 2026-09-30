@@ -1,0 +1,29 @@
+{
+  "head": "7393d601a6d95432f41da243395ed5d3e0a2fda1",
+  "working_tree": "?? reports/P3/review-cf807-after-fixture-final.json\n?? reports/P3/review-cf807-after-fixture-v1.json\n?? reports/P3/review-cf807-before.json\n?? reports/P3/review-cf807-candidates.jsonl\n?? reports/P3/review-cf807-check-clippy.json\n?? reports/P3/review-cf807-check-diff.json\n?? reports/P3/review-cf807-check-fmt.json\n?? reports/P3/review-cf807-check-pytest.json\n?? reports/P3/review-cf807-check-release.json\n?? reports/P3/review-cf807-check-ruff.json\n?? reports/P3/review-cf807-check-rust-test.json\n?? reports/P3/review-cf807-collector-before-corrected.json\n?? reports/P3/review-cf807-collector-before.json\n?? reports/P3/review-cf807-debug-acceptance-command.json\n?? reports/P3/review-cf807-debug-acceptance.json\n?? reports/P3/review-cf807-decisions.jsonl\n?? reports/P3/review-cf807-final-candidates.jsonl\n?? reports/P3/review-cf807-final-decisions.jsonl\n?? reports/P3/review-cf807-final-input-compilation-command.json\n?? reports/P3/review-cf807-final-input-compilation.json\n?? reports/P3/review-cf807-final-pilot-build-command.json\n?? reports/P3/review-cf807-final-source_manifest.json\n?? reports/P3/review-cf807-freeze-gold-command.json\n?? reports/P3/review-cf807-input-compilation-command.json\n?? reports/P3/review-cf807-input-compilation.json\n?? reports/P3/review-cf807-pilot-build-command.json\n?? reports/P3/review-cf807-real-gold.json\n?? reports/P3/review-cf807-source_manifest.json\n",
+  "argv": [
+    "python",
+    "-m",
+    "pip",
+    "wheel",
+    "--no-deps",
+    "--no-build-isolation",
+    "--no-index",
+    "--wheel-dir",
+    "dist/p3-review-7393d60",
+    "dist/p3-review-7393d60/source"
+  ],
+  "exit": 0,
+  "elapsed_s": 2.23435390018858,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "UHJvY2Vzc2luZyAuXGRpc3RccDMtcmV2aWV3LTczOTNkNjBcc291cmNlDQogIFByZXBhcmluZyBtZXRhZGF0YSAocHlwcm9qZWN0LnRvbWwpOiBzdGFydGVkDQogIFByZXBhcmluZyBtZXRhZGF0YSAocHlwcm9qZWN0LnRvbWwpOiBmaW5pc2hlZCB3aXRoIHN0YXR1cyAnZG9uZScNCkJ1aWxkaW5nIHdoZWVscyBmb3IgY29sbGVjdGVkIHBhY2thZ2VzOiBzYWt1cmEta25vd2xlZGdlDQogIEJ1aWxkaW5nIHdoZWVsIGZvciBzYWt1cmEta25vd2xlZGdlIChweXByb2plY3QudG9tbCk6IHN0YXJ0ZWQNCiAgQnVpbGRpbmcgd2hlZWwgZm9yIHNha3VyYS1rbm93bGVkZ2UgKHB5cHJvamVjdC50b21sKTogZmluaXNoZWQgd2l0aCBzdGF0dXMgJ2RvbmUnDQogIENyZWF0ZWQgd2hlZWwgZm9yIHNha3VyYS1rbm93bGVkZ2U6IGZpbGVuYW1lPXNha3VyYV9rbm93bGVkZ2UtMC4yLjAtcHkzLW5vbmUtYW55LndobCBzaXplPTMzNjQxIHNoYTI1Nj01ODA0Yzk1YTJlMGE0MGUwNGZjNjQyZmNjNDA1ZTQ0MzhjOTAyZGZjMzFlOGZhYjA1MWY1NTQyYzM0MjBhODFmDQogIFN0b3JlZCBpbiBkaXJlY3Rvcnk6IEM6XFVzZXJzXFBDXEFwcERhdGFcTG9jYWxcVGVtcFxwaXAtZXBoZW0td2hlZWwtY2FjaGUtMno5MmI2cmtcd2hlZWxzXDdiXDY2XDVhXDcyZTZjNDE5MmNhMDllMzgzYjcxMTEyNWMzOWM3YTIwZDYyMjFjOTc0YmZmNjc0MTQwDQpTdWNjZXNzZnVsbHkgYnVpbHQgc2FrdXJhLWtub3dsZWRnZQ0K",
+  "stdout_sha256": "79f511c7da3ba6d9af2a84ceea85883ee925632a7b66398986be04d0262c46cf",
+  "stdout": "Processing .\\dist\\p3-review-7393d60\\source\r\n  Preparing metadata (pyproject.toml): started\r\n  Preparing metadata (pyproject.toml): finished with status 'done'\r\nBuilding wheels for collected packages: sakura-knowledge\r\n  Building wheel for sakura-knowledge (pyproject.toml): started\r\n  Building wheel for sakura-knowledge (pyproject.toml): finished with status 'done'\r\n  Created wheel for sakura-knowledge: filename=sakura_knowledge-0.2.0-py3-none-any.whl size=33641 sha256=5804c95a2e0a40e04fc642fcc405e4438c902dfc31e8fab051f5542c3420a81f\r\n  Stored in directory: C:\\Users\\PC\\AppData\\Local\\Temp\\pip-ephem-wheel-cache-2z92b6rk\\wheels\\7b\\66\\5a\\72e6c4192ca09e383b711125c39c7a20d6221c974bff674140\r\nSuccessfully built sakura-knowledge\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

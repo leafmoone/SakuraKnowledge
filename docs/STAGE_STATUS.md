@@ -12,13 +12,20 @@
 - Scope: frozen native tags/active aliases/Wiki evidence and trusted entity names,
   typed identity, independent fixtures then real pilot including conflicts; a full
   candidate build is permitted only once after every documented gate is satisfied.
-- Source/artifact code: `b393581c54d5ac0db76802897220f4818c1eb3c0`.
-  Evidence-only commits and the final remote-bound SHA are listed in the P3 delivery.
+- Reviewed partial delivery `cf807c1a5179ce4b451b9a85870b6684d2dccaf3` received
+  **CHANGES_REQUIRED** for endpoint substitution/proof gaps/gold coverage/redirects.
+  Authorized four-item repair source/artifact SHA:
+  `7393d601a6d95432f41da243395ed5d3e0a2fda1`. Repaired code awaits fixed-SHA review;
+  historical b393 artifacts/receipts stay unchanged. New evidence paths use
+  `reports/P3/review-cf807-*`; overall P3 remains NOT_READY regardless of code review.
 - Real pilot:30 native tags,28 compatible same-source Wiki links,352 assessments;
   451entries/222FTS,874input records all accounted. 100candidate decisions,0verified
   cross-source entity_tag/0human_verified. Two changed Wiki versions quarantined.
-- Frozen50 real queries:50fullJSON+oracle+expected PASS,38positive (15Chinese-script),
-  12nonresolved,0wrong tag. This is scoped pilot coverage, not full-source recall.
+- Historical50 queries/failed49 acceptance preserved. New55 raw/input expected
+  gold froze before repaired runtime acceptance: includes actual BGMsubject265
+  candidate-only, four-Moegirl-character ambiguity, two missing native terminals,
+  explicit empty descriptions for both changed Wiki versions and proof assertions.
+  This is scoped pilot coverage, not verified cross-source positives/full-source recall.
 - Full candidate gate: all recorded cleanSHA/inputSHA/oldsnapshotSHA/disk/budget/
   pilot/native/wiki gates pass, necessary real verified entity_tag positive fails.
   **BLOCKED / NOT_RUN / zero attempts**. Supply actual source ID/link evidence or

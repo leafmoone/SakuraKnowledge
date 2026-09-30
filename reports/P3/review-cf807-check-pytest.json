@@ -1,0 +1,23 @@
+{
+  "head": "7393d601a6d95432f41da243395ed5d3e0a2fda1",
+  "working_tree": "?? reports/P3/review-cf807-after-fixture-final.json\n?? reports/P3/review-cf807-after-fixture-v1.json\n?? reports/P3/review-cf807-before.json\n?? reports/P3/review-cf807-candidates.jsonl\n?? reports/P3/review-cf807-collector-before-corrected.json\n?? reports/P3/review-cf807-collector-before.json\n?? reports/P3/review-cf807-debug-acceptance-command.json\n?? reports/P3/review-cf807-debug-acceptance.json\n?? reports/P3/review-cf807-decisions.jsonl\n?? reports/P3/review-cf807-final-candidates.jsonl\n?? reports/P3/review-cf807-final-decisions.jsonl\n?? reports/P3/review-cf807-final-input-compilation-command.json\n?? reports/P3/review-cf807-final-input-compilation.json\n?? reports/P3/review-cf807-final-pilot-build-command.json\n?? reports/P3/review-cf807-final-source_manifest.json\n?? reports/P3/review-cf807-freeze-gold-command.json\n?? reports/P3/review-cf807-input-compilation-command.json\n?? reports/P3/review-cf807-input-compilation.json\n?? reports/P3/review-cf807-pilot-build-command.json\n?? reports/P3/review-cf807-real-gold.json\n?? reports/P3/review-cf807-source_manifest.json\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "exit": 0,
+  "elapsed_s": 19.325128299882635,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgMzAlXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgNjElXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgOTIlXQ0KLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KMjM0IHBhc3NlZCBpbiAxOC43NXMNCg==",
+  "stdout_sha256": "6481b9bf1c7d7cd027a32587dd46d515f2db78bda0e68744ece544811c6bc7ec",
+  "stdout": "........................................................................ [ 30%]\r\n........................................................................ [ 61%]\r\n........................................................................ [ 92%]\r\n..................                                                       [100%]\r\n234 passed in 18.75s\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

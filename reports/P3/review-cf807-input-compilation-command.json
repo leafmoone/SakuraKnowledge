@@ -1,0 +1,25 @@
+{
+  "head": "cf807c1a5179ce4b451b9a85870b6684d2dccaf3",
+  "working_tree": " M rust/src/resolver.rs\n M tools/p3_acquire_native.py\n M tools/p3_compile_inputs.py\n M tools/p3_resolver_oracle.py\n?? reports/P3/review-cf807-before.json\n?? reports/P3/review-cf807-collector-before-corrected.json\n?? reports/P3/review-cf807-collector-before.json\n?? tests/test_p3_collector_cf807.py\n?? tests/test_p3_review_cf807.py\n",
+  "argv": [
+    "python",
+    "tools/p3_compile_inputs.py",
+    "--out",
+    "build/p3-review-cf807-inputs",
+    "--receipt-prefix",
+    "review-cf807-"
+  ],
+  "exit": 0,
+  "elapsed_s": 81.97489409986883,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJuYXRpdmVfdGFncyI6IDMwLCAib2ZmaWNpYWxfYWxpYXNfcmVjb3JkcyI6IDQsICJwaWxvdF9uYW1lc3BhY2VfcmVjb3JkX2NvdW50cyI6IHsiYmFuZ3VtaS5zdWJqZWN0IjogMTMsICJiYW5ndW1pLmNoYXJhY3RlciI6IDExNCwgImJhbmd1bWkucGVyc29uIjogNSwgImJhbmd1bWkuZXBpc29kZSI6IDY5LCAibW9lZ2lybC5jaGFyYWN0ZXIiOiA4OCwgIm1vZWdpcmwuY2F0ZWdvcnkiOiAzLCAiZGFuYm9vcnUud2lraSI6IDkwLCAibG9jYWwudGFnX2FnZ3JlZ2F0ZSI6IDgyfSwgImNyb3NzX3NvdXJjZV9jYW5kaWRhdGVzIjogMTAwLCAiY3Jvc3Nfc291cmNlX3ZlcmlmaWVkIjogMH0NCg==",
+  "stdout_sha256": "7b87556d4e5b23c36e72fea28d97f7997ca9795be530e9760fa8bb8d579f2fe1",
+  "stdout": "{\"native_tags\": 30, \"official_alias_records\": 4, \"pilot_namespace_record_counts\": {\"bangumi.subject\": 13, \"bangumi.character\": 114, \"bangumi.person\": 5, \"bangumi.episode\": 69, \"moegirl.character\": 88, \"moegirl.category\": 3, \"danbooru.wiki\": 90, \"local.tag_aggregate\": 82}, \"cross_source_candidates\": 100, \"cross_source_verified\": 0}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

@@ -44,3 +44,22 @@ verified entity_tag** and **zero human_verified**. Same-name matches do not beco
 verified. Missing real entity_tag positive evidence blocks the full candidate;
 `reports/P3/full-candidate-gate.json` records zero full-build attempts. This is P3
 NOT_READY / BLOCKED, not P3 acceptance or source-fact approval.
+
+### cf807 fixed-review repair (no new acquisition)
+
+Review found known endpoint substitution, incomplete intermediate alias scopes and
+Wiki-description association chains, missing real negative gold cases, and a latent
+urllib redirect accounting bypass. Source7393d60 repairs only these authorized items.
+Every directed alias step retains its actual endpoints/status and raw scope, including
+intermediate nodes. Actual native wiki_tag links now bind the old normalized source
+hash/line/evidence and official raw ID/reference with exact body/date/name digests;
+resolver returns the edge and document IDs. Version conflicts retain unequal-date
+quarantine evidence and explicitly no descriptions. Unknown terminal reasons survive.
+
+Collector now forbids redirects and stops that source. Mock redirect/401/403/429,
+request200-budget and >=1.05s-spacing tests issue no network GETs. Historical52request
+and byte receipts remain unchanged; no evidence says redirects actually occurred or
+historical budget was exceeded. New55gold is frozen from retained raw/input bytes,
+not resolver outputs, and keeps actual candidate-only/ambiguous/missing-terminal and
+changedWiki empty-description expectations distinct from verified positives. Both
+new realpilot and full-build gate keep verified_entity_tag=0 and fullbuildattempts=0.

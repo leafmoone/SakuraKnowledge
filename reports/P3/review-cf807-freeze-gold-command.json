@@ -1,0 +1,21 @@
+{
+  "head": "cf807c1a5179ce4b451b9a85870b6684d2dccaf3",
+  "working_tree": " M rust/src/resolver.rs\n M tests/test_p3_resolver.py\n M tools/p3_accept_resolver.py\n M tools/p3_acquire_native.py\n M tools/p3_compile_inputs.py\n M tools/p3_resolver_oracle.py\n?? reports/P3/review-cf807-after-fixture-v1.json\n?? reports/P3/review-cf807-before.json\n?? reports/P3/review-cf807-candidates.jsonl\n?? reports/P3/review-cf807-collector-before-corrected.json\n?? reports/P3/review-cf807-collector-before.json\n?? reports/P3/review-cf807-decisions.jsonl\n?? reports/P3/review-cf807-input-compilation-command.json\n?? reports/P3/review-cf807-input-compilation.json\n?? reports/P3/review-cf807-pilot-build-command.json\n?? reports/P3/review-cf807-source_manifest.json\n?? tests/test_p3_collector_cf807.py\n?? tests/test_p3_review_cf807.py\n?? tools/p3_review_cf807_gold.py\n",
+  "argv": [
+    "python",
+    "tools/p3_review_cf807_gold.py"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.2361683000344783,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJjYXNlcyI6IDU1LCAidmVyaWZpZWRfZW50aXR5X3RhZ19wb3NpdGl2ZSI6IDAsICJuZXR3b3JrIjogZmFsc2V9DQo=",
+  "stdout_sha256": "61e83abbfc69a97a219c4976c870a86de3edc17aa9fcd0c5b3886e87be542f86",
+  "stdout": "{\"cases\": 55, \"verified_entity_tag_positive\": 0, \"network\": false}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}
