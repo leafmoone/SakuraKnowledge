@@ -21,8 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "tools"))
 
-from parity_cases import CASES
 from parity_policy import classify, summarize
+from parity_repair_expected import CASES
 
 from sakura_knowledge.api import Knowledge
 

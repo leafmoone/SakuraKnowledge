@@ -119,6 +119,9 @@ fn main() -> ExitCode {
             COMMANDS.map(|c| format!("'{c}'")).join(", ")
         ));
     }
+    if matches!(cmd.as_str(), "lookup" | "search" | "ask") && pos.len() < 2 {
+        return usage_error("database and query are required");
+    }
     let result: Result<serde_json::Value, Error> = (|| match cmd.as_str() {
         "lookup" => {
             let (db, query) = two_pos(&pos)?;

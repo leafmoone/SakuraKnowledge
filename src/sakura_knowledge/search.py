@@ -9,6 +9,16 @@ AND (?2 IS NULL OR e.kind=?2) AND (?3 IS NULL OR e.namespace=?3)
 ORDER BY search_fts.rank LIMIT 10001"""
 
 
+# Selective filters should reject rows before ranking instead of ordering all
+# corpus postings only to discard them. Still no bodies in the sort payload.
+FILTERED_SQL = SQL.replace("search_fts.rank AS score", "bm25(search_fts) AS score").replace(
+    "ORDER BY search_fts.rank", "ORDER BY score,e.kind,e.namespace,e.value,search_fts.rowid").replace(
+    "FROM search_fts JOIN documents d ON d.id=search_fts.document_id\n"
+    "JOIN entries e ON e.id=search_fts.entry_id",
+    "FROM search_fts CROSS JOIN entries e ON e.id=search_fts.entry_id\n"
+    "CROSS JOIN documents d ON d.id=search_fts.document_id")
+
+
 def identity(row):
     return row["kind"], row["namespace"], row["value"]
 

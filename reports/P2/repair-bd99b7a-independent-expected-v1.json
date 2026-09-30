@@ -1,0 +1,27 @@
+{
+  "head": "2554793932044920673052688866205a5fed834f",
+  "working_tree": " M tools/check_parity.py\n?? reports/P2/repair-bd99b7a-parity-v1.json\n?? rust/examples/bench_reused.rs\n?? tools/bench_reused.py\n?? tools/measure_repair_perf.py\n?? tools/parity_repair_expected.py\n?? tools/record_check.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_repair_semantics.py",
+    "tests/test_search_repair.py",
+    "tests/test_rust_repair.py",
+    "tests/test_parity_harness.py",
+    "-q"
+  ],
+  "exit": 0,
+  "elapsed_s": 3.526857899967581,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgIFsxMDAlXQ0KNTkgcGFzc2VkIGluIDIuODBzDQo=",
+  "stdout_sha256": "8f6a07f1b1268899072c0ba0d71325704425dbd72e4736304f90b54bb19dd8b9",
+  "stdout": "...........................................................              [100%]\r\n59 passed in 2.80s\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

@@ -7,8 +7,8 @@ from functools import wraps
 from . import CONTRACT_VERSION
 from .model import IDENTITY_TRUSTED, TEXT_TRUSTED, EntryKey, match_query
 from .response import RESPONSE_VERSION, bound_response, source_observations
+from .search import FILTERED_SQL, select_rows
 from .search import SQL as SEARCH_SQL
-from .search import select_rows
 from .storage import readonly
 
 _ID = ", ".join(f"'{s}'" for s in sorted(IDENTITY_TRUSTED))
@@ -129,12 +129,10 @@ class Knowledge:
         page_size = self._execute("PRAGMA page_size").fetchone()[0]
         page_count = self._execute("PRAGMA page_count").fetchone()[0]
         freelist_count = self._execute("PRAGMA freelist_count").fetchone()[0]
-        try:
-            dbstat = self._execute("SELECT count(*) FROM dbstat").fetchone()[0]
-            dbstat_status = "available"
-        except sqlite3.OperationalError:
-            dbstat = None
-            dbstat_status = "unavailable"
+        # Optional dbstat is a whole-file page walk, not a lightweight inspect.
+        # Keep it explicitly NOT_RUN rather than silently timing out or scanning.
+        dbstat = None
+        dbstat_status = "not_run"
         meta = {r["key"]: r["value"] for r in self._execute(
             "SELECT key,value FROM build_meta WHERE key IN ('contract_version','snapshot')")}
         return {"snapshot": self.snapshot, "contract_version": meta.get("contract_version"),
@@ -277,7 +275,8 @@ class Knowledge:
         seen = {(c["entry_key"]["kind"], c["entry_key"]["namespace"],
                  c["entry_key"]["value"]) for c in candidates}
         started = time.perf_counter()
-        rows = self._execute(SEARCH_SQL, (compiled, kind, namespace))
+        rows = self._execute(FILTERED_SQL if kind or namespace else SEARCH_SQL,
+                             (compiled, kind, namespace))
         self.last_search_profile["fts_execute_first_row_s"] = time.perf_counter() - started
         started = time.perf_counter()
         try:

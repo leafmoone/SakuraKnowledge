@@ -117,6 +117,16 @@ def test_direct_unicode_tokens_and_match(binary):
         assert row["result"] == expected
 
 
+def test_rust_inspect_no_full_scan_and_missing_cli_arguments(binary, intro_db):
+    result = invoke(binary, "inspect", intro_db)
+    assert result["dbstat_pages"] is None and result["dbstat_status"] == "not_run"
+    with Knowledge(intro_db) as api:
+        assert result == api.inspect()
+    proc = subprocess.run([str(binary), "lookup"], capture_output=True, timeout=15, check=False)
+    assert proc.returncode == 2 and proc.stdout == b""
+    assert json.loads(proc.stderr)["error"] == "UsageError"
+
+
 def test_rust_observations_conflicts_null_empty_and_bounds(binary, intro_db):
     with sqlite3.connect(intro_db) as conn:
         eid = conn.execute("SELECT id FROM entries WHERE value='hero'").fetchone()[0]

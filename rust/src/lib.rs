@@ -347,10 +347,8 @@ impl Runtime {
             .conn
             .query_row("PRAGMA freelist_count", [], |r| r.get(0))
             .unwrap_or(0);
-        let dbstat: Option<i64> = self
-            .conn
-            .query_row("SELECT count(*) FROM dbstat", [], |r| r.get(0))
-            .ok();
+        // Optional whole-file dbstat walk is deliberately outside lightweight inspect.
+        let dbstat: Option<i64> = None;
         let contract: Option<String> = self
             .conn
             .query_row(
@@ -366,7 +364,7 @@ impl Runtime {
             "page_count": page_count,
             "freelist_count": freelist_count,
             "dbstat_pages": dbstat,
-            "dbstat_status": if dbstat.is_some() { "available" } else { "unavailable" },
+            "dbstat_status": "not_run",
             "read_only": true
         }))
     }

@@ -39,7 +39,21 @@ pub fn select(
     limit: usize,
     deadline: Instant,
 ) -> Result<Selected> {
-    let mut stmt = conn.prepare(SQL)?;
+    let filtered;
+    let sql = if kind.is_some() || namespace.is_some() {
+        filtered = SQL
+            .replace("search_fts.rank AS score", "bm25(search_fts) AS score")
+            .replace(
+                "ORDER BY search_fts.rank",
+                "ORDER BY score,e.kind,e.namespace,e.value,search_fts.rowid",
+            ).replace(
+                "FROM search_fts JOIN documents d ON d.id=search_fts.document_id\nJOIN entries e ON e.id=search_fts.entry_id",
+                "FROM search_fts CROSS JOIN entries e ON e.id=search_fts.entry_id\nCROSS JOIN documents d ON d.id=search_fts.document_id");
+        filtered.as_str()
+    } else {
+        SQL
+    };
+    let mut stmt = conn.prepare(sql)?;
     let mut rows = stmt.query(params![compiled, kind, namespace])?;
     let mut chosen = Vec::new();
     let mut group: BTreeMap<Key, Hit> = BTreeMap::new();

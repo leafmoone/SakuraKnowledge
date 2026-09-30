@@ -49,3 +49,15 @@ def test_exact_sufficient_skips_fts_and_nested_lookup_does_not_renew(tmp_path, m
         assert api._operation_depth == 0
         monkeypatch.setattr(api, "lookup", lookup)
         assert api.lookup("hero")["status"] == "found"  # next operation resets
+
+
+def test_filtered_fts_and_lightweight_inspect(tmp_path):
+    build(manifest(tmp_path, [record("page", "fixture", "hero", "distinctive words")]), tmp_path / "db")
+    with Knowledge(tmp_path / "db" / "knowledge.sqlite") as api:
+        assert api.search("distinctive", kind="page")["candidates"][0]["entry_key"]["value"] == "hero"
+        assert api.search("distinctive", kind="episode")["candidates"] == []
+        queries = []
+        api.conn.set_trace_callback(queries.append)
+        result = api.inspect()
+        assert result["dbstat_status"] == "not_run" and result["dbstat_pages"] is None
+        assert not any("FROM dbstat" in sql for sql in queries)

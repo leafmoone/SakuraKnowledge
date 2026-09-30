@@ -84,6 +84,17 @@ deadline; a subsequent public operation starts a new deadline. Non-SQL assembly
 and streaming also check the deadline. OR semantics and S18 input/topk unchanged.
 One-shot before/after diagnostic receipts are not 30-sample performance evidence.
 
+The first repaired formal run remains FAIL (148/151): S02 Python budget failure,
+E18 Rust dbstat scan budget failure and E16 Rust CLI argument error type mismatch.
+These are retained in repair-bd99b7a-parity-v1.json, not retried or reclassified.
+For filtered FTS, use lightweight bm25 sorting after rejecting ineligible rows
+rather than rank-ordering the whole corpus before filtering. Unfiltered S18
+continues to use the rank stream. Inspect now explicitly reports dbstat_status
+not_run on both runtimes; optional full-page dbstat scans are not part of this
+lightweight API. E16 missing positional arguments are UsageError before opening
+any database. Original case inputs are unchanged; response-v3 expectation deltas
+are explicitly listed in tools/parity_repair_expected.py.
+
 ## R2 Unicode data
 
 `tools/generate_unicode16.py` requires CPython UCD16 and enumerates every scalar
