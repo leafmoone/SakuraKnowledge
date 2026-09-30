@@ -44,17 +44,17 @@ def main():
                              and acquisition['cumulative_collector_bytes']+acquisition['documentation_byte_reserve']<=268435456,
            'realpilot_acceptance':acceptance['status']=='PASS',
            'native_real_positive':compilation['native_tags']>0,
-           'wiki_real_positive':len(compilation['compatible_wiki_links'])>0,
-           'necessary_verified_entity_tag_real_positive':bool(verified)}
+           'wiki_real_positive':len(compilation['compatible_wiki_links'])>0}
     ready=all(gates.values())
     save(args.out,{'status':'READY' if ready else 'BLOCKED','fixed_code_sha':head,'main_sha':mainsha,
                   'candidate_build':'NOT_RUN','attempts':0,'gates':gates,'inputs':inputs,
                   'old_snapshot':{'path':str(old),'bytes':old.stat().st_size,'sha256':old_sha},'free_bytes':free,
                   'decisions_verified':len(verified),'decision_count':len(decisions),
                   'manifest':{'path':str(manifest),'sha256':digest(manifest)},
-                  'blocker':'No real explicit cross-source ID/link evidence or actual human verification for necessary entity_tag positive. Name-only queue remains candidate; no runtime confidence promotion.',
-                  'overall_P3':'NOT_READY, pilot/code evidence only, not P3 acceptance',
-                  'future_action':'Supply source-backed cross-source ID/link evidence or genuine human decision, replay+new pilot; do not automatically perform/retry full build'})
+                  'coverage':{'verified_entity_tag_real_positive':'OPTIONAL_COVERAGE','verified_entity_tag':len(verified),'zero_is_legal':True},
+                  'blocker':None if ready else 'One or more mandatory noncoverage gates failed; STOP.',
+                  'overall_P3':'Gate only, not fullsnapshot acceptance; historical REQUIRED receipts remain unchanged',
+                  'future_action':'Authorized formal execution uses p3_full_candidate.py with persistent exclusive attempt cap1; do not retry or promote candidates'})
     print(json.dumps({'status':'READY' if ready else 'BLOCKED','gates':gates,'attempts':0,'free_bytes':free}))
 
 

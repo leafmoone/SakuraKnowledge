@@ -1,12 +1,13 @@
 # Stage Status (SakuraKnowledge)
 
-## Current authorized P3 — BLOCKED / NOT_READY
+## Current authorized P3 — FULL_CANDIDATE_EXECUTION_AUTHORIZED / pending actual gates
 
 - P1/P2: **CLOSED_AND_MERGED**. P2 fixed review `894dc6a73bfd42f18cc7648e8ab7481aae211ab1`
   APPROVE / NO_BLOCKING_FINDINGS within authorized Windows targeted/artifact scope.
 - P3_BASE and immutable main: `894dc6a73bfd42f18cc7648e8ab7481aae211ab1`.
   Actual fetch and independent ls-remote verified initial main/dev equality, clean
-  single worktree; ordinary switch to dev. No P3 code or source coverage acceptance yet.
+  single worktree; ordinary switch to dev. Reviewed scoped resolver implementation approved;
+  fullsnapshot readiness awaits the newly authorized one-shot build and validations.
 - P3 resolver/necessary new runtime capability: **Rust only**. Existing Python
   P2 public API/CLI frozen; Python additions restricted to ETL/audit/independent oracle.
 - Scope: frozen native tags/active aliases/Wiki evidence and trusted entity names,
@@ -25,9 +26,10 @@
   source/artifact `8a5b3d23695a43970d1902d6d6dea7c9e7dd1882` aggregates quarantine
   refs by their own typed tag_key, not containing projection.target/last-writer.
   New dualnative/doublecut fixture18completeJSON paths in both raworders before18FAIL,
-  after18+prior8=26PASS; fullpytest260. Code awaits fixed-SHA review. All historical
-  P3 receipts remain unchanged; new paths `reports/P3/review-d01-*` and
-  `REVIEW_D01_OWNER_REPORT.md`. Overall P3 remains NOT_READY regardless of code review.
+  after18+prior8=26PASS; fullpytest260. Fixed `28cf51bda963ded8bed2def289fd316a4db6bfd0`
+  reviewer APPROVE / NO_BLOCKING_FINDINGS solely for this residual and authorized
+  scoped evidence. Historical P3 receipts remain unchanged; `review-d01-*` and
+  `REVIEW_D01_OWNER_REPORT.md` describe the then-REQUIRED coverage policy.
 - Real pilot:30 native tags,28 compatible same-source Wiki links,352 assessments;
   451entries/222FTS,874input records all accounted. 100candidate decisions,0verified
   cross-source entity_tag/0human_verified. Two changed Wiki versions quarantined.
@@ -36,10 +38,18 @@
   candidate-only, four-Moegirl-character ambiguity, two missing native terminals,
   explicit empty descriptions for both changed Wiki versions and proof assertions.
   This is scoped pilot coverage, not verified cross-source positives/full-source recall.
-- Full candidate gate: all recorded cleanSHA/inputSHA/oldsnapshotSHA/disk/budget/
-  pilot/native/wiki gates pass, necessary real verified entity_tag positive fails.
-  **BLOCKED / NOT_RUN / zero attempts**. Supply actual source ID/link evidence or
-  genuine human decisions; names/scores/agent self-review cannot unblock it.
+- New explicit root/user closure authorization at baseline28cf: real verified
+  entity_tag positive is **OPTIONAL_COVERAGE**, verified0 legal, not a fullbuild gate.
+  Candidate100/human0 unchanged; no guessing names, promoting candidates, fabricated
+  positives or changes to resolver/tag_decisions safety. Historical REQUIRED gate
+  failures remain factual under their former policy, not relabeled PASS.
+- Formal fullsnapshot: pending actual noncoverage gates and one authorized build.
+  `tools/p3_full_candidate.py` rehashes original five normalized groups plus scoped
+  P3records, old21.5GB, clean code/pilot55/old151/disk/newoutput; exclusive persistent
+  attempt cap1. Any failure STOP. Normal builder new independent singleSQLite,
+  no overlay/postbuildpatch/retry/oldVACUUM/online supplement. Read-only validation,
+  frozen fullgold/old151 compatibility with predeclared new-data differences,
+  actualFULLsnapshot dualperformance, freshartifacts/sevenchecks/binding required.
 - Old151 and seven Windows checks are recorded in `reports/P3/`; independent
   new artifacts and pilot-only dual-mode performance are not full-build acceptance.
 - Existing P1/P2 reports/receipts and published 21.5GB snapshot remain immutable.

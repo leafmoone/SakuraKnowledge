@@ -1,5 +1,22 @@
 # P3 authorized execution
 
+## Current closure authorization (supersedes REQUIRED coverage only)
+
+Baseline28cf51bda963ded8bed2def289fd316a4db6bfd0 reviewedAPPROVE,
+implementation8a5b3d23695a43970d1902d6d6dea7c9e7dd1882 frozen.
+Root/user now explicitly permits one formal full candidate with verifiedentity_tag
+realpositive OPTIONAL_COVERAGE: 0verified legal, candidate100/human0 unchanged.
+No resolver/tag_decisions safety changes or identitypromotion. Other SHA/clean/
+disk/pilot55/P2old151/source-account/projection gates remain mandatory.
+One-shot runner uses exclusive persisted attempts<=1; failureSTOP no automaticretry.
+Five entire original normalized sources plus current scoped native/alias/Wiki and
+unchanged0verified decisions, normal atomically published new singleSQLite only.
+Predeclare full-data gold/P2 response differences before accepting results; oldgold/
+old151 receipts untouched. FULLsnapshot dualperf not pilot substitute. New clean
+artifacts/checks/hash binding normaldevpush/main894 unchanged/WAITING_REVIEW.
+No newGET/human/P4/Pool/Sakuratool/mainmerge. Historical clauses below document
+initial policy and historical BLOCKED receipts, never retroactively relabelled.
+
 Base/main immutable:894dc6a73bfd42f18cc7648e8ab7481aae211ab1. P1/P2 closed and merged.
 Full341line user execution attachment read; root's Rust-only override wins over
 attachment examples of a new Python production resolver. No public Python API/CLI

@@ -1,0 +1,26 @@
+{
+  "head": "28cf51bda963ded8bed2def289fd316a4db6bfd0",
+  "working_tree": " M docs/P3_PLAN.md\n M docs/STAGE_STATUS.md\n M tools/p3_freeze_gate.py\n?? docs/p3-full-coverage-contract.md\n?? reports/P3/full-authorized-precommit-pytest.json\n?? reports/P3/full-authorized-preflight-old151-command.json\n?? reports/P3/full-authorized-preflight-old151.json\n?? reports/P3/full-authorized-preflight-pilot55-command.json\n?? reports/P3/full-authorized-preflight-pilot55.json\n?? tests/test_p3_full_candidate.py\n?? tools/p3_full_candidate.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "ruff",
+    "check",
+    "src",
+    "tests",
+    "tools"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.11406189994886518,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "QWxsIGNoZWNrcyBwYXNzZWQhCg==",
+  "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+  "stdout": "All checks passed!\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}
