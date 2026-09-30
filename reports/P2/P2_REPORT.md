@@ -1,6 +1,51 @@
 # P2 Report — Rust read-only runtime and contract hardening
 
-## Current directed repair: READY_FOR_REVIEW / WAITING_REVIEW
+## Current f99a115 nine-finding repair: READY_FOR_REVIEW / WAITING_REVIEW
+
+Delivery: [`review-f99-delivery.json`](review-f99-delivery.json).
+Independent per-finding test IDs and implementation: [`review-f99-nine-findings.md`](review-f99-nine-findings.md).
+The prior f99a115 review was CHANGES_REQUIRED/NOT_READY. This is a new fixed-source
+repair submission, not an assertion that external review is now approved.
+
+Implementation/reference/artifact source: `5305e48bcc0f7d794bc21155cb834033256911d4`.
+Evidence commit: `1d5954fb233a63ef01f39ab0cd16def1f45399ce`.
+`review-f99-final-binding.json` hashes25 exact Git blobs at that commit and separately
+records checkout bytes. `review-f99-historical-binding.json` corrects the old index's
+24/26 committed-byte mismatch without changing historical receipts or artifacts.
+
+| Gate | New evidence |
+|---|---|
+| Failure-first |24 failed/5 passed on original runtime; each of findings1–8 has concrete regression; finding9 has byte-index counterexample |
+| Final checks |150 pytest with Rust enabled,5 Rust tests; seven commands exit0 |
+| Formal parity |151 PASS=135 full-value pairs+16error contracts; zero retries/timeouts;604 raw streams verified |
+| Dual-mode performance |960/960 measured success,32fixed excluded warmups;496 JSON pairs/996raw streams verified |
+| Artifacts |Clean source builds; fresh offline wheel install;8 external-source paired CLI plus real a・b and control-whitespace queries pass |
+| Snapshot |21,516,320,768bytes; SHA2564c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073 unchanged |
+
+S18 p50/p95 seconds (30/30 successful attempts per runtime/mode):
+
+| Mode | Python | Rust |
+|---|---|---|
+| Reused object/connection |0.3036 / 0.3388 |0.2427 / 0.2780 |
+| Independent CLI |0.3572 / 0.4696 |0.2217 / 0.2400 |
+
+Fixed warmups, no retries, all attempted failures counted (none in this new run).
+Inner5s remains unchanged; outerCLI15s and reused entire batch600s are distinct.
+Exact argv/raw/RSS/timing are in review-f99-perf-v1.json; RSS is sampled, no disk-cold
+or universal-speedup claim. Historical failed performance rounds remain unchanged.
+
+The optional real-query counterexample collector wrote complete exit0 UTF-8 child
+receipts, then its final console print failed in the orchestration interpreter's
+GBK encoding. That print failure is retained as a limitation in delivery; a separate
+read-back verified all raw hashes and both full JSON pairs. It was not a CLI failure
+and was not relabeled as a successful collector command.
+
+R4 not reopened. No snapshot/index rebuild, P1 changes, main merge, Pool/P3 or live
+refresh. New artifacts remain local-only. Linux/Pi/full human facts/dbstat/Pool/live
+refresh NOT_RUN. Final submission SHA is reported after independent normal-push
+verification; no self-referential SHA is embedded here.
+
+## Historical bd99b7a directed repair — superseded by CHANGES_REQUIRED review
 
 Authoritative new delivery: [`repair-bd99b7a-delivery.json`](repair-bd99b7a-delivery.json).
 External acceptance remains NOT_RUN; do not merge main or start P3.

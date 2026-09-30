@@ -1,0 +1,209 @@
+{
+  "schema": "committed-receipt-binding-v1",
+  "commit": "1d5954fb233a63ef01f39ab0cd16def1f45399ce",
+  "hash_rule": "SHA256 of exact git show COMMIT:PATH bytes; no newline/JSON normalization",
+  "worktree_rule": "observed checkout bytes only; never substituted for committed bytes",
+  "artifact_rule": "metadata correction does not rebuild or change historical artifacts",
+  "entries": {
+    "reports/P2/review-f99-artifact-cli.json": {
+      "git_blob_oid": "6945aaa486c01a3f330c9ed8a46e287f65b28d63",
+      "committed_sha256": "c64d9db9b828290d99181355d10f6ed9c371940bcd04d27199fa1efdbc111218",
+      "committed_size_bytes": 450770,
+      "worktree_sha256": "c64d9db9b828290d99181355d10f6ed9c371940bcd04d27199fa1efdbc111218",
+      "worktree_size_bytes": 450770,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-artifact-counterexamples.json": {
+      "git_blob_oid": "bc48d8fcd287cee7f7ecd259e9835c7e2a1dea44",
+      "committed_sha256": "c18832d4c87906d24c15e18f5027c1046a71c475c0c44b627100e318352be44e",
+      "committed_size_bytes": 107717,
+      "worktree_sha256": "c18832d4c87906d24c15e18f5027c1046a71c475c0c44b627100e318352be44e",
+      "worktree_size_bytes": 107717,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-artifact-manifest.json": {
+      "git_blob_oid": "dd4055ff01aefb95a23530d1b37e47df4dd9a6e2",
+      "committed_sha256": "91ab51380a2663dfd405f825e6cf72f080bbfc75f77de3c48d8f8a2b49e1d5e5",
+      "committed_size_bytes": 509,
+      "worktree_sha256": "91ab51380a2663dfd405f825e6cf72f080bbfc75f77de3c48d8f8a2b49e1d5e5",
+      "worktree_size_bytes": 509,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-check-clippy.json": {
+      "git_blob_oid": "60eae814c69f292144fbf664fdaced7a93401ddc",
+      "committed_sha256": "21f5502b7295e60b845541fca06af37e0f151a2b605193497e689b96aa722a35",
+      "committed_size_bytes": 1320,
+      "worktree_sha256": "21f5502b7295e60b845541fca06af37e0f151a2b605193497e689b96aa722a35",
+      "worktree_size_bytes": 1320,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-check-diff.json": {
+      "git_blob_oid": "7de3e51fc3f30a94caaaf497e1ba0e2b0534ec8a",
+      "committed_sha256": "4342173f9da730c3ba94d0f33bedfc1ef8d80808ac95a62893e42cfbf1a274b2",
+      "committed_size_bytes": 908,
+      "worktree_sha256": "4342173f9da730c3ba94d0f33bedfc1ef8d80808ac95a62893e42cfbf1a274b2",
+      "worktree_size_bytes": 908,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-check-fmt.json": {
+      "git_blob_oid": "849c16b87164d49553b380fd3a67bc0d14f4b9de",
+      "committed_sha256": "a2e23f65ef18aa4b5b5be481bdc109e5bc828224070fe64ced35ac199b11c546",
+      "committed_size_bytes": 1008,
+      "worktree_sha256": "a2e23f65ef18aa4b5b5be481bdc109e5bc828224070fe64ced35ac199b11c546",
+      "worktree_size_bytes": 1008,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-check-pytest.json": {
+      "git_blob_oid": "ade4df58b82bd1b08f126a2d64c7a22bc7a57da3",
+      "committed_sha256": "93ba44adb46a8c72495dbda34db1ac5bfaf3c3c897ca7870b363ed621755a8c0",
+      "committed_size_bytes": 1460,
+      "worktree_sha256": "93ba44adb46a8c72495dbda34db1ac5bfaf3c3c897ca7870b363ed621755a8c0",
+      "worktree_size_bytes": 1460,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-check-release.json": {
+      "git_blob_oid": "3a03b1ea3da55628cd6667c50f63a8f66864aaf9",
+      "committed_sha256": "498baeb3b40600b432f72155a5140b1aeca7bf86d08eb3c192fbda6ef65fc984",
+      "committed_size_bytes": 1348,
+      "worktree_sha256": "498baeb3b40600b432f72155a5140b1aeca7bf86d08eb3c192fbda6ef65fc984",
+      "worktree_size_bytes": 1348,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-check-ruff.json": {
+      "git_blob_oid": "fe85b7ed7dca669e2279fd4f74f6eb6a0d77de2d",
+      "committed_sha256": "293df36887f6260514e90a385bc5d0f6fe3a4b1cceea89f573a6720f19b3068a",
+      "committed_size_bytes": 965,
+      "worktree_sha256": "293df36887f6260514e90a385bc5d0f6fe3a4b1cceea89f573a6720f19b3068a",
+      "worktree_size_bytes": 965,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-check-rust-test.json": {
+      "git_blob_oid": "0f10eb2a6ddc0499f0a6464ec53907b175f1eee3",
+      "committed_sha256": "a4b2b7b2baa3a10d4d5b1da97ff9419b624ce6be6565126a5616acde530ee364",
+      "committed_size_bytes": 3398,
+      "worktree_sha256": "a4b2b7b2baa3a10d4d5b1da97ff9419b624ce6be6565126a5616acde530ee364",
+      "worktree_size_bytes": 3398,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-historical-binding.json": {
+      "git_blob_oid": "df5a37ab5503123351e8be4d3d42182df8afc64a",
+      "committed_sha256": "16664371086e671ec76fe732188821269d98bb627604891836ffe54e08be75bf",
+      "committed_size_bytes": 12345,
+      "worktree_sha256": "16664371086e671ec76fe732188821269d98bb627604891836ffe54e08be75bf",
+      "worktree_size_bytes": 12345,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-independent-after-v1.json": {
+      "git_blob_oid": "8931981258b4b64e2f920f89806e04ab5b9ca102",
+      "committed_sha256": "8324d54802806d0c1c2ea1387eb3851da2056c3c2a66639a909c95de2486ffb2",
+      "committed_size_bytes": 1189,
+      "worktree_sha256": "8324d54802806d0c1c2ea1387eb3851da2056c3c2a66639a909c95de2486ffb2",
+      "worktree_size_bytes": 1189,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-independent-after-v2.json": {
+      "git_blob_oid": "5eac3347e27ebd2efacbbde52727db10826f62dc",
+      "committed_sha256": "e1d40c6264b115fa69479f35fa219da88a4bd1ee2d9ae05dcba45d60ba265808",
+      "committed_size_bytes": 1425,
+      "worktree_sha256": "e1d40c6264b115fa69479f35fa219da88a4bd1ee2d9ae05dcba45d60ba265808",
+      "worktree_size_bytes": 1425,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-independent-before.json": {
+      "git_blob_oid": "312bad0bae1934d611f9a9f8a02f49084a8db57a",
+      "committed_sha256": "b37c06c7d483b571d21135bda2fbab172e2da9af10ef5d67a37e08e7c3720f15",
+      "committed_size_bytes": 124007,
+      "worktree_sha256": "b37c06c7d483b571d21135bda2fbab172e2da9af10ef5d67a37e08e7c3720f15",
+      "worktree_size_bytes": 124007,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-index-counterexample.json": {
+      "git_blob_oid": "faef54025af49fe21a8d38a0ed6d98277597c282",
+      "committed_sha256": "9b774a2bbe18cd78fe439c6900ffe56416797b6add07330cc26c95bf815a37fd",
+      "committed_size_bytes": 4207,
+      "worktree_sha256": "9b774a2bbe18cd78fe439c6900ffe56416797b6add07330cc26c95bf815a37fd",
+      "worktree_size_bytes": 4207,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-parity-v1.json": {
+      "git_blob_oid": "b0228d011cb4665f332bf7564a3e306387df8b01",
+      "committed_sha256": "193311ee81b00f104dc620ad459500156e67803e3d213d339b4df86e8aab5a30",
+      "committed_size_bytes": 18514861,
+      "worktree_sha256": "193311ee81b00f104dc620ad459500156e67803e3d213d339b4df86e8aab5a30",
+      "worktree_size_bytes": 18514861,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-parity-verification.json": {
+      "git_blob_oid": "6337931f607baa1c274cbefe02ab4fa8b973df0f",
+      "committed_sha256": "adb35a7a50f8912efedaf479988e2d697b14fce7919cc29a8c42245167cc0344",
+      "committed_size_bytes": 651,
+      "worktree_sha256": "adb35a7a50f8912efedaf479988e2d697b14fce7919cc29a8c42245167cc0344",
+      "worktree_size_bytes": 651,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-perf-v1.json": {
+      "git_blob_oid": "891791747052f68f4fa953b79e62c0181ff3aa80",
+      "committed_sha256": "a4223ee0838bdf8ae20ab2083918c4d69d783498d080a250ea4bdb4b02f0d855",
+      "committed_size_bytes": 34444087,
+      "worktree_sha256": "a4223ee0838bdf8ae20ab2083918c4d69d783498d080a250ea4bdb4b02f0d855",
+      "worktree_size_bytes": 34444087,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-perf-verification.json": {
+      "git_blob_oid": "607c965fdcad65bd2fa75454e7011d435ba607d3",
+      "committed_sha256": "37723c4a79b09deadb2c6e5fec237f719521d9afe59bf0df1d88e6882c742f77",
+      "committed_size_bytes": 7963,
+      "worktree_sha256": "37723c4a79b09deadb2c6e5fec237f719521d9afe59bf0df1d88e6882c742f77",
+      "worktree_size_bytes": 7963,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-release-build.json": {
+      "git_blob_oid": "5aee774b11a9cdf524460d9043dee77c642db6a7",
+      "committed_sha256": "d85b8306c92dc1a637c9d585489d37f9d3b173eb65ff62c46f96cfbea7113b7c",
+      "committed_size_bytes": 1099,
+      "worktree_sha256": "d85b8306c92dc1a637c9d585489d37f9d3b173eb65ff62c46f96cfbea7113b7c",
+      "worktree_size_bytes": 1099,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-snapshot-final.json": {
+      "git_blob_oid": "ad2a20cb4059ab9b713b8e27baeebabb978cf792",
+      "committed_sha256": "64058355553e8a796b2b35f9f9bfb1a09f7f64a3abb716dc7ec73474be7dc9fe",
+      "committed_size_bytes": 418,
+      "worktree_sha256": "64058355553e8a796b2b35f9f9bfb1a09f7f64a3abb716dc7ec73474be7dc9fe",
+      "worktree_size_bytes": 418,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-venv-bootstrap.json": {
+      "git_blob_oid": "485b24c893a8b5e26548a31b2d1781df18aae9a1",
+      "committed_sha256": "2a2b38777ae2068a073f082b5d46e870af766254def3c254700191ba43e46a8d",
+      "committed_size_bytes": 1735,
+      "worktree_sha256": "2a2b38777ae2068a073f082b5d46e870af766254def3c254700191ba43e46a8d",
+      "worktree_size_bytes": 1735,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-venv-create.json": {
+      "git_blob_oid": "fe907e4d6c2979036068a4b468f0fd2173c2d918",
+      "committed_sha256": "8314697420e896d2a44a848e06323e1af1bafb108880a2319eb059ba819fb0a2",
+      "committed_size_bytes": 1182,
+      "worktree_sha256": "8314697420e896d2a44a848e06323e1af1bafb108880a2319eb059ba819fb0a2",
+      "worktree_size_bytes": 1182,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-venv-install.json": {
+      "git_blob_oid": "213f9518944cef0aabcd2be51e15f70595f74f8c",
+      "committed_sha256": "144d5bd4e58b5d8da6fcc9bfd929f6f3892eb7a0ed7ef8b10ad00ffff909d837",
+      "committed_size_bytes": 1789,
+      "worktree_sha256": "144d5bd4e58b5d8da6fcc9bfd929f6f3892eb7a0ed7ef8b10ad00ffff909d837",
+      "worktree_size_bytes": 1789,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-f99-wheel-build.json": {
+      "git_blob_oid": "41ed277112b8b56e9d72b3c1157fb82c5b089e6b",
+      "committed_sha256": "baa7392a1be987130ab4322302ac434b2e47c1318afd82138d8a3ed96a94719a",
+      "committed_size_bytes": 2366,
+      "worktree_sha256": "baa7392a1be987130ab4322302ac434b2e47c1318afd82138d8a3ed96a94719a",
+      "worktree_size_bytes": 2366,
+      "worktree_equals_committed": true
+    }
+  }
+}

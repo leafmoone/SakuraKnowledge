@@ -1,6 +1,24 @@
 # Stage Status (SakuraKnowledge)
 
-## Current directed repair — READY_FOR_REVIEW / WAITING_REVIEW
+## Current f99a115 nine-finding repair — READY_FOR_REVIEW / WAITING_REVIEW
+
+Submission evidence: `reports/P2/review-f99-delivery.json` and
+`reports/P2/review-f99-nine-findings.md`. This proposes readiness, not external approval.
+The f99a115 review was **CHANGES_REQUIRED / NOT_READY**; its passing aggregate tests
+were insufficient and remain historical. Its checkout-byte receipt index is superseded
+by `review-f99-historical-binding.json`, not silently treated as a committed-byte index.
+
+- Implementation/reference/clean artifact source: `5305e48bcc0f7d794bc21155cb834033256911d4`.
+- Failure-first regression:24 FAIL/5 PASS before; final pytest150/Rust5, seven checks exit0.
+- New formal151 PASS=135 full-value+16error contracts; zero retries/timeouts,604 raw hashes verified.
+- New performance960/960 measured+32fixed warmups;496 pairs/996 stream hashes verified.
+- New wheel/binary source-external8 pairs plus2 reviewer real-query counterexamples pass.
+- New25-receipt binding hashes exact committed bytes at `1d5954fb233a63ef01f39ab0cd16def1f45399ce`.
+- Snapshot unchanged; P1/main/old receipts untouched, R4 not reopened, P3 not started.
+- Local-only artifacts; Linux/Pi/full human review/dbstat/Pool/live refresh NOT_RUN.
+- Final push SHA is verified independently and reported with submission, without a self-referential file hash.
+
+## Historical bd99b7a repair — superseded by f99a115 CHANGES_REQUIRED review
 
 Current evidence: `reports/P2/repair-bd99b7a-delivery.json` (R1–R6 and all gates).
 This is implementation/validation readiness, **not external review approval**.
