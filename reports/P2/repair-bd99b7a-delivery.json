@@ -202,8 +202,23 @@
       "receipts": [
         "repair-bd99b7a-perf-v2.json",
         "repair-bd99b7a-perf-verification.json",
-        "repair-bd99b7a-environment.json"
+        "repair-bd99b7a-environment.json",
+        "repair-bd99b7a-perf-v1.json",
+        "repair-bd99b7a-performance-method.md"
       ],
+      "method": {
+        "argv_change": "Python independent CLI search --topk 10 (invalid, v1) changed to --limit 10 (v2); actual driver/child argv and reason in performance-method.md, full executed absolute argv in raw receipts",
+        "v1_measured_attempted_success_failed": [960, 900, 60],
+        "v1_warmup_attempted_success_failed": [32, 30, 2],
+        "v2_measured_attempted_success_failed": [960, 960, 0],
+        "v2_warmup_attempted_success_failed": [32, 32, 0],
+        "warmup": "one fixed excluded pass per mode/runtime, recorded round=-1",
+        "retries": 0,
+        "inner_operation_budget_seconds": 5,
+        "independent_cli_outer_timeout_seconds": 15,
+        "reused_entire_batch_outer_timeout_seconds": 600,
+        "failure_accounting": "all failures retained in attempted/failed_rounds; percentiles only successful samples; v1 remains FAIL, not merged into v2"
+      },
       "evidence_scope": "960 measured+32warmups; all succeed;496 full JSON paired outputs;RSS sampled maxima not precise peaks;perf-v1 tool argv failure preserved"
     },
     "FINAL_CHECK_MATRIX": {
