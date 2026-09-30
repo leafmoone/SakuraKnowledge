@@ -1,0 +1,26 @@
+{
+  "head": "5305e48bcc0f7d794bc21155cb834033256911d4",
+  "working_tree": " M tests/test_review_f99.py\n?? reports/P2/review-f99-artifact-manifest.json\n?? reports/P2/review-f99-check-pytest.json\n?? reports/P2/review-f99-index-counterexample.json\n?? reports/P2/review-f99-parity-v1.json\n?? reports/P2/review-f99-release-build.json\n?? reports/P2/review-f99-wheel-build.json\n",
+  "argv": [
+    "python",
+    "-m",
+    "ruff",
+    "check",
+    "src",
+    "tests",
+    "tools"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.14432309987023473,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "QWxsIGNoZWNrcyBwYXNzZWQhCg==",
+  "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+  "stdout": "All checks passed!\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

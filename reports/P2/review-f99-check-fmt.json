@@ -1,0 +1,25 @@
+{
+  "head": "5305e48bcc0f7d794bc21155cb834033256911d4",
+  "working_tree": " M tests/test_review_f99.py\n?? reports/P2/review-f99-artifact-manifest.json\n?? reports/P2/review-f99-check-diff.json\n?? reports/P2/review-f99-check-pytest.json\n?? reports/P2/review-f99-check-ruff.json\n?? reports/P2/review-f99-index-counterexample.json\n?? reports/P2/review-f99-parity-v1.json\n?? reports/P2/review-f99-release-build.json\n?? reports/P2/review-f99-wheel-build.json\n",
+  "argv": [
+    "cargo",
+    "fmt",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--",
+    "--check"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.6662626001052558,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

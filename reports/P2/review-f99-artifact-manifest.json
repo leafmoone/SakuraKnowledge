@@ -1,0 +1,17 @@
+{
+  "source_sha": "5305e48bcc0f7d794bc21155cb834033256911d4",
+  "clean_build": true,
+  "distribution": "local-only",
+  "artifacts": [
+    {
+      "path": "dist/p2-review-5305e48/sknow-rs.exe",
+      "bytes": 4734468,
+      "sha256": "7d7ff2b5279963333fc2f560899ec70749f4331139bdaac08e55f97ef183e952"
+    },
+    {
+      "path": "dist/p2-review-5305e48/sakura_knowledge-0.2.0-py3-none-any.whl",
+      "bytes": 29234,
+      "sha256": "7478d7d0071b4c53775e8e24c68df4d5dd3eb018578dcb58fdf33fce0f519b92"
+    }
+  ]
+}

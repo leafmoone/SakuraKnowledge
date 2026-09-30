@@ -127,6 +127,9 @@ def test_r1_inspect_final_deadline(tmp_path, monkeypatch):
         monkeypatch.setattr(api, "_execute", expired_after_last_statement)
         with pytest.raises(ValueError, match="query_budget_exceeded"):
             api.inspect()
+        monkeypatch.setattr(api, "_execute", execute)
+        assert api.inspect()["read_only"]
+        assert api.lookup("hero")["status"] == "found"
 
 
 def test_r1_error_path_checks_same_deadline(tmp_path, monkeypatch):
@@ -192,6 +195,33 @@ def test_r3_non_whitespace_not_stripped(binary, tmp_path, query):
     assert actual["parsed_subject"] == "hero\u200b"
     assert actual["status"] == "unknown"
     assert actual == expected
+
+
+def test_r1_reviewer_inmemory_100_titles(monkeypatch):
+    import sakura_knowledge.api as module
+    from sakura_knowledge.storage import SCHEMA
+
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.executescript(SCHEMA)
+    conn.execute("INSERT INTO sources VALUES('fixture','{}')")
+    conn.executemany("INSERT INTO build_meta VALUES(?,?)", [
+        ("contract_version", "2"), ("search_text_version", "2"), ("snapshot", "fixture")])
+    for i in range(100):
+        conn.execute("INSERT INTO entries(id,kind,namespace,value) VALUES(?,'page','fixture',?)", (i+1, str(i)))
+        conn.execute("INSERT INTO entry_evidence(entry_id,source_id,evidence_id,status,payload) "
+                     "VALUES(?,'fixture',?,'source_backed','{}')", (i+1, str(i)))
+        conn.execute("INSERT INTO aliases(entry_id,text,source_id,evidence_id,status) "
+                     "VALUES(?,'shared','fixture',?,'source_backed')", (i+1, str(i)))
+        conn.execute("INSERT INTO documents(entry_id,title,original,source_id,evidence_id,status,payload) "
+                     "VALUES(?,?,'body','fixture',?,'source_backed','{}')", (i+1, 'x'*300000, str(i)))
+    monkeypatch.setattr(module, "readonly", lambda _path: conn)
+    with Knowledge("inmemory") as api:
+        start = time.monotonic()
+        value = api.search("shared", topk=1)
+        assert time.monotonic()-start < 5
+        assert len(value["candidates"]) == 1
+        assert value["candidates"][0]["descriptions"][0]["title_truncated"]
 
 
 def test_r1_field_and_serialization_deadline_checks():

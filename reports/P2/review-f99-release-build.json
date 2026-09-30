@@ -1,0 +1,28 @@
+{
+  "head": "5305e48bcc0f7d794bc21155cb834033256911d4",
+  "working_tree": "",
+  "argv": [
+    "cargo",
+    "build",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--release",
+    "--locked",
+    "--examples",
+    "--bin",
+    "sknow-rs"
+  ],
+  "exit": 0,
+  "elapsed_s": 6.322120900033042,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "ICAgQ29tcGlsaW5nIHNlcmRlX2pzb24gdjEuMC4xNTEKICAgQ29tcGlsaW5nIHNha3VyYS1rbm93bGVkZ2UtcnVudGltZSB2MC4yLjAgKEQ6XFNha3VyYVRvb2xcU2FrdXJhS25vd2xlZGdlXHJ1c3QpCiAgICBGaW5pc2hlZCBgcmVsZWFzZWAgcHJvZmlsZSBbb3B0aW1pemVkXSB0YXJnZXQocykgaW4gNi4yMnMK",
+  "stderr_sha256": "cf40eb4ed36931a90fd05e173b20c941bdba55dc1500e302f350ffd804dcde5e",
+  "stderr": "   Compiling serde_json v1.0.151\n   Compiling sakura-knowledge-runtime v0.2.0 (D:\\SakuraTool\\SakuraKnowledge\\rust)\n    Finished `release` profile [optimized] target(s) in 6.22s\n"
+}
