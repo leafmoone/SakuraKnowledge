@@ -1,0 +1,33 @@
+{
+  "overall": "NOT_READY",
+  "full_candidate": "BLOCKED/NOT_RUN",
+  "full_build_attempts": 0,
+  "native_tag_identities": 30,
+  "official_active_alias_graphs": 1,
+  "official_inactive_alias_records": 3,
+  "wiki_tag_links": 28,
+  "wiki_changed_versions_quarantined": 2,
+  "native_name_assessments": 352,
+  "pilot_entries": 451,
+  "pilot_fts_documents": 222,
+  "pilot_input_records": 874,
+  "pilot_accepted_records": 874,
+  "candidate_decisions": 100,
+  "verified_entity_tag": 0,
+  "human_verified": 0,
+  "gold_queries": 50,
+  "positive_denominator": 38,
+  "positive_correct": 38,
+  "chinese_script_positive_denominator": 15,
+  "nonresolved_denominator": 12,
+  "nonresolved_correct": 12,
+  "wrong_resolved_tag": 0,
+  "full_source_recall": "NOT_MEASURED",
+  "description_claim": "source text only, bounded compatibleWiki",
+  "gaps": [
+    "Real source-backed cross-source mapping ID/link evidence is missing",
+    "No actual human verification; agent candidate decisions never count as human",
+    "Old and new source cuts remain distinct; new30tag native scope only",
+    "Full candidate resolver performance and RSS NOT_RUN because build blocked"
+  ]
+}

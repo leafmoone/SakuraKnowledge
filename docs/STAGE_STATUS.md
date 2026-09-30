@@ -1,6 +1,6 @@
 # Stage Status (SakuraKnowledge)
 
-## Current authorized P3 — IN_PROGRESS
+## Current authorized P3 — BLOCKED / NOT_READY
 
 - P1/P2: **CLOSED_AND_MERGED**. P2 fixed review `894dc6a73bfd42f18cc7648e8ab7481aae211ab1`
   APPROVE / NO_BLOCKING_FINDINGS within authorized Windows targeted/artifact scope.
@@ -12,6 +12,19 @@
 - Scope: frozen native tags/active aliases/Wiki evidence and trusted entity names,
   typed identity, independent fixtures then real pilot including conflicts; a full
   candidate build is permitted only once after every documented gate is satisfied.
+- Source/artifact code: `b393581c54d5ac0db76802897220f4818c1eb3c0`.
+  Evidence-only commits and the final remote-bound SHA are listed in the P3 delivery.
+- Real pilot:30 native tags,28 compatible same-source Wiki links,352 assessments;
+  451entries/222FTS,874input records all accounted. 100candidate decisions,0verified
+  cross-source entity_tag/0human_verified. Two changed Wiki versions quarantined.
+- Frozen50 real queries:50fullJSON+oracle+expected PASS,38positive (15Chinese-script),
+  12nonresolved,0wrong tag. This is scoped pilot coverage, not full-source recall.
+- Full candidate gate: all recorded cleanSHA/inputSHA/oldsnapshotSHA/disk/budget/
+  pilot/native/wiki gates pass, necessary real verified entity_tag positive fails.
+  **BLOCKED / NOT_RUN / zero attempts**. Supply actual source ID/link evidence or
+  genuine human decisions; names/scores/agent self-review cannot unblock it.
+- Old151 and seven Windows checks are recorded in `reports/P3/`; independent
+  new artifacts and pilot-only dual-mode performance are not full-build acceptance.
 - Existing P1/P2 reports/receipts and published 21.5GB snapshot remain immutable.
 - No main merge/P4/Pool/SakuraTool integration. Existing Linux/Pi/full human facts/
   dbstat/Pool/live refresh NOT_RUN remain limitations, not new blockers.

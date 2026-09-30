@@ -1,0 +1,25 @@
+{
+  "head": "b393581c54d5ac0db76802897220f4818c1eb3c0",
+  "working_tree": "?? reports/P3/check-diff.json\n?? reports/P3/check-pytest.json\n?? reports/P3/check-ruff.json\n?? reports/P3/full-candidate-gate.json\n",
+  "argv": [
+    "cargo",
+    "fmt",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--",
+    "--check"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.760833099950105,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

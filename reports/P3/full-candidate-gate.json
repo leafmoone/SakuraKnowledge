@@ -1,0 +1,78 @@
+{
+  "status": "BLOCKED",
+  "fixed_code_sha": "b393581c54d5ac0db76802897220f4818c1eb3c0",
+  "main_sha": "894dc6a73bfd42f18cc7648e8ab7481aae211ab1",
+  "candidate_build": "NOT_RUN",
+  "attempts": 0,
+  "gates": {
+    "code_sha_clean": true,
+    "main_unchanged": true,
+    "frozen_inputs_all_sha": true,
+    "old_snapshot_unchanged": true,
+    "disk_100GiB_budget": true,
+    "official_budget": true,
+    "realpilot_acceptance": true,
+    "native_real_positive": true,
+    "wiki_real_positive": true,
+    "necessary_verified_entity_tag_real_positive": false
+  },
+  "inputs": [
+    {
+      "source_id": "bangumi-complete-6a75aefb769a",
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\real-full-7afe7fb\\bangumi.jsonl",
+      "expected": "6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4",
+      "observed": "6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4",
+      "unchanged": true
+    },
+    {
+      "source_id": "moegirl-complete-5072f7cf3e3e",
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\real-full-7afe7fb\\moegirl.jsonl",
+      "expected": "5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d",
+      "observed": "5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d",
+      "unchanged": true
+    },
+    {
+      "source_id": "mapping-complete-c8263a535096",
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\real-full-7afe7fb\\mapping.jsonl",
+      "expected": "c8263a5350964534170d833f560fb50758e3a4215e86b8f5c72cd51b72266f1f",
+      "observed": "c8263a5350964534170d833f560fb50758e3a4215e86b8f5c72cd51b72266f1f",
+      "unchanged": true
+    },
+    {
+      "source_id": "danbooru-complete-a26a3829dd42",
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\real-full-7afe7fb\\danbooru.jsonl",
+      "expected": "a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5",
+      "observed": "a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5",
+      "unchanged": true
+    },
+    {
+      "source_id": "tag_wiki-complete-a2eb055c578d",
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\real-full-7afe7fb\\tag_wiki.jsonl",
+      "expected": "a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef",
+      "observed": "a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef",
+      "unchanged": true
+    },
+    {
+      "source_id": "danbooru-native-scoped-4ccce02e466f",
+      "path": "build\\p3-inputs-v2\\native.jsonl",
+      "expected": "69f39648be2e8b9557b559c0be0c46970b2a213ce4b6033e066dbd11c0229bba",
+      "observed": "69f39648be2e8b9557b559c0be0c46970b2a213ce4b6033e066dbd11c0229bba",
+      "unchanged": true
+    }
+  ],
+  "old_snapshot": {
+    "path": "build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+    "bytes": 21516320768,
+    "sha256": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073"
+  },
+  "free_bytes": 473787285504,
+  "decisions_verified": 0,
+  "decision_count": 100,
+  "manifest": {
+    "path": "build\\p3-inputs-v2\\candidate-manifest.json",
+    "sha256": "433f4e1e908741b398ad31ef2dabd5311c7c2da492c4343d98e1e6005565d56b"
+  },
+  "blocker": "No real explicit cross-source ID/link evidence or actual human verification for necessary entity_tag positive. Name-only queue remains candidate; no runtime confidence promotion.",
+  "overall_P3": "NOT_READY, pilot/code evidence only, not P3 acceptance",
+  "future_action": "Supply source-backed cross-source ID/link evidence or genuine human decision, replay+new pilot; do not automatically perform/retry full build"
+}

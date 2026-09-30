@@ -1,0 +1,11 @@
+{
+  "status": "FAIL",
+  "command": "PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python tools/p3_collect_delivery.py",
+  "exit": 1,
+  "error": "ValueError: wheel source bytes diverge",
+  "phase": "strict byte-exact wheel versus committed Git blob audit, before output publication",
+  "observed_followup": "All 12 differing Python modules match exact archive-export bytes; each differs from committed blob only by LF to CRLF. No byte-exact source-module equality is claimed.",
+  "resolution": "Do not relabel this check PASS. New artifact manifest separately records committed blob and wheel-export hashes/sizes, exact export match and EOL-normalized equivalence, not byte-exact blob equality.",
+  "production_source_commit": "b393581c54d5ac0db76802897220f4818c1eb3c0",
+  "artifact_rebuilt": false
+}

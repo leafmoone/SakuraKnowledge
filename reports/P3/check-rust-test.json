@@ -1,0 +1,24 @@
+{
+  "head": "b393581c54d5ac0db76802897220f4818c1eb3c0",
+  "working_tree": "?? reports/P3/check-diff.json\n?? reports/P3/check-fmt.json\n?? reports/P3/check-pytest.json\n?? reports/P3/check-ruff.json\n?? reports/P3/full-candidate-gate.json\n",
+  "argv": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked"
+  ],
+  "exit": 0,
+  "elapsed_s": 3.727778799831867,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "CnJ1bm5pbmcgNiB0ZXN0cwp0ZXN0IHRlc3RzOjp0ZW1wbGF0ZXNfcGFyc2UgLi4uIG9rCnRlc3QgdGVzdHM6OnRva2VuaXplcl9tYXRjaGVzX3JlZmVyZW5jZSAuLi4gb2sKdGVzdCB0ZXN0czo6dW5pY29kZTE2X2NvbXBsZXRlX2V4YW1wbGVzIC4uLiBvawp0ZXN0IHRlc3RzOjpyZXZpZXdfZjk5X2ZvcmNlZF9kZWFkbGluZV9jb3ZlcnNfZXJyb3JzX2luc3BlY3RfYW5kX3Byb2plY3Rpb24gLi4uIG9rCnRlc3QgdGVzdHM6OmZpeHR1cmVfbG9va3VwX3NlYXJjaF9yZWxhdGVkX2FzayAuLi4gb2sKdGVzdCB0ZXN0czo6cDNfc2hhcmVkX2RlYWRsaW5lX25lc3RlZF9yZXNvbHZlcl9hbmRfcmVzZXQgLi4uIG9rCgp0ZXN0IHJlc3VsdDogb2suIDYgcGFzc2VkOyAwIGZhaWxlZDsgMCBpZ25vcmVkOyAwIG1lYXN1cmVkOyAwIGZpbHRlcmVkIG91dDsgZmluaXNoZWQgaW4gMC4wNXMKCgpydW5uaW5nIDAgdGVzdHMKCnRlc3QgcmVzdWx0OiBvay4gMCBwYXNzZWQ7IDAgZmFpbGVkOyAwIGlnbm9yZWQ7IDAgbWVhc3VyZWQ7IDAgZmlsdGVyZWQgb3V0OyBmaW5pc2hlZCBpbiAwLjAwcwoKCnJ1bm5pbmcgMCB0ZXN0cwoKdGVzdCByZXN1bHQ6IG9rLiAwIHBhc3NlZDsgMCBmYWlsZWQ7IDAgaWdub3JlZDsgMCBtZWFzdXJlZDsgMCBmaWx0ZXJlZCBvdXQ7IGZpbmlzaGVkIGluIDAuMDBzCgo=",
+  "stdout_sha256": "01493892186a78c9d90da3d677020ef93b722f26e2b16eb3e621f95193f59e03",
+  "stdout": "\nrunning 6 tests\ntest tests::templates_parse ... ok\ntest tests::tokenizer_matches_reference ... ok\ntest tests::unicode16_complete_examples ... ok\ntest tests::review_f99_forced_deadline_covers_errors_inspect_and_projection ... ok\ntest tests::fixture_lookup_search_related_ask ... ok\ntest tests::p3_shared_deadline_nested_resolver_and_reset ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+  "stderr_base64": "ICAgQ29tcGlsaW5nIHNha3VyYS1rbm93bGVkZ2UtcnVudGltZSB2MC4yLjAgKEQ6XFNha3VyYVRvb2xcU2FrdXJhS25vd2xlZGdlXHJ1c3QpCiAgICBGaW5pc2hlZCBgdGVzdGAgcHJvZmlsZSBbdW5vcHRpbWl6ZWQgKyBkZWJ1Z2luZm9dIHRhcmdldChzKSBpbiAyLjg3cwogICAgIFJ1bm5pbmcgdW5pdHRlc3RzIHNyY1xsaWIucnMgKHJ1c3RcdGFyZ2V0XGRlYnVnXGRlcHNcc2FrdXJhX2tub3dsZWRnZV9ydW50aW1lLWEwOTI2NGVhN2RhMDYwOGQuZXhlKQogICAgIFJ1bm5pbmcgdW5pdHRlc3RzIHNyY1xtYWluLnJzIChydXN0XHRhcmdldFxkZWJ1Z1xkZXBzXHNrbm93X3JzLWUwZTI1MWRkOWZhNTBlMDIuZXhlKQogICBEb2MtdGVzdHMgc2FrdXJhX2tub3dsZWRnZV9ydW50aW1lCg==",
+  "stderr_sha256": "87d65f1fa4d6a7b02dd3410945d1932247ee1a90db6e7180eaa85b37fe79b7d8",
+  "stderr": "   Compiling sakura-knowledge-runtime v0.2.0 (D:\\SakuraTool\\SakuraKnowledge\\rust)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.87s\n     Running unittests src\\lib.rs (rust\\target\\debug\\deps\\sakura_knowledge_runtime-a09264ea7da0608d.exe)\n     Running unittests src\\main.rs (rust\\target\\debug\\deps\\sknow_rs-e0e251dd9fa50e02.exe)\n   Doc-tests sakura_knowledge_runtime\n"
+}

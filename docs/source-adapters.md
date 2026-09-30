@@ -18,3 +18,29 @@ Moegirl `char2subject` categories are preserved as raw categories; they do not a
 The audited local cut contains **zero native `danbooru.tag` identities** and **zero verified `entity_tag` links**. A local aggregate tag, page title, exact spelling, confidence value, or candidate link cannot establish a Danbooru tag identity. The API reports `target_unmapped` or `entity_ambiguous` instead.
 
 The Pi runtime was not exercised (`PI_SKILL_INTEGRATION=NOT_RUN`). Full human source-fact review was not performed (`HUMAN_FACT_REVIEW=NOT_RUN`). The fixed inputs and the generated snapshot are evidence for this recorded local build only.
+
+## P3 scoped official metadata (separate from immutable P1 cut)
+
+The original zero-native observation above remains true for that frozen P1 cut.
+P3 acquired only 30 preselected native tags with embedded Wiki associations and
+42 scoped outgoing-alias name queries, using 52 total requests including earlier
+documentation. Receipts: `reports/P3/native-acquisition.json` and
+`alias-acquisition.json`. This is a bounded nontransactional official API window,
+not a full upstream refresh or historical rewrite. Source raw/data license remains
+unknown; raw stays local-only with hashes and locators, not an unrestricted dataset.
+
+`tools/p3_compile_inputs.py` validates native IDs/category/lifecycle and directed
+active alias graphs, preserving retired/deleted records without redirecting them.
+28 official Wiki associations match the old page's exact body, updated_at and
+other_names. Two changed Wiki versions are quarantined, not relabeled as compatible.
+Existing source dates remain separate. Native/Wiki/local aggregate/entities remain
+distinct namespaces; generated text creates none of these identities.
+
+Real P3 pilot: 30 native identities, 28 native `wiki_tag` links, 352 indexed name
+assessments. Conflict-preserving selection includes every old source record with
+matching selected typed values or source-backed names (not only favorable matches).
+100 cross-source candidates have replayable execution-agent decisions; **zero
+verified entity_tag** and **zero human_verified**. Same-name matches do not become
+verified. Missing real entity_tag positive evidence blocks the full candidate;
+`reports/P3/full-candidate-gate.json` records zero full-build attempts. This is P3
+NOT_READY / BLOCKED, not P3 acceptance or source-fact approval.
