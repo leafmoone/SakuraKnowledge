@@ -1,5 +1,6 @@
 """Offline frozen native/Wiki ETL and conflict-preserving pilot selection."""
 import argparse
+import hashlib
 import json
 from collections import Counter
 from datetime import UTC, datetime
@@ -55,6 +56,7 @@ def main():
                 aliases.append(a)
                 alias_refs[a['id']]=r
     assessments=assess(tags,aliases,set(scopes))
+    aliases_by_id={a['id']:a for a in aliases}
     tags_by_name={t['name']:t for t in tags}
     native_records=[]
     lookup=[]
@@ -74,12 +76,17 @@ def main():
         chain=[]
         if target:
             chain.append(proof('native_identity',tagreceipt,'native:'+str(target['id']),tag_id=target['id']))
+        path=[name]
         for aid in a['chain']:
-            chain.append(proof('official_alias_step',alias_refs[aid],'official_alias:'+str(aid),alias_id=aid))
-        if name in scopes:
-            chain.append(proof('canonical_scope',scopes[name],'scope:'+name,coverage='scoped_complete'))
-        if terminal and terminal!=name:
-            chain.append(proof('canonical_scope',scopes[terminal],'scope:'+terminal,coverage='scoped_complete'))
+            edge=aliases_by_id[aid]
+            chain.append(proof('official_alias_step',alias_refs[aid],'official_alias:'+str(aid),alias_id=aid,
+                               antecedent_name=edge['antecedent_name'],consequent_name=edge['consequent_name'],
+                               upstream_status=edge['status']))
+            path.append(edge['consequent_name'])
+        for step in dict.fromkeys(path):
+            if step in scopes:
+                chain.append(proof('canonical_scope',scopes[step],'scope:'+step,name=step,
+                                   coverage='scoped_complete',active_alias_ids=[e['id'] for e in load_raw(scopes[step]) if e['status']=='active']))
         if not chain:
             chain=[proof('canonical_scope',tagreceipt,'unknown:'+name,coverage='partial')]
         matched='native_exact' if name in tags_by_name else 'official_alias'
@@ -95,13 +102,14 @@ def main():
     original=json.loads(old_manifest.read_text())
     danbooru_source=next(s for s in original['sources'] if s['provider']=='danbooru')
     old_wiki_path=(old_manifest.parent/danbooru_source['path']).resolve()
-    old_pages={}
+    old_pages={};old_lines={}
     live_wikis={str(t['wiki_page']['id']):t for t in tags if isinstance(t.get('wiki_page'),dict)}
     with old_wiki_path.open(encoding='utf-8') as stream:
-        for text in stream:
+        for line_no,text in enumerate(stream,1):
             row=json.loads(text)
             if row.get('key',{}).get('namespace')=='danbooru.wiki' and row['key']['value'] in live_wikis:
                 old_pages[row['key']['value']]=row
+                old_lines[row['key']['value']]=line_no
     compatible=[];conflicts=[]
     for wid,t in live_wikis.items():
         wiki=t['wiki_page'];old=old_pages.get(wid);native=next(x for x in lookup if x['name']==t['name'])
@@ -117,6 +125,11 @@ def main():
             elif old['documents'][0]['original']!=wiki.get('body',''):
                 reason='mixed_cut_body_conflict'
         if reason:
+            native['evidence_chain']=native['evidence_chain']+[proof('wiki_association_quarantined',tagreceipt,
+                'wiki-quarantine:'+wid,wiki_key=key('page','danbooru.wiki',wid),tag_key=key('tag','danbooru.tag',t['name']),
+                reason=reason,old_source_id=danbooru_source['source_id'],old_input_sha256=danbooru_source['local_sha256'],
+                old_line=old_lines.get(wid),old_updated_at=old.get('raw',{}).get('raw_page_metadata',{}).get('updated_at') if old else None,
+                live_updated_at=wiki.get('updated_at'))]
             conflicts.append({'tag':t['name'],'wiki_id':wid,'reason':reason,
                               'old_updated_at':old.get('raw',{}).get('raw_page_metadata',{}).get('updated_at') if old else None,
                               'new_updated_at':wiki.get('updated_at')})
@@ -126,16 +139,31 @@ def main():
             continue
         wiki_ids.add(wid);compatible.append({'tag':t['name'],'wiki_id':wid,'updated_at':wiki['updated_at']})
         wkey=key('page','danbooru.wiki',wid)
-        native_records.append({'record_type':'link','src':wkey,'dst':key('tag','danbooru.tag',t['name']),
+        tkey=key('tag','danbooru.tag',t['name'])
+        association=proof('wiki_tag_link',tagreceipt,'wiki:'+wid,wiki_id=wiki['id'],tag_id=t['id'],
+                          wiki_key=wkey,tag_key=tkey,association='official embedded tag.wiki_page')
+        body_sha=hashlib.sha256(wiki['body'].encode('utf-8')).hexdigest()
+        names_sha=hashlib.sha256(json.dumps(wiki['other_names'],ensure_ascii=False,separators=(',',':')).encode('utf-8')).hexdigest()
+        compatibility=proof('wiki_cut_compatibility',tagreceipt,'wiki-cut:'+wid,wiki_key=wkey,tag_key=tkey,
+                            old_source_id=danbooru_source['source_id'],old_input_sha256=danbooru_source['local_sha256'],
+                            old_path=str(old_wiki_path),old_line=old_lines[wid],
+                            old_evidence_id=old.get('evidence_id',f"{danbooru_source['source_id']}:{danbooru_source['local_sha256']}:line:{old_lines[wid]}"),
+                            old_updated_at=meta['updated_at'],live_updated_at=wiki['updated_at'],
+                            body_sha256=body_sha,old_body_sha256=body_sha,live_body_sha256=body_sha,
+                            old_other_names_sha256=names_sha,live_other_names_sha256=names_sha,
+                            rule='exact body+updated_at+other_names; no live overwrite')
+        description_refs=[association,compatibility]
+        native_records.append({'record_type':'link','src':wkey,'dst':tkey,
                                'relation':'wiki_tag','method':'official-embedded-association-compatible-cut-v1',
-                               'verification_status':'native','evidence_refs':[proof('wiki_tag_link',tagreceipt,'wiki:'+wid,wiki_id=wiki['id'],tag_id=t['id'])]})
+                               'verification_status':'native','evidence_refs':description_refs})
+        native['evidence_chain']=native['evidence_chain']+description_refs
         native['wiki_key']=wkey
         for text in wiki.get('other_names',[]):
             if not isinstance(text,str) or not text:
                 continue
             reference=proof('multilingual_name',tagreceipt,'wiki:'+wid,wiki_id=wiki['id'],language='unknown',text=text)
             lookup.append({**native,'name':text,'matched_by':'wiki_name','evidence_id':'wiki:'+wid+':name:'+text,
-                           'evidence_chain':native['evidence_chain']+[proof('wiki_tag_link',tagreceipt,'wiki:'+wid,wiki_id=wiki['id']),reference]})
+                           'evidence_chain':native['evidence_chain']+[reference]})
     all_records=native_records+lookup
     lines(args.out/'native.jsonl',all_records)
     # Preserve every old record whose full identity or source-backed alias matches

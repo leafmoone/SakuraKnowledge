@@ -27,6 +27,7 @@ impl Default for TagOptions<'_> {
 }
 
 struct Assessment {
+    name: String,
     target: Option<i64>,
     value: Option<String>,
     matched: String,
@@ -85,16 +86,29 @@ impl Runtime {
     }
 
     fn assessments(&self, name: &str, category: Option<i64>) -> Result<Vec<Assessment>> {
+        self.assessments_filtered(name, category, false)
+    }
+
+    fn native_assessments(&self, name: &str, category: Option<i64>) -> Result<Vec<Assessment>> {
+        self.assessments_filtered(name, category, true)
+    }
+
+    fn assessments_filtered(
+        &self,
+        name: &str,
+        category: Option<i64>,
+        native_only: bool,
+    ) -> Result<Vec<Assessment>> {
         let mut stmt = self.conn.prepare(&format!(
             "SELECT r.target,e.value,r.matched_by,r.canonical_status,r.payload \
              FROM tag_resolutions r LEFT JOIN entries e ON e.id=r.target \
-             WHERE r.name=?1 AND (?2 IS NULL OR r.category=?2) \
+             WHERE r.name=?1 AND (?2 IS NULL OR r.category=?2) AND (?3=0 OR r.matched_by IN ('native_exact','official_alias')) \
              AND (r.target IS NULL OR (e.kind='tag' AND e.namespace='danbooru.tag' \
              AND e.conflicted=0 AND EXISTS(SELECT 1 FROM entry_evidence p \
              WHERE p.entry_id=e.id AND p.status IN ({ID_STATUSES})))) \
              ORDER BY CASE r.matched_by WHEN 'native_exact' THEN 0 WHEN 'official_alias' THEN 1 ELSE 2 END,e.value,r.id"
         ))?;
-        let rows = stmt.query_map(params![name, category], |r| {
+        let rows = stmt.query_map(params![name, category, native_only as i32], |r| {
             Ok((
                 r.get::<_, Option<i64>>(0)?,
                 r.get::<_, Option<String>>(1)?,
@@ -113,6 +127,7 @@ impl Runtime {
                 return Err(Error::Invalid("invalid P3 proof chain".into()));
             }
             out.push(Assessment {
+                name: name.to_string(),
                 target,
                 value,
                 matched,
@@ -147,6 +162,9 @@ impl Runtime {
                 }
             }
             out["evidence_chain"] = json!(chain);
+            out["unresolved_reasons"] = json!(assessments.iter()
+                .filter(|a|a.canonical!="canonical" || a.target.is_none())
+                .map(|a|json!({"name":a.name,"matched_by":a.matched,"reason":a.payload.get("reason").and_then(Value::as_str).unwrap_or("canonical_evidence_incomplete")})).collect::<Vec<_>>());
             return Ok(());
         }
         let mut unique = BTreeMap::<String, Assessment>::new();
@@ -189,27 +207,70 @@ impl Runtime {
         out["matched_by"] = json!(a.matched);
         out["canonical_status"] = json!("canonical");
         out["evidence_chain"] = a.payload["evidence_chain"].clone();
-        // Alias/mapping proof may not carry a description; fetch only the proven
-        // native target projection via the offline target index, not global names.
-        let mut wiki = a.payload.get("wiki_key").cloned();
-        if wiki.is_none() {
-            let payload:Option<String>=self.conn.query_row("SELECT payload FROM tag_resolutions WHERE target=?1 AND matched_by='native_exact' AND canonical_status='canonical' ORDER BY id LIMIT 1",[a.target],|r|r.get(0)).optional()?;
-            if let Some(text) = payload {
-                let payload: Value = serde_json::from_str(&text)
-                    .map_err(|_| Error::Invalid("invalid native description proof".into()))?;
-                wiki = payload.get("wiki_key").cloned();
+        // Description uses the actual indexed native Wiki edge, never a wiki_key
+        // or a fresh spelling resolution. Both cuts must have bound compatibility.
+        let mut stmt=self.conn.prepare("SELECT w.id,w.value,l.source_id,l.evidence_id,l.payload FROM links l JOIN entries w ON w.id=l.src WHERE l.dst=?1 AND l.relation='wiki_tag' AND l.verification_status IN ('native','verified') AND w.kind='page' AND w.namespace='danbooru.wiki' AND w.conflicted=0 ORDER BY w.value,l.id")?;
+        let rows = stmt.query_map([a.target], |r| {
+            Ok((
+                r.get::<_, i64>(0)?,
+                r.get::<_, String>(1)?,
+                r.get::<_, String>(2)?,
+                r.get::<_, String>(3)?,
+                r.get::<_, String>(4)?,
+            ))
+        })?;
+        for row in rows {
+            self.check_deadline()?;
+            let (wiki_id, wiki_value, sid, eid, text) = row?;
+            let link: Value = serde_json::from_str(&text)
+                .map_err(|_| Error::Invalid("invalid Wiki association proof".into()))?;
+            let Some(refs) = link["evidence_refs"].as_array() else {
+                continue;
+            };
+            let wk = json!({"kind":"page","namespace":"danbooru.wiki","value":wiki_value});
+            let native = tag_key(&name);
+            if !refs.iter().any(|p| {
+                p["role"] == "wiki_tag_link" && p["wiki_key"] == wk && p["tag_key"] == native
+            }) || !refs.iter().any(|p| {
+                p["role"] == "wiki_cut_compatibility"
+                    && p["wiki_key"] == wk
+                    && p["tag_key"] == native
+                    && p["old_updated_at"].as_str().is_some_and(|v| !v.is_empty())
+                    && p["old_updated_at"] == p["live_updated_at"]
+                    && [
+                        "old_source_id",
+                        "old_input_sha256",
+                        "raw_sha256",
+                        "source_id",
+                        "evidence_id",
+                        "body_sha256",
+                        "old_other_names_sha256",
+                    ]
+                    .iter()
+                    .all(|k| p[*k].as_str().is_some_and(|v| !v.is_empty()))
+                    && p["old_line"].as_i64().is_some_and(|v| v > 0)
+                    && p["body_sha256"] == p["old_body_sha256"]
+                    && p["body_sha256"] == p["live_body_sha256"]
+                    && p["old_other_names_sha256"] == p["live_other_names_sha256"]
+            }) {
+                continue;
             }
-        }
-        // Reuse bounded original Wiki documents, never a copied/generated summary.
-        if let Some(wiki) = wiki.filter(|v| v.is_object()) {
-            let id: Option<i64> = self.conn.query_row(
-                "SELECT id FROM entries WHERE kind=?1 AND namespace=?2 AND value=?3 AND conflicted=0",
-                params![wiki["kind"].as_str(),wiki["namespace"].as_str(),wiki["value"].as_str()],
-                |r|r.get(0)).optional()?;
-            if let Some(id) = id {
-                let docs = self.fetch_docs(id)?;
-                out["descriptions"] = json!(docs);
+            let docs = self.fetch_docs(wiki_id)?;
+            if docs.is_empty() {
+                continue;
             }
+            let chain = out["evidence_chain"].as_array_mut().unwrap();
+            for reference in refs {
+                if !chain.contains(reference) {
+                    chain.push(reference.clone());
+                }
+            }
+            chain.push(json!({"role":"wiki_association_edge","source_id":sid,"evidence_id":eid,"src":wk,"dst":native}));
+            for doc in &docs {
+                chain.push(json!({"role":"description","source_id":doc["source_id"],"evidence_id":doc["evidence_id"],"wiki_key":wk,"tag_key":native}));
+            }
+            out["descriptions"] = json!(docs);
+            break;
         }
         Ok(())
     }
@@ -243,7 +304,7 @@ impl Runtime {
             "snapshot":self.snapshot,"query":query,"requested_namespace":namespace,"requested_category":opt.category,
             "source_key":null,"status":"not_found","tag_key":null,"matched_by":null,"canonical_status":"unknown",
             "evidence_chain":[],"descriptions":[],"citations":[],"candidates":[],"candidates_truncated":false,
-            "source_scope":sources,"warnings":[],"relations":[]});
+            "source_scope":sources,"warnings":[],"relations":[],"unresolved_reasons":[]});
         let capability: Option<String> = self
             .conn
             .query_row(
@@ -259,10 +320,14 @@ impl Runtime {
         }
         let constrained = opt.key || opt.kind.is_some() || opt.namespace.is_some();
         if !constrained {
-            let mut direct = self.assessments(query, opt.category)?;
-            if direct.iter().any(|a| a.matched != "wiki_name") {
-                direct.retain(|a| a.matched != "wiki_name");
-            }
+            // Priority is determined before category filtering. A category cannot
+            // cause a native spelling to be reinterpreted as somebody's Wiki name.
+            let native = self.native_assessments(query, None)?;
+            let direct = if native.is_empty() {
+                self.assessments(query, opt.category)?
+            } else {
+                self.native_assessments(query, opt.category)?
+            };
             if !direct.is_empty() {
                 self.apply_assessments(&mut out, direct, opt.limit as usize)?;
                 return Ok(out);
@@ -314,13 +379,13 @@ impl Runtime {
         out["source_key"] = json!({"kind":kind,"namespace":ns,"value":value});
         out["status"] = json!("entity_found_tag_unmapped");
         if kind == "tag" && ns == "danbooru.tag" {
-            if opt.category.is_some() && self.assessments(value, opt.category)?.is_empty() {
+            if opt.category.is_some() && self.native_assessments(value, opt.category)?.is_empty() {
                 out["status"] = json!("not_found");
                 return Ok(out);
             }
             self.apply_assessments(
                 &mut out,
-                self.assessments(value, opt.category)?,
+                self.native_assessments(value, opt.category)?,
                 opt.limit as usize,
             )?;
             return Ok(out);
@@ -342,7 +407,7 @@ impl Runtime {
         for row in rows {
             self.check_deadline()?;
             let (name, sid, eid, payload) = row?;
-            for mut a in self.assessments(&name, opt.category)? {
+            for mut a in self.native_assessments(&name, opt.category)? {
                 let link: Value = serde_json::from_str(&payload)
                     .map_err(|_| Error::Invalid("invalid mapping proof JSON".into()))?;
                 a.payload["evidence_chain"].as_array_mut().unwrap().push(

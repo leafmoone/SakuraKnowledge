@@ -14,6 +14,12 @@ MAX_REQUESTS = 200
 MAX_BYTES = 256*1024*1024
 
 
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    """One counted GET is one HTTP hop. Any redirect stops this source."""
+    def redirect_request(self, request, fp, code, msg, headers, newurl):
+        raise urllib.error.HTTPError(request.full_url,code,'redirect prohibited',headers,fp)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--targets', type=Path, required=True)
@@ -39,6 +45,7 @@ def main():
     count = previous['requests_including_prior_docs'] if previous else 4
     documentation_byte_reserve = 4*1024*1024  # conservative reserve for the four earlier tool GETs
     last = 0.0
+    opener = urllib.request.build_opener(NoRedirect())
 
     def get(endpoint, params, role):
         nonlocal count, total, last
@@ -59,7 +66,7 @@ def main():
         request = urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/json'})
         last = time.monotonic()
         try:
-            response = urllib.request.urlopen(request,timeout=30)
+            response = opener.open(request,timeout=30)
         except urllib.error.HTTPError as error:
             response = error
         except (urllib.error.URLError, TimeoutError) as error:
@@ -134,7 +141,7 @@ def main():
               'user_agent':UA,'authentication':'none; no invented user ID','records':records,'failure':failure,
               'license':'unknown; raw official metadata local-only pending source license verification',
               'transaction_snapshot':False,'time_window':'per-response fetched_at; not a database transaction snapshot',
-              'retries':0,'runtime_network':False}
+              'retries':0,'runtime_network':False,'redirect_policy':'prohibited; stop source on any redirect'}
     with args.out.open('x',encoding='utf-8',newline='\n') as output:
         json.dump(result,output,indent=2)
     print(json.dumps({'status':status,'requests':count,'bytes':total,'failure':failure}))

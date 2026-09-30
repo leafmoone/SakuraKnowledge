@@ -17,6 +17,7 @@ def main():
     parser=argparse.ArgumentParser()
     for flag in ('python','bin','wheel','db','gold','out'):
         parser.add_argument('--'+flag,type=Path,required=True)
+    parser.add_argument('--source-commit',default='b393581c54d5ac0db76802897220f4818c1eb3c0')
     args=parser.parse_args()
     if args.out.exists():raise FileExistsError(args.out)
     root=Path(__file__).resolve().parents[1]
@@ -53,7 +54,7 @@ def main():
             good=value==want and check(value,case) if value is not None else False
             resolver.append({'case_id':case['id'],'passed':good})
     passed=environment_pass and all(x['passed'] for x in pairs+resolver)
-    save(args.out,{'status':'PASS' if passed else 'FAIL','source_commit':'b393581c54d5ac0db76802897220f4818c1eb3c0',
+    save(args.out,{'status':'PASS' if passed else 'FAIL','source_commit':args.source_commit,
                    'environment':env_record,'source_external_verified':environment_pass,'pairs':pairs,'resolver_cases':resolver,
                    'processes':records,'retries':0,
                    'artifacts': [{'path':str(path),'bytes':path.stat().st_size,'sha256':digest(path)} for path in (args.wheel,args.bin,args.db)],

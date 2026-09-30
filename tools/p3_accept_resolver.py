@@ -31,6 +31,12 @@ def check(value,case):
         good=good and value['matched_by']==expected['matched_by']
     if expected.get('description'):
         good=good and bool(value['descriptions'])
+    if expected.get('descriptions_empty'):
+        good=good and value['descriptions']==[]
+    if 'unresolved_reasons' in expected:
+        good=good and value.get('unresolved_reasons')==expected['unresolved_reasons']
+    for assertion in expected.get('evidence_assertions',[]):
+        good=good and any(all(ref.get(k)==v for k,v in assertion.items()) for ref in value['evidence_chain'])
     return good
 
 

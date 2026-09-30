@@ -32,7 +32,7 @@ def expected(snapshot_id, query, status, tag=None, matched=None, canonical='unkn
             'tag_key':None if tag is None else key(tag),'matched_by':matched,
             'canonical_status':canonical,'evidence_chain':[],'descriptions':[],
             'citations':[],'candidates':candidates or [],'candidates_truncated':False,
-            'source_scope':['fixture-v1'],'warnings':warnings or [],'relations':[]}
+            'source_scope':['fixture-v1'],'warnings':warnings or [],'relations':[],'unresolved_reasons':[]}
 
 
 def fixture(tmp_path):
@@ -92,6 +92,7 @@ def test_declared_simple_expected(binary,tmp_path,query,status,tag,matched,canon
     want = expected(identity,query,status,tag,matched,canonical)
     if status == 'canonical_unknown':
         want['warnings'] = ['canonical_evidence_incomplete']
+        want['unresolved_reasons']=[{'name':query,'matched_by':'native_exact' if query=='partial' else 'official_alias','reason':'unknown'}]
     assert run(binary,db,query) == want
 
 

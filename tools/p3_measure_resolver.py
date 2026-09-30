@@ -18,12 +18,15 @@ def main():
     for flag in ('db','bin','reused-bin','gold','out'):
         parser.add_argument('--'+flag,type=Path,required=True)
     parser.add_argument('--samples',type=int,default=30)
+    parser.add_argument('--review-cf807',action='store_true')
     args=parser.parse_args()
     if args.out.exists():raise FileExistsError(args.out)
     if args.samples!=30:raise ValueError('protocol fixed at30 samples')
     cases=json.loads(args.gold.read_text(encoding='utf-8'))['cases']
     # Predeclared eight representatives by ID; not selected by final timings/results.
     ids=['G01','G21','G36','G37','G42','G43','G44','G45']
+    if args.review_cf807:
+        ids+=['G51','G52','G53','G54','G55']  # fixed review cases before any timing
     workloads=[next(c for c in cases if c['id']==i) for i in ids]
     oracle={c['id']:result(args.db,c['query'],**{k:c[k] for k in ('category','kind','namespace','exact','limit') if k in c}) for c in workloads}
     env=dict(os.environ,PYTHONUTF8='1',PYTHONIOENCODING='utf-8')
@@ -87,7 +90,7 @@ def main():
                                'percentile':'nearest rank on successful samples, attempts/failures separate',
                                'rss':'NOT_RUN for P3 resolver-specific pilot; no peak-memory claim',
                                'raw':'content-addressed files retained once locally, receipt hashes reference them'}})
-    print(json.dumps({'status':'PASS' if passed else 'FAIL','measured':480,'warmups':16,'summary':summary}))
+    print(json.dumps({'status':'PASS' if passed else 'FAIL','measured':len(workloads)*30*2,'warmups':len(workloads)*2,'summary':summary}))
     return 0 if passed else 1
 
 
