@@ -1,0 +1,20 @@
+{
+  "artifact_source_sha": "eac2c9685e81ab33c0ff1390dfc29ae179456611",
+  "python": "3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]",
+  "python_sqlite": "3.50.4",
+  "unicode": "16.0.0",
+  "platform": "Windows-11-10.0.26100-SP0",
+  "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+  "logical_cpus": 16,
+  "physical_cpus": 8,
+  "memory_bytes": 34028818432,
+  "measurement": "platform + psutil under same shell Python as benchmark",
+  "measurement_exit": 0,
+  "limitations": [
+    "Performance is host-specific, not disk-cold; independent CLI includes startup and open.",
+    "RSS is 5ms-polled observed process maximum, not precise allocation or guaranteed whole-run peak.",
+    "Reused process RSS covers all workloads, not per-query allocations.",
+    "Unicode acceptance was executed with CPython UCD16, not every supported Python version.",
+    "A separate tool Python lacked psutil; that failed probe was not used for these environment values."
+  ]
+}

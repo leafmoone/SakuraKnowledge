@@ -1,0 +1,84 @@
+{
+  "artifact_source_sha": "eac2c9685e81ab33c0ff1390dfc29ae179456611",
+  "reference_fix_sha": "199af7595fa60a5af9d8e5daa9fc80be1e382d5d",
+  "implementation_sha": "199af7595fa60a5af9d8e5daa9fc80be1e382d5d",
+  "builds": {
+    "rust": {
+      "head": "eac2c9685e81ab33c0ff1390dfc29ae179456611",
+      "working_tree": "",
+      "argv": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--release",
+        "--locked",
+        "--bins",
+        "--examples"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.35721100005321205,
+      "status": "PASS",
+      "encoding_environment": {
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONUTF8": "1"
+      },
+      "stdout_base64": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr_base64": "ICAgIEZpbmlzaGVkIGByZWxlYXNlYCBwcm9maWxlIFtvcHRpbWl6ZWRdIHRhcmdldChzKSBpbiAwLjE2cwo=",
+      "stderr_sha256": "a70da5408e7a6da7efe97b23011504833b16a7875bda14543f2504b5b8c7d97a",
+      "stderr": "    Finished `release` profile [optimized] target(s) in 0.16s\n"
+    },
+    "wheel": {
+      "head": "eac2c9685e81ab33c0ff1390dfc29ae179456611",
+      "working_tree": "",
+      "argv": [
+        "python",
+        "-m",
+        "pip",
+        "wheel",
+        "--no-deps",
+        "--no-build-isolation",
+        "--no-index",
+        ".",
+        "-w",
+        "dist/p2-repair-eac2c96"
+      ],
+      "exit": 0,
+      "elapsed_s": 3.003834300208837,
+      "status": "PASS",
+      "encoding_environment": {
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONUTF8": "1"
+      },
+      "stdout_base64": "UHJvY2Vzc2luZyAuXC4NCiAgUHJlcGFyaW5nIG1ldGFkYXRhIChweXByb2plY3QudG9tbCk6IHN0YXJ0ZWQNCiAgUHJlcGFyaW5nIG1ldGFkYXRhIChweXByb2plY3QudG9tbCk6IGZpbmlzaGVkIHdpdGggc3RhdHVzICdkb25lJw0KQnVpbGRpbmcgd2hlZWxzIGZvciBjb2xsZWN0ZWQgcGFja2FnZXM6IHNha3VyYS1rbm93bGVkZ2UNCiAgQnVpbGRpbmcgd2hlZWwgZm9yIHNha3VyYS1rbm93bGVkZ2UgKHB5cHJvamVjdC50b21sKTogc3RhcnRlZA0KICBCdWlsZGluZyB3aGVlbCBmb3Igc2FrdXJhLWtub3dsZWRnZSAocHlwcm9qZWN0LnRvbWwpOiBmaW5pc2hlZCB3aXRoIHN0YXR1cyAnZG9uZScNCiAgQ3JlYXRlZCB3aGVlbCBmb3Igc2FrdXJhLWtub3dsZWRnZTogZmlsZW5hbWU9c2FrdXJhX2tub3dsZWRnZS0wLjIuMC1weTMtbm9uZS1hbnkud2hsIHNpemU9Mjg3MTQgc2hhMjU2PTc2ODI0ZTNiNWIyNmQ5NDVjNTQxMTE3YmUxMjk1ZGVkN2UwYTAzMGMzM2ZiN2JmYmMyZTkxOWZkZTkxYTkxMTUNCiAgU3RvcmVkIGluIGRpcmVjdG9yeTogQzpcVXNlcnNcUENcQXBwRGF0YVxMb2NhbFxUZW1wXHBpcC1lcGhlbS13aGVlbC1jYWNoZS1xbjVvN2EzaFx3aGVlbHNcYjdcYmJcMDJcZWI5NTE2ZTEzOTg4NWY3NjA3NWYxNzFjOWQ3N2JkMDNmOGM4YzY4Zjk1NTBkOWM4MDMNClN1Y2Nlc3NmdWxseSBidWlsdCBzYWt1cmEta25vd2xlZGdlDQo=",
+      "stdout_sha256": "93ca8b7fec4f3835863198aa272e20348c99df40d74d3e857f9377dbdc4cdf78",
+      "stdout": "Processing .\\.\r\n  Preparing metadata (pyproject.toml): started\r\n  Preparing metadata (pyproject.toml): finished with status 'done'\r\nBuilding wheels for collected packages: sakura-knowledge\r\n  Building wheel for sakura-knowledge (pyproject.toml): started\r\n  Building wheel for sakura-knowledge (pyproject.toml): finished with status 'done'\r\n  Created wheel for sakura-knowledge: filename=sakura_knowledge-0.2.0-py3-none-any.whl size=28714 sha256=76824e3b5b26d945c541117be1295ded7e0a030c33fb7bfbc2e919fde91a9115\r\n  Stored in directory: C:\\Users\\PC\\AppData\\Local\\Temp\\pip-ephem-wheel-cache-qn5o7a3h\\wheels\\b7\\bb\\02\\eb9516e139885f76075f171c9d77bd03f8c8c68f9550d9c803\r\nSuccessfully built sakura-knowledge\r\n",
+      "stderr_base64": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    }
+  },
+  "artifacts": [
+    {
+      "path": "dist/p2-repair-eac2c96/sakura_knowledge-0.2.0-py3-none-any.whl",
+      "size_bytes": 28714,
+      "sha256": "76824e3b5b26d945c541117be1295ded7e0a030c33fb7bfbc2e919fde91a9115",
+      "availability": "local-only; ignored dist path; not downloadable from Git"
+    },
+    {
+      "path": "dist/p2-repair-eac2c96/sknow-rs.exe",
+      "size_bytes": 4908686,
+      "sha256": "cb9315cca049aac17922d579f9b8625260c051255c29168e05c2c54fdb28c821",
+      "availability": "local-only; ignored dist path; not downloadable from Git"
+    }
+  ],
+  "rust_runtime": {
+    "sqlite_version": "3.45.0",
+    "unicode_version": "16.0.0",
+    "normalization_library_unicode": "17.0.0"
+  },
+  "source_tree_diff": "git diff 199af75 eac2c96 -- src rust: empty, exit 0",
+  "build_note": "cargo locked incremental build from clean tree; not claimed clean target-cache rebuild"
+}

@@ -47,22 +47,32 @@ def main():
         measured = json.loads(probe["stdout"])
         cases = [("lookup", "975"), ("lookup", "加特"), ("search", "a's_wonderland"),
                  ("ask", "介绍一下 加特"), ("ask", "加特 的标签是什么"),
-                 ("ask", "975 的 Danbooru tag 是什么"), ("inspect", None)]
+                 ("ask", "975 的 Danbooru tag 是什么"), ("lookup", "不存在的实体九二七幺")]
         pairs = []
         prefixes = [[str(args.python.resolve()), "-c",
                      "from sakura_knowledge.cli import main;raise SystemExit(main())"],
                     [str(args.rust.resolve())]]
         for op, query in cases:
             argv = [op, str(args.db.resolve())] + ([query] if query is not None else [])
-            if op == "search":
-                argv += ["--topk", "10"]
-            results = [run(prefix+argv) for prefix in prefixes]
+            results = [run(prefix+argv+(["--limit" if i == 0 else "--topk", "10"]
+                                       if op == "search" else []))
+                       for i, prefix in enumerate(prefixes)]
             equal = all(r["passed"] for r in results) and json.loads(results[0]["stdout"]) == json.loads(results[1]["stdout"])
             pairs.append({"op": op, "query": query, "full_json_equal": equal})
-        for prefix in prefixes:
+        for i, prefix in enumerate(prefixes):
             run(prefix+["--help"])
-            run(prefix+["lookup"], 2)
-            run(prefix+["search", str(args.db.resolve()), "x", "--topk", "0"], 2)
+            missing = run(prefix+["lookup"], 2)
+            missing["passed"] &= json.loads(missing["stderr"])["error"] == "UsageError"
+            invalid = run(prefix+["search", str(args.db.resolve()), "x",
+                                  "--limit" if i == 0 else "--topk", "0"], 2)
+            invalid["passed"] &= json.loads(invalid["stderr"])["message"] == "topk must be 1..100"
+        related_py = prefixes[0]+["related", str(args.db.resolve()), "975", "--key",
+                                   "--kind", "character", "--namespace", "bangumi.character"]
+        related_rs = prefixes[1]+["related", str(args.db.resolve()), "character", "bangumi.character", "975"]
+        related = [run(related_py), run(related_rs)]
+        pairs.append({"op": "related", "query": "bangumi.character/975", "full_json_equal":
+                      all(r["passed"] for r in related) and
+                      json.loads(related[0]["stdout"]) == json.loads(related[1]["stdout"])})
         report = {"artifact_source_sha": args.source_sha,
                   "wheel": {"path": str(args.wheel), "sha256": digest(args.wheel)},
                   "rust": {"path": str(args.rust), "sha256": digest(args.rust)},

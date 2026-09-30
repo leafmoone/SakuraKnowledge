@@ -1,0 +1,22 @@
+{
+  "head": "eac2c9685e81ab33c0ff1390dfc29ae179456611",
+  "working_tree": " M tools/check_repair_artifacts.py\n M tools/measure_repair_perf.py\n?? reports/P2/repair-bd99b7a-artifact-manifest.json\n?? reports/P2/repair-bd99b7a-check-pytest.json\n?? reports/P2/repair-bd99b7a-check-ruff.json\n?? reports/P2/repair-bd99b7a-environment.json\n?? reports/P2/repair-bd99b7a-perf-v1.json\n",
+  "argv": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.0436445998493582,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

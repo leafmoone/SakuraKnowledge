@@ -107,7 +107,7 @@ def main():
                       if runtime == "python" else [str(args.bin.resolve())])
             cmd = prefix + [request["op"], db, request["query"]]
             if request["op"] == "search":
-                cmd += ["--topk", "10"]
+                cmd += ["--limit" if runtime == "python" else "--topk", "10"]
             rec, out, _err = run(cmd)
             rec.update(mode="independent_cli", runtime=runtime, **request)
             rec["output"] = out.decode("utf-8", errors="strict")
