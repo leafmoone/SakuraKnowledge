@@ -17,8 +17,15 @@ def classify(py: dict, rs: dict, mode: str, expect: dict, diff, check_expect) ->
     if any(timeout):
         status = "BOTH_TIMEOUT" if all(timeout) else "SINGLE_TIMEOUT"
         problems.append({"kind": status, "python": timeout[0], "rust": timeout[1]})
+    elif any("value" in r and not isinstance(r["value"], dict) for r in (py, rs)):
+        status = "MISMATCH"
+        problems.append({"kind": "invalid_success_json_shape"})
+    elif any(isinstance(r.get("value"), dict) and "warnings" in r["value"] and
+             not isinstance(r["value"]["warnings"], list) for r in (py, rs)):
+        status = "MISMATCH"
+        problems.append({"kind": "invalid_warnings_json_shape"})
     elif any(isinstance(r.get("value"), dict) and any(
-            w in r["value"].get("warnings", []) for w in
+            w in (r["value"].get("warnings") or []) for w in
             ("search_document_scan_limit", "response_budget_truncated")) for r in (py, rs)):
         status = "PARTIAL"
         problems.append({"kind": "incomplete_response"})
@@ -26,7 +33,8 @@ def classify(py: dict, rs: dict, mode: str, expect: dict, diff, check_expect) ->
         for side, result in (("python", py), ("rust", rs)):
             error = result.get("error")
             message = error.get("message") if isinstance(error, dict) else error
-            if "value" in result or message != expect["error"] or result.get("exit") != 2:
+            if (not isinstance(error, dict) or "value" in result or
+                    message != expect["error"] or result.get("exit") != 2):
                 problems.append({"kind": "expected_error", "side": side,
                                  "want": expect["error"], "actual": result})
         error_verified = not problems

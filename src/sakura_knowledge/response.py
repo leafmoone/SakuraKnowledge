@@ -19,7 +19,8 @@ def encoded_size(value):
     return len(json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 
 
-def bounded_value(value, depth=0):
+def bounded_value(value, depth=0, check=lambda: None):
+    check()
     truncated = False
     if isinstance(value, str):
         return value[:TEXT_CHARS], len(value) > TEXT_CHARS
@@ -29,26 +30,30 @@ def bounded_value(value, depth=0):
         if isinstance(value, list):
             out = []
             for item in value[:ARRAY_ITEMS]:
-                bounded, changed = bounded_value(item, depth + 1)
+                bounded, changed = bounded_value(item, depth + 1, check)
                 out.append(bounded)
                 truncated |= changed
         else:
             out = {}
             for key in sorted(value)[:ARRAY_ITEMS]:
-                bounded, changed = bounded_value(value[key], depth + 1)
+                bounded, changed = bounded_value(value[key], depth + 1, check)
                 out[key[:TEXT_CHARS]] = bounded
                 truncated |= changed or len(key) > TEXT_CHARS
         truncated |= len(value) > ARRAY_ITEMS
         if encoded_size(out) > VALUE_BYTES:
             return None, True
         return out, truncated
-    return value, False
+    # Interoperable JSON integer domain; raw source bytes stay in storage.
+    if isinstance(value, int) and not isinstance(value, bool) and not -(2**63) <= value <= 2**64 - 1:
+        return None, True
+    return (None, True) if encoded_size(value) > VALUE_BYTES else (value, False)
 
 
-def source_observations(identities):
+def source_observations(identities, check=lambda: None):
     fields, evidence = {}, []
     truncated_fields = set()
     for proof in identities:
+        check()
         payload = json.loads(proof["payload"])
         raw = payload.get("raw", payload)
         if not isinstance(raw, dict):
@@ -60,7 +65,7 @@ def source_observations(identities):
             if len(observations) >= FIELD_OBSERVATIONS:
                 truncated_fields.add(name)
                 continue
-            value, truncated = bounded_value(raw[name])
+            value, truncated = bounded_value(raw[name], check=check)
             observations.append({"source_id": proof["source_id"],
                                  "evidence_id": proof["evidence_id"],
                                  "status": proof["status"], "value": value,
@@ -72,19 +77,36 @@ def source_observations(identities):
     return fields, evidence, sorted(truncated_fields)
 
 
-def bound_response(result):
+def bound_response(result, check=lambda: None):
     """Budget covers the full serialized object, including repeated canonical.
 
 No identity key is truncated. Drop tail candidates/relations with a warning;
 if a single irreducible identity exceeds the budget, return an explicit error.
 """
-    while encoded_size(result) > RESPONSE_BYTES:
-        if "response_budget_truncated" not in result["warnings"]:
-            result["warnings"].append("response_budget_truncated")
-        if len(result["candidates"]) > 1:
-            result["candidates"].pop()
-        elif result["relations"]:
-            result["relations"].pop()
-        else:
-            raise ValueError("response_budget_exceeded")
+    def size(value):
+        # Stream chunks; never repeatedly serialize the whole candidate tree.
+        total = 0
+        for chunk in json.JSONEncoder(ensure_ascii=False, separators=(",", ":")).iterencode(value):
+            check()
+            total += len(chunk.encode("utf-8"))
+        check()
+        return total
+
+    total = size(result)
+    if total > RESPONSE_BYTES:
+        if "response_budget_truncated" not in result.get("warnings", []):
+            warnings = result.setdefault("warnings", [])
+            before = size(warnings)
+            warnings.append("response_budget_truncated")
+            total += size(warnings) - before
+        while total > RESPONSE_BYTES:
+            check()
+            if len(result.get("candidates", [])) > 1:
+                total -= size(result["candidates"].pop()) + 1
+            elif result.get("relations"):
+                total -= size(result["relations"].pop()) + bool(result["relations"])
+            else:
+                check()
+                raise ValueError("response_budget_exceeded")
+    check()
     return result

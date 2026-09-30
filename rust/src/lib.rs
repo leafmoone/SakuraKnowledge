@@ -79,7 +79,7 @@ fn lex(text: &str) -> Vec<String> {
             }
         } else if unicode16::is_alnum(lower[i]) {
             let start = i;
-            while i < lower.len() && (unicode16::is_alnum(lower[i]) || is_cjk_kana(lower[i])) {
+            while i < lower.len() && unicode16::is_alnum(lower[i]) {
                 i += 1;
             }
             let word: String = lower[start..i].iter().collect();
@@ -228,14 +228,24 @@ impl Runtime {
             [],
             |r| r.get(0),
         )?;
-        if !definition.to_lowercase().contains("using fts5") {
+        let definition = definition.to_lowercase();
+        if !definition.starts_with("create virtual table") || !definition.contains("using fts5") {
             return Err(Error::Invalid(
                 "invalid snapshot schema: search_fts is not FTS5".into(),
             ));
         }
-        conn.prepare("SELECT rowid FROM search_fts WHERE search_fts MATCH ? LIMIT 0")?
-            .query(["runtime_capability_probe"])?
-            .next()?;
+        let hidden: Vec<(String, i64)> = conn
+            .prepare("PRAGMA table_xinfo(search_fts)")?
+            .query_map([], |r| Ok((r.get(1)?, r.get(6)?)))?
+            .collect::<std::result::Result<_, _>>()?;
+        if !hidden.contains(&("rank".into(), 1)) || !hidden.contains(&("search_fts".into(), 1)) {
+            return Err(Error::Invalid("invalid FTS5 hidden columns".into()));
+        }
+        conn.prepare(
+            "SELECT rank,bm25(search_fts) FROM search_fts WHERE search_fts MATCH ? LIMIT 0",
+        )?
+        .query(["runtime_capability_probe"])?
+        .next()?;
         let json_probe: i64 =
             conn.query_row("SELECT json_extract('{\"probe\":1}', '$.probe')", [], |r| {
                 r.get(0)
@@ -391,8 +401,13 @@ impl Runtime {
         let identities_truncated = identities.len() > 100;
         identities.truncate(100);
         payloads.truncate(100);
-        let (fields, field_evidence, field_truncated) =
-            response::observations(&identities, &payloads)?;
+        let (fields, field_evidence, mut field_truncated) =
+            response::observations(&identities, &payloads, self.deadline)?;
+        if identities_truncated {
+            let mut names = response::FIELDS.to_vec();
+            names.sort();
+            field_truncated = json!(names);
+        }
         let use_alias_proofs = matches!(alias_text, Some(t) if t != value);
         let proofs: Vec<Value> = if use_alias_proofs {
             aliases.clone()
@@ -427,14 +442,14 @@ impl Runtime {
 
     fn fetch_docs(&mut self, id: i64) -> Result<Vec<Value>> {
         let sql = format!(
-            "SELECT title,substr(original,1,4000),length(original)>4000,
-                     json_extract(payload,'$.search_text_truncated'),source_id,evidence_id,status
+            "SELECT substr(title,1,256),substr(original,1,4000),length(original)>4000,
+                     json_extract(payload,'$.search_text_truncated'),source_id,evidence_id,status,length(title)>256
              FROM documents WHERE entry_id=? AND status IN ({TEXT_STATUSES})
              ORDER BY id LIMIT 10"
         );
         let mut stmt = self.conn.prepare(&sql)?;
         let rows = stmt.query_map([id], |r| {
-            Ok(json!({
+            let mut doc = json!({
                 "title": r.get::<_, String>(0)?,
                 "original": r.get::<_, String>(1)?,
                 "response_truncated": r.get::<_, bool>(2)?,
@@ -442,7 +457,11 @@ impl Runtime {
                 "source_id": r.get::<_, String>(4)?,
                 "evidence_id": r.get::<_, String>(5)?,
                 "status": r.get::<_, String>(6)?
-            }))
+            });
+            if r.get::<_, bool>(7)? {
+                doc["title_truncated"] = json!(true);
+            }
+            Ok(doc)
         })?;
         let mut out = Vec::new();
         for r in rows {
@@ -612,7 +631,7 @@ impl Runtime {
                 .unwrap()
                 .push(json!("candidate_limit_reached"));
         }
-        response::bound_response(result)
+        response::bound_response(result, self.deadline)
     }
 
     fn lookup_key_inner(&mut self, kind: &str, namespace: &str, value: &str) -> Result<Value> {
@@ -662,7 +681,7 @@ impl Runtime {
                 Self::apply_found(&mut result, c, kind);
             }
         }
-        response::bound_response(result)
+        response::bound_response(result, self.deadline)
     }
 
     fn search_inner(
@@ -688,7 +707,7 @@ impl Runtime {
                 .unwrap()
                 .truncate(topk as usize);
             self.last_search_profile["fts_skipped_exact_sufficient"] = json!(true);
-            return response::bound_response(exact);
+            return response::bound_response(exact, self.deadline);
         }
         if compiled.is_empty() {
             let cands = exact["candidates"].as_array().cloned().unwrap_or_default();
@@ -699,7 +718,7 @@ impl Runtime {
                     .unwrap()
                     .push(json!("too_short"));
             }
-            return response::bound_response(exact);
+            return response::bound_response(exact, self.deadline);
         }
 
         let mut candidates = exact["candidates"]
@@ -752,9 +771,9 @@ impl Runtime {
             };
             assembly_s += start.elapsed().as_secs_f64();
             let start = Instant::now();
-            let (title, original, truncated, sid, eid): (String, String, bool, String, String) = self.conn.query_row(
-                "SELECT title,substr(original,1,4000),length(original)>4000,source_id,evidence_id FROM documents WHERE id=?",
-                [hit.document_id], |r| Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?)))?;
+            let (title, original, truncated, sid, eid, title_truncated): (String, String, bool, String, String, bool) = self.conn.query_row(
+                "SELECT substr(title,1,256),substr(original,1,4000),length(original)>4000,source_id,evidence_id,length(title)>256 FROM documents WHERE id=?",
+                [hit.document_id], |r| Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?,r.get(5)?)))?;
             body_s += start.elapsed().as_secs_f64();
             body_bytes += original.len();
             documents += 1;
@@ -764,6 +783,9 @@ impl Runtime {
                 "title": title, "original": original, "response_truncated": truncated,
                 "source_id": sid, "evidence_id": eid
             }]);
+            if title_truncated {
+                candidate["matched_documents"][0]["title_truncated"] = json!(true);
+            }
             candidate["source_id"] = json!(sid);
             candidate["evidence_id"] = json!(eid);
             candidates.push(candidate);
@@ -782,7 +804,7 @@ impl Runtime {
                 .unwrap()
                 .push(json!("search_document_scan_limit"));
         }
-        response::bound_response(exact)
+        response::bound_response(exact, self.deadline)
     }
 
     fn related_inner(
@@ -800,7 +822,7 @@ impl Runtime {
         validate_key(kind, namespace, value)?;
         let mut result = self.lookup_key(kind, namespace, value)?;
         if result["status"] != json!("found") {
-            return response::bound_response(result);
+            return response::bound_response(result, self.deadline);
         }
         let sql = format!(
             "SELECT d.kind,d.namespace,d.value,l.relation,l.method,
@@ -833,7 +855,7 @@ impl Runtime {
             relations.push(r?);
         }
         result["relations"] = json!(relations);
-        response::bound_response(result)
+        response::bound_response(result, self.deadline)
     }
 
     // ---------------------------------------------------------------- ask
@@ -857,13 +879,13 @@ impl Runtime {
         if result["status"] == json!("not_found") {
             result["status"] = json!("unknown");
             result["answer"] = json!("No reliable exact source entity match.");
-            return response::bound_response(result);
+            return response::bound_response(result, self.deadline);
         }
         if result["status"] == json!("ambiguous") {
             result["status"] = json!("entity_ambiguous");
             result["mapping_status"] = json!("entity_ambiguous");
             result["answer"] = json!("Multiple source entity matches; specify a source key.");
-            return response::bound_response(result);
+            return response::bound_response(result, self.deadline);
         }
 
         let source_tag = result.get("tag_key").cloned().unwrap_or(Value::Null);
@@ -888,7 +910,7 @@ impl Runtime {
                 "Exact tag identity in {}; no cross-namespace mapping inferred.",
                 ns.as_str().unwrap_or("?")
             ));
-            return response::bound_response(result);
+            return response::bound_response(result, self.deadline);
         }
 
         result["tag_key"] = Value::Null;
@@ -975,7 +997,7 @@ impl Runtime {
                 "Source entity found; no verified tag mapping in any namespace.".to_string()
             });
         }
-        response::bound_response(result)
+        response::bound_response(result, self.deadline)
     }
 
     fn ask_inner(
@@ -999,7 +1021,7 @@ impl Runtime {
             result["input_query"] = json!(query);
             result["parsed_subject"] = Value::Null;
             result["query_template"] = json!("unsupported");
-            return response::bound_response(result);
+            return response::bound_response(result, self.deadline);
         }
         let parsed = parse_ask_template(query);
         let (subject, mode) = match parsed {
@@ -1013,7 +1035,7 @@ impl Runtime {
                         .unwrap()
                         .push(json!("unsupported_query_template"));
                 }
-                return response::bound_response(result);
+                return response::bound_response(result, self.deadline);
             }
         };
         match mode.as_str() {
@@ -1044,7 +1066,7 @@ impl Runtime {
                         key["namespace"].as_str().unwrap_or(""), key["value"].as_str().unwrap_or("")
                     ));
                 }
-                response::bound_response(result)
+                response::bound_response(result, self.deadline)
             }
             "danbooru.tag" => {
                 if matches!(target, Some(t) if t != "danbooru.tag") {
@@ -1058,14 +1080,14 @@ impl Runtime {
                 result["input_query"] = json!(query);
                 result["parsed_subject"] = json!(subject);
                 result["query_template"] = json!("danbooru_tag");
-                response::bound_response(result)
+                response::bound_response(result, self.deadline)
             }
             _ => {
                 let mut result = self.ask_resolved(&subject, kind, namespace, target, None)?;
                 result["input_query"] = json!(query);
                 result["parsed_subject"] = json!(subject);
                 result["query_template"] = json!("tag");
-                response::bound_response(result)
+                response::bound_response(result, self.deadline)
             }
         }
     }
@@ -1143,7 +1165,7 @@ fn template_subject(query: &[char], mid: &[&str]) -> Option<String> {
             continue;
         }
         let subject: String = query[..end].iter().collect();
-        let stripped = subject.trim();
+        let stripped = subject.trim_matches(is_ws);
         if !stripped.is_empty() {
             return Some(stripped.to_string());
         }
@@ -1192,7 +1214,7 @@ pub fn parse_ask_template(query: &str) -> Option<(String, String)> {
                 continue;
             }
             let subject: String = chars[i..].iter().collect();
-            let stripped = subject.trim();
+            let stripped = subject.trim_matches(is_ws);
             if !stripped.is_empty() && !stripped.contains('\n') {
                 return Some((stripped.to_string(), "introduce".to_string()));
             }
@@ -1308,6 +1330,37 @@ mod tests {
         )
         .unwrap();
         conn.close().unwrap();
+    }
+
+    #[test]
+    fn review_f99_forced_deadline_covers_errors_inspect_and_projection() {
+        let dir = std::env::temp_dir().join("sknow-rs-review-f99-deadline");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("fixture.sqlite");
+        build_fixture(&path);
+        let mut rt = Runtime::open(&path).unwrap();
+        let fail = rt.operation(|s| {
+            s.deadline = Instant::now() - Duration::from_secs(1);
+            Err(Error::Invalid("response_budget_exceeded".into()))
+        });
+        assert!(matches!(fail, Err(Error::Budget)));
+        let fail = rt.operation(|s| {
+            let result = s.inspect_inner()?;
+            s.deadline = Instant::now() - Duration::from_secs(1);
+            Ok(result)
+        });
+        assert!(matches!(fail, Err(Error::Budget)));
+        let expired = Instant::now() - Duration::from_secs(1);
+        assert!(matches!(
+            response::bound_response(json!({}), expired),
+            Err(Error::Budget)
+        ));
+        assert!(matches!(
+            response::observations(&[json!({})], &["{}".into()], expired),
+            Err(Error::Budget)
+        ));
+        drop(rt);
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]

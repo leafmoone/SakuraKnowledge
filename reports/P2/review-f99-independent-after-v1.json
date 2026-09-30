@@ -1,0 +1,25 @@
+{
+  "head": "f99a11529b0f244c6b8c59f3e66cbf51d269b0a4",
+  "working_tree": " M rust/Cargo.toml\n M rust/src/lib.rs\n M rust/src/response.rs\n M src/sakura_knowledge/api.py\n M src/sakura_knowledge/response.py\n M tools/check_parity.py\n M tools/parity_policy.py\n?? reports/P2/review-f99-independent-before.json\n?? tests/test_review_f99.py\n?? tests/test_review_f99_harness.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_review_f99.py",
+    "tests/test_review_f99_harness.py",
+    "-q"
+  ],
+  "exit": 0,
+  "elapsed_s": 5.851000000024214,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KMjkgcGFzc2VkIGluIDUuMzJzDQo=",
+  "stdout_sha256": "37156c2e2d3808bdb1f5e967878b84237ddbf6b6b4becf6ebc3fa760c8546376",
+  "stdout": ".............................                                            [100%]\r\n29 passed in 5.32s\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

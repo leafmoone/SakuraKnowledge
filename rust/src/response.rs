@@ -1,10 +1,12 @@
 //! Response v3: bounded source observations, no implicit fact winner.
 use crate::{Error, Result};
+use serde_json::value::RawValue;
 use serde_json::{json, Map, Value};
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
+use std::time::Instant;
 
 pub const VERSION: &str = "3";
-const FIELDS: [&str; 4] = [
+pub const FIELDS: [&str; 4] = [
     "raw_attributes",
     "raw_subject_categories",
     "raw_cv_names",
@@ -70,14 +72,93 @@ fn bounded(value: &Value, depth: usize) -> (Value, bool) {
     }
 }
 
-pub fn observations(proofs: &[Value], payloads: &[String]) -> Result<(Value, Value, Value)> {
+fn check(deadline: Instant) -> Result<()> {
+    if Instant::now() > deadline {
+        Err(Error::Budget)
+    } else {
+        Ok(())
+    }
+}
+
+// RawValue skips unprojected JSON iteratively, without building a recursive Value.
+// Only the four displayed fields recurse, and then at most four levels.
+fn projected(raw: &str, depth: usize, deadline: Instant) -> Result<(Value, bool)> {
+    check(deadline)?;
+    let raw = raw.trim();
+    if raw.starts_with('[') || raw.starts_with('{') {
+        if depth >= 4 {
+            return Ok((Value::Null, true));
+        }
+        let mut changed = false;
+        let out = if raw.starts_with('[') {
+            let items: Vec<Box<RawValue>> = serde_json::from_str(raw).map_err(json_error)?;
+            changed |= items.len() > 16;
+            let mut out = Vec::new();
+            for item in items.iter().take(16) {
+                let (v, c) = projected(item.get(), depth + 1, deadline)?;
+                out.push(v);
+                changed |= c;
+            }
+            Value::Array(out)
+        } else {
+            let items: BTreeMap<String, Box<RawValue>> =
+                serde_json::from_str(raw).map_err(json_error)?;
+            changed |= items.len() > 16;
+            let mut out = Map::new();
+            for (k, item) in items.iter().take(16) {
+                let (v, c) = projected(item.get(), depth + 1, deadline)?;
+                changed |= c || k.chars().count() > 256;
+                out.insert(k.chars().take(256).collect(), v);
+            }
+            Value::Object(out)
+        };
+        check(deadline)?;
+        return Ok(if size(&out) > 2048 {
+            (Value::Null, true)
+        } else {
+            (out, changed)
+        });
+    }
+    if (raw.starts_with('-') || raw.starts_with(|c: char| c.is_ascii_digit()))
+        && (raw.len() > 2048
+            || (!raw.contains(['.', 'e', 'E'])
+                && raw.parse::<i64>().is_err()
+                && raw.parse::<u64>().is_err()))
+    {
+        return Ok((Value::Null, true));
+    }
+    let value: Value = serde_json::from_str(raw).map_err(json_error)?;
+    check(deadline)?;
+    Ok(bounded(&value, depth))
+}
+
+fn json_error(e: serde_json::Error) -> Error {
+    Error::Invalid(format!("invalid evidence JSON: {e}"))
+}
+
+pub fn observations(
+    proofs: &[Value],
+    payloads: &[String],
+    deadline: Instant,
+) -> Result<(Value, Value, Value)> {
     let mut fields: Map<String, Value> = Map::new();
     let mut evidence = Vec::new();
     let mut truncated_fields = BTreeSet::new();
     for (proof, payload) in proofs.iter().zip(payloads) {
-        let parsed: Value = serde_json::from_str(payload)
-            .map_err(|e| Error::Invalid(format!("invalid evidence JSON: {e}")))?;
-        let raw = parsed.get("raw").unwrap_or(&parsed);
+        check(deadline)?;
+        let parsed: BTreeMap<String, Box<RawValue>> =
+            serde_json::from_str(payload).map_err(json_error)?;
+        let nested;
+        let raw = if let Some(value) = parsed.get("raw") {
+            if !value.get().trim_start().starts_with('{') {
+                continue;
+            }
+            nested = serde_json::from_str::<BTreeMap<String, Box<RawValue>>>(value.get())
+                .map_err(json_error)?;
+            &nested
+        } else {
+            &parsed
+        };
         for name in FIELDS {
             if let Some(value) = raw.get(name) {
                 let list = fields
@@ -89,10 +170,12 @@ pub fn observations(proofs: &[Value], payloads: &[String]) -> Result<(Value, Val
                     truncated_fields.insert(name);
                     continue;
                 }
-                let (bounded, truncated) = bounded(value, 0);
-                let state = if value.is_null() {
+                let (bounded, truncated) = projected(value.get(), 0, deadline)?;
+                let state = if value.get().trim() == "null" {
                     "null"
-                } else if value == &json!([]) || value == &json!({}) || value == &json!("") {
+                } else if !truncated
+                    && (bounded == json!([]) || bounded == json!({}) || bounded == json!(""))
+                {
                     "empty"
                 } else {
                     "present"
@@ -114,19 +197,54 @@ pub fn observations(proofs: &[Value], payloads: &[String]) -> Result<(Value, Val
     ))
 }
 
-pub fn bound_response(mut value: Value) -> Result<Value> {
-    while size(&value) > RESPONSE_BYTES {
+fn checked_size(value: &Value, deadline: Instant) -> Result<usize> {
+    struct Counter {
+        bytes: usize,
+        deadline: Instant,
+    }
+    impl std::io::Write for Counter {
+        fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+            if Instant::now() > self.deadline {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::TimedOut,
+                    "query_budget_exceeded",
+                ));
+            }
+            self.bytes += bytes.len();
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+    check(deadline)?;
+    let mut counter = Counter { bytes: 0, deadline };
+    let result = serde_json::to_writer(&mut counter, value);
+    check(deadline)?;
+    result.map_err(json_error)?;
+    Ok(counter.bytes)
+}
+
+pub fn bound_response(mut value: Value, deadline: Instant) -> Result<Value> {
+    let mut total = checked_size(&value, deadline)?;
+    while total > RESPONSE_BYTES {
+        check(deadline)?;
         let warnings = value["warnings"].as_array_mut().unwrap();
         if !warnings.contains(&json!("response_budget_truncated")) {
+            total += size(&json!("response_budget_truncated")) + usize::from(!warnings.is_empty());
             warnings.push(json!("response_budget_truncated"));
         }
         if value["candidates"].as_array().unwrap().len() > 1 {
-            value["candidates"].as_array_mut().unwrap().pop();
+            let removed = value["candidates"].as_array_mut().unwrap().pop().unwrap();
+            total -= checked_size(&removed, deadline)? + 1;
         } else if !value["relations"].as_array().unwrap().is_empty() {
-            value["relations"].as_array_mut().unwrap().pop();
+            let items = value["relations"].as_array_mut().unwrap();
+            let removed = items.pop().unwrap();
+            total -= checked_size(&removed, deadline)? + usize::from(!items.is_empty());
         } else {
             return Err(Error::Invalid("response_budget_exceeded".into()));
         }
     }
+    check(deadline)?;
     Ok(value)
 }

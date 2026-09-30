@@ -133,6 +133,12 @@ def diff(a, b, path="$"):
 
 def check_expect(value: dict, expect: dict) -> list[dict]:
     problems = []
+    if not isinstance(value, dict):
+        return [{"kind": "invalid_success_json_shape"}]
+    for name in ("candidates", "relations", "warnings"):
+        if name in value and (not isinstance(value[name], list) or
+                              (name == "candidates" and any(not isinstance(c, dict) for c in value[name]))):
+            return [{"kind": "invalid_response_field_shape", "field": name}]
     for key, want in expect.items():
         if key == "n_candidates":
             got = len(value.get("candidates") or [])
@@ -175,6 +181,9 @@ def run_case(case, bin_path: Path) -> dict:
             if rec.get("stdout", ""):
                 problems.append({"kind": "stdout_not_empty", "side": side})
             error = rec.get("error", {})
+            if not isinstance(error, dict):
+                problems.append({"kind": "invalid_error_json_shape", "side": side})
+                continue
             for field in ("error", "message"):
                 key = f"stderr_{side}_{field}"
                 if key in expect and error.get(field) != expect[key]:

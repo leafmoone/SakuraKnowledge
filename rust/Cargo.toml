@@ -15,5 +15,5 @@ path = "src/main.rs"
 
 [dependencies]
 rusqlite = { version = "0.31", features = ["bundled", "hooks", "limits"] }
-serde_json = "1"
+serde_json = { version = "1", features = ["raw_value"] }
 unicode-normalization = "0.1"

@@ -6,7 +6,7 @@ from functools import wraps
 
 from . import CONTRACT_VERSION
 from .model import IDENTITY_TRUSTED, TEXT_TRUSTED, EntryKey, match_query
-from .response import RESPONSE_VERSION, bound_response, source_observations
+from .response import FIELD_NAMES, RESPONSE_VERSION, bound_response, source_observations
 from .search import FILTERED_SQL, select_rows
 from .search import SQL as SEARCH_SQL
 from .storage import readonly
@@ -43,7 +43,7 @@ def bounded_response(method):
             self._deadline = time.monotonic() + 5
         self._operation_depth += 1
         try:
-            result = bound_response(method(self, *args, **kwargs))
+            result = bound_response(method(self, *args, **kwargs), self._check_deadline)
             self._check_deadline()
             return result
         except sqlite3.OperationalError as exc:
@@ -52,6 +52,7 @@ def bounded_response(method):
             raise
         finally:
             self._operation_depth -= 1
+            self._check_deadline()
     return wrapped
 
 
@@ -93,9 +94,14 @@ class Knowledge:
                 if missing:
                     raise ValueError(f"invalid snapshot schema: {table} missing {','.join(missing)}")
             definition = self._execute("SELECT sql FROM sqlite_master WHERE name='search_fts'")
-            if "using fts5" not in definition.fetchone()[0].lower():
+            if not re.match(r"(?is)^\s*CREATE\s+VIRTUAL\s+TABLE\s+.*?\s+USING\s+fts5\s*\(",
+                            definition.fetchone()[0]):
                 raise ValueError("invalid snapshot schema: search_fts is not FTS5")
-            self._execute("SELECT rowid FROM search_fts WHERE search_fts MATCH ? LIMIT 0",
+            hidden = {r[1]: r[6] for r in self._execute("PRAGMA table_xinfo(search_fts)")}
+            if hidden.get("rank") != 1 or hidden.get("search_fts") != 1:
+                raise ValueError("invalid FTS5 hidden columns")
+            self._execute("SELECT rank,bm25(search_fts) FROM search_fts "
+                          "WHERE search_fts MATCH ? LIMIT 0",
                           ('"runtime_capability_probe"',)).fetchall()
             if self._execute("SELECT json_extract('{\"probe\":1}', '$.probe')").fetchone()[0] != 1:
                 raise ValueError("SQLite JSON capability unavailable")
@@ -124,6 +130,7 @@ class Knowledge:
         return {"contract_version": CONTRACT_VERSION, "sqlite_version": sqlite3.sqlite_version,
                 "runtime": "python"}
 
+    @bounded_response
     def inspect(self):
         self._budget()
         page_size = self._execute("PRAGMA page_size").fetchone()[0]
@@ -162,7 +169,8 @@ class Knowledge:
         key = EntryKey(row["kind"], row["namespace"], row["value"]).as_dict()
         # Descriptions are TEXT_TRUSTED; identity proofs are IDENTITY_TRUSTED.
         docs = self._execute(
-            f"SELECT title,substr(original,1,4000) AS original, "
+            f"SELECT substr(title,1,256) AS title,length(title)>256 AS title_truncated, "
+            f"substr(original,1,4000) AS original, "
             f"length(original)>4000 AS response_truncated, "
             f"json_extract(payload,'$.search_text_truncated') AS search_text_truncated, "
             f"source_id,evidence_id,status FROM documents WHERE entry_id=? "
@@ -171,6 +179,11 @@ class Knowledge:
         docs = [{**dict(d), "response_truncated": bool(d["response_truncated"]),
                  "search_text_truncated": (None if d["search_text_truncated"] is None else
                                            bool(d["search_text_truncated"]))} for d in docs]
+        for doc in docs:
+            if doc["title_truncated"]:
+                doc["title_truncated"] = True
+            else:
+                del doc["title_truncated"]
         aliases = (self._execute(
             f"SELECT text,source_id,evidence_id,status FROM aliases WHERE entry_id=? AND text=? "
             f"AND status IN ({_ID}) "
@@ -183,7 +196,9 @@ class Knowledge:
         identities_truncated = len(identities) > 100
         identities = identities[:100]
         identity_proofs = aliases if alias_text is not None and alias_text != row["value"] else identities
-        fields, field_evidence, field_truncated = source_observations(identities)
+        fields, field_evidence, field_truncated = source_observations(identities, self._check_deadline)
+        if identities_truncated:
+            field_truncated = sorted(set(field_truncated) | set(FIELD_NAMES))
         citations = [{"source_id": d["source_id"], "evidence_id": d["evidence_id"]}
                      for d in identity_proofs]
         return {"entry_key": key, "locator": row["locator"],
@@ -294,8 +309,8 @@ class Knowledge:
             self.last_search_profile["identity_field_assembly_s"] += time.perf_counter() - started
             started = time.perf_counter()
             document = self._execute(
-                "SELECT title,substr(original,1,4000) AS original,length(original)>4000 AS truncated,"
-                "source_id,evidence_id FROM documents WHERE id=?", (row["document_id"],)).fetchone()
+                "SELECT substr(title,1,256) AS title,substr(original,1,4000) AS original,length(original)>4000 AS truncated,"
+                "source_id,evidence_id,length(title)>256 AS title_truncated FROM documents WHERE id=?", (row["document_id"],)).fetchone()
             self.last_search_profile["matched_document_read_s"] += time.perf_counter() - started
             self.last_search_profile["materialized_matched_documents"] += 1
             self.last_search_profile["returned_matched_body_utf8_bytes"] += len(document["original"].encode("utf-8"))
@@ -304,6 +319,8 @@ class Knowledge:
             candidate["matched_documents"] = [{"title": document["title"],
                 "original": document["original"], "response_truncated": bool(document["truncated"]),
                 "source_id": document["source_id"], "evidence_id": document["evidence_id"]}]
+            if document["title_truncated"]:
+                candidate["matched_documents"][0]["title_truncated"] = True
             candidate["source_id"] = document["source_id"]
             candidate["evidence_id"] = document["evidence_id"]
             candidates.append(candidate)
