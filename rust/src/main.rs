@@ -1,6 +1,6 @@
 //! sknow-rs CLI: read-only query surface over a published snapshot.
 
-use sakura_knowledge_runtime::{Error, Runtime};
+use sakura_knowledge_runtime::{Error, Runtime, TagOptions};
 use std::path::PathBuf;
 use std::process::ExitCode;
 
@@ -13,13 +13,16 @@ struct Opt {
     topk: u32,
     key: bool,
     target: Option<String>,
+    category: Option<i64>,
+    direction: String,
 }
 
 const USAGE: &str = "usage: sknow-rs lookup DB QUERY [--kind K --namespace N] [--key]
        sknow-rs search DB QUERY [--limit N | --topk N] [--kind K --namespace N]
-       sknow-rs related DB VALUE --kind K --namespace N [--relation R --limit N]
+       sknow-rs related DB VALUE --kind K --namespace N [--relation R --limit N --direction out|in]
        sknow-rs related DB KIND NAMESPACE VALUE [--relation R --kind DSTKIND --limit N]
        sknow-rs ask DB QUERY [--kind K --namespace N --target-tag-namespace T]
+       sknow-rs resolve-tag DB QUERY [--target-namespace T --category N --kind K --namespace N --key --limit N]
        sknow-rs inspect DB
        sknow-rs runtime
        sknow-rs -h | --help";
@@ -54,6 +57,8 @@ fn main() -> ExitCode {
         topk: 20,
         key: false,
         target: None,
+        category: None,
+        direction: "out".into(),
     };
     let mut pos: Vec<String> = Vec::new();
     let mut i = 0usize;
@@ -97,7 +102,26 @@ fn main() -> ExitCode {
                 None => return usage_error(&format!("argument {a}: expected a value")),
             },
             "--key" => opt.key = true,
-            "--target-tag-namespace" => match rest.get(i + 1) {
+            "--direction" if cmd == "related" => match rest.get(i + 1) {
+                Some(v) if v == "in" || v == "out" => {
+                    opt.direction = v.clone();
+                    i += 1;
+                }
+                _ => return usage_error("direction must be in or out"),
+            },
+            "--category" if cmd == "resolve-tag" => {
+                match rest.get(i + 1).and_then(|v| v.parse().ok()) {
+                    Some(v) => {
+                        opt.category = Some(v);
+                        i += 1;
+                    }
+                    None => return usage_error(&format!("argument {a}: expected a value")),
+                }
+            }
+            "--target-namespace" if cmd != "resolve-tag" => {
+                return usage_error(&format!("unrecognized arguments: {a}"))
+            }
+            "--target-tag-namespace" | "--target-namespace" => match rest.get(i + 1) {
                 Some(v) => {
                     opt.target = Some(v.clone());
                     i += 1;
@@ -112,7 +136,15 @@ fn main() -> ExitCode {
         i += 1;
     }
 
-    const COMMANDS: [&str; 6] = ["lookup", "search", "related", "ask", "inspect", "runtime"];
+    const COMMANDS: [&str; 7] = [
+        "lookup",
+        "search",
+        "related",
+        "ask",
+        "inspect",
+        "runtime",
+        "resolve-tag",
+    ];
     if !COMMANDS.contains(&cmd.as_str()) {
         return usage_error(&format!(
             "argument command: invalid choice: '{cmd}' (choose from {})",
@@ -123,6 +155,20 @@ fn main() -> ExitCode {
         return usage_error("database and query are required");
     }
     let result: Result<serde_json::Value, Error> = (|| match cmd.as_str() {
+        "resolve-tag" => {
+            let (db, query) = two_pos(&pos)?;
+            Runtime::open(db)?.resolve_tag(
+                query,
+                TagOptions {
+                    target_namespace: opt.target.as_deref(),
+                    category: opt.category,
+                    kind: opt.kind.as_deref(),
+                    namespace: opt.namespace.as_deref(),
+                    key: opt.key,
+                    limit: opt.limit,
+                },
+            )
+        }
         "lookup" => {
             let (db, query) = two_pos(&pos)?;
             let mut rt = Runtime::open(db)?;
@@ -157,7 +203,13 @@ fn main() -> ExitCode {
                     }
                 };
                 let mut rt = Runtime::open(pos[0].clone())?;
-                return rt.related(
+                let call = if opt.direction == "in" {
+                    Runtime::related_in
+                } else {
+                    Runtime::related
+                };
+                return call(
+                    &mut rt,
                     &kind,
                     &namespace,
                     &pos[1],
@@ -172,7 +224,13 @@ fn main() -> ExitCode {
                 ));
             }
             let mut rt = Runtime::open(pos[0].clone())?;
-            Ok(rt.related(
+            let call = if opt.direction == "in" {
+                Runtime::related_in
+            } else {
+                Runtime::related
+            };
+            Ok(call(
+                &mut rt,
                 &pos[1],
                 &pos[2],
                 &pos[3],

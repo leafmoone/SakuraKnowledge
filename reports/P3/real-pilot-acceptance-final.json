@@ -1,0 +1,1705 @@
+{
+  "status": "PASS",
+  "attempted": 50,
+  "passed": 50,
+  "retries": 0,
+  "positive_denominator": 38,
+  "positive_correct": 38,
+  "nonresolved_denominator": 12,
+  "nonresolved_correct": 12,
+  "wrong_resolved": 0,
+  "records": [
+    {
+      "case_id": "G01",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "hatsune_miku",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.052083399845287204,
+      "stdout": {
+        "path": "reports/P3/raw/83bcfd464aed536ef5e2ba34e162ab18035847ea02fb3ebafc2a71b3972cea41.raw",
+        "sha256": "83bcfd464aed536ef5e2ba34e162ab18035847ea02fb3ebafc2a71b3972cea41",
+        "bytes": 5924
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/dd15a084351553ed4e1c6852c817d685d47c4870e3a5b3502c12ee793709927d.raw",
+        "sha256": "dd15a084351553ed4e1c6852c817d685d47c4870e3a5b3502c12ee793709927d",
+        "bytes": 5923
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G02",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "hakurei_reimu",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.03926700004376471,
+      "stdout": {
+        "path": "reports/P3/raw/a905c954d8f8d84b4f9d5e51086584c93785d0b70a5c8ddd55e223ec99bfab36.raw",
+        "sha256": "a905c954d8f8d84b4f9d5e51086584c93785d0b70a5c8ddd55e223ec99bfab36",
+        "bytes": 4410
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/6cd702a89cd1c01c1e1f8b5e22aa058c973902d61cd13ff91f5f4520408a1236.raw",
+        "sha256": "6cd702a89cd1c01c1e1f8b5e22aa058c973902d61cd13ff91f5f4520408a1236",
+        "bytes": 4409
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G03",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "kirisame_marisa",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04280599998310208,
+      "stdout": {
+        "path": "reports/P3/raw/26e484236682f6208ee15664ff577f78c8c5c7ad29cbfde07f72af4e558a8e4f.raw",
+        "sha256": "26e484236682f6208ee15664ff577f78c8c5c7ad29cbfde07f72af4e558a8e4f",
+        "bytes": 3371
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/1d0e6166e10c480a6f27834b8b134e4d103d0dc34977a6a9a9f96ff57a684efd.raw",
+        "sha256": "1d0e6166e10c480a6f27834b8b134e4d103d0dc34977a6a9a9f96ff57a684efd",
+        "bytes": 3370
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G04",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "rem_(re:zero)",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04338239994831383,
+      "stdout": {
+        "path": "reports/P3/raw/bb853d8ddfea6e41e38e00b2ab671a0140bcde7920294e0b7034601f45129eb7.raw",
+        "sha256": "bb853d8ddfea6e41e38e00b2ab671a0140bcde7920294e0b7034601f45129eb7",
+        "bytes": 2447
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/ef6d5f0d0b2d6d67185d09ebe70abe5c9005c52a80ccf9d05a62482f7ccc441c.raw",
+        "sha256": "ef6d5f0d0b2d6d67185d09ebe70abe5c9005c52a80ccf9d05a62482f7ccc441c",
+        "bytes": 2446
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G05",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "ram_(re:zero)",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04444659990258515,
+      "stdout": {
+        "path": "reports/P3/raw/b4f19458271167e1ba3a2f2aa7657b702972bc8395445a36ae74970ca4343c95.raw",
+        "sha256": "b4f19458271167e1ba3a2f2aa7657b702972bc8395445a36ae74970ca4343c95",
+        "bytes": 2455
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/1504f04a1f61ad5286bd98bb96e9497b8c866e686c396bc89897742b81bef338.raw",
+        "sha256": "1504f04a1f61ad5286bd98bb96e9497b8c866e686c396bc89897742b81bef338",
+        "bytes": 2454
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G06",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "gotoh_hitori",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.03751849988475442,
+      "stdout": {
+        "path": "reports/P3/raw/76426138d74305e6986713e4038c41c5911becbbe5d937814a06289e3a0a591a.raw",
+        "sha256": "76426138d74305e6986713e4038c41c5911becbbe5d937814a06289e3a0a591a",
+        "bytes": 3189
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/6a8b6989d4c781207cfd894e4615a80b71859b5a439200db3119cc617074b170.raw",
+        "sha256": "6a8b6989d4c781207cfd894e4615a80b71859b5a439200db3119cc617074b170",
+        "bytes": 3188
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G07",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "bocchi_the_rock!",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.03910799999721348,
+      "stdout": {
+        "path": "reports/P3/raw/5811d963023269517424acfe17b8746ff2f6128e84dc9ca4502094b514864f00.raw",
+        "sha256": "5811d963023269517424acfe17b8746ff2f6128e84dc9ca4502094b514864f00",
+        "bytes": 2882
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/e674e8fc0d842d3b05b43660c8ee003b4bc8fad1bddf80194cf9206881004852.raw",
+        "sha256": "e674e8fc0d842d3b05b43660c8ee003b4bc8fad1bddf80194cf9206881004852",
+        "bytes": 2881
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G08",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "ijichi_nijika",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04121710010804236,
+      "stdout": {
+        "path": "reports/P3/raw/45f34d37ede3f7351e12125b07515321c63c333bbaf10cee7bc412b3a8f9d2a8.raw",
+        "sha256": "45f34d37ede3f7351e12125b07515321c63c333bbaf10cee7bc412b3a8f9d2a8",
+        "bytes": 1454
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/7e2bf477a569ac75d297dd395aec2d3327e5f3a4e1f983155a626aa1868f5c4e.raw",
+        "sha256": "7e2bf477a569ac75d297dd395aec2d3327e5f3a4e1f983155a626aa1868f5c4e",
+        "bytes": 1453
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G09",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "kita_ikuyo",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04058880009688437,
+      "stdout": {
+        "path": "reports/P3/raw/562f19a5723eb0c7245c23336e1b9afadc0d8778e7b411a79dbf251109421268.raw",
+        "sha256": "562f19a5723eb0c7245c23336e1b9afadc0d8778e7b411a79dbf251109421268",
+        "bytes": 2351
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/adb79f3e42a9fd0a88406f2e917a1439a6e8863d82ac9d3dfd603523d5ab336d.raw",
+        "sha256": "adb79f3e42a9fd0a88406f2e917a1439a6e8863d82ac9d3dfd603523d5ab336d",
+        "bytes": 2350
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G10",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "ayanami_rei",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.05652579991146922,
+      "stdout": {
+        "path": "reports/P3/raw/6f960074a9f05c036c40deb50fc79c77e3d76b6dd5f9876e598039bbedd066df.raw",
+        "sha256": "6f960074a9f05c036c40deb50fc79c77e3d76b6dd5f9876e598039bbedd066df",
+        "bytes": 2116
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/26635476dd9d0a7d32f0a0e032db3783829a212fc714a953c94bab0a7881fdb4.raw",
+        "sha256": "26635476dd9d0a7d32f0a0e032db3783829a212fc714a953c94bab0a7881fdb4",
+        "bytes": 2115
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G11",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "souryuu_asuka_langley",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.044935999903827906,
+      "stdout": {
+        "path": "reports/P3/raw/394127ac4b6d8db9005db0e634d956c7b3adb376a02ac428b030f4c350c21aa8.raw",
+        "sha256": "394127ac4b6d8db9005db0e634d956c7b3adb376a02ac428b030f4c350c21aa8",
+        "bytes": 3069
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/b23bdf233a64007752a47a3dcb3ff8145db8a8250a03d632171561baf4533200.raw",
+        "sha256": "b23bdf233a64007752a47a3dcb3ff8145db8a8250a03d632171561baf4533200",
+        "bytes": 3068
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G12",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "suzumiya_haruhi",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04107210016809404,
+      "stdout": {
+        "path": "reports/P3/raw/f3f896f49cce023b2ad3e1934e73c5f92131285093fbfc9f55763d200749a33a.raw",
+        "sha256": "f3f896f49cce023b2ad3e1934e73c5f92131285093fbfc9f55763d200749a33a",
+        "bytes": 3279
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/be0b8ab47c3bf643fd365a0a542bc62c5f143567fbb3e1b29cfbf5160cca2543.raw",
+        "sha256": "be0b8ab47c3bf643fd365a0a542bc62c5f143567fbb3e1b29cfbf5160cca2543",
+        "bytes": 3278
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G13",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "kaname_madoka",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.042684199986979365,
+      "stdout": {
+        "path": "reports/P3/raw/c954143b4b69e8ffdd4eade7dffdbe3ec0a3de2cea910da280ad74b91985f2e2.raw",
+        "sha256": "c954143b4b69e8ffdd4eade7dffdbe3ec0a3de2cea910da280ad74b91985f2e2",
+        "bytes": 4146
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/687af98e3c1593531c8897f6588e3ede2cebca720528d57435275262e03cf7cb.raw",
+        "sha256": "687af98e3c1593531c8897f6588e3ede2cebca720528d57435275262e03cf7cb",
+        "bytes": 4145
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G14",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "akemi_homura",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.044679699931293726,
+      "stdout": {
+        "path": "reports/P3/raw/58bbe97d41aa8588dee7d5a4a4b013738bdf483ad24c0da339c76a9bf62e7a50.raw",
+        "sha256": "58bbe97d41aa8588dee7d5a4a4b013738bdf483ad24c0da339c76a9bf62e7a50",
+        "bytes": 4115
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/ef90f6751b23cd55cf8c0e3e54c271220a171c8b8b8b442d81476957c90ddfcf.raw",
+        "sha256": "ef90f6751b23cd55cf8c0e3e54c271220a171c8b8b8b442d81476957c90ddfcf",
+        "bytes": 4114
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G15",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "sakura_miku",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.03849920001812279,
+      "stdout": {
+        "path": "reports/P3/raw/901058b6931e70c896189684db6a949b3c3a478190f038a36b5b7ab76766307f.raw",
+        "sha256": "901058b6931e70c896189684db6a949b3c3a478190f038a36b5b7ab76766307f",
+        "bytes": 2957
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/804e42cf34a0156f632498cb844b61453e1c8470de4bb6d464adb32a34592c40.raw",
+        "sha256": "804e42cf34a0156f632498cb844b61453e1c8470de4bb6d464adb32a34592c40",
+        "bytes": 2956
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G16",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "megurine_luka",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.042605800088495016,
+      "stdout": {
+        "path": "reports/P3/raw/3a3100d0550685a476fea4e0423cd5b99d73e999668c916f4d49953599ed81fb.raw",
+        "sha256": "3a3100d0550685a476fea4e0423cd5b99d73e999668c916f4d49953599ed81fb",
+        "bytes": 5389
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/4c89aed3ad7d7c106ea5c100e81cb99f8f7e7f6e8a3ae3eaefcecf08ec92eefa.raw",
+        "sha256": "4c89aed3ad7d7c106ea5c100e81cb99f8f7e7f6e8a3ae3eaefcecf08ec92eefa",
+        "bytes": 5388
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G17",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "kagamine_rin",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.040608299896121025,
+      "stdout": {
+        "path": "reports/P3/raw/a420eaa6ffe98ab8bbbcb8a79ca2ee9e71076faee696a995f3c6eabb363c835a.raw",
+        "sha256": "a420eaa6ffe98ab8bbbcb8a79ca2ee9e71076faee696a995f3c6eabb363c835a",
+        "bytes": 3350
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/7f3fc1f0397baa8c20ad60486a721b007802e7a35c117c949211b711183e2ba8.raw",
+        "sha256": "7f3fc1f0397baa8c20ad60486a721b007802e7a35c117c949211b711183e2ba8",
+        "bytes": 3349
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G18",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "kagamine_len",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.037458800012245774,
+      "stdout": {
+        "path": "reports/P3/raw/19992fd7e16c278f0a0a4fcd801bef9be5f691e7eef2a1147440dadb1891600c.raw",
+        "sha256": "19992fd7e16c278f0a0a4fcd801bef9be5f691e7eef2a1147440dadb1891600c",
+        "bytes": 3293
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/4b721b3e6d2dec2d401862b4381205feb625e1abf67a79c130ba73f4876a41f3.raw",
+        "sha256": "4b721b3e6d2dec2d401862b4381205feb625e1abf67a79c130ba73f4876a41f3",
+        "bytes": 3292
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G19",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "artoria_pendragon_(fate)",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.03940749983303249,
+      "stdout": {
+        "path": "reports/P3/raw/c2534389166fc2afce1a3cdccd4a5067d96a561c68274ec90b7bf0fd7fcad29b.raw",
+        "sha256": "c2534389166fc2afce1a3cdccd4a5067d96a561c68274ec90b7bf0fd7fcad29b",
+        "bytes": 4324
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/d12da731b9941f02a972a72437dd3349683334f793de6cad74adb53182213cdb.raw",
+        "sha256": "d12da731b9941f02a972a72437dd3349683334f793de6cad74adb53182213cdb",
+        "bytes": 4323
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G20",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "tohsaka_rin",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.0385687998495996,
+      "stdout": {
+        "path": "reports/P3/raw/3dae69ecbb6d287b253ba094130128481ac8c12863f04313dbf0e636d53b1a6d.raw",
+        "sha256": "3dae69ecbb6d287b253ba094130128481ac8c12863f04313dbf0e636d53b1a6d",
+        "bytes": 4463
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/9aa7ff017764726ed720b1b46a18155a8293c9612a040fefa31d31cd9c5856ec.raw",
+        "sha256": "9aa7ff017764726ed720b1b46a18155a8293c9612a040fefa31d31cd9c5856ec",
+        "bytes": 4462
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G21",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "后藤一里",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04469689982943237,
+      "stdout": {
+        "path": "reports/P3/raw/ec6b839f0fd1667f956bd4f09981df0308d80f8cb4cb5d74b9ef54558cc46e21.raw",
+        "sha256": "ec6b839f0fd1667f956bd4f09981df0308d80f8cb4cb5d74b9ef54558cc46e21",
+        "bytes": 3931
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/e57c78078c6220e9b148273cd11dbf1632d5e23cd50c3ebcddf27954266b7d60.raw",
+        "sha256": "e57c78078c6220e9b148273cd11dbf1632d5e23cd50c3ebcddf27954266b7d60",
+        "bytes": 3930
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G22",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "喜多郁代",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04851550003513694,
+      "stdout": {
+        "path": "reports/P3/raw/99bdedfd6b970c25c33288794e70f9e830ce8105770fbbf0cd6045041860aca3.raw",
+        "sha256": "99bdedfd6b970c25c33288794e70f9e830ce8105770fbbf0cd6045041860aca3",
+        "bytes": 3095
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/cfb05ec8550b178236d88e2e6daf9d662f441f4049684aa1daf3c7f8952ce67a.raw",
+        "sha256": "cfb05ec8550b178236d88e2e6daf9d662f441f4049684aa1daf3c7f8952ce67a",
+        "bytes": 3094
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G23",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "孤独摇滚",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04094139998778701,
+      "stdout": {
+        "path": "reports/P3/raw/6126fbb9384122fe98605b3c60fade3a731018312be78173ca06eface6ea1f11.raw",
+        "sha256": "6126fbb9384122fe98605b3c60fade3a731018312be78173ca06eface6ea1f11",
+        "bytes": 3620
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/c476f78249fc6bd22b2ee22865060d7af8e2015d34efc107240c92c9a65b736a.raw",
+        "sha256": "c476f78249fc6bd22b2ee22865060d7af8e2015d34efc107240c92c9a65b736a",
+        "bytes": 3619
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G24",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "阿尔托莉雅",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.056006999919191,
+      "stdout": {
+        "path": "reports/P3/raw/39b7d4e04f70ce4cc3cc7ea89d3f6970f3b705fb9969657a51fc28ddb84e7473.raw",
+        "sha256": "39b7d4e04f70ce4cc3cc7ea89d3f6970f3b705fb9969657a51fc28ddb84e7473",
+        "bytes": 5056
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/383441d2b7de3548992bfadb963ec14002d7bd19b6d6de01dd0a8fe7e87c0f8e.raw",
+        "sha256": "383441d2b7de3548992bfadb963ec14002d7bd19b6d6de01dd0a8fe7e87c0f8e",
+        "bytes": 5055
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G25",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "拉姆",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.03879759996198118,
+      "stdout": {
+        "path": "reports/P3/raw/21c4abfb82593b9ddef29e8cae2fef94a71983eb7c620def7e6b425f6b65d9a3.raw",
+        "sha256": "21c4abfb82593b9ddef29e8cae2fef94a71983eb7c620def7e6b425f6b65d9a3",
+        "bytes": 3180
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/0d4546457fc46e4f057e2bc3544a8d5be5f8af7aa2bc412dd7c5c4c7927b852a.raw",
+        "sha256": "0d4546457fc46e4f057e2bc3544a8d5be5f8af7aa2bc412dd7c5c4c7927b852a",
+        "bytes": 3179
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G26",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "雷姆",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04346249997615814,
+      "stdout": {
+        "path": "reports/P3/raw/274449f00c17644c73c095a0b400495885069dc3dd2997cde5604d7d3b04f6f9.raw",
+        "sha256": "274449f00c17644c73c095a0b400495885069dc3dd2997cde5604d7d3b04f6f9",
+        "bytes": 3172
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/d4fbaf9d5c8c0ca94c339ce85b8cba6593af60126bcaf6b125763cc68e2f9fad.raw",
+        "sha256": "d4fbaf9d5c8c0ca94c339ce85b8cba6593af60126bcaf6b125763cc68e2f9fad",
+        "bytes": 3171
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G27",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "鹿目圆",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04056390002369881,
+      "stdout": {
+        "path": "reports/P3/raw/098b8a2c7c0609d350185f57f479a6f7ad2a05d22e3edaf08988d8b709e0ee86.raw",
+        "sha256": "098b8a2c7c0609d350185f57f479a6f7ad2a05d22e3edaf08988d8b709e0ee86",
+        "bytes": 4877
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/98c9b41796daadb81767c088bfa6bdf6afad129f07407dbeef592b45ba072bec.raw",
+        "sha256": "98c9b41796daadb81767c088bfa6bdf6afad129f07407dbeef592b45ba072bec",
+        "bytes": 4876
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G28",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "晓美焰",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04772259993478656,
+      "stdout": {
+        "path": "reports/P3/raw/22c2eb463115cfce1710704579a7cb6bbc91f718b371041baed9bc8663114064.raw",
+        "sha256": "22c2eb463115cfce1710704579a7cb6bbc91f718b371041baed9bc8663114064",
+        "bytes": 4847
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/de03cbb2300743851ead3fc778345d2c8e56b9ec89fedfddb9cd64cb02418ee2.raw",
+        "sha256": "de03cbb2300743851ead3fc778345d2c8e56b9ec89fedfddb9cd64cb02418ee2",
+        "bytes": 4846
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G29",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "魔法少女小圆",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.039651700062677264,
+      "stdout": {
+        "path": "reports/P3/raw/bd42d9b9a0ac56318ab933fe18f0c5ddc6cd12d6669b976c934458ff4ea65b2f.raw",
+        "sha256": "bd42d9b9a0ac56318ab933fe18f0c5ddc6cd12d6669b976c934458ff4ea65b2f",
+        "bytes": 6369
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/bdfa5d241e023ec3759746b5dbfd6d71590434682174d24c0d3b884ffa7125ef.raw",
+        "sha256": "bdfa5d241e023ec3759746b5dbfd6d71590434682174d24c0d3b884ffa7125ef",
+        "bytes": 6368
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G30",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "樱初音",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04353230004198849,
+      "stdout": {
+        "path": "reports/P3/raw/27ed84186a2cf87eb035442560be1961d1bacb47e911033ad6107c96fc1709de.raw",
+        "sha256": "27ed84186a2cf87eb035442560be1961d1bacb47e911033ad6107c96fc1709de",
+        "bytes": 3690
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/ff5d198be110ebd086c32fe7e604c162427f2ec1f6d20d5edd0f7c104e4366fa.raw",
+        "sha256": "ff5d198be110ebd086c32fe7e604c162427f2ec1f6d20d5edd0f7c104e4366fa",
+        "bytes": 3689
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G31",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "远坂凛",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04215179989114404,
+      "stdout": {
+        "path": "reports/P3/raw/c6835bbff40b047b6adc53293bcd913350c10bdab0ac9beb0616755a3f29e9c0.raw",
+        "sha256": "c6835bbff40b047b6adc53293bcd913350c10bdab0ac9beb0616755a3f29e9c0",
+        "bytes": 5196
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/fb7c6859cbd7a4b5235bdec44400e3cd12eef3447a125478d2fad1c2e458de4c.raw",
+        "sha256": "fb7c6859cbd7a4b5235bdec44400e3cd12eef3447a125478d2fad1c2e458de4c",
+        "bytes": 5195
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G32",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "巡音流歌",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04046729998663068,
+      "stdout": {
+        "path": "reports/P3/raw/7f89d7f8c47ed5f7817dc9a7bf6cc15a29e865c2db76bd57c8dea6df54c13366.raw",
+        "sha256": "7f89d7f8c47ed5f7817dc9a7bf6cc15a29e865c2db76bd57c8dea6df54c13366",
+        "bytes": 6122
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/0d47e130675833ebda213d0d494a02bab3f566fc6ef84e1bb250e7833e5cb99b.raw",
+        "sha256": "0d47e130675833ebda213d0d494a02bab3f566fc6ef84e1bb250e7833e5cb99b",
+        "bytes": 6121
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G33",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "镜音连",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04552789987064898,
+      "stdout": {
+        "path": "reports/P3/raw/47c0ba4f5cb235d9d32aebf1244fe22885a0ed47f48a788f60b57bb4c6de1e9f.raw",
+        "sha256": "47c0ba4f5cb235d9d32aebf1244fe22885a0ed47f48a788f60b57bb4c6de1e9f",
+        "bytes": 4021
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/0256bce87a52e5e88448fef2cf99527e532294eda1b1e194b15ddbd9b2444499.raw",
+        "sha256": "0256bce87a52e5e88448fef2cf99527e532294eda1b1e194b15ddbd9b2444499",
+        "bytes": 4020
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G34",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "镜音铃",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.03879200015217066,
+      "stdout": {
+        "path": "reports/P3/raw/9b40f82c6392680c5d29b3ef513b47d670ae959c0dfad12dc449de4c5e4a7ee3.raw",
+        "sha256": "9b40f82c6392680c5d29b3ef513b47d670ae959c0dfad12dc449de4c5e4a7ee3",
+        "bytes": 4078
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/b72cf99b044e34c361b1a6394402fbfb44cb112e76e6056e13d9fc947d3224ca.raw",
+        "sha256": "b72cf99b044e34c361b1a6394402fbfb44cb112e76e6056e13d9fc947d3224ca",
+        "bytes": 4077
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G35",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "初音未来",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.03955459990538657,
+      "stdout": {
+        "path": "reports/P3/raw/29ea03dbb7d7083ba2a0f2c3215f852927cc668da52182ec92c03bd8e04714a5.raw",
+        "sha256": "29ea03dbb7d7083ba2a0f2c3215f852927cc668da52182ec92c03bd8e04714a5",
+        "bytes": 6658
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/ed7da2a3e97768e64ba91a963f57518eacbb916781511e9d8977975e7950073b.raw",
+        "sha256": "ed7da2a3e97768e64ba91a963f57518eacbb916781511e9d8977975e7950073b",
+        "bytes": 6657
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G36",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "puella_magi_madoka_magica",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04967650002799928,
+      "stdout": {
+        "path": "reports/P3/raw/595220d6f630f641c35dc684f7595b33fae0d14f4550a28354e0c8403c4a4c3c.raw",
+        "sha256": "595220d6f630f641c35dc684f7595b33fae0d14f4550a28354e0c8403c4a4c3c",
+        "bytes": 6379
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/e93ea1edca8283ac2c23a84bc8dd018d987fff9f1ec07d24cf957e8ff7d336aa.raw",
+        "sha256": "e93ea1edca8283ac2c23a84bc8dd018d987fff9f1ec07d24cf957e8ff7d336aa",
+        "bytes": 6378
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G37",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "ぼ喜多",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.03833739995025098,
+      "stdout": {
+        "path": "reports/P3/raw/43f55e36ebb5ad7e3f2912c0eaa4c80b6fe26d6160739a074e616fd35535efc6.raw",
+        "sha256": "43f55e36ebb5ad7e3f2912c0eaa4c80b6fe26d6160739a074e616fd35535efc6",
+        "bytes": 809
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/63333ef7feb170beb603d582b7f4d3935af604a3d7f52d3111ad69bc73a57a62.raw",
+        "sha256": "63333ef7feb170beb603d582b7f4d3935af604a3d7f52d3111ad69bc73a57a62",
+        "bytes": 808
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "tag_ambiguous",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G38",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "madohomu",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.036354999989271164,
+      "stdout": {
+        "path": "reports/P3/raw/c73b93c49b71fa5783d6c839695999cd36a40f21cb1711ef882df3fa25409b1b.raw",
+        "sha256": "c73b93c49b71fa5783d6c839695999cd36a40f21cb1711ef882df3fa25409b1b",
+        "bytes": 811
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/e6c9df2af6da015c93812380177821980277d8daf2978446f12bda08994316e1.raw",
+        "sha256": "e6c9df2af6da015c93812380177821980277d8daf2978446f12bda08994316e1",
+        "bytes": 810
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "tag_ambiguous",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G39",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "镜音リンレン",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.03722280007787049,
+      "stdout": {
+        "path": "reports/P3/raw/c7bf33becc0409d7fe7311ed9bba0f8d293ae2865ffef33913b95de24509d516.raw",
+        "sha256": "c7bf33becc0409d7fe7311ed9bba0f8d293ae2865ffef33913b95de24509d516",
+        "bytes": 820
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/7c0717892a2d5a424d53f934ffa3fac35741e9c0605117fc70db234b5ffbafb8.raw",
+        "sha256": "7c0717892a2d5a424d53f934ffa3fac35741e9c0605117fc70db234b5ffbafb8",
+        "bytes": 819
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "tag_ambiguous",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G40",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "鏡音",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.039208600064739585,
+      "stdout": {
+        "path": "reports/P3/raw/0c7275ef3568789a96db30cf9203221e7816b87e049dad0b0ea131988bb57345.raw",
+        "sha256": "0c7275ef3568789a96db30cf9203221e7816b87e049dad0b0ea131988bb57345",
+        "bytes": 808
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/ed709c2eba7af8f42b3b4b3b420ca14995b7200047b96eb26afc06d28c849d17.raw",
+        "sha256": "ed709c2eba7af8f42b3b4b3b420ca14995b7200047b96eb26afc06d28c849d17",
+        "bytes": 807
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "tag_ambiguous",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G41",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "ネギトロ",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.0427879998460412,
+      "stdout": {
+        "path": "reports/P3/raw/9f6d5bbc95cb2c18436e07416c63eb1a37ba4aa7b9355f09488a1489c19fe853.raw",
+        "sha256": "9f6d5bbc95cb2c18436e07416c63eb1a37ba4aa7b9355f09488a1489c19fe853",
+        "bytes": 815
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/322b9d2ad67c0beeee0b681fa5dd1202272e5ba0508bb5283f491c244fb66997.raw",
+        "sha256": "322b9d2ad67c0beeee0b681fa5dd1202272e5ba0508bb5283f491c244fb66997",
+        "bytes": 814
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "tag_ambiguous",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G42",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "初音未来",
+        "--kind",
+        "character",
+        "--namespace",
+        "moegirl.character",
+        "--key",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04345980007201433,
+      "stdout": {
+        "path": "reports/P3/raw/7fd99a9ca7a6806b45b5596f67142872cc3ba78a53eace45bcc797b98d20a080.raw",
+        "sha256": "7fd99a9ca7a6806b45b5596f67142872cc3ba78a53eace45bcc797b98d20a080",
+        "bytes": 744
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/d5c4772b5aa16cc9b1689d5a526258595c12ffbe1e944155666eb4860445eb9d.raw",
+        "sha256": "d5c4772b5aa16cc9b1689d5a526258595c12ffbe1e944155666eb4860445eb9d",
+        "bytes": 743
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "entity_found_tag_unmapped",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G43",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "hatsune_miku",
+        "--kind",
+        "tag",
+        "--namespace",
+        "local.tag_aggregate",
+        "--key",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.043086899910122156,
+      "stdout": {
+        "path": "reports/P3/raw/6c91dd2238eaa4899a0bff746810dc1a12c2c9efdfe06a8442b15f4dd6e3eefa.raw",
+        "sha256": "6c91dd2238eaa4899a0bff746810dc1a12c2c9efdfe06a8442b15f4dd6e3eefa",
+        "bytes": 740
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/eeeb5d7f8669878cbc2f35ec19f9c9d570d88eba9aac87d43234da0ed847a9f5.raw",
+        "sha256": "eeeb5d7f8669878cbc2f35ec19f9c9d570d88eba9aac87d43234da0ed847a9f5",
+        "bytes": 739
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "entity_found_tag_unmapped",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G44",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "puella_magi_madoka_magica",
+        "--category",
+        "4",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04051319998688996,
+      "stdout": {
+        "path": "reports/P3/raw/5c4ba4bf419f1565deb5301afab74d43b1734f9c4d03711e8d1359a78d69aa17.raw",
+        "sha256": "5c4ba4bf419f1565deb5301afab74d43b1734f9c4d03711e8d1359a78d69aa17",
+        "bytes": 667
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/68b26639891d69b8f9be827983d59a2d882ac3d669d6c312b7ee91f57262ee49.raw",
+        "sha256": "68b26639891d69b8f9be827983d59a2d882ac3d669d6c312b7ee91f57262ee49",
+        "bytes": 666
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "not_found",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G45",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "5655",
+        "--kind",
+        "page",
+        "--namespace",
+        "danbooru.wiki",
+        "--key",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04207890015095472,
+      "stdout": {
+        "path": "reports/P3/raw/964c20ef44fe1ceec64e80bc95bc7205442f14350b41d31fdb9d34e1795e193d.raw",
+        "sha256": "964c20ef44fe1ceec64e80bc95bc7205442f14350b41d31fdb9d34e1795e193d",
+        "bytes": 719
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/383839eebfcfa3285a2bbe676948ec43125b0f543e781377faabb8bafae6615a.raw",
+        "sha256": "383839eebfcfa3285a2bbe676948ec43125b0f543e781377faabb8bafae6615a",
+        "bytes": 718
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "entity_found_tag_unmapped",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G46",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "hatsune_miku",
+        "--kind",
+        "character",
+        "--namespace",
+        "moegirl.character",
+        "--key",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.039642000105232,
+      "stdout": {
+        "path": "reports/P3/raw/c41725a1e2346326836c95c6ccf015e3d6b7b84aa23fa635de26b08c0b11a321.raw",
+        "sha256": "c41725a1e2346326836c95c6ccf015e3d6b7b84aa23fa635de26b08c0b11a321",
+        "bytes": 657
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/cd148b15adfb902ac3606f9e4007b1601a791d6692a8a3d8348802c43f23534a.raw",
+        "sha256": "cd148b15adfb902ac3606f9e4007b1601a791d6692a8a3d8348802c43f23534a",
+        "bytes": 656
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "not_found",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G47",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "151534",
+        "--kind",
+        "page",
+        "--namespace",
+        "danbooru.wiki",
+        "--key",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.039928900077939034,
+      "stdout": {
+        "path": "reports/P3/raw/ed33b6163300dd3939ed210d2425fcee77d8f2c30c42e9e0f4cb5652771f2d69.raw",
+        "sha256": "ed33b6163300dd3939ed210d2425fcee77d8f2c30c42e9e0f4cb5652771f2d69",
+        "bytes": 723
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/0b290ce17e5f68f0251862162eb7398acab759ef8a50a6fa4ad6f2a8be9d8887.raw",
+        "sha256": "0b290ce17e5f68f0251862162eb7398acab759ef8a50a6fa4ad6f2a8be9d8887",
+        "bytes": 722
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "entity_found_tag_unmapped",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G48",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "konpaku_youmu",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04482419998385012,
+      "stdout": {
+        "path": "reports/P3/raw/cfd580a1e89c3e6f6131d713c40601bf6ccc730bed39c132cb1a6607a7c76c8b.raw",
+        "sha256": "cfd580a1e89c3e6f6131d713c40601bf6ccc730bed39c132cb1a6607a7c76c8b",
+        "bytes": 1450
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/d6d4f620f138aa98f4fd0b10a18b10a2eec30fd95f231a8de2764598fa54562c.raw",
+        "sha256": "d6d4f620f138aa98f4fd0b10a18b10a2eec30fd95f231a8de2764598fa54562c",
+        "bytes": 1449
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G49",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "hatsune_miku",
+        "--category",
+        "3",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.04177899984642863,
+      "stdout": {
+        "path": "reports/P3/raw/17deadc064425e9a2caaa7ccb36a39c616422c6baf354f2262f0973f0143b8b9.raw",
+        "sha256": "17deadc064425e9a2caaa7ccb36a39c616422c6baf354f2262f0973f0143b8b9",
+        "bytes": 654
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/b20b25bfae306771dfed245deff50802e840a4046ab7595bd0b2d9eaea85259b.raw",
+        "sha256": "b20b25bfae306771dfed245deff50802e840a4046ab7595bd0b2d9eaea85259b",
+        "bytes": 653
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "not_found",
+      "unexpected_resolved": false
+    },
+    {
+      "case_id": "G50",
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\debug\\sknow-rs.exe",
+        "resolve-tag",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-pilot-v2\\knowledge.sqlite",
+        "madoka_kaname",
+        "--target-namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "elapsed_s": 0.040792200015857816,
+      "stdout": {
+        "path": "reports/P3/raw/c1d7bee018cde6d431fe73ef20ab7f417acd63ef1785cf86e37a23ef5311218c.raw",
+        "sha256": "c1d7bee018cde6d431fe73ef20ab7f417acd63ef1785cf86e37a23ef5311218c",
+        "bytes": 4885
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "oracle_json": {
+        "path": "reports/P3/raw/d8a93d61787d95927e3e55d5175a12c2ba374851b3c75568b55f634e83cb4f31.raw",
+        "sha256": "d8a93d61787d95927e3e55d5175a12c2ba374851b3c75568b55f634e83cb4f31",
+        "bytes": 4884
+      },
+      "expected_behavior_passed": true,
+      "full_json_passed": true,
+      "error": null,
+      "actual_status": "resolved",
+      "unexpected_resolved": false
+    }
+  ],
+  "limits": {
+    "inner_s": 5,
+    "outer_s": 15,
+    "total_response_bytes": 524288
+  },
+  "limitations": [
+    "50scoped queries, not fullsource recall or universal name ownership",
+    "15Chinese-script positive names from officialWiki under proven nativeidentity; not humantranslations",
+    "2changed Wiki versions quarantined; native direct stillexists, no oldWiki identity upgrade",
+    "No verified entity_tag real positives: cross-source ID/link evidence missing; these remain unmapped",
+    "inactive official aliases never redirect; G50 separately resolves via explicit compatibleWiki name"
+  ],
+  "gold_path": "reports\\P3\\real-gold-cases.json"
+}

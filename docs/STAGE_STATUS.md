@@ -1,6 +1,22 @@
 # Stage Status (SakuraKnowledge)
 
-## Current b7547a A-C repair — READY_FOR_REVIEW / WAITING_REVIEW
+## Current authorized P3 — IN_PROGRESS
+
+- P1/P2: **CLOSED_AND_MERGED**. P2 fixed review `894dc6a73bfd42f18cc7648e8ab7481aae211ab1`
+  APPROVE / NO_BLOCKING_FINDINGS within authorized Windows targeted/artifact scope.
+- P3_BASE and immutable main: `894dc6a73bfd42f18cc7648e8ab7481aae211ab1`.
+  Actual fetch and independent ls-remote verified initial main/dev equality, clean
+  single worktree; ordinary switch to dev. No P3 code or source coverage acceptance yet.
+- P3 resolver/necessary new runtime capability: **Rust only**. Existing Python
+  P2 public API/CLI frozen; Python additions restricted to ETL/audit/independent oracle.
+- Scope: frozen native tags/active aliases/Wiki evidence and trusted entity names,
+  typed identity, independent fixtures then real pilot including conflicts; a full
+  candidate build is permitted only once after every documented gate is satisfied.
+- Existing P1/P2 reports/receipts and published 21.5GB snapshot remain immutable.
+- No main merge/P4/Pool/SakuraTool integration. Existing Linux/Pi/full human facts/
+  dbstat/Pool/live refresh NOT_RUN remain limitations, not new blockers.
+
+## Historical b7547a A-C delivery — subsequently APPROVED and merged
 
 New submission evidence: `reports/P2/review-b754-delivery.json`, with per-finding
 mapping `review-b754-findings.md`. This proposes review, not external approval.

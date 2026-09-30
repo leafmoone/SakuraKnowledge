@@ -1,0 +1,22 @@
+{
+  "head": "894dc6a73bfd42f18cc7648e8ab7481aae211ab1",
+  "working_tree": " M .gitattributes\n M .gitignore\n M docs/STAGE_STATUS.md\n M rust/src/lib.rs\n M rust/src/main.rs\n M rust/src/response.rs\n M src/sakura_knowledge/storage.py\n?? configs/p3-inputs.json\n?? docs/P3_PLAN.md\n?? docs/p3-resolver-contract.md\n?? reports/P3/\n?? rust/examples/bench_resolver.rs\n?? rust/src/resolver.rs\n?? src/sakura_knowledge/native_tags.py\n?? src/sakura_knowledge/tag_decisions.py\n?? tests/test_p3_builder.py\n?? tests/test_p3_decisions.py\n?? tests/test_p3_native.py\n?? tests/test_p3_proofs.py\n?? tests/test_p3_resolver.py\n?? tools/p3_accept_resolver.py\n?? tools/p3_acquire_native.py\n?? tools/p3_audit_inputs.py\n?? tools/p3_compile_inputs.py\n?? tools/p3_evidence.py\n?? tools/p3_measure_resolver.py\n?? tools/p3_resolver_oracle.py\n",
+  "argv": [
+    "python",
+    "-c",
+    "from sakura_knowledge.storage import build; import json; print(json.dumps(build('build/p3-inputs-v2/pilot-manifest.json','build/p3-pilot-v2')))"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.5559288000222296,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJzbmFwc2hvdCI6ICIwOTIxMzNhMWRlZWRlMDgyYjkyZDdiMGY1YTI0YTIwZDhmMDM4MzdmNTI2ZGNhOGI5ZTYyYjZkZmQ1YjM2ODI2IiwgImNvdW50cyI6IHsiYmFuZ3VtaS1jb21wbGV0ZS02YTc1YWVmYjc2OWEiOiB7ImlucHV0IjogMjAxLCAiYWNjZXB0ZWQiOiAyMDEsICJyZWplY3RlZCI6IDAsICJjb25mbGljdGVkIjogMCwgImR1cGxpY2F0ZSI6IDAsICJ1bnJlc29sdmVkIjogMCwgImJ5X2tpbmQiOiB7InN1YmplY3QiOiAxMywgImNoYXJhY3RlciI6IDExNCwgInBlcnNvbiI6IDUsICJlcGlzb2RlIjogNjl9fSwgIm1vZWdpcmwtY29tcGxldGUtNTA3MmY3Y2YzZTNlIjogeyJpbnB1dCI6IDkxLCAiYWNjZXB0ZWQiOiA5MSwgInJlamVjdGVkIjogMCwgImNvbmZsaWN0ZWQiOiAwLCAiZHVwbGljYXRlIjogMCwgInVucmVzb2x2ZWQiOiAwLCAiYnlfa2luZCI6IHsiY2hhcmFjdGVyIjogODgsICJzdWJqZWN0IjogM319LCAiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIjogeyJpbnB1dCI6IDkwLCAiYWNjZXB0ZWQiOiA5MCwgInJlamVjdGVkIjogMCwgImNvbmZsaWN0ZWQiOiAwLCAiZHVwbGljYXRlIjogMCwgInVucmVzb2x2ZWQiOiAwLCAiYnlfa2luZCI6IHsicGFnZSI6IDkwfX0sICJ0YWdfd2lraS1jb21wbGV0ZS1hMmViMDU1YzU3OGQiOiB7ImlucHV0IjogODIsICJhY2NlcHRlZCI6IDgyLCAicmVqZWN0ZWQiOiAwLCAiY29uZmxpY3RlZCI6IDAsICJkdXBsaWNhdGUiOiAwLCAidW5yZXNvbHZlZCI6IDAsICJieV9raW5kIjogeyJ0YWciOiA4Mn19LCAiZGFuYm9vcnUtbmF0aXZlLXNjb3BlZC00Y2NjZTAyZTQ2NmYiOiB7ImlucHV0IjogNDEwLCAiYWNjZXB0ZWQiOiA0MTAsICJyZWplY3RlZCI6IDAsICJjb25mbGljdGVkIjogMCwgImR1cGxpY2F0ZSI6IDAsICJ1bnJlc29sdmVkIjogMCwgImJ5X2tpbmQiOiB7InRhZyI6IDMwfX19LCAidmVyaWZpY2F0aW9uIjogeyJvayI6IHRydWUsICJpbnRlZ3JpdHkiOiAib2siLCAiZm9yZWlnbl9rZXlfZXJyb3JzIjogMCwgImZ0c19kb2N1bWVudHMiOiAyMjIsICJmdHNfZXhwZWN0ZWQiOiAyMjIsICJmdHNfaW52YWxpZCI6IDAsICJmdHNfbWlzc2luZyI6IDAsICJzb3VyY2VfYWNjb3VudF9lcnJvcnMiOiBbXSwgInVucmVzb2x2ZWRfcmVhc29ucyI6IHt9LCAiZW50cmllcyI6IDQ1MX0sICJ3YWxfY2hlY2twb2ludCI6IFswLCAwLCAwXSwgImVsYXBzZWRfc2Vjb25kcyI6IDAuNDMwMzQ1ODAwMDA2NzYyMTV9DQo=",
+  "stdout_sha256": "53760ac9e11f4511ee5a99a05423396d334220c0c8f79a07b44748b669970b51",
+  "stdout": "{\"snapshot\": \"092133a1deede082b92d7b0f5a24a20d8f03837f526dca8b9e62b6dfd5b36826\", \"counts\": {\"bangumi-complete-6a75aefb769a\": {\"input\": 201, \"accepted\": 201, \"rejected\": 0, \"conflicted\": 0, \"duplicate\": 0, \"unresolved\": 0, \"by_kind\": {\"subject\": 13, \"character\": 114, \"person\": 5, \"episode\": 69}}, \"moegirl-complete-5072f7cf3e3e\": {\"input\": 91, \"accepted\": 91, \"rejected\": 0, \"conflicted\": 0, \"duplicate\": 0, \"unresolved\": 0, \"by_kind\": {\"character\": 88, \"subject\": 3}}, \"danbooru-complete-a26a3829dd42\": {\"input\": 90, \"accepted\": 90, \"rejected\": 0, \"conflicted\": 0, \"duplicate\": 0, \"unresolved\": 0, \"by_kind\": {\"page\": 90}}, \"tag_wiki-complete-a2eb055c578d\": {\"input\": 82, \"accepted\": 82, \"rejected\": 0, \"conflicted\": 0, \"duplicate\": 0, \"unresolved\": 0, \"by_kind\": {\"tag\": 82}}, \"danbooru-native-scoped-4ccce02e466f\": {\"input\": 410, \"accepted\": 410, \"rejected\": 0, \"conflicted\": 0, \"duplicate\": 0, \"unresolved\": 0, \"by_kind\": {\"tag\": 30}}}, \"verification\": {\"ok\": true, \"integrity\": \"ok\", \"foreign_key_errors\": 0, \"fts_documents\": 222, \"fts_expected\": 222, \"fts_invalid\": 0, \"fts_missing\": 0, \"source_account_errors\": [], \"unresolved_reasons\": {}, \"entries\": 451}, \"wal_checkpoint\": [0, 0, 0], \"elapsed_seconds\": 0.43034580000676215}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

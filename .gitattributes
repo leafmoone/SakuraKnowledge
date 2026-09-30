@@ -3,3 +3,6 @@ reports/P2/raw/** -text -diff
 # New f99 review receipts bind byte-verbatim; historical receipts remain untouched.
 reports/P2/review-f99-*.json -text -diff
 reports/P2/review-b754-*.json -text -diff
+# New P3 receipts and replay decisions bind exact committed bytes.
+reports/P3/*.json -text -diff
+reports/P3/*.jsonl -text -diff

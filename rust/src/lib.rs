@@ -8,7 +8,9 @@ use rusqlite::{params, Connection, OpenFlags};
 use serde_json::{json, Value};
 use std::path::Path;
 use std::time::{Duration, Instant};
+mod resolver;
 mod response;
+pub use resolver::TagOptions;
 mod search;
 mod unicode16;
 
@@ -444,7 +446,7 @@ impl Runtime {
         }))
     }
 
-    fn fetch_docs(&mut self, id: i64) -> Result<Vec<Value>> {
+    fn fetch_docs(&self, id: i64) -> Result<Vec<Value>> {
         let sql = format!(
             "SELECT substr(title,1,256),substr(original,1,4000),length(original)>4000,
                      json_extract(payload,'$.search_text_truncated'),source_id,evidence_id,status,length(title)>256
@@ -1363,6 +1365,30 @@ mod tests {
             response::observations(&[json!({})], &["{}".into()], expired),
             Err(Error::Budget)
         ));
+        drop(rt);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn p3_shared_deadline_nested_resolver_and_reset() {
+        let dir = std::env::temp_dir().join("sknow-rs-p3-budget");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("fixture.sqlite");
+        build_fixture(&path);
+        let conn = Connection::open(&path).unwrap();
+        conn.execute_batch("CREATE TABLE sources(source_id TEXT PRIMARY KEY,metadata TEXT); INSERT INTO sources VALUES('s','{}');").unwrap();
+        drop(conn);
+        let mut rt = Runtime::open(&path).unwrap();
+        let fail = rt.operation(|s| {
+            s.deadline = Instant::now() - Duration::from_secs(1);
+            s.resolve_tag("hero", TagOptions::default())
+        });
+        assert!(matches!(fail, Err(Error::Budget)));
+        assert_eq!(
+            rt.resolve_tag("hero", TagOptions::default()).unwrap()["status"],
+            json!("unsupported")
+        );
+        assert_eq!(rt.operation_depth, 0);
         drop(rt);
         std::fs::remove_file(path).unwrap();
     }

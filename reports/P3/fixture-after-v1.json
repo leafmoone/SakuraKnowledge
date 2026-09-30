@@ -1,0 +1,26 @@
+{
+  "head": "894dc6a73bfd42f18cc7648e8ab7481aae211ab1",
+  "working_tree": " M docs/STAGE_STATUS.md\n M rust/src/lib.rs\n M rust/src/main.rs\n M src/sakura_knowledge/storage.py\n?? docs/p3-resolver-contract.md\n?? reports/P3/\n?? rust/src/resolver.rs\n?? src/sakura_knowledge/native_tags.py\n?? tests/test_p3_native.py\n?? tests/test_p3_resolver.py\n?? tools/p3_acquire_native.py\n?? tools/p3_audit_inputs.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_p3_native.py",
+    "tests/test_p3_resolver.py",
+    "-q",
+    "--tb=short"
+  ],
+  "exit": 0,
+  "elapsed_s": 1.9601278000045568,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "Li4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KMjEgcGFzc2VkIGluIDEuMjhzDQo=",
+  "stdout_sha256": "a9c648f5db9239073c5cf98b50d5edd0bfd00080c7e7ebfb1273fdfac9f2471b",
+  "stdout": ".....................                                                    [100%]\r\n21 passed in 1.28s\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

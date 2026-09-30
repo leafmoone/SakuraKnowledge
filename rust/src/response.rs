@@ -267,6 +267,10 @@ pub fn bound_response(mut value: Value, deadline: Instant) -> Result<Value> {
         {
             let removed = value["candidates"].as_array_mut().unwrap().pop().unwrap();
             total -= checked_size(&removed, deadline)? + 1;
+            if value.get("candidates_truncated") == Some(&json!(false)) {
+                value["candidates_truncated"] = json!(true);
+                total -= 1; // true is one byte shorter than false
+            }
         } else if value
             .get("relations")
             .and_then(Value::as_array)

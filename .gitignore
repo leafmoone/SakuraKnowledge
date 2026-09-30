@@ -8,3 +8,5 @@ dist/
 *.sqlite
 *.sqlite-*
 MEMORY.md
+# P3 source bodies retained once locally; committed receipts bind hashes/paths.
+reports/P3/raw/

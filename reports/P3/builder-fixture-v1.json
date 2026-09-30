@@ -1,0 +1,25 @@
+{
+  "head": "894dc6a73bfd42f18cc7648e8ab7481aae211ab1",
+  "working_tree": " M .gitignore\n M docs/STAGE_STATUS.md\n M rust/src/lib.rs\n M rust/src/main.rs\n M rust/src/response.rs\n M src/sakura_knowledge/storage.py\n?? docs/p3-resolver-contract.md\n?? reports/P3/\n?? rust/src/resolver.rs\n?? src/sakura_knowledge/native_tags.py\n?? tests/test_p3_builder.py\n?? tests/test_p3_native.py\n?? tests/test_p3_resolver.py\n?? tools/p3_acquire_native.py\n?? tools/p3_audit_inputs.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_p3_builder.py",
+    "-q",
+    "--tb=short"
+  ],
+  "exit": 1,
+  "elapsed_s": 0.8808997001033276,
+  "status": "FAIL",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "Ri4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSBGQUlMVVJFUyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KX19fX19fX19fX19fX19fX19fX18gdGVzdF9wcm9qZWN0aW9uX2F0b21pY19hbmRfYWNjb3VudGVkIF9fX19fX19fX19fX19fX19fX19fXw0KdGVzdHNcdGVzdF9wM19idWlsZGVyLnB5OjM1OiBpbiB0ZXN0X3Byb2plY3Rpb25fYXRvbWljX2FuZF9hY2NvdW50ZWQNCiAgICBidWlsZChwYXRoLG91dHB1dCkNCnNyY1xzYWt1cmFfa25vd2xlZGdlXHN0b3JhZ2UucHk6NDYwOiBpbiBidWlsZA0KICAgIHJhaXNlIFZhbHVlRXJyb3IoZiJ2ZXJpZmljYXRpb24gcmVqZWN0ZWQgcHVibGljYXRpb246IHtjb3VudHN9OyB7Y2hlY2tzfSIpDQpFICAgVmFsdWVFcnJvcjogdmVyaWZpY2F0aW9uIHJlamVjdGVkIHB1YmxpY2F0aW9uOiB7J2ZpeHR1cmUtdjEnOiB7J2lucHV0JzogMiwgJ2FjY2VwdGVkJzogMiwgJ3JlamVjdGVkJzogMCwgJ2NvbmZsaWN0ZWQnOiAwLCAnZHVwbGljYXRlJzogMCwgJ3VucmVzb2x2ZWQnOiAwLCAnYnlfa2luZCc6IHsndGFnJzogMX19fTsgeydvayc6IEZhbHNlLCAnaW50ZWdyaXR5JzogJ29rJywgJ2ZvcmVpZ25fa2V5X2Vycm9ycyc6IDAsICdmdHNfZG9jdW1lbnRzJzogMCwgJ2Z0c19leHBlY3RlZCc6IDAsICdmdHNfaW52YWxpZCc6IDAsICdmdHNfbWlzc2luZyc6IDAsICdzb3VyY2VfYWNjb3VudF9lcnJvcnMnOiBbJ2ZpeHR1cmUtdjEnXSwgJ3VucmVzb2x2ZWRfcmVhc29ucyc6IHt9LCAnZW50cmllcyc6IDF9DQo9PT09PT09PT09PT09PT09PT09PT09PT09PT0gc2hvcnQgdGVzdCBzdW1tYXJ5IGluZm8gPT09PT09PT09PT09PT09PT09PT09PT09PT09DQpGQUlMRUQgdGVzdHMvdGVzdF9wM19idWlsZGVyLnB5Ojp0ZXN0X3Byb2plY3Rpb25fYXRvbWljX2FuZF9hY2NvdW50ZWQgLSBWYWx1ZS4uLg0KMSBmYWlsZWQsIDMgcGFzc2VkIGluIDAuMjZzDQo=",
+  "stdout_sha256": "8641fac41fb89680f51f6007532cba43cf50ae5e7e708d3c2480ade16adc231f",
+  "stdout": "F...                                                                     [100%]\r\n================================== FAILURES ===================================\r\n____________________ test_projection_atomic_and_accounted _____________________\r\ntests\\test_p3_builder.py:35: in test_projection_atomic_and_accounted\r\n    build(path,output)\r\nsrc\\sakura_knowledge\\storage.py:460: in build\r\n    raise ValueError(f\"verification rejected publication: {counts}; {checks}\")\r\nE   ValueError: verification rejected publication: {'fixture-v1': {'input': 2, 'accepted': 2, 'rejected': 0, 'conflicted': 0, 'duplicate': 0, 'unresolved': 0, 'by_kind': {'tag': 1}}}; {'ok': False, 'integrity': 'ok', 'foreign_key_errors': 0, 'fts_documents': 0, 'fts_expected': 0, 'fts_invalid': 0, 'fts_missing': 0, 'source_account_errors': ['fixture-v1'], 'unresolved_reasons': {}, 'entries': 1}\r\n=========================== short test summary info ===========================\r\nFAILED tests/test_p3_builder.py::test_projection_atomic_and_accounted - Value...\r\n1 failed, 3 passed in 0.26s\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

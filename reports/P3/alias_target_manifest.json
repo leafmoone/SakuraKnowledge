@@ -1,0 +1,120 @@
+{
+  "selection": "Finite alias-scope extension solely from actual frozen official Wiki other_names, not generated native identities",
+  "targets": [
+    {
+      "title": "hatsunemiku",
+      "observed_in": [
+        {
+          "tag": "hatsune_miku",
+          "wiki_id": 5655
+        }
+      ]
+    },
+    {
+      "title": "mikuhatsune",
+      "observed_in": [
+        {
+          "tag": "hatsune_miku",
+          "wiki_id": 5655
+        }
+      ]
+    },
+    {
+      "title": "miku_hatsune",
+      "observed_in": [
+        {
+          "tag": "hatsune_miku",
+          "wiki_id": 5655
+        }
+      ]
+    },
+    {
+      "title": "vocaloid_miku",
+      "observed_in": [
+        {
+          "tag": "hatsune_miku",
+          "wiki_id": 5655
+        }
+      ]
+    },
+    {
+      "title": "madoka_kaname",
+      "observed_in": [
+        {
+          "tag": "kaname_madoka",
+          "wiki_id": 25531
+        }
+      ]
+    },
+    {
+      "title": "homura_akemi",
+      "observed_in": [
+        {
+          "tag": "akemi_homura",
+          "wiki_id": 25530
+        }
+      ]
+    },
+    {
+      "title": "haruhi_suzumiya",
+      "observed_in": [
+        {
+          "tag": "suzumiya_haruhi",
+          "wiki_id": 3613
+        }
+      ]
+    },
+    {
+      "title": "soryu_asuka_langley",
+      "observed_in": [
+        {
+          "tag": "souryuu_asuka_langley",
+          "wiki_id": 12272
+        }
+      ]
+    },
+    {
+      "title": "asuka_langley_soryu",
+      "observed_in": [
+        {
+          "tag": "souryuu_asuka_langley",
+          "wiki_id": 12272
+        }
+      ]
+    },
+    {
+      "title": "rin_kagamine",
+      "observed_in": [
+        {
+          "tag": "kagamine_rin",
+          "wiki_id": 5809
+        }
+      ]
+    },
+    {
+      "title": "puella_magi_madoka_magica",
+      "observed_in": [
+        {
+          "tag": "mahou_shoujo_madoka_magica",
+          "wiki_id": 24793
+        }
+      ]
+    },
+    {
+      "title": "touhouproject",
+      "observed_in": [
+        {
+          "tag": "touhou",
+          "wiki_id": 11
+        }
+      ]
+    }
+  ],
+  "parent_target_manifest_sha256": "8e911e9946c08dcfd2efad3cefc8c256ec8e6ff8f7607e4b20e71c65b9e48989",
+  "raw_sha256": "4ccce02e466f4f14ee4a5252b48b72c33b53db57c6b470fe7307e40a3668a7b8",
+  "cumulative_targets": 42,
+  "cumulative_request_start": 40,
+  "max_targets": 500,
+  "request_budget": 200,
+  "retries": 0
+}

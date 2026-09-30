@@ -117,6 +117,8 @@ def readonly(path):
 
 def verify(path):
     with closing(readonly(path)) as conn:
+        from .native_tags import verify_projection
+        verify_projection(conn)
         integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]
         foreign = list(conn.execute("PRAGMA foreign_key_check"))
         index_episodes = conn.execute(
@@ -153,6 +155,7 @@ def verify(path):
             if document_id not in indexed_ids:
                 missing += 1
         accounts = []
+        p3_enabled = conn.execute("SELECT 1 FROM build_meta WHERE key='p3_resolver_version'").fetchone()
         for row in conn.execute("SELECT s.source_id,c.* FROM sources s LEFT JOIN source_counts c "
                                 "ON c.source_id=s.source_id"):
             if (row["input"] is None or row["input"] != sum(row[k] for k in
@@ -164,6 +167,9 @@ def verify(path):
                 "(SELECT count(*) FROM links WHERE source_id=?) + "
                 "(SELECT count(*) FROM unresolved_records WHERE source_id=?)",
                 (row["source_id"], row["source_id"], row["source_id"])).fetchone()[0]
+            if p3_enabled:
+                stored += conn.execute("SELECT count(*) FROM tag_resolutions WHERE source_id=?",
+                                       (row["source_id"],)).fetchone()[0]
             kinds = {kind: count for kind, count in conn.execute(
                 "SELECT e.kind,count(*) FROM entry_evidence v JOIN entries e ON e.id=v.entry_id "
                 "WHERE v.source_id=? GROUP BY e.kind", (row["source_id"],))}
@@ -207,6 +213,9 @@ def evidence(item, fallback):
 def insert_record(conn, record, source, line, index_episodes):
     sid = source["source_id"]
     fallback = f"{sid}:{source['local_sha256']}:line:{line}"
+    if record.get("record_type") == "tag_resolution":
+        from .native_tags import insert_projection
+        return insert_projection(conn, record, source, fallback)
     if record.get("record_type") == "link":
         src = entry_id(conn, record["src"])
         dst = entry_id(conn, record["dst"])
@@ -359,6 +368,13 @@ def build(manifest, output):
             conn.row_factory = sqlite3.Row
             conn.execute("PRAGMA journal_mode=WAL")
             conn.executescript(SCHEMA)
+            p3 = data.get("p3_resolver_version")
+            if p3 is not None:
+                if p3 != "1":
+                    raise ValueError("unsupported P3 resolver capability")
+                from .native_tags import P3_SCHEMA
+                conn.executescript(P3_SCHEMA)
+                conn.execute("INSERT INTO build_meta VALUES('p3_resolver_version','1')")
             for name, value in (("contract_version", CONTRACT_VERSION),
                                 ("search_text_version", SEARCH_TEXT_VERSION),
                                 ("index_episodes", json.dumps(data.get("index_episodes", False))),
@@ -390,7 +406,7 @@ def build(manifest, output):
                             record = json.loads(text)
                             if not isinstance(record, dict):
                                 raise TypeError("JSONL record must be an object")
-                            if record.get("record_type") == "link":
+                            if record.get("record_type") in {"link", "tag_resolution"}:
                                 conn.execute("INSERT INTO pending_links VALUES(?,?,?)",
                                              (sid, line, text))
                                 result = None

@@ -1,0 +1,25 @@
+{
+  "head": "894dc6a73bfd42f18cc7648e8ab7481aae211ab1",
+  "working_tree": " M .gitattributes\n M .gitignore\n M docs/STAGE_STATUS.md\n M rust/src/lib.rs\n M rust/src/main.rs\n M rust/src/response.rs\n M src/sakura_knowledge/storage.py\n?? configs/p3-inputs.json\n?? docs/P3_PLAN.md\n?? docs/p3-resolver-contract.md\n?? reports/P3/\n?? rust/examples/bench_resolver.rs\n?? rust/src/resolver.rs\n?? src/sakura_knowledge/native_tags.py\n?? src/sakura_knowledge/tag_decisions.py\n?? tests/test_p3_builder.py\n?? tests/test_p3_decisions.py\n?? tests/test_p3_native.py\n?? tests/test_p3_proofs.py\n?? tests/test_p3_resolver.py\n?? tools/p3_accept_resolver.py\n?? tools/p3_acquire_native.py\n?? tools/p3_audit_inputs.py\n?? tools/p3_compile_inputs.py\n?? tools/p3_evidence.py\n?? tools/p3_measure_resolver.py\n?? tools/p3_resolver_oracle.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_p3_resolver.py::test_terminal_category",
+    "-q",
+    "--tb=short"
+  ],
+  "exit": 1,
+  "elapsed_s": 0.7861708998680115,
+  "status": "FAIL",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "RiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSBGQUlMVVJFUyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KX19fX19fX19fX19fX19fX19fX19fX19fX19fIHRlc3RfdGVybWluYWxfY2F0ZWdvcnkgX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KdGVzdHNcdGVzdF9wM19yZXNvbHZlci5weToxMTM6IGluIHRlc3RfdGVybWluYWxfY2F0ZWdvcnkNCiAgICBhc3NlcnQgcnVuKGJpbmFyeSxkYiwnQV8ob3JpZ2luYWwhKScsJy0tY2F0ZWdvcnknLCczJylbJ3N0YXR1cyddID09ICdub3RfZm91bmQnDQpFICAgQXNzZXJ0aW9uRXJyb3I6IGFzc2VydCAnZW50aXR5X2ZvdW5kX3RhZ191bm1hcHBlZCcgPT0gJ25vdF9mb3VuZCcNCkUgICAgIA0KRSAgICAgLSBub3RfZm91bmQNCkUgICAgICsgZW50aXR5X2ZvdW5kX3RhZ191bm1hcHBlZA0KPT09PT09PT09PT09PT09PT09PT09PT09PT09IHNob3J0IHRlc3Qgc3VtbWFyeSBpbmZvID09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KRkFJTEVEIHRlc3RzL3Rlc3RfcDNfcmVzb2x2ZXIucHk6OnRlc3RfdGVybWluYWxfY2F0ZWdvcnkgLSBBc3NlcnRpb25FcnJvcjogYXMuLi4NCjEgZmFpbGVkIGluIDAuMzBzDQo=",
+  "stdout_sha256": "9dc40159416a3ffcf211e83069036da5b572d9249b5747833e0558550f722043",
+  "stdout": "F                                                                        [100%]\r\n================================== FAILURES ===================================\r\n___________________________ test_terminal_category ____________________________\r\ntests\\test_p3_resolver.py:113: in test_terminal_category\r\n    assert run(binary,db,'A_(original!)','--category','3')['status'] == 'not_found'\r\nE   AssertionError: assert 'entity_found_tag_unmapped' == 'not_found'\r\nE     \r\nE     - not_found\r\nE     + entity_found_tag_unmapped\r\n=========================== short test summary info ===========================\r\nFAILED tests/test_p3_resolver.py::test_terminal_category - AssertionError: as...\r\n1 failed in 0.30s\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}
