@@ -1,0 +1,27 @@
+{
+  "head": "229c2ddcc43c0d3919d44a4ea823f6a999a48a57",
+  "working_tree": " M tools/p3_review_cf807_bind.py\n?? reports/P3/review-9d5-artifact-abc-command.json\n?? reports/P3/review-9d5-artifact-abc.json\n?? reports/P3/review-9d5-artifact-external-command.json\n?? reports/P3/review-9d5-artifact-external.json\n?? reports/P3/review-9d5-check-clippy.json\n?? reports/P3/review-9d5-check-diff.json\n?? reports/P3/review-9d5-check-fmt.json\n?? reports/P3/review-9d5-check-pytest.json\n?? reports/P3/review-9d5-check-release.json\n?? reports/P3/review-9d5-check-ruff.json\n?? reports/P3/review-9d5-check-rust-test.json\n?? reports/P3/review-9d5-quarantine-after.json\n?? reports/P3/review-9d5-quarantine-before-corrected.json\n?? reports/P3/review-9d5-quarantine-before.json\n?? reports/P3/review-9d5-quarantine-raw-check.json\n?? reports/P3/review-9d5-quarantine-raw.json\n?? reports/P3/review-9d5-quarantine-release-command.json\n?? reports/P3/review-9d5-quarantine-release.json\n?? reports/P3/review-9d5-release-acceptance-command.json\n?? reports/P3/review-9d5-release-acceptance.json\n?? reports/P3/review-9d5-venv-create.json\n?? reports/P3/review-9d5-venv-install.json\n?? reports/P3/review-9d5-wheel-build.json\n?? tools/p3_quarantine_9d5_delivery.py\n",
+  "argv": [
+    "python",
+    "tools/p3_old_regression.py",
+    "--db",
+    "build/snapshot-full-20bf5b3/knowledge.sqlite",
+    "--bin",
+    "dist/p3-quarantine-229c2dd/source/rust/target/release/sknow-rs.exe",
+    "--out",
+    "reports/P3/review-9d5-old151.json"
+  ],
+  "exit": 0,
+  "elapsed_s": 41.18180719995871,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eydyZXF1aXJlZCc6IDE1MSwgJ2F0dGVtcHRlZCc6IDE1MSwgJ3Bhc3NlZCc6IDE1MSwgJ2FjdHVhbGx5X2NvbXBhcmVkJzogMTM1LCAnbm90X2NvbXBhcmVkJzogMTYsICdlcnJvcl9jb250cmFjdF92ZXJpZmllZCc6IDE2LCAnb3ZlcmFsbCc6ICdQQVNTJ30NCg==",
+  "stdout_sha256": "01b88f2a6f0682fa76feaf7712932542da2a8ef18ab02844bae7d89a4052a059",
+  "stdout": "{'required': 151, 'attempted': 151, 'passed': 151, 'actually_compared': 135, 'not_compared': 16, 'error_contract_verified': 16, 'overall': 'PASS'}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

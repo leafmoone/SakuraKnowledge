@@ -1,0 +1,25 @@
+{
+  "head": "9d5f26ddeb5335c8d449eb72335bb2df603d5e28",
+  "working_tree": " M tools/p3_compile_inputs.py\n?? reports/P3/review-9d5-quarantine-before-corrected.json\n?? reports/P3/review-9d5-quarantine-before.json\n?? tests/test_p3_quarantine_9d5.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_p3_quarantine_9d5.py",
+    "-q",
+    "--tb=short"
+  ],
+  "exit": 0,
+  "elapsed_s": 1.2478732999879867,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "Li4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KOCBwYXNzZWQgaW4gMC44MnMNCg==",
+  "stdout_sha256": "7faefe3977751c51ccabd075ebce537293dd23ff06e7c9fe54782013e0e00ad2",
+  "stdout": "........                                                                 [100%]\r\n8 passed in 0.82s\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

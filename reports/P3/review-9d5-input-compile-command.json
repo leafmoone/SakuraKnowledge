@@ -1,0 +1,25 @@
+{
+  "head": "229c2ddcc43c0d3919d44a4ea823f6a999a48a57",
+  "working_tree": " M tools/p3_review_cf807_bind.py\n?? reports/P3/review-9d5-check-clippy.json\n?? reports/P3/review-9d5-check-diff.json\n?? reports/P3/review-9d5-check-fmt.json\n?? reports/P3/review-9d5-check-pytest.json\n?? reports/P3/review-9d5-check-release.json\n?? reports/P3/review-9d5-check-ruff.json\n?? reports/P3/review-9d5-check-rust-test.json\n?? reports/P3/review-9d5-quarantine-after.json\n?? reports/P3/review-9d5-quarantine-before-corrected.json\n?? reports/P3/review-9d5-quarantine-before.json\n?? reports/P3/review-9d5-quarantine-raw-check.json\n?? reports/P3/review-9d5-quarantine-raw.json\n?? reports/P3/review-9d5-venv-create.json\n?? reports/P3/review-9d5-venv-install.json\n?? reports/P3/review-9d5-wheel-build.json\n?? tools/p3_quarantine_9d5_delivery.py\n",
+  "argv": [
+    "python",
+    "tools/p3_compile_inputs.py",
+    "--out",
+    "build/p3-quarantine-229c2dd-inputs",
+    "--receipt-prefix",
+    "review-9d5-"
+  ],
+  "exit": 0,
+  "elapsed_s": 96.05739630013704,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJuYXRpdmVfdGFncyI6IDMwLCAib2ZmaWNpYWxfYWxpYXNfcmVjb3JkcyI6IDQsICJwaWxvdF9uYW1lc3BhY2VfcmVjb3JkX2NvdW50cyI6IHsiYmFuZ3VtaS5zdWJqZWN0IjogMTMsICJiYW5ndW1pLmNoYXJhY3RlciI6IDExNCwgImJhbmd1bWkucGVyc29uIjogNSwgImJhbmd1bWkuZXBpc29kZSI6IDY5LCAibW9lZ2lybC5jaGFyYWN0ZXIiOiA4OCwgIm1vZWdpcmwuY2F0ZWdvcnkiOiAzLCAiZGFuYm9vcnUud2lraSI6IDkwLCAibG9jYWwudGFnX2FnZ3JlZ2F0ZSI6IDgyfSwgImNyb3NzX3NvdXJjZV9jYW5kaWRhdGVzIjogMTAwLCAiY3Jvc3Nfc291cmNlX3ZlcmlmaWVkIjogMH0NCg==",
+  "stdout_sha256": "7b87556d4e5b23c36e72fea28d97f7997ca9795be530e9760fa8bb8d579f2fe1",
+  "stdout": "{\"native_tags\": 30, \"official_alias_records\": 4, \"pilot_namespace_record_counts\": {\"bangumi.subject\": 13, \"bangumi.character\": 114, \"bangumi.person\": 5, \"bangumi.episode\": 69, \"moegirl.character\": 88, \"moegirl.category\": 3, \"danbooru.wiki\": 90, \"local.tag_aggregate\": 82}, \"cross_source_candidates\": 100, \"cross_source_verified\": 0}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

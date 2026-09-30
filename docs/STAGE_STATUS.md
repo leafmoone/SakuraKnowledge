@@ -15,9 +15,14 @@
 - Reviewed partial delivery `cf807c1a5179ce4b451b9a85870b6684d2dccaf3` received
   **CHANGES_REQUIRED** for endpoint substitution/proof gaps/gold coverage/redirects.
   Authorized four-item repair source/artifact SHA:
-  `7393d601a6d95432f41da243395ed5d3e0a2fda1`. Repaired code awaits fixed-SHA review;
-  historical b393 artifacts/receipts stay unchanged. New evidence paths use
-  `reports/P3/review-cf807-*`; overall P3 remains NOT_READY regardless of code review.
+  `7393d601a6d95432f41da243395ed5d3e0a2fda1`. Fixed delivery `9d5f26d...`
+  reviewed: endpoint/category, realgold and redirect **closed**. One MEDIUM residual:
+  actual terminal Wiki quarantine omitted on canonical aliases. Authorized 15-line
+  compiler-only repair source/artifact `229c2ddcc43c0d3919d44a4ea823f6a999a48a57`;
+  independent rawcompiler+normalbuilder eight completeJSON paths before5FAIL/3PASS,
+  after8PASS, fullpytest242. Code awaits fixed-SHA review. All historical P3 receipts
+  remain unchanged; new paths `reports/P3/review-9d5-*` and
+  `REVIEW_9D5_QUARANTINE_REPORT.md`. Overall P3 remains NOT_READY regardless of code review.
 - Real pilot:30 native tags,28 compatible same-source Wiki links,352 assessments;
   451entries/222FTS,874input records all accounted. 100candidate decisions,0verified
   cross-source entity_tag/0human_verified. Two changed Wiki versions quarantined.

@@ -1,0 +1,21 @@
+{
+  "head": "229c2ddcc43c0d3919d44a4ea823f6a999a48a57",
+  "working_tree": " M docs/STAGE_STATUS.md\n M tools/p3_review_cf807_bind.py\n?? reports/P3/REVIEW_9D5_QUARANTINE_REPORT.md\n?? reports/P3/review-9d5-artifact-abc-command.json\n?? reports/P3/review-9d5-artifact-abc.json\n?? reports/P3/review-9d5-artifact-external-command.json\n?? reports/P3/review-9d5-artifact-external.json\n?? reports/P3/review-9d5-candidates.jsonl\n?? reports/P3/review-9d5-check-clippy.json\n?? reports/P3/review-9d5-check-diff.json\n?? reports/P3/review-9d5-check-fmt.json\n?? reports/P3/review-9d5-check-pytest.json\n?? reports/P3/review-9d5-check-release.json\n?? reports/P3/review-9d5-check-ruff.json\n?? reports/P3/review-9d5-check-rust-test.json\n?? reports/P3/review-9d5-decisions.jsonl\n?? reports/P3/review-9d5-input-compilation.json\n?? reports/P3/review-9d5-input-compile-command.json\n?? reports/P3/review-9d5-inspection-error.json\n?? reports/P3/review-9d5-old151-command.json\n?? reports/P3/review-9d5-old151.json\n?? reports/P3/review-9d5-performance-command.json\n?? reports/P3/review-9d5-performance.json\n?? reports/P3/review-9d5-quarantine-after.json\n?? reports/P3/review-9d5-quarantine-before-corrected.json\n?? reports/P3/review-9d5-quarantine-before.json\n?? reports/P3/review-9d5-quarantine-raw-check.json\n?? reports/P3/review-9d5-quarantine-raw.json\n?? reports/P3/review-9d5-quarantine-release-command.json\n?? reports/P3/review-9d5-quarantine-release.json\n?? reports/P3/review-9d5-real-input-equality.json\n?? reports/P3/review-9d5-release-acceptance-command.json\n?? reports/P3/review-9d5-release-acceptance.json\n?? reports/P3/review-9d5-source_manifest.json\n?? reports/P3/review-9d5-venv-create.json\n?? reports/P3/review-9d5-venv-install.json\n?? reports/P3/review-9d5-wheel-build.json\n?? tools/p3_quarantine_9d5_delivery.py\n",
+  "argv": [
+    "python",
+    "tools/p3_quarantine_9d5_delivery.py"
+  ],
+  "exit": 0,
+  "elapsed_s": 41.08043249999173,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJzdGF0dXMiOiAiQkxPQ0tFRCIsICJjaGVja3MiOiA3LCAicXVhcmFudGluZV9mdWxsSlNPTl9jYXNlcyI6IDgsICJyZWFsZ29sZCI6IDU1LCAib2xkMTUxIjogMTUxLCAicmF3X3VuaXF1ZSI6IDU5OCwgImVtYmVkZGVkX3N0cmVhbXMiOiAyOTQsICJhcnRpZmFjdHMiOiBbeyJwYXRoIjogImRpc3RcXHAzLXF1YXJhbnRpbmUtMjI5YzJkZFxcc2FrdXJhX2tub3dsZWRnZS0wLjIuMC1weTMtbm9uZS1hbnkud2hsIiwgInNoYTI1NiI6ICJiM2NjMmY3ZjY1NDBjODA4NGIyMDY2ODRkODhjOGUzMzcwNmQxMGYyZTIwYjU0NjkwMTYxMjAzZWYxNWJiNjQ0IiwgImJ5dGVzIjogMzM2NDF9LCB7InBhdGgiOiAiZGlzdFxccDMtcXVhcmFudGluZS0yMjljMmRkXFxzb3VyY2VcXHJ1c3RcXHRhcmdldFxccmVsZWFzZVxcc2tub3ctcnMuZXhlIiwgInNoYTI1NiI6ICIyY2ViODEyZjljYWUzYzZiYjMxNTg1NGZkNzczZWE4MzczYjlhNmIzZWNiZTEyNmE3ZDMxMDAwNjAyOGRjMGQ3IiwgImJ5dGVzIjogNTEyODc2N30sIHsicGF0aCI6ICJkaXN0XFxwMy1xdWFyYW50aW5lLTIyOWMyZGRcXHNvdXJjZVxccnVzdFxcdGFyZ2V0XFxyZWxlYXNlXFxleGFtcGxlc1xcYmVuY2hfcmVzb2x2ZXIuZXhlIiwgInNoYTI1NiI6ICJhYmY2NDAwNjU1NzAwN2U5MjI4YTg3M2NhZjMxOTc2MDU3NDk2YTA4NjlmYjM1OGU2OGQzZDBlY2M4Nzc4MzhhIiwgImJ5dGVzIjogNTExNTU5Mn1dfQ0K",
+  "stdout_sha256": "1bdf856c110ca99bedf3220d8b4c49f6e74ce936df4806488dcf67cc7ed72a33",
+  "stdout": "{\"status\": \"BLOCKED\", \"checks\": 7, \"quarantine_fullJSON_cases\": 8, \"realgold\": 55, \"old151\": 151, \"raw_unique\": 598, \"embedded_streams\": 294, \"artifacts\": [{\"path\": \"dist\\\\p3-quarantine-229c2dd\\\\sakura_knowledge-0.2.0-py3-none-any.whl\", \"sha256\": \"b3cc2f7f6540c8084b206684d88c8e33706d10f2e20b54690161203ef15bb644\", \"bytes\": 33641}, {\"path\": \"dist\\\\p3-quarantine-229c2dd\\\\source\\\\rust\\\\target\\\\release\\\\sknow-rs.exe\", \"sha256\": \"2ceb812f9cae3c6bb315854fd773ea8373b9a6b3ecbe126a7d310006028dc0d7\", \"bytes\": 5128767}, {\"path\": \"dist\\\\p3-quarantine-229c2dd\\\\source\\\\rust\\\\target\\\\release\\\\examples\\\\bench_resolver.exe\", \"sha256\": \"abf64006557007e9228a873caf31976057496a0869fb358e68d3d0ecc877838a\", \"bytes\": 5115592}]}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

@@ -1,0 +1,29 @@
+{
+  "head": "229c2ddcc43c0d3919d44a4ea823f6a999a48a57",
+  "working_tree": "?? reports/P3/review-9d5-check-clippy.json\n?? reports/P3/review-9d5-check-diff.json\n?? reports/P3/review-9d5-check-fmt.json\n?? reports/P3/review-9d5-check-pytest.json\n?? reports/P3/review-9d5-check-release.json\n?? reports/P3/review-9d5-check-ruff.json\n?? reports/P3/review-9d5-check-rust-test.json\n?? reports/P3/review-9d5-quarantine-after.json\n?? reports/P3/review-9d5-quarantine-before-corrected.json\n?? reports/P3/review-9d5-quarantine-before.json\n?? reports/P3/review-9d5-quarantine-raw-check.json\n?? reports/P3/review-9d5-quarantine-raw.json\n",
+  "argv": [
+    "python",
+    "-m",
+    "pip",
+    "wheel",
+    "--no-deps",
+    "--no-build-isolation",
+    "--no-index",
+    "--wheel-dir",
+    "dist/p3-quarantine-229c2dd",
+    "dist/p3-quarantine-229c2dd/source"
+  ],
+  "exit": 0,
+  "elapsed_s": 2.8320134999230504,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "UHJvY2Vzc2luZyAuXGRpc3RccDMtcXVhcmFudGluZS0yMjljMmRkXHNvdXJjZQ0KICBQcmVwYXJpbmcgbWV0YWRhdGEgKHB5cHJvamVjdC50b21sKTogc3RhcnRlZA0KICBQcmVwYXJpbmcgbWV0YWRhdGEgKHB5cHJvamVjdC50b21sKTogZmluaXNoZWQgd2l0aCBzdGF0dXMgJ2RvbmUnDQpCdWlsZGluZyB3aGVlbHMgZm9yIGNvbGxlY3RlZCBwYWNrYWdlczogc2FrdXJhLWtub3dsZWRnZQ0KICBCdWlsZGluZyB3aGVlbCBmb3Igc2FrdXJhLWtub3dsZWRnZSAocHlwcm9qZWN0LnRvbWwpOiBzdGFydGVkDQogIEJ1aWxkaW5nIHdoZWVsIGZvciBzYWt1cmEta25vd2xlZGdlIChweXByb2plY3QudG9tbCk6IGZpbmlzaGVkIHdpdGggc3RhdHVzICdkb25lJw0KICBDcmVhdGVkIHdoZWVsIGZvciBzYWt1cmEta25vd2xlZGdlOiBmaWxlbmFtZT1zYWt1cmFfa25vd2xlZGdlLTAuMi4wLXB5My1ub25lLWFueS53aGwgc2l6ZT0zMzY0MSBzaGEyNTY9YjNjYzJmN2Y2NTQwYzgwODRiMjA2Njg0ZDg4YzhlMzM3MDZkMTBmMmUyMGI1NDY5MDE2MTIwM2VmMTViYjY0NA0KICBTdG9yZWQgaW4gZGlyZWN0b3J5OiBDOlxVc2Vyc1xQQ1xBcHBEYXRhXExvY2FsXFRlbXBccGlwLWVwaGVtLXdoZWVsLWNhY2hlLTRwX2V0ZnkxXHdoZWVsc1wyY1w1Y1wxYlwzNmEzNjlmZjg2YTM4ZGQzYzY2N2NjMDU2MDhkNThjMmVhMjI4NjBhN2RjM2RhMjBlNg0KU3VjY2Vzc2Z1bGx5IGJ1aWx0IHNha3VyYS1rbm93bGVkZ2UNCg==",
+  "stdout_sha256": "fd6ef3ddd02bf5124110609eeed194348fec5f907979def17a4b5ee15d3c735e",
+  "stdout": "Processing .\\dist\\p3-quarantine-229c2dd\\source\r\n  Preparing metadata (pyproject.toml): started\r\n  Preparing metadata (pyproject.toml): finished with status 'done'\r\nBuilding wheels for collected packages: sakura-knowledge\r\n  Building wheel for sakura-knowledge (pyproject.toml): started\r\n  Building wheel for sakura-knowledge (pyproject.toml): finished with status 'done'\r\n  Created wheel for sakura-knowledge: filename=sakura_knowledge-0.2.0-py3-none-any.whl size=33641 sha256=b3cc2f7f6540c8084b206684d88c8e33706d10f2e20b54690161203ef15bb644\r\n  Stored in directory: C:\\Users\\PC\\AppData\\Local\\Temp\\pip-ephem-wheel-cache-4p_etfy1\\wheels\\2c\\5c\\1b\\36a369ff86a38dd3c667cc05608d58c2ea22860a7dc3da20e6\r\nSuccessfully built sakura-knowledge\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

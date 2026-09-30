@@ -47,21 +47,25 @@ def inventory(commit):
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--verify',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--verify',action='store_true')
+    parser.add_argument('--baseline',default=BASE);parser.add_argument('--source',default=SOURCE)
+    parser.add_argument('--out',type=Path,default=OUT);args=parser.parse_args()
+    baseline=args.baseline;source=args.source;output=args.out
     head=git('rev-parse','HEAD').decode().strip();rows,refs,streams=inventory(head)
-    assert git('diff','--name-only',SOURCE,head,'--','src','rust').strip()==b''
-    assert git('diff','--name-only',BASE,head,'--','reports/P1','reports/P2','src/sakura_knowledge',
+    assert git('diff','--name-only',source,head,'--','src','rust','tools/p3_compile_inputs.py',
+               'tools/p3_accept_quarantine_9d5.py','tests/test_p3_quarantine_9d5.py').strip()==b''
+    assert git('diff','--name-only',baseline,head,'--','reports/P1','reports/P2','src/sakura_knowledge',
                'tools/parity_cases.py','tools/parity_repair_expected.py').strip()==b''
-    historical=git('ls-tree','-r','--name-only',BASE,'reports/P3').decode().splitlines()
-    for path in historical:assert git('rev-parse',BASE+':'+path)==git('rev-parse',head+':'+path),path
+    historical=git('ls-tree','-r','--name-only',baseline,'reports/P3').decode().splitlines()
+    for path in historical:assert git('rev-parse',baseline+':'+path)==git('rev-parse',head+':'+path),path
     assert git('rev-parse','main').decode().strip()==MAIN
-    summary={'status':'VERIFIED','HEAD':head,'source_artifact_commit':SOURCE,'overall_P3':'BLOCKED/NOT_READY',
+    summary={'status':'VERIFIED','HEAD':head,'source_artifact_commit':source,'overall_P3':'BLOCKED/NOT_READY',
              'code_review_state':'WAITING_REVIEW','committed_files_verified':len(rows),
              'exact_JSON_JSONL':sum(r['path'].endswith(('.json','.jsonl')) for r in rows),
              'unique_raw_verified':len(refs),'embedded_streams_verified':streams,
              'historical_P3_files_unchanged':len(historical),'main':MAIN,'fullcandidate_attempts':0}
     if args.verify:
-        binding=json.loads(git('show',head+':'+str(OUT).replace('\\','/')))
+        binding=json.loads(git('show',head+':'+str(output).replace('\\','/')))
         for r in binding['files']:
             data=git('show',head+':'+r['path'])
             assert len(data)==r['bytes'] and hashlib.sha256(data).hexdigest()==r['sha256']
@@ -72,10 +76,10 @@ def main():
         summary.update(origin_dev=remote['refs/heads/dev'],origin_main=remote['refs/heads/main'],working_tree='CLEAN',
                        evidence_commit=binding['evidence_commit'])
     else:
-        save(OUT,dict(summary,evidence_commit=head,files=rows,raw_inventory=list(refs.values()),
+        save(output,dict(summary,evidence_commit=head,files=rows,raw_inventory=list(refs.values()),
                       binding_boundary='Exact immutable parent receipt blobs; newbinding cannot selfhash futurecommit. --verify finalhead includes closedset+self and actualremote.',
                       EOL='JSONJSONL byteverbatim; Markdown checkout differences truthfully listed',
-                      historical_base=BASE))
+                      historical_base=baseline))
     print(json.dumps(summary))
 
 

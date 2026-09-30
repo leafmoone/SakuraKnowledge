@@ -1,0 +1,757 @@
+{
+  "status": "PASS",
+  "attempted": 8,
+  "passed": 8,
+  "retries": 0,
+  "snapshot": "bffb12a47036c8f800bcec2d691f81abc0dbf1b8cb1d3885750253c217c35409",
+  "normal_builder_atomic_verified": true,
+  "fixture_files": [
+    {
+      "fixture_path": "build/real-full-7afe7fb/manifest.json",
+      "raw": {
+        "path": "reports/P3/raw/f93712086006f4a17ace3866aad892b59e4015c755d5c1cf2afc43c8402c9c3b.raw",
+        "sha256": "f93712086006f4a17ace3866aad892b59e4015c755d5c1cf2afc43c8402c9c3b",
+        "bytes": 170
+      }
+    },
+    {
+      "fixture_path": "build/real-full-7afe7fb/wiki.jsonl",
+      "raw": {
+        "path": "reports/P3/raw/68dcb706009841a0e96e24843af87e120fe12239a270743758be0561bc632a6f.raw",
+        "sha256": "68dcb706009841a0e96e24843af87e120fe12239a270743758be0561bc632a6f",
+        "bytes": 296
+      }
+    },
+    {
+      "fixture_path": "builder/input.jsonl",
+      "raw": {
+        "path": "reports/P3/raw/7e7df7dd26e4328871fd8bf9856cd1d8f007eba4c057d713b35c4287cb0bcc79.raw",
+        "sha256": "7e7df7dd26e4328871fd8bf9856cd1d8f007eba4c057d713b35c4287cb0bcc79",
+        "bytes": 9154
+      }
+    },
+    {
+      "fixture_path": "builder/manifest.json",
+      "raw": {
+        "path": "reports/P3/raw/bffb12a47036c8f800bcec2d691f81abc0dbf1b8cb1d3885750253c217c35409.raw",
+        "sha256": "bffb12a47036c8f800bcec2d691f81abc0dbf1b8cb1d3885750253c217c35409",
+        "bytes": 690
+      }
+    },
+    {
+      "fixture_path": "builder/published/build_report.json",
+      "raw": {
+        "path": "reports/P3/raw/c189ca3ee06abb12647ac1deac8391163a8ba86d9928ad874b383e41f1e3937b.raw",
+        "sha256": "c189ca3ee06abb12647ac1deac8391163a8ba86d9928ad874b383e41f1e3937b",
+        "bytes": 735
+      }
+    },
+    {
+      "fixture_path": "builder/published/sources.lock.json",
+      "raw": {
+        "path": "reports/P3/raw/54272f1e35c6b6b224c1c146533126b7f4198e164e17a262e2ca3d6168f5e0f9.raw",
+        "sha256": "54272f1e35c6b6b224c1c146533126b7f4198e164e17a262e2ca3d6168f5e0f9",
+        "bytes": 954
+      }
+    },
+    {
+      "fixture_path": "compiled/candidate-manifest.json",
+      "raw": {
+        "path": "reports/P3/raw/1abb513e88a91b20bf87e3a0f441d3f5e3780f1f31572873d9d1fcc8fe01cb5e.raw",
+        "sha256": "1abb513e88a91b20bf87e3a0f441d3f5e3780f1f31572873d9d1fcc8fe01cb5e",
+        "bytes": 2349
+      }
+    },
+    {
+      "fixture_path": "compiled/native.jsonl",
+      "raw": {
+        "path": "reports/P3/raw/b0284e452eb6b1d95f5a76600b7e37f958169df76c838c7239344ae118906165.raw",
+        "sha256": "b0284e452eb6b1d95f5a76600b7e37f958169df76c838c7239344ae118906165",
+        "bytes": 6720
+      }
+    },
+    {
+      "fixture_path": "compiled/pilot-manifest.json",
+      "raw": {
+        "path": "reports/P3/raw/d02129f5fe01acc3d99a35917544e30350c60ab82ecf58441cccb5a09a1fe86e.raw",
+        "sha256": "d02129f5fe01acc3d99a35917544e30350c60ab82ecf58441cccb5a09a1fe86e",
+        "bytes": 2064
+      }
+    },
+    {
+      "fixture_path": "reports/P3/A.raw",
+      "raw": {
+        "path": "reports/P3/raw/a80d19403fbb7f98b8a04ad242199fecc7612c5cb03d0c212e4b8f252db9f8c2.raw",
+        "sha256": "a80d19403fbb7f98b8a04ad242199fecc7612c5cb03d0c212e4b8f252db9f8c2",
+        "bytes": 79
+      }
+    },
+    {
+      "fixture_path": "reports/P3/alias-acquisition.json",
+      "raw": {
+        "path": "reports/P3/raw/fd461f7b2cb4dfd44e997df7f3a3591ad03bf9ac4f0b49a1773b8675b5f5c653.raw",
+        "sha256": "fd461f7b2cb4dfd44e997df7f3a3591ad03bf9ac4f0b49a1773b8675b5f5c653",
+        "bytes": 44
+      }
+    },
+    {
+      "fixture_path": "reports/P3/B.raw",
+      "raw": {
+        "path": "reports/P3/raw/84d57a3ff88327ea10181520767852a7048a52992d3ccb330c2356098e99423b.raw",
+        "sha256": "84d57a3ff88327ea10181520767852a7048a52992d3ccb330c2356098e99423b",
+        "bytes": 79
+      }
+    },
+    {
+      "fixture_path": "reports/P3/C.raw",
+      "raw": {
+        "path": "reports/P3/raw/4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945.raw",
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "bytes": 2
+      }
+    },
+    {
+      "fixture_path": "reports/P3/candidates.jsonl",
+      "raw": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "fixture_path": "reports/P3/decisions.jsonl",
+      "raw": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "fixture_path": "reports/P3/input-compilation.json",
+      "raw": {
+        "path": "reports/P3/raw/dbe7000376c5202d303ed9095639795ff9fe50bab20db4b88d257d037b005e22.raw",
+        "sha256": "dbe7000376c5202d303ed9095639795ff9fe50bab20db4b88d257d037b005e22",
+        "bytes": 1531
+      }
+    },
+    {
+      "fixture_path": "reports/P3/native-acquisition.json",
+      "raw": {
+        "path": "reports/P3/raw/d26a734fe03a2994debabd8e5a3ead028e6cba99007054e5c9569b95650163d6.raw",
+        "sha256": "d26a734fe03a2994debabd8e5a3ead028e6cba99007054e5c9569b95650163d6",
+        "bytes": 932
+      }
+    },
+    {
+      "fixture_path": "reports/P3/source_manifest.json",
+      "raw": {
+        "path": "reports/P3/raw/d5ad32027eec0015e3489f61e7156c05dc5643620efcc1586c664cfd3d64e7b2.raw",
+        "sha256": "d5ad32027eec0015e3489f61e7156c05dc5643620efcc1586c664cfd3d64e7b2",
+        "bytes": 1799
+      }
+    },
+    {
+      "fixture_path": "reports/P3/tags.raw",
+      "raw": {
+        "path": "reports/P3/raw/b3d56053496e1a9c6deab91484ec58d727376d539bf7efe3bfd2542b20438389.raw",
+        "sha256": "b3d56053496e1a9c6deab91484ec58d727376d539bf7efe3bfd2542b20438389",
+        "bytes": 204
+      }
+    }
+  ],
+  "compiled_projections": [
+    {
+      "key": {
+        "kind": "tag",
+        "namespace": "danbooru.tag",
+        "value": "C"
+      },
+      "status": "source_backed",
+      "evidence_id": "native:3",
+      "raw_native": {
+        "id": 3,
+        "name": "C",
+        "category": 4,
+        "is_deprecated": false
+      },
+      "raw_reference": {
+        "path": "reports\\P3\\tags.raw",
+        "sha256": "b3d56053496e1a9c6deab91484ec58d727376d539bf7efe3bfd2542b20438389",
+        "record_id": 3
+      },
+      "source_cut": "fetch-cut"
+    },
+    {
+      "record_type": "tag_resolution",
+      "name": "A",
+      "target": {
+        "kind": "tag",
+        "namespace": "danbooru.tag",
+        "value": "C"
+      },
+      "matched_by": "official_alias",
+      "canonical_status": "canonical",
+      "category": 4,
+      "reason": null,
+      "rule_version": "danbooru-native-1",
+      "status": "source_backed",
+      "evidence_id": "assessment:A",
+      "evidence_chain": [
+        {
+          "role": "native_identity",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "native:3",
+          "raw_path": "reports\\P3\\tags.raw",
+          "raw_sha256": "b3d56053496e1a9c6deab91484ec58d727376d539bf7efe3bfd2542b20438389",
+          "fetched_at_utc": "fetch-cut",
+          "tag_id": 3
+        },
+        {
+          "role": "official_alias_step",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "official_alias:1",
+          "raw_path": "reports\\P3\\A.raw",
+          "raw_sha256": "a80d19403fbb7f98b8a04ad242199fecc7612c5cb03d0c212e4b8f252db9f8c2",
+          "fetched_at_utc": "fetch-cut",
+          "alias_id": 1,
+          "antecedent_name": "A",
+          "consequent_name": "B",
+          "upstream_status": "active"
+        },
+        {
+          "role": "official_alias_step",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "official_alias:2",
+          "raw_path": "reports\\P3\\B.raw",
+          "raw_sha256": "84d57a3ff88327ea10181520767852a7048a52992d3ccb330c2356098e99423b",
+          "fetched_at_utc": "fetch-cut",
+          "alias_id": 2,
+          "antecedent_name": "B",
+          "consequent_name": "C",
+          "upstream_status": "active"
+        },
+        {
+          "role": "canonical_scope",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "scope:A",
+          "raw_path": "reports\\P3\\A.raw",
+          "raw_sha256": "a80d19403fbb7f98b8a04ad242199fecc7612c5cb03d0c212e4b8f252db9f8c2",
+          "fetched_at_utc": "fetch-cut",
+          "name": "A",
+          "coverage": "scoped_complete",
+          "active_alias_ids": [
+            1
+          ]
+        },
+        {
+          "role": "canonical_scope",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "scope:B",
+          "raw_path": "reports\\P3\\B.raw",
+          "raw_sha256": "84d57a3ff88327ea10181520767852a7048a52992d3ccb330c2356098e99423b",
+          "fetched_at_utc": "fetch-cut",
+          "name": "B",
+          "coverage": "scoped_complete",
+          "active_alias_ids": [
+            2
+          ]
+        },
+        {
+          "role": "canonical_scope",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "scope:C",
+          "raw_path": "reports\\P3\\C.raw",
+          "raw_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "fetched_at_utc": "fetch-cut",
+          "name": "C",
+          "coverage": "scoped_complete",
+          "active_alias_ids": []
+        },
+        {
+          "role": "wiki_association_quarantined",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "wiki-quarantine:9",
+          "raw_path": "reports\\P3\\tags.raw",
+          "raw_sha256": "b3d56053496e1a9c6deab91484ec58d727376d539bf7efe3bfd2542b20438389",
+          "fetched_at_utc": "fetch-cut",
+          "wiki_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "9"
+          },
+          "tag_key": {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "C"
+          },
+          "reason": "mixed_cut_version_conflict",
+          "old_source_id": "old-wiki",
+          "old_input_sha256": "68dcb706009841a0e96e24843af87e120fe12239a270743758be0561bc632a6f",
+          "old_line": 1,
+          "old_updated_at": "old-cut",
+          "live_updated_at": "new-cut"
+        }
+      ]
+    },
+    {
+      "record_type": "tag_resolution",
+      "name": "B",
+      "target": {
+        "kind": "tag",
+        "namespace": "danbooru.tag",
+        "value": "C"
+      },
+      "matched_by": "official_alias",
+      "canonical_status": "canonical",
+      "category": 4,
+      "reason": null,
+      "rule_version": "danbooru-native-1",
+      "status": "source_backed",
+      "evidence_id": "assessment:B",
+      "evidence_chain": [
+        {
+          "role": "native_identity",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "native:3",
+          "raw_path": "reports\\P3\\tags.raw",
+          "raw_sha256": "b3d56053496e1a9c6deab91484ec58d727376d539bf7efe3bfd2542b20438389",
+          "fetched_at_utc": "fetch-cut",
+          "tag_id": 3
+        },
+        {
+          "role": "official_alias_step",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "official_alias:2",
+          "raw_path": "reports\\P3\\B.raw",
+          "raw_sha256": "84d57a3ff88327ea10181520767852a7048a52992d3ccb330c2356098e99423b",
+          "fetched_at_utc": "fetch-cut",
+          "alias_id": 2,
+          "antecedent_name": "B",
+          "consequent_name": "C",
+          "upstream_status": "active"
+        },
+        {
+          "role": "canonical_scope",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "scope:B",
+          "raw_path": "reports\\P3\\B.raw",
+          "raw_sha256": "84d57a3ff88327ea10181520767852a7048a52992d3ccb330c2356098e99423b",
+          "fetched_at_utc": "fetch-cut",
+          "name": "B",
+          "coverage": "scoped_complete",
+          "active_alias_ids": [
+            2
+          ]
+        },
+        {
+          "role": "canonical_scope",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "scope:C",
+          "raw_path": "reports\\P3\\C.raw",
+          "raw_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "fetched_at_utc": "fetch-cut",
+          "name": "C",
+          "coverage": "scoped_complete",
+          "active_alias_ids": []
+        },
+        {
+          "role": "wiki_association_quarantined",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "wiki-quarantine:9",
+          "raw_path": "reports\\P3\\tags.raw",
+          "raw_sha256": "b3d56053496e1a9c6deab91484ec58d727376d539bf7efe3bfd2542b20438389",
+          "fetched_at_utc": "fetch-cut",
+          "wiki_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "9"
+          },
+          "tag_key": {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "C"
+          },
+          "reason": "mixed_cut_version_conflict",
+          "old_source_id": "old-wiki",
+          "old_input_sha256": "68dcb706009841a0e96e24843af87e120fe12239a270743758be0561bc632a6f",
+          "old_line": 1,
+          "old_updated_at": "old-cut",
+          "live_updated_at": "new-cut"
+        }
+      ]
+    },
+    {
+      "record_type": "tag_resolution",
+      "name": "C",
+      "target": {
+        "kind": "tag",
+        "namespace": "danbooru.tag",
+        "value": "C"
+      },
+      "matched_by": "native_exact",
+      "canonical_status": "canonical",
+      "category": 4,
+      "reason": null,
+      "rule_version": "danbooru-native-1",
+      "status": "source_backed",
+      "evidence_id": "assessment:C",
+      "evidence_chain": [
+        {
+          "role": "native_identity",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "native:3",
+          "raw_path": "reports\\P3\\tags.raw",
+          "raw_sha256": "b3d56053496e1a9c6deab91484ec58d727376d539bf7efe3bfd2542b20438389",
+          "fetched_at_utc": "fetch-cut",
+          "tag_id": 3
+        },
+        {
+          "role": "canonical_scope",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "scope:C",
+          "raw_path": "reports\\P3\\C.raw",
+          "raw_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "fetched_at_utc": "fetch-cut",
+          "name": "C",
+          "coverage": "scoped_complete",
+          "active_alias_ids": []
+        },
+        {
+          "role": "wiki_association_quarantined",
+          "source_id": "danbooru-native-scoped-b3d56053496e",
+          "evidence_id": "wiki-quarantine:9",
+          "raw_path": "reports\\P3\\tags.raw",
+          "raw_sha256": "b3d56053496e1a9c6deab91484ec58d727376d539bf7efe3bfd2542b20438389",
+          "fetched_at_utc": "fetch-cut",
+          "wiki_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "9"
+          },
+          "tag_key": {
+            "kind": "tag",
+            "namespace": "danbooru.tag",
+            "value": "C"
+          },
+          "reason": "mixed_cut_version_conflict",
+          "old_source_id": "old-wiki",
+          "old_input_sha256": "68dcb706009841a0e96e24843af87e120fe12239a270743758be0561bc632a6f",
+          "old_line": 1,
+          "old_updated_at": "old-cut",
+          "live_updated_at": "new-cut"
+        }
+      ]
+    }
+  ],
+  "records": [
+    {
+      "name": "A",
+      "exact": false,
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-review-7393d60\\source\\rust\\target\\release\\sknow-rs.exe",
+        "resolve-tag",
+        "C:\\Users\\PC\\AppData\\Local\\Temp\\sknow-quarantine-9d5-s1stryux\\builder\\published\\knowledge.sqlite",
+        "A"
+      ],
+      "exit": 0,
+      "stdout": {
+        "path": "reports/P3/raw/aec7ff4b9c65c791144d31f06246b867e3f6d90fb020bf906799d3d773772190.raw",
+        "sha256": "aec7ff4b9c65c791144d31f06246b867e3f6d90fb020bf906799d3d773772190",
+        "bytes": 3043
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "expected": {
+        "path": "reports/P3/raw/6d70daab0a2995a0ac4b73978e798e49534013ae4d7c0d1357493d7736e9ea46.raw",
+        "sha256": "6d70daab0a2995a0ac4b73978e798e49534013ae4d7c0d1357493d7736e9ea46",
+        "bytes": 3042
+      },
+      "oracle": {
+        "path": "reports/P3/raw/6d70daab0a2995a0ac4b73978e798e49534013ae4d7c0d1357493d7736e9ea46.raw",
+        "sha256": "6d70daab0a2995a0ac4b73978e798e49534013ae4d7c0d1357493d7736e9ea46",
+        "bytes": 3042
+      },
+      "independent_fullJSON": true,
+      "oracle_fullJSON": true,
+      "passed": true,
+      "retries": 0
+    },
+    {
+      "name": "B",
+      "exact": false,
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-review-7393d60\\source\\rust\\target\\release\\sknow-rs.exe",
+        "resolve-tag",
+        "C:\\Users\\PC\\AppData\\Local\\Temp\\sknow-quarantine-9d5-s1stryux\\builder\\published\\knowledge.sqlite",
+        "B"
+      ],
+      "exit": 0,
+      "stdout": {
+        "path": "reports/P3/raw/339593b9856976cb122e0c4a511366db479399a6bcb7561fab6ae705f108b6bb.raw",
+        "sha256": "339593b9856976cb122e0c4a511366db479399a6bcb7561fab6ae705f108b6bb",
+        "bytes": 2399
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "expected": {
+        "path": "reports/P3/raw/9355142c99ad41310e0dc42fa337b1d5705f7304a206fdc497fa5d8a3eeaa66c.raw",
+        "sha256": "9355142c99ad41310e0dc42fa337b1d5705f7304a206fdc497fa5d8a3eeaa66c",
+        "bytes": 2398
+      },
+      "oracle": {
+        "path": "reports/P3/raw/9355142c99ad41310e0dc42fa337b1d5705f7304a206fdc497fa5d8a3eeaa66c.raw",
+        "sha256": "9355142c99ad41310e0dc42fa337b1d5705f7304a206fdc497fa5d8a3eeaa66c",
+        "bytes": 2398
+      },
+      "independent_fullJSON": true,
+      "oracle_fullJSON": true,
+      "passed": true,
+      "retries": 0
+    },
+    {
+      "name": "C",
+      "exact": false,
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-review-7393d60\\source\\rust\\target\\release\\sknow-rs.exe",
+        "resolve-tag",
+        "C:\\Users\\PC\\AppData\\Local\\Temp\\sknow-quarantine-9d5-s1stryux\\builder\\published\\knowledge.sqlite",
+        "C"
+      ],
+      "exit": 0,
+      "stdout": {
+        "path": "reports/P3/raw/e9ad5e66592fda2689f4c59d1952e8a98fbc8c5b9297c8ddee5a4403bf03ec8b.raw",
+        "sha256": "e9ad5e66592fda2689f4c59d1952e8a98fbc8c5b9297c8ddee5a4403bf03ec8b",
+        "bytes": 1753
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "expected": {
+        "path": "reports/P3/raw/3d467558ff8e7536146057047e2dd09f02100fe771f8fd72a45b66e109545bf9.raw",
+        "sha256": "3d467558ff8e7536146057047e2dd09f02100fe771f8fd72a45b66e109545bf9",
+        "bytes": 1752
+      },
+      "oracle": {
+        "path": "reports/P3/raw/3d467558ff8e7536146057047e2dd09f02100fe771f8fd72a45b66e109545bf9.raw",
+        "sha256": "3d467558ff8e7536146057047e2dd09f02100fe771f8fd72a45b66e109545bf9",
+        "bytes": 1752
+      },
+      "independent_fullJSON": true,
+      "oracle_fullJSON": true,
+      "passed": true,
+      "retries": 0
+    },
+    {
+      "name": "A",
+      "exact": true,
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-review-7393d60\\source\\rust\\target\\release\\sknow-rs.exe",
+        "resolve-tag",
+        "C:\\Users\\PC\\AppData\\Local\\Temp\\sknow-quarantine-9d5-s1stryux\\builder\\published\\knowledge.sqlite",
+        "A",
+        "--key",
+        "--kind",
+        "tag",
+        "--namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "stdout": {
+        "path": "reports/P3/raw/46b283a55af096510abb36935ffb0edc7980cfae3244e5ce5e05faa5647633cc.raw",
+        "sha256": "46b283a55af096510abb36935ffb0edc7980cfae3244e5ce5e05faa5647633cc",
+        "bytes": 3092
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "expected": {
+        "path": "reports/P3/raw/0d60fcc9aab4bfa7d976df39b01fff13d7b2bbeda635c31248d24435313af902.raw",
+        "sha256": "0d60fcc9aab4bfa7d976df39b01fff13d7b2bbeda635c31248d24435313af902",
+        "bytes": 3091
+      },
+      "oracle": {
+        "path": "reports/P3/raw/0d60fcc9aab4bfa7d976df39b01fff13d7b2bbeda635c31248d24435313af902.raw",
+        "sha256": "0d60fcc9aab4bfa7d976df39b01fff13d7b2bbeda635c31248d24435313af902",
+        "bytes": 3091
+      },
+      "independent_fullJSON": true,
+      "oracle_fullJSON": true,
+      "passed": true,
+      "retries": 0
+    },
+    {
+      "name": "B",
+      "exact": true,
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-review-7393d60\\source\\rust\\target\\release\\sknow-rs.exe",
+        "resolve-tag",
+        "C:\\Users\\PC\\AppData\\Local\\Temp\\sknow-quarantine-9d5-s1stryux\\builder\\published\\knowledge.sqlite",
+        "B",
+        "--key",
+        "--kind",
+        "tag",
+        "--namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "stdout": {
+        "path": "reports/P3/raw/ff421cb70aece91fe703dc756fd576fb760aaa024623713b87beb6b13b72467f.raw",
+        "sha256": "ff421cb70aece91fe703dc756fd576fb760aaa024623713b87beb6b13b72467f",
+        "bytes": 2448
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "expected": {
+        "path": "reports/P3/raw/d9486ff62953a15765c2babbe053189f84b1be6a5b2cef0a04cfe7eaa90ec78f.raw",
+        "sha256": "d9486ff62953a15765c2babbe053189f84b1be6a5b2cef0a04cfe7eaa90ec78f",
+        "bytes": 2447
+      },
+      "oracle": {
+        "path": "reports/P3/raw/d9486ff62953a15765c2babbe053189f84b1be6a5b2cef0a04cfe7eaa90ec78f.raw",
+        "sha256": "d9486ff62953a15765c2babbe053189f84b1be6a5b2cef0a04cfe7eaa90ec78f",
+        "bytes": 2447
+      },
+      "independent_fullJSON": true,
+      "oracle_fullJSON": true,
+      "passed": true,
+      "retries": 0
+    },
+    {
+      "name": "C",
+      "exact": true,
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-review-7393d60\\source\\rust\\target\\release\\sknow-rs.exe",
+        "resolve-tag",
+        "C:\\Users\\PC\\AppData\\Local\\Temp\\sknow-quarantine-9d5-s1stryux\\builder\\published\\knowledge.sqlite",
+        "C",
+        "--key",
+        "--kind",
+        "tag",
+        "--namespace",
+        "danbooru.tag"
+      ],
+      "exit": 0,
+      "stdout": {
+        "path": "reports/P3/raw/f52292fe37c30205a625c3f3d3e497baff44e052c344c1a7b004f1293eef06dc.raw",
+        "sha256": "f52292fe37c30205a625c3f3d3e497baff44e052c344c1a7b004f1293eef06dc",
+        "bytes": 1802
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "expected": {
+        "path": "reports/P3/raw/f1e731ca97508ff4d6e80c034c239f74b896466bc4bc40cddbc120a30d48328f.raw",
+        "sha256": "f1e731ca97508ff4d6e80c034c239f74b896466bc4bc40cddbc120a30d48328f",
+        "bytes": 1801
+      },
+      "oracle": {
+        "path": "reports/P3/raw/f1e731ca97508ff4d6e80c034c239f74b896466bc4bc40cddbc120a30d48328f.raw",
+        "sha256": "f1e731ca97508ff4d6e80c034c239f74b896466bc4bc40cddbc120a30d48328f",
+        "bytes": 1801
+      },
+      "independent_fullJSON": true,
+      "oracle_fullJSON": true,
+      "passed": true,
+      "retries": 0
+    },
+    {
+      "name": "heroA",
+      "exact": true,
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-review-7393d60\\source\\rust\\target\\release\\sknow-rs.exe",
+        "resolve-tag",
+        "C:\\Users\\PC\\AppData\\Local\\Temp\\sknow-quarantine-9d5-s1stryux\\builder\\published\\knowledge.sqlite",
+        "heroA",
+        "--key",
+        "--kind",
+        "character",
+        "--namespace",
+        "fixture.character"
+      ],
+      "exit": 0,
+      "stdout": {
+        "path": "reports/P3/raw/7750d5f24292766b7eff53a61de37df5afc4b2347b119dee4352574f4eb93b25.raw",
+        "sha256": "7750d5f24292766b7eff53a61de37df5afc4b2347b119dee4352574f4eb93b25",
+        "bytes": 3860
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "expected": {
+        "path": "reports/P3/raw/de8fe4c837dbbb843abf1904ec740675ec9368338c0596c96460c5f69a0327d7.raw",
+        "sha256": "de8fe4c837dbbb843abf1904ec740675ec9368338c0596c96460c5f69a0327d7",
+        "bytes": 3859
+      },
+      "oracle": {
+        "path": "reports/P3/raw/de8fe4c837dbbb843abf1904ec740675ec9368338c0596c96460c5f69a0327d7.raw",
+        "sha256": "de8fe4c837dbbb843abf1904ec740675ec9368338c0596c96460c5f69a0327d7",
+        "bytes": 3859
+      },
+      "independent_fullJSON": true,
+      "oracle_fullJSON": true,
+      "passed": true,
+      "retries": 0
+    },
+    {
+      "name": "heroC",
+      "exact": true,
+      "argv": [
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-review-7393d60\\source\\rust\\target\\release\\sknow-rs.exe",
+        "resolve-tag",
+        "C:\\Users\\PC\\AppData\\Local\\Temp\\sknow-quarantine-9d5-s1stryux\\builder\\published\\knowledge.sqlite",
+        "heroC",
+        "--key",
+        "--kind",
+        "character",
+        "--namespace",
+        "fixture.character"
+      ],
+      "exit": 0,
+      "stdout": {
+        "path": "reports/P3/raw/84f3042ffc2f5c212ce825cb47e5b4eb6386fffb86216089195da32aeaf260d5.raw",
+        "sha256": "84f3042ffc2f5c212ce825cb47e5b4eb6386fffb86216089195da32aeaf260d5",
+        "bytes": 2572
+      },
+      "stderr": {
+        "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "expected": {
+        "path": "reports/P3/raw/cc7cb8fcfe1fc38de4d101f2adaa8863d2fece5c6f39489bf1e61f5547f3d3bd.raw",
+        "sha256": "cc7cb8fcfe1fc38de4d101f2adaa8863d2fece5c6f39489bf1e61f5547f3d3bd",
+        "bytes": 2571
+      },
+      "oracle": {
+        "path": "reports/P3/raw/cc7cb8fcfe1fc38de4d101f2adaa8863d2fece5c6f39489bf1e61f5547f3d3bd.raw",
+        "sha256": "cc7cb8fcfe1fc38de4d101f2adaa8863d2fece5c6f39489bf1e61f5547f3d3bd",
+        "bytes": 2571
+      },
+      "independent_fullJSON": true,
+      "oracle_fullJSON": true,
+      "passed": true,
+      "retries": 0
+    }
+  ],
+  "expected_origin": "hardcoded raw IDs/keypairs/source SHA/step endpoints/scopes/cut old-cut!=new-cut, not resolver-derived",
+  "real_source_positive": false,
+  "upstream_GETs": 0,
+  "fullcandidate_attempts": 0
+}

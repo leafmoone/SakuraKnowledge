@@ -1,0 +1,9 @@
+{
+  "status": "FAIL",
+  "kind": "auxiliary receipt inspection, no execution or data mutation",
+  "exit": 1,
+  "error": "AttributeError: 'list' object has no attribute 'get'",
+  "cause": "Inspection used dict.get(status, summary.get(overall)) whose default evaluates eagerly; performance summary is a list, unlike old151 summary object.",
+  "resolution": "Second read-only inspection selects old151.summary.overall explicitly and other top-level statuses. All existing acceptance/regression/performance and seven check prerequisites PASS on source229. No test or performance retry and no receipt modification.",
+  "claim": "Failed inspection remains FAIL, not converted into validation PASS."
+}

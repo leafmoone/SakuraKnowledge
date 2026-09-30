@@ -1,0 +1,26 @@
+{
+  "head": "229c2ddcc43c0d3919d44a4ea823f6a999a48a57",
+  "working_tree": "?? reports/P3/review-9d5-check-clippy.json\n?? reports/P3/review-9d5-check-diff.json\n?? reports/P3/review-9d5-check-fmt.json\n?? reports/P3/review-9d5-check-pytest.json\n?? reports/P3/review-9d5-check-release.json\n?? reports/P3/review-9d5-check-ruff.json\n?? reports/P3/review-9d5-check-rust-test.json\n?? reports/P3/review-9d5-quarantine-after.json\n?? reports/P3/review-9d5-quarantine-before-corrected.json\n?? reports/P3/review-9d5-quarantine-before.json\n?? reports/P3/review-9d5-quarantine-raw-check.json\n?? reports/P3/review-9d5-quarantine-raw.json\n?? reports/P3/review-9d5-venv-create.json\n?? reports/P3/review-9d5-wheel-build.json\n",
+  "argv": [
+    "dist/p3-quarantine-229c2dd/venv/Scripts/python.exe",
+    "-m",
+    "pip",
+    "install",
+    "--no-index",
+    "--no-deps",
+    "dist/p3-quarantine-229c2dd/sakura_knowledge-0.2.0-py3-none-any.whl"
+  ],
+  "exit": 0,
+  "elapsed_s": 1.413886700058356,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "UHJvY2Vzc2luZyAuXGRpc3RccDMtcXVhcmFudGluZS0yMjljMmRkXHNha3VyYV9rbm93bGVkZ2UtMC4yLjAtcHkzLW5vbmUtYW55LndobA0KSW5zdGFsbGluZyBjb2xsZWN0ZWQgcGFja2FnZXM6IHNha3VyYS1rbm93bGVkZ2UNClN1Y2Nlc3NmdWxseSBpbnN0YWxsZWQgc2FrdXJhLWtub3dsZWRnZS0wLjIuMA0K",
+  "stdout_sha256": "ab8650ed27164f2042a341d9a33d1b6f1f728e0d50066b83477b5084ef48bdd0",
+  "stdout": "Processing .\\dist\\p3-quarantine-229c2dd\\sakura_knowledge-0.2.0-py3-none-any.whl\r\nInstalling collected packages: sakura-knowledge\r\nSuccessfully installed sakura-knowledge-0.2.0\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}
