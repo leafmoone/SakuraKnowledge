@@ -1,10 +1,9 @@
 """A-evidence tests: occurrence semantics and source_fields bounded projection.
 
 Covers the review items for P2:
-  - occurrences are per-dataset (seven-table group) partition rows;
-    frequency carries the observed source_count and the raw payload keeps
-    the source row, including a NULLABLE sample_count (JSON null must
-    survive the round trip as SQL NULL, not 0),
+  - occurrences separate dataset membership from seven-table partition;
+    source_count is coverage, not frequency. The real adapter preserves
+    raw rows and emits nullable sample_count, never invented image counts,
   - source_fields is a bounded projection: only the four whitelisted
     raw_* keys are exposed from identity evidence, anything else is
     dropped, and entries without such raw fields project to {}.
@@ -36,20 +35,10 @@ def manifest(tmp_path, records):
 
 
 def test_occurrence_dataset_partition_and_nullable_sample_count(tmp_path):
-    record = {
-        "key": EntryKey("tag", "local.tag_aggregate", "ev-tag").as_dict(),
-        "aliases": [{"text": "ev-tag", "status": "source_backed", "type": "tag_key"}],
-        "occurrences": [
-            {"group": "anime_pictures_1_noncommon",
-             "dataset": "anime_pictures_1_noncommon", "frequency": 3,
-             "raw": {"tag_key": "ev-tag", "source_count": 3,
-                     "sample_count": None, "category": "general"}},
-            {"group": "bangumi_1_noncommon",
-             "dataset": "bangumi_1_noncommon", "frequency": 2,
-             "raw": {"tag_key": "ev-tag", "source_count": 2,
-                     "sample_count": None, "category": "general"}},
-        ],
-    }
+    from sakura_knowledge.adapters import tag_group_record
+    record = tag_group_record("anime_pictures_1_noncommon", {
+        "tag_key": "ev-tag", "source_count": 2,
+        "sources_json": '["anime_pictures_1", "bangumi_1"]', "category": "general"})
     path = manifest(tmp_path, [record])
     output = tmp_path / "snapshot"
     build(path, output)
@@ -62,17 +51,16 @@ def test_occurrence_dataset_partition_and_nullable_sample_count(tmp_path):
     ).fetchall()
     conn.close()
     assert [(r[0], r[1], r[2]) for r in rows] == [
-        ("anime_pictures_1_noncommon", "anime_pictures_1_noncommon", 3),
-        ("bangumi_1_noncommon", "bangumi_1_noncommon", 2),
+        ("anime_pictures_1", "anime_pictures_1_noncommon", None),
+        ("bangumi_1", "anime_pictures_1_noncommon", None),
     ]
     for _, _, frequency, payload in rows:
         occ = json.loads(payload)
-        # frequency == observed source_count per dataset partition
-        assert frequency == occ["raw"]["source_count"]
-        # sample_count is nullable: JSON null must round-trip as null
-        assert "sample_count" in occ["raw"]
-        assert occ["raw"]["sample_count"] is None
-        assert json.loads(payload)["dataset"] == occ["dataset"]
+        assert frequency is None  # coverage is NOT sample frequency
+        assert occ["source_count"] == occ["raw"]["source_count"] == 2
+        assert occ["sample_count"] is None
+        assert occ["partition"] == "anime_pictures_1_noncommon"
+        assert occ["dataset_id"] in ("anime_pictures_1", "bangumi_1")
 
 
 def test_occurrence_frequency_validation(tmp_path):
@@ -116,8 +104,8 @@ def test_source_fields_bounded_projection(tmp_path):
         fields = populated["source_fields"]
         assert set(fields) <= ALLOWED_SOURCE_FIELDS
         assert "raw_not_whitelisted" not in fields
-        assert fields.get("raw_attributes") == {"height": "165"}
-        assert fields.get("raw_gender") == "female"
+        assert fields["raw_attributes"][0]["value"] == {"height": "165"}
+        assert fields["raw_gender"][0]["value"] == "female"
         # bounded projection drops non-whitelisted keys from source_fields,
         # while the raw payload stays preserved in the entry_evidence row
         # (evidence boundary: raw bytes are never stripped from proofs)

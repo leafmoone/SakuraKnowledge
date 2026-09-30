@@ -212,13 +212,42 @@ def iter_danbooru_links(parquet, *, sample=None):
                 return
 
 
+# Explicit audited partition/source vocabulary. Partitions are not datasets.
+TAG_DATASETS = {
+    "anime_pictures_1_noncommon": "anime_pictures_1",
+    "bangumi_1_noncommon": "bangumi_1",
+    "gamecg_5m_noncommon": "gamecg_5m",
+    "konachan_1_noncommon": "konachan_1",
+    "yande_1_noncommon": "yande_1",
+    "zerochan_1_noncommon": "zerochan_1",
+}
+
+
 def tag_group_record(group, row):
     item = dict(row)
+    if group not in GROUPS:
+        raise ValueError("unknown seven-table group")
+    coverage = item.get("source_count")
+    if type(coverage) is not int or coverage < 0:
+        raise ValueError("invalid source_count")
+    sources = json.loads(item["sources_json"]) if item.get("sources_json") else []
+    if not isinstance(sources, list) or any(s not in TAG_DATASETS.values() for s in sources):
+        raise ValueError("invalid dataset membership")
+    if len(sources) != len(set(sources)):
+        raise ValueError("duplicate dataset membership")
+    # Preserve every actual member, not just the partition's naming source.
+    # Common with absent membership remains unknown, never a 'common' dataset.
+    members = sorted(sources) or ([TAG_DATASETS[group]] if group in TAG_DATASETS else [None])
+    occurrences = [{
+        "occurrence_contract": "2", "partition": group, "dataset_id": member,
+        "source_count": coverage, "sample_count": None,
+        "membership_basis": "sources_json" if sources else
+                            "partition_mapping" if member else "unknown",
+        "raw": item,
+    } for member in members]
     key = _key("tag", "local.tag_aggregate", item["tag_key"])
     return _entity(key, status="source_backed", aliases=[_alias(
-        item["tag_key"], "tag_key")], occurrences=[{
-        "group": group, "dataset": group, "frequency": item["source_count"],
-        "raw": item}], raw_group=group, raw_tag=item)
+        item["tag_key"], "tag_key")], occurrences=occurrences, raw_group=group, raw_tag=item)
 
 
 def iter_tag_wiki(path, *, sample=None):

@@ -1,11 +1,12 @@
 """Shared read-only API for the CLI and Skill."""
-import json
 import re
 import sqlite3
 import time
+from functools import wraps
 
 from . import CONTRACT_VERSION
 from .model import IDENTITY_TRUSTED, TEXT_TRUSTED, EntryKey, match_query
+from .response import RESPONSE_VERSION, bound_response, source_observations
 from .storage import readonly
 
 _ID = ", ".join(f"'{s}'" for s in sorted(IDENTITY_TRUSTED))
@@ -17,7 +18,7 @@ _TEXT = ", ".join(f"'{s}'" for s in sorted(TEXT_TRUSTED))
 _ASK_DANBOORU = re.compile(
     r"^(?P<x>.+?)\s*的\s*danbooru\s*tag\s*是什么\s*[？?。.\s]*$", re.IGNORECASE)
 _ASK_TAG = re.compile(r"^(?P<x>.+?)\s*的\s*标签\s*是什么\s*[？?。.\s]*$")
-_ASK_INTRODUCE = re.compile(r"^介绍(?:一下)?\s*(?P<x>.+?)\s*[？?。.\s]*$")
+_ASK_INTRODUCE = re.compile(r"^介绍(?:一下)?\s*(?P<x>.+?)\s*$")
 
 
 def parse_ask_template(query):
@@ -32,14 +33,58 @@ def parse_ask_template(query):
     return None
 
 
+def bounded_response(method):
+    @wraps(method)
+    def wrapped(self, *args, **kwargs):
+        return bound_response(method(self, *args, **kwargs))
+    return wrapped
+
+
 class Knowledge:
     def __init__(self, path):
         self.conn = readonly(path)
         self._deadline = time.monotonic() + 5
         self.conn.set_progress_handler(lambda: int(time.monotonic() > self._deadline), 1000)
         self.conn.setlimit(sqlite3.SQLITE_LIMIT_LENGTH, 2_000_000)
-        self.snapshot = self._execute(
-            "SELECT value FROM build_meta WHERE key='snapshot'").fetchone()[0]
+        try:
+            self._validate_storage()
+        except Exception:
+            self.conn.close()
+            raise
+
+    def _validate_storage(self):
+        """Read-only constant-size capability/schema gate, never integrity_scan."""
+        try:
+            meta = dict(self._execute("SELECT key,value FROM build_meta WHERE key IN "
+                                      "('contract_version','search_text_version','snapshot')"))
+            for key in ("contract_version", "search_text_version"):
+                if meta.get(key) != "2":
+                    raise ValueError(f"unsupported {key}: {meta.get(key)}")
+            if not meta.get("snapshot"):
+                raise ValueError("missing snapshot identity")
+            required = {
+                "entries": "id kind namespace value locator conflicted",
+                "entry_evidence": "id entry_id source_id evidence_id status type locator payload",
+                "aliases": "id entry_id text source_id evidence_id status",
+                "documents": "id entry_id title original status source_id evidence_id payload",
+                "links": "id src dst relation method verification_status source_id evidence_id payload",
+                "search_fts": "text document_id entry_id",
+            }
+            for table, names in required.items():
+                columns = {r[1] for r in self._execute(f"PRAGMA table_info({table})")}
+                missing = sorted(set(names.split()) - columns)
+                if missing:
+                    raise ValueError(f"invalid snapshot schema: {table} missing {','.join(missing)}")
+            definition = self._execute("SELECT sql FROM sqlite_master WHERE name='search_fts'")
+            if "using fts5" not in definition.fetchone()[0].lower():
+                raise ValueError("invalid snapshot schema: search_fts is not FTS5")
+            self._execute("SELECT rowid FROM search_fts WHERE search_fts MATCH ? LIMIT 0",
+                          ('"runtime_capability_probe"',)).fetchall()
+            if self._execute("SELECT json_extract('{\"probe\":1}', '$.probe')").fetchone()[0] != 1:
+                raise ValueError("SQLite JSON capability unavailable")
+            self.snapshot = meta["snapshot"]
+        except sqlite3.DatabaseError as exc:
+            raise ValueError(f"invalid snapshot schema or capability: {exc}") from exc
 
     def close(self):
         self.conn.close()
@@ -51,7 +96,8 @@ class Knowledge:
         self.close()
 
     def result(self, query, status, candidates=(), warnings=()):
-        return {"contract_version": CONTRACT_VERSION, "snapshot": self.snapshot,
+        return {"contract_version": CONTRACT_VERSION, "response_version": RESPONSE_VERSION,
+                "snapshot": self.snapshot,
                 "query": query, "status": status, "entry_key": None, "tag_key": None,
                 "canonical": None, "candidates": list(candidates), "descriptions": [],
                 "relations": [], "citations": [], "warnings": list(warnings)}
@@ -108,31 +154,29 @@ class Knowledge:
         identities = self._execute(
             f"SELECT source_id,evidence_id,status,type,locator,payload FROM entry_evidence "
             f"WHERE entry_id=? AND status IN ({_ID}) "
-            f"ORDER BY source_id,evidence_id LIMIT 100", (row["id"],)).fetchall()
+            f"ORDER BY source_id,evidence_id LIMIT 101", (row["id"],)).fetchall()
+        identities_truncated = len(identities) > 100
+        identities = identities[:100]
         identity_proofs = aliases if alias_text is not None and alias_text != row["value"] else identities
-        fields = {}
-        for proof in identities:
-            try:
-                payload = json.loads(proof["payload"])
-                raw = payload.get("raw", payload)
-            except (TypeError, json.JSONDecodeError):
-                raw = {}
-            for name in ("raw_attributes", "raw_subject_categories", "raw_cv_names", "raw_gender"):
-                if name in raw:
-                    fields[name] = raw[name]
+        fields, field_evidence, field_truncated = source_observations(identities)
         citations = [{"source_id": d["source_id"], "evidence_id": d["evidence_id"]}
                      for d in identity_proofs]
         return {"entry_key": key, "locator": row["locator"],
                 "descriptions": [dict(d) for d in docs],
                 "matched_documents": [dict(d) for d in docs],
                 "aliases": [dict(a) for a in aliases],
-                "identity_evidence": [dict(d) for d in identities],
-                "source_fields": fields, "source_fields_evidence": citations,
+                "identity_evidence": [{k: d[k] for k in
+                                       ("source_id", "evidence_id", "status", "type", "locator")}
+                                      for d in identities],
+                "source_fields": fields, "source_fields_evidence": field_evidence,
+                "source_fields_truncated": field_truncated,
+                "identity_evidence_truncated": identities_truncated,
                 "matched_by": "exact" if alias_text is None or alias_text == row["value"] else "alias",
                 "source_id": identity_proofs[0]["source_id"] if identity_proofs else None,
                 "evidence_id": identity_proofs[0]["evidence_id"] if identity_proofs else None,
                 "citations": citations}
 
+    @bounded_response
     def lookup(self, query=None, *, key=None, kind=None, namespace=None):
         self._budget()
         # Identity resolution: source-anchored evidence only; a generated
@@ -171,6 +215,7 @@ class Knowledge:
             result["matched_documents"] = candidates[0]["matched_documents"]
             result["source_fields"] = candidates[0]["source_fields"]
             result["source_fields_evidence"] = candidates[0]["source_fields_evidence"]
+            result["source_fields_truncated"] = candidates[0]["source_fields_truncated"]
             result["matched_by"] = candidates[0]["matched_by"]
             result["source_id"] = candidates[0]["source_id"]
             result["evidence_id"] = candidates[0]["evidence_id"]
@@ -181,6 +226,7 @@ class Knowledge:
             result["warnings"].append("candidate_limit_reached")
         return result
 
+    @bounded_response
     def search(self, query, *, topk=20, kind=None, namespace=None):
         self._budget()
         if type(topk) is not int or not 1 <= topk <= 100:
@@ -241,6 +287,7 @@ class Knowledge:
             exact["warnings"].append("search_document_scan_limit")
         return exact
 
+    @bounded_response
     def related(self, key, *, relation=None, kind=None, limit=20):
         self._budget()
         if type(limit) is not int or not 1 <= limit <= 100:
@@ -266,6 +313,7 @@ class Knowledge:
                               "payload": r["payload"]} for r in rows]
         return base
 
+    @bounded_response
     def ask(self, query, *, kind=None, namespace=None, target_tag_namespace=None):
         """Resolve an exact *source* entity, then independently assess a target tag.
 
@@ -281,9 +329,9 @@ class Knowledge:
                                                  or not 1 <= len(target_tag_namespace) <= 256):
             raise ValueError("target_tag_namespace must contain 1..256 characters")
         direct = self.lookup(query, kind=kind, namespace=namespace)
-        if direct["status"] == "found":
+        if direct["status"] in ("found", "ambiguous"):
             result = self._ask_resolved(query, kind=kind, namespace=namespace,
-                                        target_tag_namespace=target_tag_namespace)
+                                        target_tag_namespace=target_tag_namespace, resolved=direct)
             result["input_query"] = query
             result["parsed_subject"] = None
             result["query_template"] = "unsupported"
@@ -291,7 +339,7 @@ class Knowledge:
         parsed = parse_ask_template(query)
         if parsed is None:
             result = self._ask_resolved(query, kind=kind, namespace=namespace,
-                                        target_tag_namespace=target_tag_namespace)
+                                        target_tag_namespace=target_tag_namespace, resolved=direct)
             result["query_template"] = "unsupported"
             if result["status"] == "unknown":
                 result["warnings"].append("unsupported_query_template")
@@ -300,8 +348,15 @@ class Knowledge:
         if mode == "introduce":
             if target_tag_namespace is not None:
                 raise ValueError("introduce template cannot combine with target_tag_namespace")
-            result = self._ask_resolved(subject, kind=kind, namespace=namespace,
-                                        target_tag_namespace=None)
+            result = self.lookup(subject, kind=kind, namespace=namespace)
+            result["mapping_status"] = "not_requested"
+            result["target_namespace"] = None
+            if result["status"] == "not_found":
+                result["status"] = "unknown"
+                result["answer"] = "No reliable exact source entity match."
+            elif result["status"] == "ambiguous":
+                result["status"] = "entity_ambiguous"
+                result["answer"] = "Multiple source entity matches; specify a source key."
             result["input_query"] = query
             result["parsed_subject"] = subject
             result["query_template"] = "introduce"
@@ -327,8 +382,10 @@ class Knowledge:
         result["query_template"] = "tag"
         return result
 
-    def _ask_resolved(self, query, *, kind=None, namespace=None, target_tag_namespace=None):
-        result = self.lookup(query, kind=kind, namespace=namespace)
+    def _ask_resolved(self, query, *, kind=None, namespace=None, target_tag_namespace=None,
+                      resolved=None):
+        result = (resolved if resolved is not None else
+                  self.lookup(query, kind=kind, namespace=namespace))
         result["input_query"] = query
         result["parsed_subject"] = None
         result["target_namespace"] = target_tag_namespace

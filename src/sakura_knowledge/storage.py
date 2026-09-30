@@ -272,14 +272,26 @@ def insert_record(conn, record, source, line, index_episodes):
         if status in TEXT_TRUSTED and (record["key"]["kind"] != "episode" or index_episodes):
             conn.execute("INSERT INTO search_fts VALUES(?,?,?)", (text, cur.lastrowid, eid))
     for occurrence in record.get("occurrences", []):
-        if occurrence["group"] not in GROUPS:
+        modern = occurrence.get("occurrence_contract") == "2"
+        group = occurrence["partition"] if modern else occurrence["group"]
+        dataset = occurrence["dataset_id"] if modern else occurrence["dataset"]
+        if group not in GROUPS:
             raise ValueError("unknown seven-table group")
-        frequency = occurrence["frequency"]
-        if type(frequency) is not int or frequency < 0:
+        # Existing storage v2 remains readable: new semantic fields live in
+        # payload, while frequency is reserved for legacy uninterpreted data.
+        frequency = None if modern else occurrence["frequency"]
+        if not modern and (type(frequency) is not int or frequency < 0):
             raise ValueError("invalid frequency")
+        if modern:
+            count = occurrence.get("sample_count")
+            if count is not None and (type(count) is not int or count < 0):
+                raise ValueError("invalid sample_count")
+            coverage = occurrence.get("source_count")
+            if type(coverage) is not int or coverage < 0:
+                raise ValueError("invalid source_count")
         conn.execute("INSERT INTO occurrences(entry_id,source_id,evidence_id,dataset,group_name,"
                      "frequency,payload) VALUES(?,?,?,?,?,?,?)",
-                     (eid, sid, fallback, occurrence["dataset"], occurrence["group"], frequency,
+                     (eid, sid, fallback, dataset, group, frequency,
                       json.dumps(occurrence, ensure_ascii=False)))
     return "conflicted" if conflict else "accepted"
 

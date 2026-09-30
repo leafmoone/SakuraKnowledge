@@ -124,7 +124,10 @@ def test_tag_evidence_exact_match_and_ai_status_are_not_verified(tmp_path):
     assert len(items) == 4
     tag, match, annotation, cache = items
     assert tag["key"]["namespace"] == "local.tag_aggregate"
-    assert tag["occurrences"][0]["group"] == "anime_pictures_1_noncommon"
+    assert tag["occurrences"][0]["partition"] == "anime_pictures_1_noncommon"
+    assert tag["occurrences"][0]["dataset_id"] == "anime_pictures_1"
+    assert tag["occurrences"][0]["source_count"] == 3
+    assert tag["occurrences"][0]["sample_count"] is None
     assert match["verification_status"] == "candidate"
     assert match["raw"]["confidence"] == 1.0
     assert match["src"]["kind"] == "tag" and match["dst"]["kind"] == "page"

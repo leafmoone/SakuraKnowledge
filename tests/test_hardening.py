@@ -148,11 +148,15 @@ def test_p2_moegirl_source_fields_are_bounded_and_cited(tmp_path):
     with Knowledge(out / "knowledge.sqlite") as api:
         result = api.lookup(key=record["key"])
     fields = result["source_fields"]
-    assert fields["raw_attributes"] == ["银发", "灰瞳"]
-    assert fields["raw_subject_categories"] == ["第五人格"]
-    assert fields["raw_cv_names"] == ["黑石稔"]
-    assert fields["raw_gender"] is None
-    assert result["source_fields_evidence"] == result["citations"]
+    assert fields["raw_attributes"][0]["value"] == ["银发", "灰瞳"]
+    assert fields["raw_subject_categories"][0]["value"] == ["第五人格"]
+    assert fields["raw_cv_names"][0]["value"] == ["黑石稔"]
+    assert fields["raw_gender"][0]["value"] is None
+    assert fields["raw_gender"][0]["value_state"] == "null"
+    assert {p["field"] for p in result["source_fields_evidence"]} == set(fields)
+    assert all(p["source_id"] == fields[p["field"]][0]["source_id"]
+               and p["evidence_id"] == fields[p["field"]][0]["evidence_id"]
+               for p in result["source_fields_evidence"])
 
 
 def test_ask_templates_extract_subject_verbatim(tmp_path):
@@ -161,7 +165,8 @@ def test_ask_templates_extract_subject_verbatim(tmp_path):
     assert parse_ask_template("hero 的 danbooru tag 是什么？") == ("hero", "danbooru.tag")
     assert parse_ask_template("hero 的标签是什么") == ("hero", "tag")
     assert parse_ask_template("介绍一下 hero") == ("hero", "introduce")
-    assert parse_ask_template("介绍 hero。") == ("hero", "introduce")
+    # R3: introduction subject punctuation is identity data, not removable syntax.
+    assert parse_ask_template("介绍 hero。") == ("hero。", "introduce")
     assert parse_ask_template("a_b (x) 的标签是什么") == ("a_b (x)", "tag")
     assert parse_ask_template("  的标签是什么") is None
     assert parse_ask_template("hero") is None
