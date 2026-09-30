@@ -1,0 +1,1155 @@
+{
+  "mode": "single_shot_diagnostic",
+  "retries": 0,
+  "query": "a's_wonderland",
+  "topk": 10,
+  "match": "\"a\" OR \"s\" OR \"wonderland\"",
+  "sql": "SELECT e.id,e.kind,e.namespace,e.value,e.locator,\nsearch_fts.rank AS score,d.id AS document_id,search_fts.rowid AS fts_rowid\nFROM search_fts JOIN documents d ON d.id=search_fts.document_id\nJOIN entries e ON e.id=search_fts.entry_id WHERE search_fts MATCH ?1\nAND e.conflicted=0 AND d.status IN ('generated_from_evidence','source_backed')\nAND EXISTS (SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id AND v.status='source_backed')\nAND (?2 IS NULL OR e.kind=?2) AND (?3 IS NULL OR e.namespace=?3)\nORDER BY search_fts.rank LIMIT 10001",
+  "python_explain": [
+    [
+      6,
+      0,
+      132,
+      "SCAN search_fts VIRTUAL TABLE INDEX 32:M3"
+    ],
+    [
+      11,
+      0,
+      45,
+      "SEARCH d USING INTEGER PRIMARY KEY (rowid=?)"
+    ],
+    [
+      17,
+      0,
+      45,
+      "SEARCH e USING INTEGER PRIMARY KEY (rowid=?)"
+    ],
+    [
+      29,
+      0,
+      0,
+      "CORRELATED SCALAR SUBQUERY 1"
+    ],
+    [
+      33,
+      29,
+      53,
+      "SEARCH v USING COVERING INDEX entry_evidence_entry (entry_id=? AND status=?)"
+    ]
+  ],
+  "python": {
+    "value": {
+      "contract_version": "2",
+      "response_version": "3",
+      "snapshot": "7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c",
+      "query": "a's_wonderland",
+      "status": "ambiguous",
+      "entry_key": null,
+      "tag_key": null,
+      "canonical": null,
+      "candidates": [
+        {
+          "entry_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "46520"
+          },
+          "locator": null,
+          "descriptions": [
+            {
+              "title": "a's_wonderland",
+              "original": "[b]A's Wonderland[/b] is a card battle RPG for iOS by CyberAgent, Inc.\r\nThe setting of the game is based off of [i][[Alice's Adventures in Wonderland]][/i].\r\n\r\nh4. External links\r\n\r\n* \"Official Website\":http://www.amebaspgame.com/ace_wonderland/lp/pc/index.html\r\n* \"Official Blog\":http://ameblo.jp/ace-wonderland/\r\n* \"iTunes Store web page\":https://itunes.apple.com/jp/app/esunowandarando/id586832423",
+              "response_truncated": false,
+              "search_text_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+              "status": "source_backed"
+            }
+          ],
+          "matched_documents": [
+            {
+              "title": "a's_wonderland",
+              "original": "[b]A's Wonderland[/b] is a card battle RPG for iOS by CyberAgent, Inc.\r\nThe setting of the game is based off of [i][[Alice's Adventures in Wonderland]][/i].\r\n\r\nh4. External links\r\n\r\n* \"Official Website\":http://www.amebaspgame.com/ace_wonderland/lp/pc/index.html\r\n* \"Official Blog\":http://ameblo.jp/ace-wonderland/\r\n* \"iTunes Store web page\":https://itunes.apple.com/jp/app/esunowandarando/id586832423",
+              "response_truncated": false,
+              "search_text_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+              "status": "source_backed"
+            }
+          ],
+          "aliases": [
+            {
+              "text": "a's_wonderland",
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+              "status": "source_backed"
+            }
+          ],
+          "identity_evidence": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+              "status": "source_backed",
+              "type": "page",
+              "locator": null
+            }
+          ],
+          "source_fields": {},
+          "source_fields_evidence": [],
+          "source_fields_truncated": [],
+          "identity_evidence_truncated": false,
+          "matched_by": "alias",
+          "source_id": "danbooru-complete-a26a3829dd42",
+          "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+          "citations": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433"
+            }
+          ]
+        },
+        {
+          "entry_key": {
+            "kind": "tag",
+            "namespace": "local.tag_aggregate",
+            "value": "a's_wonderland"
+          },
+          "locator": null,
+          "descriptions": [],
+          "matched_documents": [],
+          "aliases": [],
+          "identity_evidence": [
+            {
+              "source_id": "tag_wiki-complete-a2eb055c578d",
+              "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1075",
+              "status": "source_backed",
+              "type": "tag",
+              "locator": null
+            }
+          ],
+          "source_fields": {},
+          "source_fields_evidence": [],
+          "source_fields_truncated": [],
+          "identity_evidence_truncated": false,
+          "matched_by": "exact",
+          "source_id": "tag_wiki-complete-a2eb055c578d",
+          "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1075",
+          "citations": [
+            {
+              "source_id": "tag_wiki-complete-a2eb055c578d",
+              "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1075"
+            }
+          ]
+        },
+        {
+          "entry_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "8789"
+          },
+          "locator": null,
+          "descriptions": [
+            {
+              "title": "white_rabbit_(alice_in_wonderland)",
+              "original": "A character in Lewis Carroll's book [[Alice's Adventures in Wonderland]]. Often drawn holding a [[pocket watch]] or next to a large [[clock]].\r\n\r\nh4. See also\r\n\r\n* [[White Rabbit (Disney)]] ([[Alice in Wonderland (Disney)]])\r\n* [[White Rabbit pointing at a clock (meme)]]",
+              "response_truncated": false,
+              "search_text_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001",
+              "status": "source_backed"
+            }
+          ],
+          "matched_documents": [
+            {
+              "title": "white_rabbit_(alice_in_wonderland)",
+              "original": "A character in Lewis Carroll's book [[Alice's Adventures in Wonderland]]. Often drawn holding a [[pocket watch]] or next to a large [[clock]].\r\n\r\nh4. See also\r\n\r\n* [[White Rabbit (Disney)]] ([[Alice in Wonderland (Disney)]])\r\n* [[White Rabbit pointing at a clock (meme)]]",
+              "response_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001"
+            }
+          ],
+          "aliases": [],
+          "identity_evidence": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001",
+              "status": "source_backed",
+              "type": "page",
+              "locator": null
+            }
+          ],
+          "source_fields": {},
+          "source_fields_evidence": [],
+          "source_fields_truncated": [],
+          "identity_evidence_truncated": false,
+          "matched_by": "fts",
+          "source_id": "danbooru-complete-a26a3829dd42",
+          "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001",
+          "citations": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001"
+            }
+          ],
+          "score": -20.895929830140126
+        },
+        {
+          "entry_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "8793"
+          },
+          "locator": null,
+          "descriptions": [
+            {
+              "title": "dormouse_(alice_in_wonderland)",
+              "original": "A character in \"A Mad Tea Party\", often popularly known as \"The [[Mad Hatter (alice In Wonderland)|]]'s Tea Party\", from [[Alice's Adventures in Wonderland]] by Lewis Carroll. This mouse is terrified of cats and appears to be a narcoleptic.",
+              "response_truncated": false,
+              "search_text_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005",
+              "status": "source_backed"
+            }
+          ],
+          "matched_documents": [
+            {
+              "title": "dormouse_(alice_in_wonderland)",
+              "original": "A character in \"A Mad Tea Party\", often popularly known as \"The [[Mad Hatter (alice In Wonderland)|]]'s Tea Party\", from [[Alice's Adventures in Wonderland]] by Lewis Carroll. This mouse is terrified of cats and appears to be a narcoleptic.",
+              "response_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005"
+            }
+          ],
+          "aliases": [],
+          "identity_evidence": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005",
+              "status": "source_backed",
+              "type": "page",
+              "locator": null
+            }
+          ],
+          "source_fields": {},
+          "source_fields_evidence": [],
+          "source_fields_truncated": [],
+          "identity_evidence_truncated": false,
+          "matched_by": "fts",
+          "source_id": "danbooru-complete-a26a3829dd42",
+          "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005",
+          "citations": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005"
+            }
+          ],
+          "score": -20.782963286550412
+        },
+        {
+          "entry_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "8379"
+          },
+          "locator": null,
+          "descriptions": [
+            {
+              "title": "alice's_adventures_in_wonderland",
+              "original": "A book duology by English author [[Lewis Carroll]] as well as a large media franchise which resulted from them, tagged here with the name of the first book.\r\n\r\nThe first book, [i]Alice's Adventures in Wonderland[/i] (1865), tells the story of a girl named Alice, who falls down a rabbit hole into a fantasy world populated by peculiar and anthropomorphic creatures. [i]Through the Looking-Glass, and What Alice Found There[/i] (1871) is a continuation in which Alice goes through the titular looking glass and enters a world that works like a chess board. Once again, Alice finds various peculiar and anthropomorphic creatures and has to deal with their eccentricities.\r\n\r\nBetween the original story arriving in Japan just as the country was opening up in the late 1800s and the extremely popular [[Disney]] adaptation, the story has remained as a permanent part of Japanese literature and fashion. \r\n\r\nh4. Characters\r\n\r\n* [[Alice (alice in wonderland)|]]\r\n* [[Caterpillar (alice in wonderland)|]]\r\n* [[Cheshire Cat (alice In Wonderland)|]]\r\n* [[Dodo (alice in wonderland)|]]\r\n* [[Dormouse (alice in wonderland)|]]\r\n* [[Duck (alice in wonderland)|]]\r\n* [[Jabberwock (alice in wonderland)|]]\r\n* [[Mad Hatter (alice In Wonderland)|]]\r\n* [[March Hare (alice In Wonderland)|]]\r\n* [[Queen of Hearts (alice in wonderland)|]]\r\n* [[Red Queen]]\r\n* [[Tweedledee (alice in wonderland)|]]\r\n* [[Tweedledum (alice in wonderland)|]]\r\n* [[White Rabbit (alice In Wonderland)|]]\r\n* [[White Queen]]\r\n\r\nh4. Copyrights\r\n\r\n* [[Alice in Wonderland (Disney)]]\r\n** [[Alice in Wonderland (Tim Burton)]]\r\n* [[American McGee's Alice]]\r\n** [[Alice: Madness Returns]]\r\n* [[Neco z Alenky]]\r\n\r\nh4. See also\r\n\r\n* [[Grimms' Fairy Tales]]\r\n\r\nh4. External links\r\n\r\n* \"Wikipedia: Alice's Adventures in Wonderland\":[https://en.wikipedia.org/wiki/Alice%27s_Adventures_in_Wonderland]\r\n* \"Wikipedia: Through the Looking-Glass, and What Alice Found There\":[https://en.wikipedia.org/wiki/Through_the_Looking-Glass]",
+              "response_truncated": false,
+              "search_text_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642",
+              "status": "source_backed"
+            }
+          ],
+          "matched_documents": [
+            {
+              "title": "alice's_adventures_in_wonderland",
+              "original": "A book duology by English author [[Lewis Carroll]] as well as a large media franchise which resulted from them, tagged here with the name of the first book.\r\n\r\nThe first book, [i]Alice's Adventures in Wonderland[/i] (1865), tells the story of a girl named Alice, who falls down a rabbit hole into a fantasy world populated by peculiar and anthropomorphic creatures. [i]Through the Looking-Glass, and What Alice Found There[/i] (1871) is a continuation in which Alice goes through the titular looking glass and enters a world that works like a chess board. Once again, Alice finds various peculiar and anthropomorphic creatures and has to deal with their eccentricities.\r\n\r\nBetween the original story arriving in Japan just as the country was opening up in the late 1800s and the extremely popular [[Disney]] adaptation, the story has remained as a permanent part of Japanese literature and fashion. \r\n\r\nh4. Characters\r\n\r\n* [[Alice (alice in wonderland)|]]\r\n* [[Caterpillar (alice in wonderland)|]]\r\n* [[Cheshire Cat (alice In Wonderland)|]]\r\n* [[Dodo (alice in wonderland)|]]\r\n* [[Dormouse (alice in wonderland)|]]\r\n* [[Duck (alice in wonderland)|]]\r\n* [[Jabberwock (alice in wonderland)|]]\r\n* [[Mad Hatter (alice In Wonderland)|]]\r\n* [[March Hare (alice In Wonderland)|]]\r\n* [[Queen of Hearts (alice in wonderland)|]]\r\n* [[Red Queen]]\r\n* [[Tweedledee (alice in wonderland)|]]\r\n* [[Tweedledum (alice in wonderland)|]]\r\n* [[White Rabbit (alice In Wonderland)|]]\r\n* [[White Queen]]\r\n\r\nh4. Copyrights\r\n\r\n* [[Alice in Wonderland (Disney)]]\r\n** [[Alice in Wonderland (Tim Burton)]]\r\n* [[American McGee's Alice]]\r\n** [[Alice: Madness Returns]]\r\n* [[Neco z Alenky]]\r\n\r\nh4. See also\r\n\r\n* [[Grimms' Fairy Tales]]\r\n\r\nh4. External links\r\n\r\n* \"Wikipedia: Alice's Adventures in Wonderland\":[https://en.wikipedia.org/wiki/Alice%27s_Adventures_in_Wonderland]\r\n* \"Wikipedia: Through the Looking-Glass, and What Alice Found There\":[https://en.wikipedia.org/wiki/Through_the_Looking-Glass]",
+              "response_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642"
+            }
+          ],
+          "aliases": [],
+          "identity_evidence": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642",
+              "status": "source_backed",
+              "type": "page",
+              "locator": null
+            }
+          ],
+          "source_fields": {},
+          "source_fields_evidence": [],
+          "source_fields_truncated": [],
+          "identity_evidence_truncated": false,
+          "matched_by": "fts",
+          "source_id": "danbooru-complete-a26a3829dd42",
+          "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642",
+          "citations": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642"
+            }
+          ],
+          "score": -20.701665200899022
+        },
+        {
+          "entry_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "110516"
+          },
+          "locator": null,
+          "descriptions": [
+            {
+              "title": "alice_(alicesoft)",
+              "original": "[[Alicesoft]]'s mascot, a [[blonde hair|blonde]] girl wearing a [[blue dress]] and a [[white apron]].\r\n\r\nHer appearance is based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].",
+              "response_truncated": false,
+              "search_text_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192",
+              "status": "source_backed"
+            }
+          ],
+          "matched_documents": [
+            {
+              "title": "alice_(alicesoft)",
+              "original": "[[Alicesoft]]'s mascot, a [[blonde hair|blonde]] girl wearing a [[blue dress]] and a [[white apron]].\r\n\r\nHer appearance is based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].",
+              "response_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192"
+            }
+          ],
+          "aliases": [],
+          "identity_evidence": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192",
+              "status": "source_backed",
+              "type": "page",
+              "locator": null
+            }
+          ],
+          "source_fields": {},
+          "source_fields_evidence": [],
+          "source_fields_truncated": [],
+          "identity_evidence_truncated": false,
+          "matched_by": "fts",
+          "source_id": "danbooru-complete-a26a3829dd42",
+          "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192",
+          "citations": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192"
+            }
+          ],
+          "score": -20.399896980045902
+        },
+        {
+          "entry_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "112801"
+          },
+          "locator": null,
+          "descriptions": [
+            {
+              "title": "alice_(cat_busters)",
+              "original": "A 5-star Plant element [[Cat Busters]] character based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].\r\n\r\nh4. Appearance\r\n* !asset #41328012: Default\r\n* !asset #41328032: Awakened\r\n* !asset #41329746: [[alice (wonderland) (cat busters)|Wonderland]]\r\n* !asset #41395037: Wonderland (Awakened)",
+              "response_truncated": false,
+              "search_text_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477",
+              "status": "source_backed"
+            }
+          ],
+          "matched_documents": [
+            {
+              "title": "alice_(cat_busters)",
+              "original": "A 5-star Plant element [[Cat Busters]] character based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].\r\n\r\nh4. Appearance\r\n* !asset #41328012: Default\r\n* !asset #41328032: Awakened\r\n* !asset #41329746: [[alice (wonderland) (cat busters)|Wonderland]]\r\n* !asset #41395037: Wonderland (Awakened)",
+              "response_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477"
+            }
+          ],
+          "aliases": [],
+          "identity_evidence": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477",
+              "status": "source_backed",
+              "type": "page",
+              "locator": null
+            }
+          ],
+          "source_fields": {},
+          "source_fields_evidence": [],
+          "source_fields_truncated": [],
+          "identity_evidence_truncated": false,
+          "matched_by": "fts",
+          "source_id": "danbooru-complete-a26a3829dd42",
+          "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477",
+          "citations": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477"
+            }
+          ],
+          "score": -20.27178242015498
+        },
+        {
+          "entry_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "21892"
+          },
+          "locator": null,
+          "descriptions": [
+            {
+              "title": "caterpillar_(alice_in_wonderland)",
+              "original": "A character appearing in [[Alice's Adventures in Wonderland]]. It is seen smoking a [[hookah]] while sitting on a [[mushroom]].",
+              "response_truncated": false,
+              "search_text_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269",
+              "status": "source_backed"
+            }
+          ],
+          "matched_documents": [
+            {
+              "title": "caterpillar_(alice_in_wonderland)",
+              "original": "A character appearing in [[Alice's Adventures in Wonderland]]. It is seen smoking a [[hookah]] while sitting on a [[mushroom]].",
+              "response_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269"
+            }
+          ],
+          "aliases": [],
+          "identity_evidence": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269",
+              "status": "source_backed",
+              "type": "page",
+              "locator": null
+            }
+          ],
+          "source_fields": {},
+          "source_fields_evidence": [],
+          "source_fields_truncated": [],
+          "identity_evidence_truncated": false,
+          "matched_by": "fts",
+          "source_id": "danbooru-complete-a26a3829dd42",
+          "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269",
+          "citations": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269"
+            }
+          ],
+          "score": -20.267046094961955
+        },
+        {
+          "entry_key": {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "8792"
+          },
+          "locator": null,
+          "descriptions": [
+            {
+              "title": "march_hare_(alice_in_wonderland)",
+              "original": "The March Hare, often called the Mad March Hare, is a character who appears in the tea party scene in Lewis Carroll's [[Alice's Adventures in Wonderland]].\r\n\r\nHis friend is the [[Mad Hatter (alice In Wonderland)|]].\r\n\r\nh4. See also\r\n\r\n* [[March Hare (Disney)]] ([[Alice in Wonderland (Disney)]])",
+              "response_truncated": false,
+              "search_text_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004",
+              "status": "source_backed"
+            }
+          ],
+          "matched_documents": [
+            {
+              "title": "march_hare_(alice_in_wonderland)",
+              "original": "The March Hare, often called the Mad March Hare, is a character who appears in the tea party scene in Lewis Carroll's [[Alice's Adventures in Wonderland]].\r\n\r\nHis friend is the [[Mad Hatter (alice In Wonderland)|]].\r\n\r\nh4. See also\r\n\r\n* [[March Hare (Disney)]] ([[Alice in Wonderland (Disney)]])",
+              "response_truncated": false,
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004"
+            }
+          ],
+          "aliases": [],
+          "identity_evidence": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004",
+              "status": "source_backed",
+              "type": "page",
+              "locator": null
+            }
+          ],
+          "source_fields": {},
+          "source_fields_evidence": [],
+          "source_fields_truncated": [],
+          "identity_evidence_truncated": false,
+          "matched_by": "fts",
+          "source_id": "danbooru-complete-a26a3829dd42",
+          "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004",
+          "citations": [
+            {
+              "source_id": "danbooru-complete-a26a3829dd42",
+              "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004"
+            }
+          ],
+          "score": -20.171487619519702
+        },
+        {
+          "entry_key": {
+            "kind": "subject",
+            "namespace": "bangumi.subject",
+            "value": "642007"
+          },
+          "locator": null,
+          "descriptions": [
+            {
+              "title": "Adventures in Beauty Wonderland",
+              "original": "A joyfully psychedelic animation inspired by Lewis Carroll\u2019s Alice in Wonderland.",
+              "response_truncated": false,
+              "search_text_truncated": false,
+              "source_id": "bangumi-complete-6a75aefb769a",
+              "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760",
+              "status": "source_backed"
+            }
+          ],
+          "matched_documents": [
+            {
+              "title": "Adventures in Beauty Wonderland",
+              "original": "A joyfully psychedelic animation inspired by Lewis Carroll\u2019s Alice in Wonderland.",
+              "response_truncated": false,
+              "source_id": "bangumi-complete-6a75aefb769a",
+              "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760"
+            }
+          ],
+          "aliases": [],
+          "identity_evidence": [
+            {
+              "source_id": "bangumi-complete-6a75aefb769a",
+              "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760",
+              "status": "source_backed",
+              "type": "subject",
+              "locator": null
+            }
+          ],
+          "source_fields": {},
+          "source_fields_evidence": [],
+          "source_fields_truncated": [],
+          "identity_evidence_truncated": false,
+          "matched_by": "fts",
+          "source_id": "bangumi-complete-6a75aefb769a",
+          "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760",
+          "citations": [
+            {
+              "source_id": "bangumi-complete-6a75aefb769a",
+              "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760"
+            }
+          ],
+          "score": -20.17141161057451
+        }
+      ],
+      "descriptions": [],
+      "relations": [],
+      "citations": [],
+      "warnings": []
+    },
+    "open_s": 0.027483699843287468,
+    "search_s": 0.2238361998461187,
+    "serialization_s": 9.600003249943256e-05,
+    "response_bytes": 22595,
+    "profile": {
+      "scanned_rows": 10,
+      "materialized_matched_documents": 8,
+      "returned_matched_body_utf8_bytes": 3516,
+      "exact_identity_assembly_s": 0.0005020999815315008,
+      "fts_execute_first_row_s": 0.2214312998112291,
+      "selected_identities": 8,
+      "fts_select_s": 0.0010038998443633318,
+      "identity_field_assembly_s": 0.00062039983458817,
+      "matched_document_read_s": 7.6299998909235e-05
+    }
+  },
+  "rust": {
+    "argv": [
+      "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\release\\examples\\profile_search.exe",
+      "D:\\SakuraTool\\SakuraKnowledge\\build\\snapshot-full-20bf5b3\\knowledge.sqlite"
+    ],
+    "exit": 0,
+    "elapsed_s": 0.36004039994440973,
+    "outer_timeout": false,
+    "timeout": false,
+    "attempted": 1,
+    "succeeded": 1,
+    "other_error": 0,
+    "stdout_base64": "eyJvcGVuX3MiOjAuMDA2NDAwNCwicHJvZmlsZSI6eyJleGFjdF9pZGVudGl0eV9hc3NlbWJseV9zIjowLjAwMDU2ODcsImZ0c19leGVjdXRlX3NlbGVjdF9zIjowLjE4MTk2MzEsImlkZW50aXR5X2ZpZWxkX2Fzc2VtYmx5X3MiOjAuMDAwNjMxNiwibWF0Y2hlZF9kb2N1bWVudF9yZWFkX3MiOjAuMDAwMDg1MywibWF0ZXJpYWxpemVkX21hdGNoZWRfZG9jdW1lbnRzIjo4LCJyZXR1cm5lZF9tYXRjaGVkX2JvZHlfdXRmOF9ieXRlcyI6MzUxNiwic2Nhbm5lZF9yb3dzIjoxMCwic2VsZWN0ZWRfaWRlbnRpdGllcyI6OH0sInF1ZXJ5IjoiYSdzX3dvbmRlcmxhbmQiLCJyZXNwb25zZV9ieXRlcyI6MjI1OTUsInJ1bnRpbWUiOnsiY29udHJhY3RfdmVyc2lvbiI6IjIiLCJub3JtYWxpemF0aW9uX2xpYnJhcnlfdW5pY29kZSI6IigxNywgMCwgMCkiLCJydW50aW1lIjoicnVzdCIsInNxbGl0ZV92ZXJzaW9uIjoiMy40NS4wIiwidW5pY29kZV92ZXJzaW9uIjoiMTYuMC4wIn0sInNlYXJjaF9zIjowLjE4MzQ5MDMsInNlcmlhbGl6YXRpb25fcyI6MC4wMDAwMTgsInRvcGsiOjEwLCJ2YWx1ZSI6eyJjYW5kaWRhdGVzIjpbeyJhbGlhc2VzIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6NDA0MzMiLCJzb3VyY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDIiLCJzdGF0dXMiOiJzb3VyY2VfYmFja2VkIiwidGV4dCI6ImEnc193b25kZXJsYW5kIn1dLCJjaXRhdGlvbnMiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTo0MDQzMyIsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiJ9XSwiZGVzY3JpcHRpb25zIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6NDA0MzMiLCJvcmlnaW5hbCI6IltiXUEncyBXb25kZXJsYW5kWy9iXSBpcyBhIGNhcmQgYmF0dGxlIFJQRyBmb3IgaU9TIGJ5IEN5YmVyQWdlbnQsIEluYy5cclxuVGhlIHNldHRpbmcgb2YgdGhlIGdhbWUgaXMgYmFzZWQgb2ZmIG9mIFtpXVtbQWxpY2UncyBBZHZlbnR1cmVzIGluIFdvbmRlcmxhbmRdXVsvaV0uXHJcblxyXG5oNC4gRXh0ZXJuYWwgbGlua3NcclxuXHJcbiogXCJPZmZpY2lhbCBXZWJzaXRlXCI6aHR0cDovL3d3dy5hbWViYXNwZ2FtZS5jb20vYWNlX3dvbmRlcmxhbmQvbHAvcGMvaW5kZXguaHRtbFxyXG4qIFwiT2ZmaWNpYWwgQmxvZ1wiOmh0dHA6Ly9hbWVibG8uanAvYWNlLXdvbmRlcmxhbmQvXHJcbiogXCJpVHVuZXMgU3RvcmUgd2ViIHBhZ2VcIjpodHRwczovL2l0dW5lcy5hcHBsZS5jb20vanAvYXBwL2VzdW5vd2FuZGFyYW5kby9pZDU4NjgzMjQyMyIsInJlc3BvbnNlX3RydW5jYXRlZCI6ZmFsc2UsInNlYXJjaF90ZXh0X3RydW5jYXRlZCI6ZmFsc2UsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiIsInN0YXR1cyI6InNvdXJjZV9iYWNrZWQiLCJ0aXRsZSI6ImEnc193b25kZXJsYW5kIn1dLCJlbnRyeV9rZXkiOnsia2luZCI6InBhZ2UiLCJuYW1lc3BhY2UiOiJkYW5ib29ydS53aWtpIiwidmFsdWUiOiI0NjUyMCJ9LCJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6NDA0MzMiLCJpZGVudGl0eV9ldmlkZW5jZSI6W3siZXZpZGVuY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDI6YTI2YTM4MjlkZDQyMTU1ODQ4MzkyYzA2MzZkYWViZDZjYTAxYWNmNTQwZDM1MDlmZWMyYWMzMjE5Zjg1OTZjNTpsaW5lOjQwNDMzIiwibG9jYXRvciI6bnVsbCwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwic3RhdHVzIjoic291cmNlX2JhY2tlZCIsInR5cGUiOiJwYWdlIn1dLCJpZGVudGl0eV9ldmlkZW5jZV90cnVuY2F0ZWQiOmZhbHNlLCJsb2NhdG9yIjpudWxsLCJtYXRjaGVkX2J5IjoiYWxpYXMiLCJtYXRjaGVkX2RvY3VtZW50cyI6W3siZXZpZGVuY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDI6YTI2YTM4MjlkZDQyMTU1ODQ4MzkyYzA2MzZkYWViZDZjYTAxYWNmNTQwZDM1MDlmZWMyYWMzMjE5Zjg1OTZjNTpsaW5lOjQwNDMzIiwib3JpZ2luYWwiOiJbYl1BJ3MgV29uZGVybGFuZFsvYl0gaXMgYSBjYXJkIGJhdHRsZSBSUEcgZm9yIGlPUyBieSBDeWJlckFnZW50LCBJbmMuXHJcblRoZSBzZXR0aW5nIG9mIHRoZSBnYW1lIGlzIGJhc2VkIG9mZiBvZiBbaV1bW0FsaWNlJ3MgQWR2ZW50dXJlcyBpbiBXb25kZXJsYW5kXV1bL2ldLlxyXG5cclxuaDQuIEV4dGVybmFsIGxpbmtzXHJcblxyXG4qIFwiT2ZmaWNpYWwgV2Vic2l0ZVwiOmh0dHA6Ly93d3cuYW1lYmFzcGdhbWUuY29tL2FjZV93b25kZXJsYW5kL2xwL3BjL2luZGV4Lmh0bWxcclxuKiBcIk9mZmljaWFsIEJsb2dcIjpodHRwOi8vYW1lYmxvLmpwL2FjZS13b25kZXJsYW5kL1xyXG4qIFwiaVR1bmVzIFN0b3JlIHdlYiBwYWdlXCI6aHR0cHM6Ly9pdHVuZXMuYXBwbGUuY29tL2pwL2FwcC9lc3Vub3dhbmRhcmFuZG8vaWQ1ODY4MzI0MjMiLCJyZXNwb25zZV90cnVuY2F0ZWQiOmZhbHNlLCJzZWFyY2hfdGV4dF90cnVuY2F0ZWQiOmZhbHNlLCJzb3VyY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDIiLCJzdGF0dXMiOiJzb3VyY2VfYmFja2VkIiwidGl0bGUiOiJhJ3Nfd29uZGVybGFuZCJ9XSwic291cmNlX2ZpZWxkcyI6e30sInNvdXJjZV9maWVsZHNfZXZpZGVuY2UiOltdLCJzb3VyY2VfZmllbGRzX3RydW5jYXRlZCI6W10sInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiJ9LHsiYWxpYXNlcyI6W10sImNpdGF0aW9ucyI6W3siZXZpZGVuY2VfaWQiOiJ0YWdfd2lraS1jb21wbGV0ZS1hMmViMDU1YzU3OGQ6YTJlYjA1NWM1NzhkMzdlODJiNzFkZjc4N2NkMTFiNzYxNmU3Nzc2OGViMzE5Y2YwODM5ODMxY2ZkYmIyOGZlZjpsaW5lOjEwNzUiLCJzb3VyY2VfaWQiOiJ0YWdfd2lraS1jb21wbGV0ZS1hMmViMDU1YzU3OGQifV0sImRlc2NyaXB0aW9ucyI6W10sImVudHJ5X2tleSI6eyJraW5kIjoidGFnIiwibmFtZXNwYWNlIjoibG9jYWwudGFnX2FnZ3JlZ2F0ZSIsInZhbHVlIjoiYSdzX3dvbmRlcmxhbmQifSwiZXZpZGVuY2VfaWQiOiJ0YWdfd2lraS1jb21wbGV0ZS1hMmViMDU1YzU3OGQ6YTJlYjA1NWM1NzhkMzdlODJiNzFkZjc4N2NkMTFiNzYxNmU3Nzc2OGViMzE5Y2YwODM5ODMxY2ZkYmIyOGZlZjpsaW5lOjEwNzUiLCJpZGVudGl0eV9ldmlkZW5jZSI6W3siZXZpZGVuY2VfaWQiOiJ0YWdfd2lraS1jb21wbGV0ZS1hMmViMDU1YzU3OGQ6YTJlYjA1NWM1NzhkMzdlODJiNzFkZjc4N2NkMTFiNzYxNmU3Nzc2OGViMzE5Y2YwODM5ODMxY2ZkYmIyOGZlZjpsaW5lOjEwNzUiLCJsb2NhdG9yIjpudWxsLCJzb3VyY2VfaWQiOiJ0YWdfd2lraS1jb21wbGV0ZS1hMmViMDU1YzU3OGQiLCJzdGF0dXMiOiJzb3VyY2VfYmFja2VkIiwidHlwZSI6InRhZyJ9XSwiaWRlbnRpdHlfZXZpZGVuY2VfdHJ1bmNhdGVkIjpmYWxzZSwibG9jYXRvciI6bnVsbCwibWF0Y2hlZF9ieSI6ImV4YWN0IiwibWF0Y2hlZF9kb2N1bWVudHMiOltdLCJzb3VyY2VfZmllbGRzIjp7fSwic291cmNlX2ZpZWxkc19ldmlkZW5jZSI6W10sInNvdXJjZV9maWVsZHNfdHJ1bmNhdGVkIjpbXSwic291cmNlX2lkIjoidGFnX3dpa2ktY29tcGxldGUtYTJlYjA1NWM1NzhkIn0seyJhbGlhc2VzIjpbXSwiY2l0YXRpb25zIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6NDAwMSIsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiJ9XSwiZGVzY3JpcHRpb25zIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6NDAwMSIsIm9yaWdpbmFsIjoiQSBjaGFyYWN0ZXIgaW4gTGV3aXMgQ2Fycm9sbCdzIGJvb2sgW1tBbGljZSdzIEFkdmVudHVyZXMgaW4gV29uZGVybGFuZF1dLiBPZnRlbiBkcmF3biBob2xkaW5nIGEgW1twb2NrZXQgd2F0Y2hdXSBvciBuZXh0IHRvIGEgbGFyZ2UgW1tjbG9ja11dLlxyXG5cclxuaDQuIFNlZSBhbHNvXHJcblxyXG4qIFtbV2hpdGUgUmFiYml0IChEaXNuZXkpXV0gKFtbQWxpY2UgaW4gV29uZGVybGFuZCAoRGlzbmV5KV1dKVxyXG4qIFtbV2hpdGUgUmFiYml0IHBvaW50aW5nIGF0IGEgY2xvY2sgKG1lbWUpXV0iLCJyZXNwb25zZV90cnVuY2F0ZWQiOmZhbHNlLCJzZWFyY2hfdGV4dF90cnVuY2F0ZWQiOmZhbHNlLCJzb3VyY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDIiLCJzdGF0dXMiOiJzb3VyY2VfYmFja2VkIiwidGl0bGUiOiJ3aGl0ZV9yYWJiaXRfKGFsaWNlX2luX3dvbmRlcmxhbmQpIn1dLCJlbnRyeV9rZXkiOnsia2luZCI6InBhZ2UiLCJuYW1lc3BhY2UiOiJkYW5ib29ydS53aWtpIiwidmFsdWUiOiI4Nzg5In0sImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTo0MDAxIiwiaWRlbnRpdHlfZXZpZGVuY2UiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTo0MDAxIiwibG9jYXRvciI6bnVsbCwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwic3RhdHVzIjoic291cmNlX2JhY2tlZCIsInR5cGUiOiJwYWdlIn1dLCJpZGVudGl0eV9ldmlkZW5jZV90cnVuY2F0ZWQiOmZhbHNlLCJsb2NhdG9yIjpudWxsLCJtYXRjaGVkX2J5IjoiZnRzIiwibWF0Y2hlZF9kb2N1bWVudHMiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTo0MDAxIiwib3JpZ2luYWwiOiJBIGNoYXJhY3RlciBpbiBMZXdpcyBDYXJyb2xsJ3MgYm9vayBbW0FsaWNlJ3MgQWR2ZW50dXJlcyBpbiBXb25kZXJsYW5kXV0uIE9mdGVuIGRyYXduIGhvbGRpbmcgYSBbW3BvY2tldCB3YXRjaF1dIG9yIG5leHQgdG8gYSBsYXJnZSBbW2Nsb2NrXV0uXHJcblxyXG5oNC4gU2VlIGFsc29cclxuXHJcbiogW1tXaGl0ZSBSYWJiaXQgKERpc25leSldXSAoW1tBbGljZSBpbiBXb25kZXJsYW5kIChEaXNuZXkpXV0pXHJcbiogW1tXaGl0ZSBSYWJiaXQgcG9pbnRpbmcgYXQgYSBjbG9jayAobWVtZSldXSIsInJlc3BvbnNlX3RydW5jYXRlZCI6ZmFsc2UsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiIsInRpdGxlIjoid2hpdGVfcmFiYml0XyhhbGljZV9pbl93b25kZXJsYW5kKSJ9XSwic2NvcmUiOi0yMC44OTU5Mjk4MzAxNDAxMjYsInNvdXJjZV9maWVsZHMiOnt9LCJzb3VyY2VfZmllbGRzX2V2aWRlbmNlIjpbXSwic291cmNlX2ZpZWxkc190cnVuY2F0ZWQiOltdLCJzb3VyY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDIifSx7ImFsaWFzZXMiOltdLCJjaXRhdGlvbnMiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTo0MDA1Iiwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIn1dLCJkZXNjcmlwdGlvbnMiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTo0MDA1Iiwib3JpZ2luYWwiOiJBIGNoYXJhY3RlciBpbiBcIkEgTWFkIFRlYSBQYXJ0eVwiLCBvZnRlbiBwb3B1bGFybHkga25vd24gYXMgXCJUaGUgW1tNYWQgSGF0dGVyIChhbGljZSBJbiBXb25kZXJsYW5kKXxdXSdzIFRlYSBQYXJ0eVwiLCBmcm9tIFtbQWxpY2UncyBBZHZlbnR1cmVzIGluIFdvbmRlcmxhbmRdXSBieSBMZXdpcyBDYXJyb2xsLiBUaGlzIG1vdXNlIGlzIHRlcnJpZmllZCBvZiBjYXRzIGFuZCBhcHBlYXJzIHRvIGJlIGEgbmFyY29sZXB0aWMuIiwicmVzcG9uc2VfdHJ1bmNhdGVkIjpmYWxzZSwic2VhcmNoX3RleHRfdHJ1bmNhdGVkIjpmYWxzZSwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwic3RhdHVzIjoic291cmNlX2JhY2tlZCIsInRpdGxlIjoiZG9ybW91c2VfKGFsaWNlX2luX3dvbmRlcmxhbmQpIn1dLCJlbnRyeV9rZXkiOnsia2luZCI6InBhZ2UiLCJuYW1lc3BhY2UiOiJkYW5ib29ydS53aWtpIiwidmFsdWUiOiI4NzkzIn0sImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTo0MDA1IiwiaWRlbnRpdHlfZXZpZGVuY2UiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTo0MDA1IiwibG9jYXRvciI6bnVsbCwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwic3RhdHVzIjoic291cmNlX2JhY2tlZCIsInR5cGUiOiJwYWdlIn1dLCJpZGVudGl0eV9ldmlkZW5jZV90cnVuY2F0ZWQiOmZhbHNlLCJsb2NhdG9yIjpudWxsLCJtYXRjaGVkX2J5IjoiZnRzIiwibWF0Y2hlZF9kb2N1bWVudHMiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTo0MDA1Iiwib3JpZ2luYWwiOiJBIGNoYXJhY3RlciBpbiBcIkEgTWFkIFRlYSBQYXJ0eVwiLCBvZnRlbiBwb3B1bGFybHkga25vd24gYXMgXCJUaGUgW1tNYWQgSGF0dGVyIChhbGljZSBJbiBXb25kZXJsYW5kKXxdXSdzIFRlYSBQYXJ0eVwiLCBmcm9tIFtbQWxpY2UncyBBZHZlbnR1cmVzIGluIFdvbmRlcmxhbmRdXSBieSBMZXdpcyBDYXJyb2xsLiBUaGlzIG1vdXNlIGlzIHRlcnJpZmllZCBvZiBjYXRzIGFuZCBhcHBlYXJzIHRvIGJlIGEgbmFyY29sZXB0aWMuIiwicmVzcG9uc2VfdHJ1bmNhdGVkIjpmYWxzZSwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwidGl0bGUiOiJkb3Jtb3VzZV8oYWxpY2VfaW5fd29uZGVybGFuZCkifV0sInNjb3JlIjotMjAuNzgyOTYzMjg2NTUwNDEyLCJzb3VyY2VfZmllbGRzIjp7fSwic291cmNlX2ZpZWxkc19ldmlkZW5jZSI6W10sInNvdXJjZV9maWVsZHNfdHJ1bmNhdGVkIjpbXSwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIn0seyJhbGlhc2VzIjpbXSwiY2l0YXRpb25zIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6MzY0MiIsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiJ9XSwiZGVzY3JpcHRpb25zIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6MzY0MiIsIm9yaWdpbmFsIjoiQSBib29rIGR1b2xvZ3kgYnkgRW5nbGlzaCBhdXRob3IgW1tMZXdpcyBDYXJyb2xsXV0gYXMgd2VsbCBhcyBhIGxhcmdlIG1lZGlhIGZyYW5jaGlzZSB3aGljaCByZXN1bHRlZCBmcm9tIHRoZW0sIHRhZ2dlZCBoZXJlIHdpdGggdGhlIG5hbWUgb2YgdGhlIGZpcnN0IGJvb2suXHJcblxyXG5UaGUgZmlyc3QgYm9vaywgW2ldQWxpY2UncyBBZHZlbnR1cmVzIGluIFdvbmRlcmxhbmRbL2ldICgxODY1KSwgdGVsbHMgdGhlIHN0b3J5IG9mIGEgZ2lybCBuYW1lZCBBbGljZSwgd2hvIGZhbGxzIGRvd24gYSByYWJiaXQgaG9sZSBpbnRvIGEgZmFudGFzeSB3b3JsZCBwb3B1bGF0ZWQgYnkgcGVjdWxpYXIgYW5kIGFudGhyb3BvbW9ycGhpYyBjcmVhdHVyZXMuIFtpXVRocm91Z2ggdGhlIExvb2tpbmctR2xhc3MsIGFuZCBXaGF0IEFsaWNlIEZvdW5kIFRoZXJlWy9pXSAoMTg3MSkgaXMgYSBjb250aW51YXRpb24gaW4gd2hpY2ggQWxpY2UgZ29lcyB0aHJvdWdoIHRoZSB0aXR1bGFyIGxvb2tpbmcgZ2xhc3MgYW5kIGVudGVycyBhIHdvcmxkIHRoYXQgd29ya3MgbGlrZSBhIGNoZXNzIGJvYXJkLiBPbmNlIGFnYWluLCBBbGljZSBmaW5kcyB2YXJpb3VzIHBlY3VsaWFyIGFuZCBhbnRocm9wb21vcnBoaWMgY3JlYXR1cmVzIGFuZCBoYXMgdG8gZGVhbCB3aXRoIHRoZWlyIGVjY2VudHJpY2l0aWVzLlxyXG5cclxuQmV0d2VlbiB0aGUgb3JpZ2luYWwgc3RvcnkgYXJyaXZpbmcgaW4gSmFwYW4ganVzdCBhcyB0aGUgY291bnRyeSB3YXMgb3BlbmluZyB1cCBpbiB0aGUgbGF0ZSAxODAwcyBhbmQgdGhlIGV4dHJlbWVseSBwb3B1bGFyIFtbRGlzbmV5XV0gYWRhcHRhdGlvbiwgdGhlIHN0b3J5IGhhcyByZW1haW5lZCBhcyBhIHBlcm1hbmVudCBwYXJ0IG9mIEphcGFuZXNlIGxpdGVyYXR1cmUgYW5kIGZhc2hpb24uIFxyXG5cclxuaDQuIENoYXJhY3RlcnNcclxuXHJcbiogW1tBbGljZSAoYWxpY2UgaW4gd29uZGVybGFuZCl8XV1cclxuKiBbW0NhdGVycGlsbGFyIChhbGljZSBpbiB3b25kZXJsYW5kKXxdXVxyXG4qIFtbQ2hlc2hpcmUgQ2F0IChhbGljZSBJbiBXb25kZXJsYW5kKXxdXVxyXG4qIFtbRG9kbyAoYWxpY2UgaW4gd29uZGVybGFuZCl8XV1cclxuKiBbW0Rvcm1vdXNlIChhbGljZSBpbiB3b25kZXJsYW5kKXxdXVxyXG4qIFtbRHVjayAoYWxpY2UgaW4gd29uZGVybGFuZCl8XV1cclxuKiBbW0phYmJlcndvY2sgKGFsaWNlIGluIHdvbmRlcmxhbmQpfF1dXHJcbiogW1tNYWQgSGF0dGVyIChhbGljZSBJbiBXb25kZXJsYW5kKXxdXVxyXG4qIFtbTWFyY2ggSGFyZSAoYWxpY2UgSW4gV29uZGVybGFuZCl8XV1cclxuKiBbW1F1ZWVuIG9mIEhlYXJ0cyAoYWxpY2UgaW4gd29uZGVybGFuZCl8XV1cclxuKiBbW1JlZCBRdWVlbl1dXHJcbiogW1tUd2VlZGxlZGVlIChhbGljZSBpbiB3b25kZXJsYW5kKXxdXVxyXG4qIFtbVHdlZWRsZWR1bSAoYWxpY2UgaW4gd29uZGVybGFuZCl8XV1cclxuKiBbW1doaXRlIFJhYmJpdCAoYWxpY2UgSW4gV29uZGVybGFuZCl8XV1cclxuKiBbW1doaXRlIFF1ZWVuXV1cclxuXHJcbmg0LiBDb3B5cmlnaHRzXHJcblxyXG4qIFtbQWxpY2UgaW4gV29uZGVybGFuZCAoRGlzbmV5KV1dXHJcbioqIFtbQWxpY2UgaW4gV29uZGVybGFuZCAoVGltIEJ1cnRvbildXVxyXG4qIFtbQW1lcmljYW4gTWNHZWUncyBBbGljZV1dXHJcbioqIFtbQWxpY2U6IE1hZG5lc3MgUmV0dXJuc11dXHJcbiogW1tOZWNvIHogQWxlbmt5XV1cclxuXHJcbmg0LiBTZWUgYWxzb1xyXG5cclxuKiBbW0dyaW1tcycgRmFpcnkgVGFsZXNdXVxyXG5cclxuaDQuIEV4dGVybmFsIGxpbmtzXHJcblxyXG4qIFwiV2lraXBlZGlhOiBBbGljZSdzIEFkdmVudHVyZXMgaW4gV29uZGVybGFuZFwiOltodHRwczovL2VuLndpa2lwZWRpYS5vcmcvd2lraS9BbGljZSUyN3NfQWR2ZW50dXJlc19pbl9Xb25kZXJsYW5kXVxyXG4qIFwiV2lraXBlZGlhOiBUaHJvdWdoIHRoZSBMb29raW5nLUdsYXNzLCBhbmQgV2hhdCBBbGljZSBGb3VuZCBUaGVyZVwiOltodHRwczovL2VuLndpa2lwZWRpYS5vcmcvd2lraS9UaHJvdWdoX3RoZV9Mb29raW5nLUdsYXNzXSIsInJlc3BvbnNlX3RydW5jYXRlZCI6ZmFsc2UsInNlYXJjaF90ZXh0X3RydW5jYXRlZCI6ZmFsc2UsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiIsInN0YXR1cyI6InNvdXJjZV9iYWNrZWQiLCJ0aXRsZSI6ImFsaWNlJ3NfYWR2ZW50dXJlc19pbl93b25kZXJsYW5kIn1dLCJlbnRyeV9rZXkiOnsia2luZCI6InBhZ2UiLCJuYW1lc3BhY2UiOiJkYW5ib29ydS53aWtpIiwidmFsdWUiOiI4Mzc5In0sImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTozNjQyIiwiaWRlbnRpdHlfZXZpZGVuY2UiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTozNjQyIiwibG9jYXRvciI6bnVsbCwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwic3RhdHVzIjoic291cmNlX2JhY2tlZCIsInR5cGUiOiJwYWdlIn1dLCJpZGVudGl0eV9ldmlkZW5jZV90cnVuY2F0ZWQiOmZhbHNlLCJsb2NhdG9yIjpudWxsLCJtYXRjaGVkX2J5IjoiZnRzIiwibWF0Y2hlZF9kb2N1bWVudHMiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZTozNjQyIiwib3JpZ2luYWwiOiJBIGJvb2sgZHVvbG9neSBieSBFbmdsaXNoIGF1dGhvciBbW0xld2lzIENhcnJvbGxdXSBhcyB3ZWxsIGFzIGEgbGFyZ2UgbWVkaWEgZnJhbmNoaXNlIHdoaWNoIHJlc3VsdGVkIGZyb20gdGhlbSwgdGFnZ2VkIGhlcmUgd2l0aCB0aGUgbmFtZSBvZiB0aGUgZmlyc3QgYm9vay5cclxuXHJcblRoZSBmaXJzdCBib29rLCBbaV1BbGljZSdzIEFkdmVudHVyZXMgaW4gV29uZGVybGFuZFsvaV0gKDE4NjUpLCB0ZWxscyB0aGUgc3Rvcnkgb2YgYSBnaXJsIG5hbWVkIEFsaWNlLCB3aG8gZmFsbHMgZG93biBhIHJhYmJpdCBob2xlIGludG8gYSBmYW50YXN5IHdvcmxkIHBvcHVsYXRlZCBieSBwZWN1bGlhciBhbmQgYW50aHJvcG9tb3JwaGljIGNyZWF0dXJlcy4gW2ldVGhyb3VnaCB0aGUgTG9va2luZy1HbGFzcywgYW5kIFdoYXQgQWxpY2UgRm91bmQgVGhlcmVbL2ldICgxODcxKSBpcyBhIGNvbnRpbnVhdGlvbiBpbiB3aGljaCBBbGljZSBnb2VzIHRocm91Z2ggdGhlIHRpdHVsYXIgbG9va2luZyBnbGFzcyBhbmQgZW50ZXJzIGEgd29ybGQgdGhhdCB3b3JrcyBsaWtlIGEgY2hlc3MgYm9hcmQuIE9uY2UgYWdhaW4sIEFsaWNlIGZpbmRzIHZhcmlvdXMgcGVjdWxpYXIgYW5kIGFudGhyb3BvbW9ycGhpYyBjcmVhdHVyZXMgYW5kIGhhcyB0byBkZWFsIHdpdGggdGhlaXIgZWNjZW50cmljaXRpZXMuXHJcblxyXG5CZXR3ZWVuIHRoZSBvcmlnaW5hbCBzdG9yeSBhcnJpdmluZyBpbiBKYXBhbiBqdXN0IGFzIHRoZSBjb3VudHJ5IHdhcyBvcGVuaW5nIHVwIGluIHRoZSBsYXRlIDE4MDBzIGFuZCB0aGUgZXh0cmVtZWx5IHBvcHVsYXIgW1tEaXNuZXldXSBhZGFwdGF0aW9uLCB0aGUgc3RvcnkgaGFzIHJlbWFpbmVkIGFzIGEgcGVybWFuZW50IHBhcnQgb2YgSmFwYW5lc2UgbGl0ZXJhdHVyZSBhbmQgZmFzaGlvbi4gXHJcblxyXG5oNC4gQ2hhcmFjdGVyc1xyXG5cclxuKiBbW0FsaWNlIChhbGljZSBpbiB3b25kZXJsYW5kKXxdXVxyXG4qIFtbQ2F0ZXJwaWxsYXIgKGFsaWNlIGluIHdvbmRlcmxhbmQpfF1dXHJcbiogW1tDaGVzaGlyZSBDYXQgKGFsaWNlIEluIFdvbmRlcmxhbmQpfF1dXHJcbiogW1tEb2RvIChhbGljZSBpbiB3b25kZXJsYW5kKXxdXVxyXG4qIFtbRG9ybW91c2UgKGFsaWNlIGluIHdvbmRlcmxhbmQpfF1dXHJcbiogW1tEdWNrIChhbGljZSBpbiB3b25kZXJsYW5kKXxdXVxyXG4qIFtbSmFiYmVyd29jayAoYWxpY2UgaW4gd29uZGVybGFuZCl8XV1cclxuKiBbW01hZCBIYXR0ZXIgKGFsaWNlIEluIFdvbmRlcmxhbmQpfF1dXHJcbiogW1tNYXJjaCBIYXJlIChhbGljZSBJbiBXb25kZXJsYW5kKXxdXVxyXG4qIFtbUXVlZW4gb2YgSGVhcnRzIChhbGljZSBpbiB3b25kZXJsYW5kKXxdXVxyXG4qIFtbUmVkIFF1ZWVuXV1cclxuKiBbW1R3ZWVkbGVkZWUgKGFsaWNlIGluIHdvbmRlcmxhbmQpfF1dXHJcbiogW1tUd2VlZGxlZHVtIChhbGljZSBpbiB3b25kZXJsYW5kKXxdXVxyXG4qIFtbV2hpdGUgUmFiYml0IChhbGljZSBJbiBXb25kZXJsYW5kKXxdXVxyXG4qIFtbV2hpdGUgUXVlZW5dXVxyXG5cclxuaDQuIENvcHlyaWdodHNcclxuXHJcbiogW1tBbGljZSBpbiBXb25kZXJsYW5kIChEaXNuZXkpXV1cclxuKiogW1tBbGljZSBpbiBXb25kZXJsYW5kIChUaW0gQnVydG9uKV1dXHJcbiogW1tBbWVyaWNhbiBNY0dlZSdzIEFsaWNlXV1cclxuKiogW1tBbGljZTogTWFkbmVzcyBSZXR1cm5zXV1cclxuKiBbW05lY28geiBBbGVua3ldXVxyXG5cclxuaDQuIFNlZSBhbHNvXHJcblxyXG4qIFtbR3JpbW1zJyBGYWlyeSBUYWxlc11dXHJcblxyXG5oNC4gRXh0ZXJuYWwgbGlua3NcclxuXHJcbiogXCJXaWtpcGVkaWE6IEFsaWNlJ3MgQWR2ZW50dXJlcyBpbiBXb25kZXJsYW5kXCI6W2h0dHBzOi8vZW4ud2lraXBlZGlhLm9yZy93aWtpL0FsaWNlJTI3c19BZHZlbnR1cmVzX2luX1dvbmRlcmxhbmRdXHJcbiogXCJXaWtpcGVkaWE6IFRocm91Z2ggdGhlIExvb2tpbmctR2xhc3MsIGFuZCBXaGF0IEFsaWNlIEZvdW5kIFRoZXJlXCI6W2h0dHBzOi8vZW4ud2lraXBlZGlhLm9yZy93aWtpL1Rocm91Z2hfdGhlX0xvb2tpbmctR2xhc3NdIiwicmVzcG9uc2VfdHJ1bmNhdGVkIjpmYWxzZSwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwidGl0bGUiOiJhbGljZSdzX2FkdmVudHVyZXNfaW5fd29uZGVybGFuZCJ9XSwic2NvcmUiOi0yMC43MDE2NjUyMDA4OTkwMjIsInNvdXJjZV9maWVsZHMiOnt9LCJzb3VyY2VfZmllbGRzX2V2aWRlbmNlIjpbXSwic291cmNlX2ZpZWxkc190cnVuY2F0ZWQiOltdLCJzb3VyY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDIifSx7ImFsaWFzZXMiOltdLCJjaXRhdGlvbnMiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZToxMDQxOTIiLCJzb3VyY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDIifV0sImRlc2NyaXB0aW9ucyI6W3siZXZpZGVuY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDI6YTI2YTM4MjlkZDQyMTU1ODQ4MzkyYzA2MzZkYWViZDZjYTAxYWNmNTQwZDM1MDlmZWMyYWMzMjE5Zjg1OTZjNTpsaW5lOjEwNDE5MiIsIm9yaWdpbmFsIjoiW1tBbGljZXNvZnRdXSdzIG1hc2NvdCwgYSBbW2Jsb25kZSBoYWlyfGJsb25kZV1dIGdpcmwgd2VhcmluZyBhIFtbYmx1ZSBkcmVzc11dIGFuZCBhIFtbd2hpdGUgYXByb25dXS5cclxuXHJcbkhlciBhcHBlYXJhbmNlIGlzIGJhc2VkIG9uIFtbQWxpY2UgKGFsaWNlIGluIHdvbmRlcmxhbmQpfF1dIGZyb20gW1tBbGljZSdzIEFkdmVudHVyZXMgaW4gV29uZGVybGFuZF1dLiIsInJlc3BvbnNlX3RydW5jYXRlZCI6ZmFsc2UsInNlYXJjaF90ZXh0X3RydW5jYXRlZCI6ZmFsc2UsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiIsInN0YXR1cyI6InNvdXJjZV9iYWNrZWQiLCJ0aXRsZSI6ImFsaWNlXyhhbGljZXNvZnQpIn1dLCJlbnRyeV9rZXkiOnsia2luZCI6InBhZ2UiLCJuYW1lc3BhY2UiOiJkYW5ib29ydS53aWtpIiwidmFsdWUiOiIxMTA1MTYifSwiZXZpZGVuY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDI6YTI2YTM4MjlkZDQyMTU1ODQ4MzkyYzA2MzZkYWViZDZjYTAxYWNmNTQwZDM1MDlmZWMyYWMzMjE5Zjg1OTZjNTpsaW5lOjEwNDE5MiIsImlkZW50aXR5X2V2aWRlbmNlIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6MTA0MTkyIiwibG9jYXRvciI6bnVsbCwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwic3RhdHVzIjoic291cmNlX2JhY2tlZCIsInR5cGUiOiJwYWdlIn1dLCJpZGVudGl0eV9ldmlkZW5jZV90cnVuY2F0ZWQiOmZhbHNlLCJsb2NhdG9yIjpudWxsLCJtYXRjaGVkX2J5IjoiZnRzIiwibWF0Y2hlZF9kb2N1bWVudHMiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZToxMDQxOTIiLCJvcmlnaW5hbCI6IltbQWxpY2Vzb2Z0XV0ncyBtYXNjb3QsIGEgW1tibG9uZGUgaGFpcnxibG9uZGVdXSBnaXJsIHdlYXJpbmcgYSBbW2JsdWUgZHJlc3NdXSBhbmQgYSBbW3doaXRlIGFwcm9uXV0uXHJcblxyXG5IZXIgYXBwZWFyYW5jZSBpcyBiYXNlZCBvbiBbW0FsaWNlIChhbGljZSBpbiB3b25kZXJsYW5kKXxdXSBmcm9tIFtbQWxpY2UncyBBZHZlbnR1cmVzIGluIFdvbmRlcmxhbmRdXS4iLCJyZXNwb25zZV90cnVuY2F0ZWQiOmZhbHNlLCJzb3VyY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDIiLCJ0aXRsZSI6ImFsaWNlXyhhbGljZXNvZnQpIn1dLCJzY29yZSI6LTIwLjM5OTg5Njk4MDA0NTkwMiwic291cmNlX2ZpZWxkcyI6e30sInNvdXJjZV9maWVsZHNfZXZpZGVuY2UiOltdLCJzb3VyY2VfZmllbGRzX3RydW5jYXRlZCI6W10sInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiJ9LHsiYWxpYXNlcyI6W10sImNpdGF0aW9ucyI6W3siZXZpZGVuY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDI6YTI2YTM4MjlkZDQyMTU1ODQ4MzkyYzA2MzZkYWViZDZjYTAxYWNmNTQwZDM1MDlmZWMyYWMzMjE5Zjg1OTZjNTpsaW5lOjEwNjQ3NyIsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiJ9XSwiZGVzY3JpcHRpb25zIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6MTA2NDc3Iiwib3JpZ2luYWwiOiJBIDUtc3RhciBQbGFudCBlbGVtZW50IFtbQ2F0IEJ1c3RlcnNdXSBjaGFyYWN0ZXIgYmFzZWQgb24gW1tBbGljZSAoYWxpY2UgaW4gd29uZGVybGFuZCl8XV0gZnJvbSBbW0FsaWNlJ3MgQWR2ZW50dXJlcyBpbiBXb25kZXJsYW5kXV0uXHJcblxyXG5oNC4gQXBwZWFyYW5jZVxyXG4qICFhc3NldCAjNDEzMjgwMTI6IERlZmF1bHRcclxuKiAhYXNzZXQgIzQxMzI4MDMyOiBBd2FrZW5lZFxyXG4qICFhc3NldCAjNDEzMjk3NDY6IFtbYWxpY2UgKHdvbmRlcmxhbmQpIChjYXQgYnVzdGVycyl8V29uZGVybGFuZF1dXHJcbiogIWFzc2V0ICM0MTM5NTAzNzogV29uZGVybGFuZCAoQXdha2VuZWQpIiwicmVzcG9uc2VfdHJ1bmNhdGVkIjpmYWxzZSwic2VhcmNoX3RleHRfdHJ1bmNhdGVkIjpmYWxzZSwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwic3RhdHVzIjoic291cmNlX2JhY2tlZCIsInRpdGxlIjoiYWxpY2VfKGNhdF9idXN0ZXJzKSJ9XSwiZW50cnlfa2V5Ijp7ImtpbmQiOiJwYWdlIiwibmFtZXNwYWNlIjoiZGFuYm9vcnUud2lraSIsInZhbHVlIjoiMTEyODAxIn0sImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZToxMDY0NzciLCJpZGVudGl0eV9ldmlkZW5jZSI6W3siZXZpZGVuY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDI6YTI2YTM4MjlkZDQyMTU1ODQ4MzkyYzA2MzZkYWViZDZjYTAxYWNmNTQwZDM1MDlmZWMyYWMzMjE5Zjg1OTZjNTpsaW5lOjEwNjQ3NyIsImxvY2F0b3IiOm51bGwsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiIsInN0YXR1cyI6InNvdXJjZV9iYWNrZWQiLCJ0eXBlIjoicGFnZSJ9XSwiaWRlbnRpdHlfZXZpZGVuY2VfdHJ1bmNhdGVkIjpmYWxzZSwibG9jYXRvciI6bnVsbCwibWF0Y2hlZF9ieSI6ImZ0cyIsIm1hdGNoZWRfZG9jdW1lbnRzIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6MTA2NDc3Iiwib3JpZ2luYWwiOiJBIDUtc3RhciBQbGFudCBlbGVtZW50IFtbQ2F0IEJ1c3RlcnNdXSBjaGFyYWN0ZXIgYmFzZWQgb24gW1tBbGljZSAoYWxpY2UgaW4gd29uZGVybGFuZCl8XV0gZnJvbSBbW0FsaWNlJ3MgQWR2ZW50dXJlcyBpbiBXb25kZXJsYW5kXV0uXHJcblxyXG5oNC4gQXBwZWFyYW5jZVxyXG4qICFhc3NldCAjNDEzMjgwMTI6IERlZmF1bHRcclxuKiAhYXNzZXQgIzQxMzI4MDMyOiBBd2FrZW5lZFxyXG4qICFhc3NldCAjNDEzMjk3NDY6IFtbYWxpY2UgKHdvbmRlcmxhbmQpIChjYXQgYnVzdGVycyl8V29uZGVybGFuZF1dXHJcbiogIWFzc2V0ICM0MTM5NTAzNzogV29uZGVybGFuZCAoQXdha2VuZWQpIiwicmVzcG9uc2VfdHJ1bmNhdGVkIjpmYWxzZSwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwidGl0bGUiOiJhbGljZV8oY2F0X2J1c3RlcnMpIn1dLCJzY29yZSI6LTIwLjI3MTc4MjQyMDE1NDk4LCJzb3VyY2VfZmllbGRzIjp7fSwic291cmNlX2ZpZWxkc19ldmlkZW5jZSI6W10sInNvdXJjZV9maWVsZHNfdHJ1bmNhdGVkIjpbXSwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIn0seyJhbGlhc2VzIjpbXSwiY2l0YXRpb25zIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6MTYyNjkiLCJzb3VyY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDIifV0sImRlc2NyaXB0aW9ucyI6W3siZXZpZGVuY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDI6YTI2YTM4MjlkZDQyMTU1ODQ4MzkyYzA2MzZkYWViZDZjYTAxYWNmNTQwZDM1MDlmZWMyYWMzMjE5Zjg1OTZjNTpsaW5lOjE2MjY5Iiwib3JpZ2luYWwiOiJBIGNoYXJhY3RlciBhcHBlYXJpbmcgaW4gW1tBbGljZSdzIEFkdmVudHVyZXMgaW4gV29uZGVybGFuZF1dLiBJdCBpcyBzZWVuIHNtb2tpbmcgYSBbW2hvb2thaF1dIHdoaWxlIHNpdHRpbmcgb24gYSBbW211c2hyb29tXV0uIiwicmVzcG9uc2VfdHJ1bmNhdGVkIjpmYWxzZSwic2VhcmNoX3RleHRfdHJ1bmNhdGVkIjpmYWxzZSwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwic3RhdHVzIjoic291cmNlX2JhY2tlZCIsInRpdGxlIjoiY2F0ZXJwaWxsYXJfKGFsaWNlX2luX3dvbmRlcmxhbmQpIn1dLCJlbnRyeV9rZXkiOnsia2luZCI6InBhZ2UiLCJuYW1lc3BhY2UiOiJkYW5ib29ydS53aWtpIiwidmFsdWUiOiIyMTg5MiJ9LCJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6MTYyNjkiLCJpZGVudGl0eV9ldmlkZW5jZSI6W3siZXZpZGVuY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDI6YTI2YTM4MjlkZDQyMTU1ODQ4MzkyYzA2MzZkYWViZDZjYTAxYWNmNTQwZDM1MDlmZWMyYWMzMjE5Zjg1OTZjNTpsaW5lOjE2MjY5IiwibG9jYXRvciI6bnVsbCwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIiwic3RhdHVzIjoic291cmNlX2JhY2tlZCIsInR5cGUiOiJwYWdlIn1dLCJpZGVudGl0eV9ldmlkZW5jZV90cnVuY2F0ZWQiOmZhbHNlLCJsb2NhdG9yIjpudWxsLCJtYXRjaGVkX2J5IjoiZnRzIiwibWF0Y2hlZF9kb2N1bWVudHMiOlt7ImV2aWRlbmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyOmEyNmEzODI5ZGQ0MjE1NTg0ODM5MmMwNjM2ZGFlYmQ2Y2EwMWFjZjU0MGQzNTA5ZmVjMmFjMzIxOWY4NTk2YzU6bGluZToxNjI2OSIsIm9yaWdpbmFsIjoiQSBjaGFyYWN0ZXIgYXBwZWFyaW5nIGluIFtbQWxpY2UncyBBZHZlbnR1cmVzIGluIFdvbmRlcmxhbmRdXS4gSXQgaXMgc2VlbiBzbW9raW5nIGEgW1tob29rYWhdXSB3aGlsZSBzaXR0aW5nIG9uIGEgW1ttdXNocm9vbV1dLiIsInJlc3BvbnNlX3RydW5jYXRlZCI6ZmFsc2UsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiIsInRpdGxlIjoiY2F0ZXJwaWxsYXJfKGFsaWNlX2luX3dvbmRlcmxhbmQpIn1dLCJzY29yZSI6LTIwLjI2NzA0NjA5NDk2MTk1NSwic291cmNlX2ZpZWxkcyI6e30sInNvdXJjZV9maWVsZHNfZXZpZGVuY2UiOltdLCJzb3VyY2VfZmllbGRzX3RydW5jYXRlZCI6W10sInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiJ9LHsiYWxpYXNlcyI6W10sImNpdGF0aW9ucyI6W3siZXZpZGVuY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDI6YTI2YTM4MjlkZDQyMTU1ODQ4MzkyYzA2MzZkYWViZDZjYTAxYWNmNTQwZDM1MDlmZWMyYWMzMjE5Zjg1OTZjNTpsaW5lOjQwMDQiLCJzb3VyY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDIifV0sImRlc2NyaXB0aW9ucyI6W3siZXZpZGVuY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDI6YTI2YTM4MjlkZDQyMTU1ODQ4MzkyYzA2MzZkYWViZDZjYTAxYWNmNTQwZDM1MDlmZWMyYWMzMjE5Zjg1OTZjNTpsaW5lOjQwMDQiLCJvcmlnaW5hbCI6IlRoZSBNYXJjaCBIYXJlLCBvZnRlbiBjYWxsZWQgdGhlIE1hZCBNYXJjaCBIYXJlLCBpcyBhIGNoYXJhY3RlciB3aG8gYXBwZWFycyBpbiB0aGUgdGVhIHBhcnR5IHNjZW5lIGluIExld2lzIENhcnJvbGwncyBbW0FsaWNlJ3MgQWR2ZW50dXJlcyBpbiBXb25kZXJsYW5kXV0uXHJcblxyXG5IaXMgZnJpZW5kIGlzIHRoZSBbW01hZCBIYXR0ZXIgKGFsaWNlIEluIFdvbmRlcmxhbmQpfF1dLlxyXG5cclxuaDQuIFNlZSBhbHNvXHJcblxyXG4qIFtbTWFyY2ggSGFyZSAoRGlzbmV5KV1dIChbW0FsaWNlIGluIFdvbmRlcmxhbmQgKERpc25leSldXSkiLCJyZXNwb25zZV90cnVuY2F0ZWQiOmZhbHNlLCJzZWFyY2hfdGV4dF90cnVuY2F0ZWQiOmZhbHNlLCJzb3VyY2VfaWQiOiJkYW5ib29ydS1jb21wbGV0ZS1hMjZhMzgyOWRkNDIiLCJzdGF0dXMiOiJzb3VyY2VfYmFja2VkIiwidGl0bGUiOiJtYXJjaF9oYXJlXyhhbGljZV9pbl93b25kZXJsYW5kKSJ9XSwiZW50cnlfa2V5Ijp7ImtpbmQiOiJwYWdlIiwibmFtZXNwYWNlIjoiZGFuYm9vcnUud2lraSIsInZhbHVlIjoiODc5MiJ9LCJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6NDAwNCIsImlkZW50aXR5X2V2aWRlbmNlIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6NDAwNCIsImxvY2F0b3IiOm51bGwsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiIsInN0YXR1cyI6InNvdXJjZV9iYWNrZWQiLCJ0eXBlIjoicGFnZSJ9XSwiaWRlbnRpdHlfZXZpZGVuY2VfdHJ1bmNhdGVkIjpmYWxzZSwibG9jYXRvciI6bnVsbCwibWF0Y2hlZF9ieSI6ImZ0cyIsIm1hdGNoZWRfZG9jdW1lbnRzIjpbeyJldmlkZW5jZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MjphMjZhMzgyOWRkNDIxNTU4NDgzOTJjMDYzNmRhZWJkNmNhMDFhY2Y1NDBkMzUwOWZlYzJhYzMyMTlmODU5NmM1OmxpbmU6NDAwNCIsIm9yaWdpbmFsIjoiVGhlIE1hcmNoIEhhcmUsIG9mdGVuIGNhbGxlZCB0aGUgTWFkIE1hcmNoIEhhcmUsIGlzIGEgY2hhcmFjdGVyIHdobyBhcHBlYXJzIGluIHRoZSB0ZWEgcGFydHkgc2NlbmUgaW4gTGV3aXMgQ2Fycm9sbCdzIFtbQWxpY2UncyBBZHZlbnR1cmVzIGluIFdvbmRlcmxhbmRdXS5cclxuXHJcbkhpcyBmcmllbmQgaXMgdGhlIFtbTWFkIEhhdHRlciAoYWxpY2UgSW4gV29uZGVybGFuZCl8XV0uXHJcblxyXG5oNC4gU2VlIGFsc29cclxuXHJcbiogW1tNYXJjaCBIYXJlIChEaXNuZXkpXV0gKFtbQWxpY2UgaW4gV29uZGVybGFuZCAoRGlzbmV5KV1dKSIsInJlc3BvbnNlX3RydW5jYXRlZCI6ZmFsc2UsInNvdXJjZV9pZCI6ImRhbmJvb3J1LWNvbXBsZXRlLWEyNmEzODI5ZGQ0MiIsInRpdGxlIjoibWFyY2hfaGFyZV8oYWxpY2VfaW5fd29uZGVybGFuZCkifV0sInNjb3JlIjotMjAuMTcxNDg3NjE5NTE5NzAyLCJzb3VyY2VfZmllbGRzIjp7fSwic291cmNlX2ZpZWxkc19ldmlkZW5jZSI6W10sInNvdXJjZV9maWVsZHNfdHJ1bmNhdGVkIjpbXSwic291cmNlX2lkIjoiZGFuYm9vcnUtY29tcGxldGUtYTI2YTM4MjlkZDQyIn0seyJhbGlhc2VzIjpbXSwiY2l0YXRpb25zIjpbeyJldmlkZW5jZV9pZCI6ImJhbmd1bWktY29tcGxldGUtNmE3NWFlZmI3NjlhOjZhNzVhZWZiNzY5YTYyZjBlYWEzYjU4ZWQ3NmZiMTcyYTVkYzE5MjJhOWU1YmU0MGJkN2RlMmZmODM0M2RjYzQ6bGluZTo2MjU3NjAiLCJzb3VyY2VfaWQiOiJiYW5ndW1pLWNvbXBsZXRlLTZhNzVhZWZiNzY5YSJ9XSwiZGVzY3JpcHRpb25zIjpbeyJldmlkZW5jZV9pZCI6ImJhbmd1bWktY29tcGxldGUtNmE3NWFlZmI3NjlhOjZhNzVhZWZiNzY5YTYyZjBlYWEzYjU4ZWQ3NmZiMTcyYTVkYzE5MjJhOWU1YmU0MGJkN2RlMmZmODM0M2RjYzQ6bGluZTo2MjU3NjAiLCJvcmlnaW5hbCI6IkEgam95ZnVsbHkgcHN5Y2hlZGVsaWMgYW5pbWF0aW9uIGluc3BpcmVkIGJ5IExld2lzIENhcnJvbGzigJlzIEFsaWNlIGluIFdvbmRlcmxhbmQuIiwicmVzcG9uc2VfdHJ1bmNhdGVkIjpmYWxzZSwic2VhcmNoX3RleHRfdHJ1bmNhdGVkIjpmYWxzZSwic291cmNlX2lkIjoiYmFuZ3VtaS1jb21wbGV0ZS02YTc1YWVmYjc2OWEiLCJzdGF0dXMiOiJzb3VyY2VfYmFja2VkIiwidGl0bGUiOiJBZHZlbnR1cmVzIGluIEJlYXV0eSBXb25kZXJsYW5kIn1dLCJlbnRyeV9rZXkiOnsia2luZCI6InN1YmplY3QiLCJuYW1lc3BhY2UiOiJiYW5ndW1pLnN1YmplY3QiLCJ2YWx1ZSI6IjY0MjAwNyJ9LCJldmlkZW5jZV9pZCI6ImJhbmd1bWktY29tcGxldGUtNmE3NWFlZmI3NjlhOjZhNzVhZWZiNzY5YTYyZjBlYWEzYjU4ZWQ3NmZiMTcyYTVkYzE5MjJhOWU1YmU0MGJkN2RlMmZmODM0M2RjYzQ6bGluZTo2MjU3NjAiLCJpZGVudGl0eV9ldmlkZW5jZSI6W3siZXZpZGVuY2VfaWQiOiJiYW5ndW1pLWNvbXBsZXRlLTZhNzVhZWZiNzY5YTo2YTc1YWVmYjc2OWE2MmYwZWFhM2I1OGVkNzZmYjE3MmE1ZGMxOTIyYTllNWJlNDBiZDdkZTJmZjgzNDNkY2M0OmxpbmU6NjI1NzYwIiwibG9jYXRvciI6bnVsbCwic291cmNlX2lkIjoiYmFuZ3VtaS1jb21wbGV0ZS02YTc1YWVmYjc2OWEiLCJzdGF0dXMiOiJzb3VyY2VfYmFja2VkIiwidHlwZSI6InN1YmplY3QifV0sImlkZW50aXR5X2V2aWRlbmNlX3RydW5jYXRlZCI6ZmFsc2UsImxvY2F0b3IiOm51bGwsIm1hdGNoZWRfYnkiOiJmdHMiLCJtYXRjaGVkX2RvY3VtZW50cyI6W3siZXZpZGVuY2VfaWQiOiJiYW5ndW1pLWNvbXBsZXRlLTZhNzVhZWZiNzY5YTo2YTc1YWVmYjc2OWE2MmYwZWFhM2I1OGVkNzZmYjE3MmE1ZGMxOTIyYTllNWJlNDBiZDdkZTJmZjgzNDNkY2M0OmxpbmU6NjI1NzYwIiwib3JpZ2luYWwiOiJBIGpveWZ1bGx5IHBzeWNoZWRlbGljIGFuaW1hdGlvbiBpbnNwaXJlZCBieSBMZXdpcyBDYXJyb2xs4oCZcyBBbGljZSBpbiBXb25kZXJsYW5kLiIsInJlc3BvbnNlX3RydW5jYXRlZCI6ZmFsc2UsInNvdXJjZV9pZCI6ImJhbmd1bWktY29tcGxldGUtNmE3NWFlZmI3NjlhIiwidGl0bGUiOiJBZHZlbnR1cmVzIGluIEJlYXV0eSBXb25kZXJsYW5kIn1dLCJzY29yZSI6LTIwLjE3MTQxMTYxMDU3NDUxLCJzb3VyY2VfZmllbGRzIjp7fSwic291cmNlX2ZpZWxkc19ldmlkZW5jZSI6W10sInNvdXJjZV9maWVsZHNfdHJ1bmNhdGVkIjpbXSwic291cmNlX2lkIjoiYmFuZ3VtaS1jb21wbGV0ZS02YTc1YWVmYjc2OWEifV0sImNhbm9uaWNhbCI6bnVsbCwiY2l0YXRpb25zIjpbXSwiY29udHJhY3RfdmVyc2lvbiI6IjIiLCJkZXNjcmlwdGlvbnMiOltdLCJlbnRyeV9rZXkiOm51bGwsInF1ZXJ5IjoiYSdzX3dvbmRlcmxhbmQiLCJyZWxhdGlvbnMiOltdLCJyZXNwb25zZV92ZXJzaW9uIjoiMyIsInNuYXBzaG90IjoiN2UxNTkyYTYxNDUyZDQzN2FlNDZmYWI1ODkzMTdkMmFjN2IxMGM1YTAyYzZjOTY2MDk3ZmE2NzlhOTYzYTU3YyIsInN0YXR1cyI6ImFtYmlndW91cyIsInRhZ19rZXkiOm51bGwsIndhcm5pbmdzIjpbXX19Cg==",
+    "stdout_sha256": "77cdf188ed77a86733d8b52c3cad2e5321f0b6bc54c6145cf640b6327c8f65a9",
+    "stdout_bytes": 23155,
+    "stdout": "{\"open_s\":0.0064004,\"profile\":{\"exact_identity_assembly_s\":0.0005687,\"fts_execute_select_s\":0.1819631,\"identity_field_assembly_s\":0.0006316,\"matched_document_read_s\":0.0000853,\"materialized_matched_documents\":8,\"returned_matched_body_utf8_bytes\":3516,\"scanned_rows\":10,\"selected_identities\":8},\"query\":\"a's_wonderland\",\"response_bytes\":22595,\"runtime\":{\"contract_version\":\"2\",\"normalization_library_unicode\":\"(17, 0, 0)\",\"runtime\":\"rust\",\"sqlite_version\":\"3.45.0\",\"unicode_version\":\"16.0.0\"},\"search_s\":0.1834903,\"serialization_s\":0.000018,\"topk\":10,\"value\":{\"candidates\":[{\"aliases\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433\",\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"text\":\"a's_wonderland\"}],\"citations\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"descriptions\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433\",\"original\":\"[b]A's Wonderland[/b] is a card battle RPG for iOS by CyberAgent, Inc.\\r\\nThe setting of the game is based off of [i][[Alice's Adventures in Wonderland]][/i].\\r\\n\\r\\nh4. External links\\r\\n\\r\\n* \\\"Official Website\\\":http://www.amebaspgame.com/ace_wonderland/lp/pc/index.html\\r\\n* \\\"Official Blog\\\":http://ameblo.jp/ace-wonderland/\\r\\n* \\\"iTunes Store web page\\\":https://itunes.apple.com/jp/app/esunowandarando/id586832423\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"a's_wonderland\"}],\"entry_key\":{\"kind\":\"page\",\"namespace\":\"danbooru.wiki\",\"value\":\"46520\"},\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433\",\"identity_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433\",\"locator\":null,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"type\":\"page\"}],\"identity_evidence_truncated\":false,\"locator\":null,\"matched_by\":\"alias\",\"matched_documents\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433\",\"original\":\"[b]A's Wonderland[/b] is a card battle RPG for iOS by CyberAgent, Inc.\\r\\nThe setting of the game is based off of [i][[Alice's Adventures in Wonderland]][/i].\\r\\n\\r\\nh4. External links\\r\\n\\r\\n* \\\"Official Website\\\":http://www.amebaspgame.com/ace_wonderland/lp/pc/index.html\\r\\n* \\\"Official Blog\\\":http://ameblo.jp/ace-wonderland/\\r\\n* \\\"iTunes Store web page\\\":https://itunes.apple.com/jp/app/esunowandarando/id586832423\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"a's_wonderland\"}],\"source_fields\":{},\"source_fields_evidence\":[],\"source_fields_truncated\":[],\"source_id\":\"danbooru-complete-a26a3829dd42\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1075\",\"source_id\":\"tag_wiki-complete-a2eb055c578d\"}],\"descriptions\":[],\"entry_key\":{\"kind\":\"tag\",\"namespace\":\"local.tag_aggregate\",\"value\":\"a's_wonderland\"},\"evidence_id\":\"tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1075\",\"identity_evidence\":[{\"evidence_id\":\"tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1075\",\"locator\":null,\"source_id\":\"tag_wiki-complete-a2eb055c578d\",\"status\":\"source_backed\",\"type\":\"tag\"}],\"identity_evidence_truncated\":false,\"locator\":null,\"matched_by\":\"exact\",\"matched_documents\":[],\"source_fields\":{},\"source_fields_evidence\":[],\"source_fields_truncated\":[],\"source_id\":\"tag_wiki-complete-a2eb055c578d\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"descriptions\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001\",\"original\":\"A character in Lewis Carroll's book [[Alice's Adventures in Wonderland]]. Often drawn holding a [[pocket watch]] or next to a large [[clock]].\\r\\n\\r\\nh4. See also\\r\\n\\r\\n* [[White Rabbit (Disney)]] ([[Alice in Wonderland (Disney)]])\\r\\n* [[White Rabbit pointing at a clock (meme)]]\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"white_rabbit_(alice_in_wonderland)\"}],\"entry_key\":{\"kind\":\"page\",\"namespace\":\"danbooru.wiki\",\"value\":\"8789\"},\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001\",\"identity_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001\",\"locator\":null,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"type\":\"page\"}],\"identity_evidence_truncated\":false,\"locator\":null,\"matched_by\":\"fts\",\"matched_documents\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001\",\"original\":\"A character in Lewis Carroll's book [[Alice's Adventures in Wonderland]]. Often drawn holding a [[pocket watch]] or next to a large [[clock]].\\r\\n\\r\\nh4. See also\\r\\n\\r\\n* [[White Rabbit (Disney)]] ([[Alice in Wonderland (Disney)]])\\r\\n* [[White Rabbit pointing at a clock (meme)]]\",\"response_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"title\":\"white_rabbit_(alice_in_wonderland)\"}],\"score\":-20.895929830140126,\"source_fields\":{},\"source_fields_evidence\":[],\"source_fields_truncated\":[],\"source_id\":\"danbooru-complete-a26a3829dd42\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"descriptions\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005\",\"original\":\"A character in \\\"A Mad Tea Party\\\", often popularly known as \\\"The [[Mad Hatter (alice In Wonderland)|]]'s Tea Party\\\", from [[Alice's Adventures in Wonderland]] by Lewis Carroll. This mouse is terrified of cats and appears to be a narcoleptic.\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"dormouse_(alice_in_wonderland)\"}],\"entry_key\":{\"kind\":\"page\",\"namespace\":\"danbooru.wiki\",\"value\":\"8793\"},\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005\",\"identity_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005\",\"locator\":null,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"type\":\"page\"}],\"identity_evidence_truncated\":false,\"locator\":null,\"matched_by\":\"fts\",\"matched_documents\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005\",\"original\":\"A character in \\\"A Mad Tea Party\\\", often popularly known as \\\"The [[Mad Hatter (alice In Wonderland)|]]'s Tea Party\\\", from [[Alice's Adventures in Wonderland]] by Lewis Carroll. This mouse is terrified of cats and appears to be a narcoleptic.\",\"response_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"title\":\"dormouse_(alice_in_wonderland)\"}],\"score\":-20.782963286550412,\"source_fields\":{},\"source_fields_evidence\":[],\"source_fields_truncated\":[],\"source_id\":\"danbooru-complete-a26a3829dd42\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"descriptions\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642\",\"original\":\"A book duology by English author [[Lewis Carroll]] as well as a large media franchise which resulted from them, tagged here with the name of the first book.\\r\\n\\r\\nThe first book, [i]Alice's Adventures in Wonderland[/i] (1865), tells the story of a girl named Alice, who falls down a rabbit hole into a fantasy world populated by peculiar and anthropomorphic creatures. [i]Through the Looking-Glass, and What Alice Found There[/i] (1871) is a continuation in which Alice goes through the titular looking glass and enters a world that works like a chess board. Once again, Alice finds various peculiar and anthropomorphic creatures and has to deal with their eccentricities.\\r\\n\\r\\nBetween the original story arriving in Japan just as the country was opening up in the late 1800s and the extremely popular [[Disney]] adaptation, the story has remained as a permanent part of Japanese literature and fashion. \\r\\n\\r\\nh4. Characters\\r\\n\\r\\n* [[Alice (alice in wonderland)|]]\\r\\n* [[Caterpillar (alice in wonderland)|]]\\r\\n* [[Cheshire Cat (alice In Wonderland)|]]\\r\\n* [[Dodo (alice in wonderland)|]]\\r\\n* [[Dormouse (alice in wonderland)|]]\\r\\n* [[Duck (alice in wonderland)|]]\\r\\n* [[Jabberwock (alice in wonderland)|]]\\r\\n* [[Mad Hatter (alice In Wonderland)|]]\\r\\n* [[March Hare (alice In Wonderland)|]]\\r\\n* [[Queen of Hearts (alice in wonderland)|]]\\r\\n* [[Red Queen]]\\r\\n* [[Tweedledee (alice in wonderland)|]]\\r\\n* [[Tweedledum (alice in wonderland)|]]\\r\\n* [[White Rabbit (alice In Wonderland)|]]\\r\\n* [[White Queen]]\\r\\n\\r\\nh4. Copyrights\\r\\n\\r\\n* [[Alice in Wonderland (Disney)]]\\r\\n** [[Alice in Wonderland (Tim Burton)]]\\r\\n* [[American McGee's Alice]]\\r\\n** [[Alice: Madness Returns]]\\r\\n* [[Neco z Alenky]]\\r\\n\\r\\nh4. See also\\r\\n\\r\\n* [[Grimms' Fairy Tales]]\\r\\n\\r\\nh4. External links\\r\\n\\r\\n* \\\"Wikipedia: Alice's Adventures in Wonderland\\\":[https://en.wikipedia.org/wiki/Alice%27s_Adventures_in_Wonderland]\\r\\n* \\\"Wikipedia: Through the Looking-Glass, and What Alice Found There\\\":[https://en.wikipedia.org/wiki/Through_the_Looking-Glass]\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"alice's_adventures_in_wonderland\"}],\"entry_key\":{\"kind\":\"page\",\"namespace\":\"danbooru.wiki\",\"value\":\"8379\"},\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642\",\"identity_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642\",\"locator\":null,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"type\":\"page\"}],\"identity_evidence_truncated\":false,\"locator\":null,\"matched_by\":\"fts\",\"matched_documents\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642\",\"original\":\"A book duology by English author [[Lewis Carroll]] as well as a large media franchise which resulted from them, tagged here with the name of the first book.\\r\\n\\r\\nThe first book, [i]Alice's Adventures in Wonderland[/i] (1865), tells the story of a girl named Alice, who falls down a rabbit hole into a fantasy world populated by peculiar and anthropomorphic creatures. [i]Through the Looking-Glass, and What Alice Found There[/i] (1871) is a continuation in which Alice goes through the titular looking glass and enters a world that works like a chess board. Once again, Alice finds various peculiar and anthropomorphic creatures and has to deal with their eccentricities.\\r\\n\\r\\nBetween the original story arriving in Japan just as the country was opening up in the late 1800s and the extremely popular [[Disney]] adaptation, the story has remained as a permanent part of Japanese literature and fashion. \\r\\n\\r\\nh4. Characters\\r\\n\\r\\n* [[Alice (alice in wonderland)|]]\\r\\n* [[Caterpillar (alice in wonderland)|]]\\r\\n* [[Cheshire Cat (alice In Wonderland)|]]\\r\\n* [[Dodo (alice in wonderland)|]]\\r\\n* [[Dormouse (alice in wonderland)|]]\\r\\n* [[Duck (alice in wonderland)|]]\\r\\n* [[Jabberwock (alice in wonderland)|]]\\r\\n* [[Mad Hatter (alice In Wonderland)|]]\\r\\n* [[March Hare (alice In Wonderland)|]]\\r\\n* [[Queen of Hearts (alice in wonderland)|]]\\r\\n* [[Red Queen]]\\r\\n* [[Tweedledee (alice in wonderland)|]]\\r\\n* [[Tweedledum (alice in wonderland)|]]\\r\\n* [[White Rabbit (alice In Wonderland)|]]\\r\\n* [[White Queen]]\\r\\n\\r\\nh4. Copyrights\\r\\n\\r\\n* [[Alice in Wonderland (Disney)]]\\r\\n** [[Alice in Wonderland (Tim Burton)]]\\r\\n* [[American McGee's Alice]]\\r\\n** [[Alice: Madness Returns]]\\r\\n* [[Neco z Alenky]]\\r\\n\\r\\nh4. See also\\r\\n\\r\\n* [[Grimms' Fairy Tales]]\\r\\n\\r\\nh4. External links\\r\\n\\r\\n* \\\"Wikipedia: Alice's Adventures in Wonderland\\\":[https://en.wikipedia.org/wiki/Alice%27s_Adventures_in_Wonderland]\\r\\n* \\\"Wikipedia: Through the Looking-Glass, and What Alice Found There\\\":[https://en.wikipedia.org/wiki/Through_the_Looking-Glass]\",\"response_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"title\":\"alice's_adventures_in_wonderland\"}],\"score\":-20.701665200899022,\"source_fields\":{},\"source_fields_evidence\":[],\"source_fields_truncated\":[],\"source_id\":\"danbooru-complete-a26a3829dd42\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"descriptions\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192\",\"original\":\"[[Alicesoft]]'s mascot, a [[blonde hair|blonde]] girl wearing a [[blue dress]] and a [[white apron]].\\r\\n\\r\\nHer appearance is based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"alice_(alicesoft)\"}],\"entry_key\":{\"kind\":\"page\",\"namespace\":\"danbooru.wiki\",\"value\":\"110516\"},\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192\",\"identity_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192\",\"locator\":null,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"type\":\"page\"}],\"identity_evidence_truncated\":false,\"locator\":null,\"matched_by\":\"fts\",\"matched_documents\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192\",\"original\":\"[[Alicesoft]]'s mascot, a [[blonde hair|blonde]] girl wearing a [[blue dress]] and a [[white apron]].\\r\\n\\r\\nHer appearance is based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].\",\"response_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"title\":\"alice_(alicesoft)\"}],\"score\":-20.399896980045902,\"source_fields\":{},\"source_fields_evidence\":[],\"source_fields_truncated\":[],\"source_id\":\"danbooru-complete-a26a3829dd42\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"descriptions\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477\",\"original\":\"A 5-star Plant element [[Cat Busters]] character based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].\\r\\n\\r\\nh4. Appearance\\r\\n* !asset #41328012: Default\\r\\n* !asset #41328032: Awakened\\r\\n* !asset #41329746: [[alice (wonderland) (cat busters)|Wonderland]]\\r\\n* !asset #41395037: Wonderland (Awakened)\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"alice_(cat_busters)\"}],\"entry_key\":{\"kind\":\"page\",\"namespace\":\"danbooru.wiki\",\"value\":\"112801\"},\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477\",\"identity_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477\",\"locator\":null,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"type\":\"page\"}],\"identity_evidence_truncated\":false,\"locator\":null,\"matched_by\":\"fts\",\"matched_documents\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477\",\"original\":\"A 5-star Plant element [[Cat Busters]] character based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].\\r\\n\\r\\nh4. Appearance\\r\\n* !asset #41328012: Default\\r\\n* !asset #41328032: Awakened\\r\\n* !asset #41329746: [[alice (wonderland) (cat busters)|Wonderland]]\\r\\n* !asset #41395037: Wonderland (Awakened)\",\"response_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"title\":\"alice_(cat_busters)\"}],\"score\":-20.27178242015498,\"source_fields\":{},\"source_fields_evidence\":[],\"source_fields_truncated\":[],\"source_id\":\"danbooru-complete-a26a3829dd42\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"descriptions\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269\",\"original\":\"A character appearing in [[Alice's Adventures in Wonderland]]. It is seen smoking a [[hookah]] while sitting on a [[mushroom]].\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"caterpillar_(alice_in_wonderland)\"}],\"entry_key\":{\"kind\":\"page\",\"namespace\":\"danbooru.wiki\",\"value\":\"21892\"},\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269\",\"identity_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269\",\"locator\":null,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"type\":\"page\"}],\"identity_evidence_truncated\":false,\"locator\":null,\"matched_by\":\"fts\",\"matched_documents\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269\",\"original\":\"A character appearing in [[Alice's Adventures in Wonderland]]. It is seen smoking a [[hookah]] while sitting on a [[mushroom]].\",\"response_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"title\":\"caterpillar_(alice_in_wonderland)\"}],\"score\":-20.267046094961955,\"source_fields\":{},\"source_fields_evidence\":[],\"source_fields_truncated\":[],\"source_id\":\"danbooru-complete-a26a3829dd42\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004\",\"source_id\":\"danbooru-complete-a26a3829dd42\"}],\"descriptions\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004\",\"original\":\"The March Hare, often called the Mad March Hare, is a character who appears in the tea party scene in Lewis Carroll's [[Alice's Adventures in Wonderland]].\\r\\n\\r\\nHis friend is the [[Mad Hatter (alice In Wonderland)|]].\\r\\n\\r\\nh4. See also\\r\\n\\r\\n* [[March Hare (Disney)]] ([[Alice in Wonderland (Disney)]])\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"title\":\"march_hare_(alice_in_wonderland)\"}],\"entry_key\":{\"kind\":\"page\",\"namespace\":\"danbooru.wiki\",\"value\":\"8792\"},\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004\",\"identity_evidence\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004\",\"locator\":null,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"status\":\"source_backed\",\"type\":\"page\"}],\"identity_evidence_truncated\":false,\"locator\":null,\"matched_by\":\"fts\",\"matched_documents\":[{\"evidence_id\":\"danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004\",\"original\":\"The March Hare, often called the Mad March Hare, is a character who appears in the tea party scene in Lewis Carroll's [[Alice's Adventures in Wonderland]].\\r\\n\\r\\nHis friend is the [[Mad Hatter (alice In Wonderland)|]].\\r\\n\\r\\nh4. See also\\r\\n\\r\\n* [[March Hare (Disney)]] ([[Alice in Wonderland (Disney)]])\",\"response_truncated\":false,\"source_id\":\"danbooru-complete-a26a3829dd42\",\"title\":\"march_hare_(alice_in_wonderland)\"}],\"score\":-20.171487619519702,\"source_fields\":{},\"source_fields_evidence\":[],\"source_fields_truncated\":[],\"source_id\":\"danbooru-complete-a26a3829dd42\"},{\"aliases\":[],\"citations\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760\",\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"descriptions\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760\",\"original\":\"A joyfully psychedelic animation inspired by Lewis Carroll\u2019s Alice in Wonderland.\",\"response_truncated\":false,\"search_text_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"title\":\"Adventures in Beauty Wonderland\"}],\"entry_key\":{\"kind\":\"subject\",\"namespace\":\"bangumi.subject\",\"value\":\"642007\"},\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760\",\"identity_evidence\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760\",\"locator\":null,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"status\":\"source_backed\",\"type\":\"subject\"}],\"identity_evidence_truncated\":false,\"locator\":null,\"matched_by\":\"fts\",\"matched_documents\":[{\"evidence_id\":\"bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760\",\"original\":\"A joyfully psychedelic animation inspired by Lewis Carroll\u2019s Alice in Wonderland.\",\"response_truncated\":false,\"source_id\":\"bangumi-complete-6a75aefb769a\",\"title\":\"Adventures in Beauty Wonderland\"}],\"score\":-20.17141161057451,\"source_fields\":{},\"source_fields_evidence\":[],\"source_fields_truncated\":[],\"source_id\":\"bangumi-complete-6a75aefb769a\"}],\"canonical\":null,\"citations\":[],\"contract_version\":\"2\",\"descriptions\":[],\"entry_key\":null,\"query\":\"a's_wonderland\",\"relations\":[],\"response_version\":\"3\",\"snapshot\":\"7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c\",\"status\":\"ambiguous\",\"tag_key\":null,\"warnings\":[]}}\n",
+    "stderr_base64": "",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_bytes": 0,
+    "stderr": "",
+    "value": {
+      "open_s": 0.0064004,
+      "profile": {
+        "exact_identity_assembly_s": 0.0005687,
+        "fts_execute_select_s": 0.1819631,
+        "identity_field_assembly_s": 0.0006316,
+        "matched_document_read_s": 8.53e-05,
+        "materialized_matched_documents": 8,
+        "returned_matched_body_utf8_bytes": 3516,
+        "scanned_rows": 10,
+        "selected_identities": 8
+      },
+      "query": "a's_wonderland",
+      "response_bytes": 22595,
+      "runtime": {
+        "contract_version": "2",
+        "normalization_library_unicode": "(17, 0, 0)",
+        "runtime": "rust",
+        "sqlite_version": "3.45.0",
+        "unicode_version": "16.0.0"
+      },
+      "search_s": 0.1834903,
+      "serialization_s": 1.8e-05,
+      "topk": 10,
+      "value": {
+        "candidates": [
+          {
+            "aliases": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "text": "a's_wonderland"
+              }
+            ],
+            "citations": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+                "source_id": "danbooru-complete-a26a3829dd42"
+              }
+            ],
+            "descriptions": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+                "original": "[b]A's Wonderland[/b] is a card battle RPG for iOS by CyberAgent, Inc.\r\nThe setting of the game is based off of [i][[Alice's Adventures in Wonderland]][/i].\r\n\r\nh4. External links\r\n\r\n* \"Official Website\":http://www.amebaspgame.com/ace_wonderland/lp/pc/index.html\r\n* \"Official Blog\":http://ameblo.jp/ace-wonderland/\r\n* \"iTunes Store web page\":https://itunes.apple.com/jp/app/esunowandarando/id586832423",
+                "response_truncated": false,
+                "search_text_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "title": "a's_wonderland"
+              }
+            ],
+            "entry_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "46520"
+            },
+            "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+            "identity_evidence": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+                "locator": null,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "type": "page"
+              }
+            ],
+            "identity_evidence_truncated": false,
+            "locator": null,
+            "matched_by": "alias",
+            "matched_documents": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:40433",
+                "original": "[b]A's Wonderland[/b] is a card battle RPG for iOS by CyberAgent, Inc.\r\nThe setting of the game is based off of [i][[Alice's Adventures in Wonderland]][/i].\r\n\r\nh4. External links\r\n\r\n* \"Official Website\":http://www.amebaspgame.com/ace_wonderland/lp/pc/index.html\r\n* \"Official Blog\":http://ameblo.jp/ace-wonderland/\r\n* \"iTunes Store web page\":https://itunes.apple.com/jp/app/esunowandarando/id586832423",
+                "response_truncated": false,
+                "search_text_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "title": "a's_wonderland"
+              }
+            ],
+            "source_fields": {},
+            "source_fields_evidence": [],
+            "source_fields_truncated": [],
+            "source_id": "danbooru-complete-a26a3829dd42"
+          },
+          {
+            "aliases": [],
+            "citations": [
+              {
+                "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1075",
+                "source_id": "tag_wiki-complete-a2eb055c578d"
+              }
+            ],
+            "descriptions": [],
+            "entry_key": {
+              "kind": "tag",
+              "namespace": "local.tag_aggregate",
+              "value": "a's_wonderland"
+            },
+            "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1075",
+            "identity_evidence": [
+              {
+                "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:1075",
+                "locator": null,
+                "source_id": "tag_wiki-complete-a2eb055c578d",
+                "status": "source_backed",
+                "type": "tag"
+              }
+            ],
+            "identity_evidence_truncated": false,
+            "locator": null,
+            "matched_by": "exact",
+            "matched_documents": [],
+            "source_fields": {},
+            "source_fields_evidence": [],
+            "source_fields_truncated": [],
+            "source_id": "tag_wiki-complete-a2eb055c578d"
+          },
+          {
+            "aliases": [],
+            "citations": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001",
+                "source_id": "danbooru-complete-a26a3829dd42"
+              }
+            ],
+            "descriptions": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001",
+                "original": "A character in Lewis Carroll's book [[Alice's Adventures in Wonderland]]. Often drawn holding a [[pocket watch]] or next to a large [[clock]].\r\n\r\nh4. See also\r\n\r\n* [[White Rabbit (Disney)]] ([[Alice in Wonderland (Disney)]])\r\n* [[White Rabbit pointing at a clock (meme)]]",
+                "response_truncated": false,
+                "search_text_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "title": "white_rabbit_(alice_in_wonderland)"
+              }
+            ],
+            "entry_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "8789"
+            },
+            "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001",
+            "identity_evidence": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001",
+                "locator": null,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "type": "page"
+              }
+            ],
+            "identity_evidence_truncated": false,
+            "locator": null,
+            "matched_by": "fts",
+            "matched_documents": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4001",
+                "original": "A character in Lewis Carroll's book [[Alice's Adventures in Wonderland]]. Often drawn holding a [[pocket watch]] or next to a large [[clock]].\r\n\r\nh4. See also\r\n\r\n* [[White Rabbit (Disney)]] ([[Alice in Wonderland (Disney)]])\r\n* [[White Rabbit pointing at a clock (meme)]]",
+                "response_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "title": "white_rabbit_(alice_in_wonderland)"
+              }
+            ],
+            "score": -20.895929830140126,
+            "source_fields": {},
+            "source_fields_evidence": [],
+            "source_fields_truncated": [],
+            "source_id": "danbooru-complete-a26a3829dd42"
+          },
+          {
+            "aliases": [],
+            "citations": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005",
+                "source_id": "danbooru-complete-a26a3829dd42"
+              }
+            ],
+            "descriptions": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005",
+                "original": "A character in \"A Mad Tea Party\", often popularly known as \"The [[Mad Hatter (alice In Wonderland)|]]'s Tea Party\", from [[Alice's Adventures in Wonderland]] by Lewis Carroll. This mouse is terrified of cats and appears to be a narcoleptic.",
+                "response_truncated": false,
+                "search_text_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "title": "dormouse_(alice_in_wonderland)"
+              }
+            ],
+            "entry_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "8793"
+            },
+            "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005",
+            "identity_evidence": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005",
+                "locator": null,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "type": "page"
+              }
+            ],
+            "identity_evidence_truncated": false,
+            "locator": null,
+            "matched_by": "fts",
+            "matched_documents": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4005",
+                "original": "A character in \"A Mad Tea Party\", often popularly known as \"The [[Mad Hatter (alice In Wonderland)|]]'s Tea Party\", from [[Alice's Adventures in Wonderland]] by Lewis Carroll. This mouse is terrified of cats and appears to be a narcoleptic.",
+                "response_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "title": "dormouse_(alice_in_wonderland)"
+              }
+            ],
+            "score": -20.782963286550412,
+            "source_fields": {},
+            "source_fields_evidence": [],
+            "source_fields_truncated": [],
+            "source_id": "danbooru-complete-a26a3829dd42"
+          },
+          {
+            "aliases": [],
+            "citations": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642",
+                "source_id": "danbooru-complete-a26a3829dd42"
+              }
+            ],
+            "descriptions": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642",
+                "original": "A book duology by English author [[Lewis Carroll]] as well as a large media franchise which resulted from them, tagged here with the name of the first book.\r\n\r\nThe first book, [i]Alice's Adventures in Wonderland[/i] (1865), tells the story of a girl named Alice, who falls down a rabbit hole into a fantasy world populated by peculiar and anthropomorphic creatures. [i]Through the Looking-Glass, and What Alice Found There[/i] (1871) is a continuation in which Alice goes through the titular looking glass and enters a world that works like a chess board. Once again, Alice finds various peculiar and anthropomorphic creatures and has to deal with their eccentricities.\r\n\r\nBetween the original story arriving in Japan just as the country was opening up in the late 1800s and the extremely popular [[Disney]] adaptation, the story has remained as a permanent part of Japanese literature and fashion. \r\n\r\nh4. Characters\r\n\r\n* [[Alice (alice in wonderland)|]]\r\n* [[Caterpillar (alice in wonderland)|]]\r\n* [[Cheshire Cat (alice In Wonderland)|]]\r\n* [[Dodo (alice in wonderland)|]]\r\n* [[Dormouse (alice in wonderland)|]]\r\n* [[Duck (alice in wonderland)|]]\r\n* [[Jabberwock (alice in wonderland)|]]\r\n* [[Mad Hatter (alice In Wonderland)|]]\r\n* [[March Hare (alice In Wonderland)|]]\r\n* [[Queen of Hearts (alice in wonderland)|]]\r\n* [[Red Queen]]\r\n* [[Tweedledee (alice in wonderland)|]]\r\n* [[Tweedledum (alice in wonderland)|]]\r\n* [[White Rabbit (alice In Wonderland)|]]\r\n* [[White Queen]]\r\n\r\nh4. Copyrights\r\n\r\n* [[Alice in Wonderland (Disney)]]\r\n** [[Alice in Wonderland (Tim Burton)]]\r\n* [[American McGee's Alice]]\r\n** [[Alice: Madness Returns]]\r\n* [[Neco z Alenky]]\r\n\r\nh4. See also\r\n\r\n* [[Grimms' Fairy Tales]]\r\n\r\nh4. External links\r\n\r\n* \"Wikipedia: Alice's Adventures in Wonderland\":[https://en.wikipedia.org/wiki/Alice%27s_Adventures_in_Wonderland]\r\n* \"Wikipedia: Through the Looking-Glass, and What Alice Found There\":[https://en.wikipedia.org/wiki/Through_the_Looking-Glass]",
+                "response_truncated": false,
+                "search_text_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "title": "alice's_adventures_in_wonderland"
+              }
+            ],
+            "entry_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "8379"
+            },
+            "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642",
+            "identity_evidence": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642",
+                "locator": null,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "type": "page"
+              }
+            ],
+            "identity_evidence_truncated": false,
+            "locator": null,
+            "matched_by": "fts",
+            "matched_documents": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:3642",
+                "original": "A book duology by English author [[Lewis Carroll]] as well as a large media franchise which resulted from them, tagged here with the name of the first book.\r\n\r\nThe first book, [i]Alice's Adventures in Wonderland[/i] (1865), tells the story of a girl named Alice, who falls down a rabbit hole into a fantasy world populated by peculiar and anthropomorphic creatures. [i]Through the Looking-Glass, and What Alice Found There[/i] (1871) is a continuation in which Alice goes through the titular looking glass and enters a world that works like a chess board. Once again, Alice finds various peculiar and anthropomorphic creatures and has to deal with their eccentricities.\r\n\r\nBetween the original story arriving in Japan just as the country was opening up in the late 1800s and the extremely popular [[Disney]] adaptation, the story has remained as a permanent part of Japanese literature and fashion. \r\n\r\nh4. Characters\r\n\r\n* [[Alice (alice in wonderland)|]]\r\n* [[Caterpillar (alice in wonderland)|]]\r\n* [[Cheshire Cat (alice In Wonderland)|]]\r\n* [[Dodo (alice in wonderland)|]]\r\n* [[Dormouse (alice in wonderland)|]]\r\n* [[Duck (alice in wonderland)|]]\r\n* [[Jabberwock (alice in wonderland)|]]\r\n* [[Mad Hatter (alice In Wonderland)|]]\r\n* [[March Hare (alice In Wonderland)|]]\r\n* [[Queen of Hearts (alice in wonderland)|]]\r\n* [[Red Queen]]\r\n* [[Tweedledee (alice in wonderland)|]]\r\n* [[Tweedledum (alice in wonderland)|]]\r\n* [[White Rabbit (alice In Wonderland)|]]\r\n* [[White Queen]]\r\n\r\nh4. Copyrights\r\n\r\n* [[Alice in Wonderland (Disney)]]\r\n** [[Alice in Wonderland (Tim Burton)]]\r\n* [[American McGee's Alice]]\r\n** [[Alice: Madness Returns]]\r\n* [[Neco z Alenky]]\r\n\r\nh4. See also\r\n\r\n* [[Grimms' Fairy Tales]]\r\n\r\nh4. External links\r\n\r\n* \"Wikipedia: Alice's Adventures in Wonderland\":[https://en.wikipedia.org/wiki/Alice%27s_Adventures_in_Wonderland]\r\n* \"Wikipedia: Through the Looking-Glass, and What Alice Found There\":[https://en.wikipedia.org/wiki/Through_the_Looking-Glass]",
+                "response_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "title": "alice's_adventures_in_wonderland"
+              }
+            ],
+            "score": -20.701665200899022,
+            "source_fields": {},
+            "source_fields_evidence": [],
+            "source_fields_truncated": [],
+            "source_id": "danbooru-complete-a26a3829dd42"
+          },
+          {
+            "aliases": [],
+            "citations": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192",
+                "source_id": "danbooru-complete-a26a3829dd42"
+              }
+            ],
+            "descriptions": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192",
+                "original": "[[Alicesoft]]'s mascot, a [[blonde hair|blonde]] girl wearing a [[blue dress]] and a [[white apron]].\r\n\r\nHer appearance is based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].",
+                "response_truncated": false,
+                "search_text_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "title": "alice_(alicesoft)"
+              }
+            ],
+            "entry_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "110516"
+            },
+            "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192",
+            "identity_evidence": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192",
+                "locator": null,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "type": "page"
+              }
+            ],
+            "identity_evidence_truncated": false,
+            "locator": null,
+            "matched_by": "fts",
+            "matched_documents": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:104192",
+                "original": "[[Alicesoft]]'s mascot, a [[blonde hair|blonde]] girl wearing a [[blue dress]] and a [[white apron]].\r\n\r\nHer appearance is based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].",
+                "response_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "title": "alice_(alicesoft)"
+              }
+            ],
+            "score": -20.399896980045902,
+            "source_fields": {},
+            "source_fields_evidence": [],
+            "source_fields_truncated": [],
+            "source_id": "danbooru-complete-a26a3829dd42"
+          },
+          {
+            "aliases": [],
+            "citations": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477",
+                "source_id": "danbooru-complete-a26a3829dd42"
+              }
+            ],
+            "descriptions": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477",
+                "original": "A 5-star Plant element [[Cat Busters]] character based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].\r\n\r\nh4. Appearance\r\n* !asset #41328012: Default\r\n* !asset #41328032: Awakened\r\n* !asset #41329746: [[alice (wonderland) (cat busters)|Wonderland]]\r\n* !asset #41395037: Wonderland (Awakened)",
+                "response_truncated": false,
+                "search_text_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "title": "alice_(cat_busters)"
+              }
+            ],
+            "entry_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "112801"
+            },
+            "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477",
+            "identity_evidence": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477",
+                "locator": null,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "type": "page"
+              }
+            ],
+            "identity_evidence_truncated": false,
+            "locator": null,
+            "matched_by": "fts",
+            "matched_documents": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:106477",
+                "original": "A 5-star Plant element [[Cat Busters]] character based on [[Alice (alice in wonderland)|]] from [[Alice's Adventures in Wonderland]].\r\n\r\nh4. Appearance\r\n* !asset #41328012: Default\r\n* !asset #41328032: Awakened\r\n* !asset #41329746: [[alice (wonderland) (cat busters)|Wonderland]]\r\n* !asset #41395037: Wonderland (Awakened)",
+                "response_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "title": "alice_(cat_busters)"
+              }
+            ],
+            "score": -20.27178242015498,
+            "source_fields": {},
+            "source_fields_evidence": [],
+            "source_fields_truncated": [],
+            "source_id": "danbooru-complete-a26a3829dd42"
+          },
+          {
+            "aliases": [],
+            "citations": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269",
+                "source_id": "danbooru-complete-a26a3829dd42"
+              }
+            ],
+            "descriptions": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269",
+                "original": "A character appearing in [[Alice's Adventures in Wonderland]]. It is seen smoking a [[hookah]] while sitting on a [[mushroom]].",
+                "response_truncated": false,
+                "search_text_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "title": "caterpillar_(alice_in_wonderland)"
+              }
+            ],
+            "entry_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "21892"
+            },
+            "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269",
+            "identity_evidence": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269",
+                "locator": null,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "type": "page"
+              }
+            ],
+            "identity_evidence_truncated": false,
+            "locator": null,
+            "matched_by": "fts",
+            "matched_documents": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:16269",
+                "original": "A character appearing in [[Alice's Adventures in Wonderland]]. It is seen smoking a [[hookah]] while sitting on a [[mushroom]].",
+                "response_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "title": "caterpillar_(alice_in_wonderland)"
+              }
+            ],
+            "score": -20.267046094961955,
+            "source_fields": {},
+            "source_fields_evidence": [],
+            "source_fields_truncated": [],
+            "source_id": "danbooru-complete-a26a3829dd42"
+          },
+          {
+            "aliases": [],
+            "citations": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004",
+                "source_id": "danbooru-complete-a26a3829dd42"
+              }
+            ],
+            "descriptions": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004",
+                "original": "The March Hare, often called the Mad March Hare, is a character who appears in the tea party scene in Lewis Carroll's [[Alice's Adventures in Wonderland]].\r\n\r\nHis friend is the [[Mad Hatter (alice In Wonderland)|]].\r\n\r\nh4. See also\r\n\r\n* [[March Hare (Disney)]] ([[Alice in Wonderland (Disney)]])",
+                "response_truncated": false,
+                "search_text_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "title": "march_hare_(alice_in_wonderland)"
+              }
+            ],
+            "entry_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "8792"
+            },
+            "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004",
+            "identity_evidence": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004",
+                "locator": null,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "status": "source_backed",
+                "type": "page"
+              }
+            ],
+            "identity_evidence_truncated": false,
+            "locator": null,
+            "matched_by": "fts",
+            "matched_documents": [
+              {
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:4004",
+                "original": "The March Hare, often called the Mad March Hare, is a character who appears in the tea party scene in Lewis Carroll's [[Alice's Adventures in Wonderland]].\r\n\r\nHis friend is the [[Mad Hatter (alice In Wonderland)|]].\r\n\r\nh4. See also\r\n\r\n* [[March Hare (Disney)]] ([[Alice in Wonderland (Disney)]])",
+                "response_truncated": false,
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "title": "march_hare_(alice_in_wonderland)"
+              }
+            ],
+            "score": -20.171487619519702,
+            "source_fields": {},
+            "source_fields_evidence": [],
+            "source_fields_truncated": [],
+            "source_id": "danbooru-complete-a26a3829dd42"
+          },
+          {
+            "aliases": [],
+            "citations": [
+              {
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760",
+                "source_id": "bangumi-complete-6a75aefb769a"
+              }
+            ],
+            "descriptions": [
+              {
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760",
+                "original": "A joyfully psychedelic animation inspired by Lewis Carroll\u2019s Alice in Wonderland.",
+                "response_truncated": false,
+                "search_text_truncated": false,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "status": "source_backed",
+                "title": "Adventures in Beauty Wonderland"
+              }
+            ],
+            "entry_key": {
+              "kind": "subject",
+              "namespace": "bangumi.subject",
+              "value": "642007"
+            },
+            "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760",
+            "identity_evidence": [
+              {
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760",
+                "locator": null,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "status": "source_backed",
+                "type": "subject"
+              }
+            ],
+            "identity_evidence_truncated": false,
+            "locator": null,
+            "matched_by": "fts",
+            "matched_documents": [
+              {
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:625760",
+                "original": "A joyfully psychedelic animation inspired by Lewis Carroll\u2019s Alice in Wonderland.",
+                "response_truncated": false,
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "title": "Adventures in Beauty Wonderland"
+              }
+            ],
+            "score": -20.17141161057451,
+            "source_fields": {},
+            "source_fields_evidence": [],
+            "source_fields_truncated": [],
+            "source_id": "bangumi-complete-6a75aefb769a"
+          }
+        ],
+        "canonical": null,
+        "citations": [],
+        "contract_version": "2",
+        "descriptions": [],
+        "entry_key": null,
+        "query": "a's_wonderland",
+        "relations": [],
+        "response_version": "3",
+        "snapshot": "7e1592a61452d437ae46fab589317d2ac7b10c5a02c6c966097fa679a963a57c",
+        "status": "ambiguous",
+        "tag_key": null,
+        "warnings": []
+      }
+    }
+  },
+  "full_json_problems": [],
+  "status": "EQUAL"
+}

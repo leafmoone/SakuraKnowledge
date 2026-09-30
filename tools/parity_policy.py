@@ -17,6 +17,11 @@ def classify(py: dict, rs: dict, mode: str, expect: dict, diff, check_expect) ->
     if any(timeout):
         status = "BOTH_TIMEOUT" if all(timeout) else "SINGLE_TIMEOUT"
         problems.append({"kind": status, "python": timeout[0], "rust": timeout[1]})
+    elif any(isinstance(r.get("value"), dict) and any(
+            w in r["value"].get("warnings", []) for w in
+            ("search_document_scan_limit", "response_budget_truncated")) for r in (py, rs)):
+        status = "PARTIAL"
+        problems.append({"kind": "incomplete_response"})
     elif mode == "error":
         for side, result in (("python", py), ("rust", rs)):
             error = result.get("error")

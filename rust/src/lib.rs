@@ -9,6 +9,7 @@ use serde_json::{json, Value};
 use std::path::Path;
 use std::time::{Duration, Instant};
 mod response;
+mod search;
 mod unicode16;
 
 pub const CONTRACT_VERSION: &str = "2";
@@ -19,18 +20,6 @@ const MAX_QUERY_TOKENS: usize = 256;
 const MAX_WORD: usize = 256;
 const BUDGET_SECS: u64 = 5;
 type EntryRow = (i64, String, String, String, Option<String>);
-type FtsRow = (
-    i64,
-    String,
-    String,
-    String,
-    f64,
-    String,
-    String,
-    bool,
-    String,
-    String,
-);
 
 #[derive(Debug)]
 pub enum Error {
@@ -134,6 +123,9 @@ pub fn match_query(text: &str) -> Result<String> {
 pub struct Runtime {
     conn: Connection,
     snapshot: String,
+    operation_depth: usize,
+    deadline: Instant,
+    pub last_search_profile: Value,
 }
 
 fn base(query: &Value, snapshot: &str, status: &str) -> Value {
@@ -253,13 +245,80 @@ impl Runtime {
                 "invalid snapshot capability or identity".into(),
             ));
         }
-        Ok(Runtime { conn, snapshot })
+        Ok(Runtime {
+            conn,
+            snapshot,
+            operation_depth: 0,
+            deadline: Instant::now() + Duration::from_secs(5),
+            last_search_profile: json!({}),
+        })
     }
 
     fn install_budget(conn: &Connection) {
         let deadline = Duration::from_secs(BUDGET_SECS);
         let start = Instant::now();
         conn.progress_handler(1000, Some(move || start.elapsed() > deadline));
+    }
+
+    fn check_deadline(&self) -> Result<()> {
+        if Instant::now() > self.deadline {
+            Err(Error::Budget)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn operation(&mut self, call: impl FnOnce(&mut Self) -> Result<Value>) -> Result<Value> {
+        if self.operation_depth == 0 {
+            self.deadline = Instant::now() + Duration::from_secs(5);
+            let deadline = self.deadline;
+            self.conn
+                .progress_handler(1000, Some(move || Instant::now() > deadline));
+        }
+        self.operation_depth += 1;
+        let result = call(self);
+        self.operation_depth -= 1;
+        self.check_deadline()?;
+        result
+    }
+
+    pub fn inspect(&mut self) -> Result<Value> {
+        self.operation(|s| s.inspect_inner())
+    }
+    pub fn lookup(&mut self, q: &str, k: Option<&str>, ns: Option<&str>) -> Result<Value> {
+        self.operation(|s| s.lookup_inner(q, k, ns))
+    }
+    pub fn lookup_key(&mut self, k: &str, ns: &str, v: &str) -> Result<Value> {
+        self.operation(|s| s.lookup_key_inner(k, ns, v))
+    }
+    pub fn search(
+        &mut self,
+        q: &str,
+        topk: u32,
+        k: Option<&str>,
+        ns: Option<&str>,
+    ) -> Result<Value> {
+        self.operation(|s| s.search_inner(q, topk, k, ns))
+    }
+    pub fn related(
+        &mut self,
+        k: &str,
+        ns: &str,
+        v: &str,
+        rel: Option<&str>,
+        filter: Option<&str>,
+        limit: u32,
+    ) -> Result<Value> {
+        self.operation(|s| s.related_inner(k, ns, v, rel, filter, limit))
+    }
+    pub fn ask(
+        &mut self,
+        q: &str,
+        k: Option<&str>,
+        ns: Option<&str>,
+        target: Option<&str>,
+    ) -> Result<Value> {
+        self.operation(|s| s.ask_inner(q, k, ns, target))
     }
 
     pub fn snapshot(&self) -> &str {
@@ -274,8 +333,8 @@ impl Runtime {
                "normalization_library_unicode": format!("{:?}", unicode_normalization::UNICODE_VERSION)})
     }
 
-    pub fn inspect(&mut self) -> Result<Value> {
-        Self::install_budget(&self.conn);
+    fn inspect_inner(&mut self) -> Result<Value> {
+        self.check_deadline()?;
         let page_size: i64 = self
             .conn
             .query_row("PRAGMA page_size", [], |r| r.get(0))
@@ -486,13 +545,13 @@ impl Runtime {
 
     // ------------------------------------------------------------- queries
 
-    pub fn lookup(
+    fn lookup_inner(
         &mut self,
         query: &str,
         kind: Option<&str>,
         namespace: Option<&str>,
     ) -> Result<Value> {
-        Self::install_budget(&self.conn);
+        self.check_deadline()?;
         if query.is_empty() || query.chars().count() > MAX_QUERY_CHARS {
             return Err(Error::Invalid(
                 "query must contain 1..4096 characters".into(),
@@ -558,8 +617,8 @@ impl Runtime {
         response::bound_response(result)
     }
 
-    pub fn lookup_key(&mut self, kind: &str, namespace: &str, value: &str) -> Result<Value> {
-        Self::install_budget(&self.conn);
+    fn lookup_key_inner(&mut self, kind: &str, namespace: &str, value: &str) -> Result<Value> {
+        self.check_deadline()?;
         validate_key(kind, namespace, value)?;
         let sql = format!(
             "SELECT e.id,e.kind,e.namespace,e.value,e.locator FROM entries e
@@ -608,7 +667,7 @@ impl Runtime {
         response::bound_response(result)
     }
 
-    pub fn search(
+    fn search_inner(
         &mut self,
         query: &str,
         topk: u32,
@@ -618,8 +677,21 @@ impl Runtime {
         if !(1..=100).contains(&topk) {
             return Err(Error::Invalid("topk must be 1..100".into()));
         }
+        let started = Instant::now();
+        self.last_search_profile = json!({"scanned_rows":0,"materialized_matched_documents":0,
+                                         "returned_matched_body_utf8_bytes":0});
         let mut exact = self.lookup(query, kind, namespace)?;
+        self.last_search_profile["exact_identity_assembly_s"] =
+            json!(started.elapsed().as_secs_f64());
         let compiled = match_query(query)?;
+        if exact["candidates"].as_array().unwrap().len() >= topk as usize {
+            exact["candidates"]
+                .as_array_mut()
+                .unwrap()
+                .truncate(topk as usize);
+            self.last_search_profile["fts_skipped_exact_sufficient"] = json!(true);
+            return response::bound_response(exact);
+        }
         if compiled.is_empty() {
             let cands = exact["candidates"].as_array().cloned().unwrap_or_default();
             exact["candidates"] = json!(cands.into_iter().take(topk as usize).collect::<Vec<_>>());
@@ -631,44 +703,7 @@ impl Runtime {
             }
             return response::bound_response(exact);
         }
-        let sql = format!(
-            "SELECT e.id,e.kind,e.namespace,e.value,
-                    bm25(search_fts),
-                    d.title,substr(d.original,1,4000),length(d.original)>4000,
-                    d.source_id,d.evidence_id
-             FROM search_fts JOIN documents d ON d.id=search_fts.document_id
-             JOIN entries e ON e.id=search_fts.entry_id
-             WHERE search_fts MATCH ?1
-             AND e.conflicted=0 AND d.status IN ({TEXT_STATUSES})
-             AND EXISTS (SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id
-                    AND v.status IN ({ID_STATUSES}))
-             AND (?2 IS NULL OR e.kind=?2) AND (?3 IS NULL OR e.namespace=?3)
-             ORDER BY bm25(search_fts),e.kind,e.namespace,e.value,search_fts.rowid
-             LIMIT 10001"
-        );
-        let raw: Vec<FtsRow> = {
-            let mut stmt = self.conn.prepare(&sql)?;
-            let rows = stmt.query_map(params![compiled, kind, namespace], |r| {
-                Ok((
-                    r.get::<_, i64>(0)?,
-                    r.get::<_, String>(1)?,
-                    r.get::<_, String>(2)?,
-                    r.get::<_, String>(3)?,
-                    r.get::<_, f64>(4)?,
-                    r.get::<_, String>(5)?,
-                    r.get::<_, String>(6)?,
-                    r.get::<_, bool>(7)?,
-                    r.get::<_, String>(8)?,
-                    r.get::<_, String>(9)?,
-                ))
-            })?;
-            let mut v = Vec::new();
-            for row in rows {
-                v.push(row?);
-            }
-            v
-        };
-        let mut rows = raw.into_iter();
+
         let mut candidates = exact["candidates"]
             .as_array()
             .cloned()
@@ -676,7 +711,7 @@ impl Runtime {
             .into_iter()
             .take(topk as usize)
             .collect::<Vec<_>>();
-        let mut seen: std::collections::HashSet<(String, String, String)> = candidates
+        let seen: std::collections::HashSet<(String, String, String)> = candidates
             .iter()
             .map(|c| {
                 (
@@ -686,48 +721,64 @@ impl Runtime {
                 )
             })
             .collect();
-        let mut scanned = 0u32;
-        loop {
-            if candidates.len() >= topk as usize {
-                break;
-            }
-            let Some((id, k, ns, v, score, title, original, truncated, sid, eid)) = rows.next()
+        let start = Instant::now();
+        let selected = search::select(
+            &self.conn,
+            &compiled,
+            kind,
+            namespace,
+            seen,
+            topk as usize - candidates.len(),
+            self.deadline,
+        )?;
+        self.last_search_profile["fts_execute_select_s"] = json!(start.elapsed().as_secs_f64());
+        self.last_search_profile["scanned_rows"] = json!(selected.scanned);
+        self.last_search_profile["selected_identities"] = json!(selected.hits.len());
+        let mut assembly_s = 0.0;
+        let mut body_s = 0.0;
+        let mut body_bytes = 0;
+        let mut documents = 0;
+        for hit in selected.hits {
+            self.check_deadline()?;
+            let start = Instant::now();
+            let Some(mut candidate) = self.candidate_for(
+                hit.id,
+                &hit.key.0,
+                &hit.key.1,
+                &hit.key.2,
+                hit.locator.as_deref(),
+                None,
+            )?
             else {
-                break;
-            };
-            scanned += 1;
-            if scanned > 10000 {
-                break;
-            }
-            let ident = (k.clone(), ns.clone(), v.clone());
-            if seen.contains(&ident) {
-                continue;
-            }
-            let Some(mut candidate) = self.candidate_for(id, &k, &ns, &v, None, None)? else {
                 continue;
             };
+            assembly_s += start.elapsed().as_secs_f64();
+            let start = Instant::now();
+            let (title, original, truncated, sid, eid): (String, String, bool, String, String) = self.conn.query_row(
+                "SELECT title,substr(original,1,4000),length(original)>4000,source_id,evidence_id FROM documents WHERE id=?",
+                [hit.document_id], |r| Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?)))?;
+            body_s += start.elapsed().as_secs_f64();
+            body_bytes += original.len();
+            documents += 1;
             candidate["matched_by"] = json!("fts");
-            candidate["score"] = json!(score);
+            candidate["score"] = json!(hit.score);
             candidate["matched_documents"] = json!([{
-                "title": title, "original": original,
-                "response_truncated": truncated,
+                "title": title, "original": original, "response_truncated": truncated,
                 "source_id": sid, "evidence_id": eid
             }]);
             candidate["source_id"] = json!(sid);
             candidate["evidence_id"] = json!(eid);
-            seen.insert(ident);
             candidates.push(candidate);
         }
+        self.last_search_profile["identity_field_assembly_s"] = json!(assembly_s);
+        self.last_search_profile["matched_document_read_s"] = json!(body_s);
+        self.last_search_profile["returned_matched_body_utf8_bytes"] = json!(body_bytes);
+        self.last_search_profile["materialized_matched_documents"] = json!(documents);
         exact["candidates"] = json!(candidates);
         if exact["status"] == json!("not_found") && !candidates.is_empty() {
             exact["status"] = json!("found");
         }
-        if scanned > 10000
-            && exact["candidates"]
-                .as_array()
-                .map(|a| a.len() < topk as usize)
-                .unwrap_or(false)
-        {
+        if selected.truncated {
             exact["warnings"]
                 .as_array_mut()
                 .unwrap()
@@ -736,7 +787,7 @@ impl Runtime {
         response::bound_response(exact)
     }
 
-    pub fn related(
+    fn related_inner(
         &mut self,
         kind: &str,
         namespace: &str,
@@ -929,7 +980,7 @@ impl Runtime {
         response::bound_response(result)
     }
 
-    pub fn ask(
+    fn ask_inner(
         &mut self,
         query: &str,
         kind: Option<&str>,
@@ -943,7 +994,7 @@ impl Runtime {
                 ));
             }
         }
-        Self::install_budget(&self.conn);
+        self.check_deadline()?;
         let direct = self.lookup(query, kind, namespace)?;
         if direct["status"] == json!("found") || direct["status"] == json!("ambiguous") {
             let mut result = self.ask_resolved(query, kind, namespace, target, Some(direct))?;

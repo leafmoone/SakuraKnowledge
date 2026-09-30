@@ -119,6 +119,12 @@ def test_capture_outer_timeout_is_bounded():
     assert rec["attempted"] == 1 and rec["succeeded"] == 0
 
 
+@pytest.mark.parametrize("warning", ["search_document_scan_limit", "response_budget_truncated"])
+def test_equal_partial_is_not_pass(warning):
+    result = classify(value({"warnings": [warning]}), value({"warnings": [warning]}))
+    assert result["status"] == "PARTIAL" and not result["passed"]
+
+
 def test_real_error_first_child():
     rec = harness.capture([sys.executable, "-c",
                            ("import sys,json;print(json.dumps(dict(error='ValueError',"

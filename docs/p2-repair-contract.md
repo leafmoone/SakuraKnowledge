@@ -62,6 +62,40 @@ preparable MATCH and a functioning JSON extraction operation. Failure closes the
 connection. These bounded checks never invoke full integrity_check, digest scan,
 implicit migration, index creation or download.
 
+## R1 query plan and unified deadline
+
+Legacy S18 EXPLAIN shows a temporary B-tree for ORDER BY bm25 plus identity.
+Both legacy diagnostic runs exhausted five seconds before returning a first row;
+therefore this receipt does not attribute measured cost to body materialization
+that never happened. The old Rust code additionally collected 10,001 bodies
+when SQL succeeded; that independent memory defect is removed.
+
+The new query orders by the FTS hidden rank column (default BM25), enabling the
+FTS rank cursor and avoiding the joined wide temporary sort. It selects only
+entry key/locator, score and document/FTS row IDs. Complete equal-score groups
+are examined, retaining only the needed lexicographically smallest identities;
+duplicate documents choose the smallest FTS rowid. This preserves old
+(score,kind,namespace,value,rowid) ordering. At 10,000 scanned rows an incomplete
+tie is explicitly warned and cannot pass formal parity. Selected identities
+alone fetch matched document text. Exact matches sufficient for topk skip FTS.
+
+Nested lookup/related/ask/search calls share a single five-second operation
+deadline; a subsequent public operation starts a new deadline. Non-SQL assembly
+and streaming also check the deadline. OR semantics and S18 input/topk unchanged.
+One-shot before/after diagnostic receipts are not 30-sample performance evidence.
+
+## R2 Unicode data
+
+`tools/generate_unicode16.py` requires CPython UCD16 and enumerates every scalar
+to generate full default casefold mappings, Python alphanumeric ranges and UCD16
+assigned ranges. Rust normalizes assigned runs with the pinned normalization
+crate, preserving UCD16-unassigned characters as CCC=0 boundaries, then applies
+the complete generated casefold table. No Python runtime subprocess is used.
+Generator `--check`, direct token/MATCH cases, nonempty FTS and full JSON tests
+cover sharp-S, sigma, dotted-I, combining marks, width forms, kana, CJK, whitespace
+and supplementary-plane letters. Runtime metadata states both UCD16 and the
+normalization library Unicode version, and actual bundled SQLite version.
+
 ## Expected deltas
 
 Old introduction mapping_status=unmapped becomes not_requested; no tag is

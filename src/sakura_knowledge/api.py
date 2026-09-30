@@ -7,6 +7,8 @@ from functools import wraps
 from . import CONTRACT_VERSION
 from .model import IDENTITY_TRUSTED, TEXT_TRUSTED, EntryKey, match_query
 from .response import RESPONSE_VERSION, bound_response, source_observations
+from .search import SQL as SEARCH_SQL
+from .search import select_rows
 from .storage import readonly
 
 _ID = ", ".join(f"'{s}'" for s in sorted(IDENTITY_TRUSTED))
@@ -36,7 +38,20 @@ def parse_ask_template(query):
 def bounded_response(method):
     @wraps(method)
     def wrapped(self, *args, **kwargs):
-        return bound_response(method(self, *args, **kwargs))
+        outer = self._operation_depth == 0
+        if outer:
+            self._deadline = time.monotonic() + 5
+        self._operation_depth += 1
+        try:
+            result = bound_response(method(self, *args, **kwargs))
+            self._check_deadline()
+            return result
+        except sqlite3.OperationalError as exc:
+            if "interrupted" in str(exc).lower():
+                raise ValueError("query_budget_exceeded") from exc
+            raise
+        finally:
+            self._operation_depth -= 1
     return wrapped
 
 
@@ -44,6 +59,8 @@ class Knowledge:
     def __init__(self, path):
         self.conn = readonly(path)
         self._deadline = time.monotonic() + 5
+        self._operation_depth = 0
+        self.last_search_profile = {}
         self.conn.set_progress_handler(lambda: int(time.monotonic() > self._deadline), 1000)
         self.conn.setlimit(sqlite3.SQLITE_LIMIT_LENGTH, 2_000_000)
         try:
@@ -126,9 +143,16 @@ class Knowledge:
                 "dbstat_status": dbstat_status, "read_only": True}
 
     def _budget(self):
-        self._deadline = time.monotonic() + 5
+        if self._operation_depth == 0:
+            self._deadline = time.monotonic() + 5
+        self._check_deadline()
+
+    def _check_deadline(self):
+        if time.monotonic() > self._deadline:
+            raise ValueError("query_budget_exceeded")
 
     def _execute(self, sql, parameters=()):
+        self._check_deadline()
         try:
             return self.conn.execute(sql, parameters)
         except sqlite3.OperationalError as exc:
@@ -234,59 +258,60 @@ class Knowledge:
         self._budget()
         if type(topk) is not int or not 1 <= topk <= 100:
             raise ValueError("topk must be 1..100")
+        started = time.perf_counter()
+        self.last_search_profile = {"scanned_rows": 0, "materialized_matched_documents": 0,
+                                    "returned_matched_body_utf8_bytes": 0}
         exact = self.lookup(query, kind=kind, namespace=namespace)
+        self.last_search_profile["exact_identity_assembly_s"] = time.perf_counter() - started
         compiled = match_query(query)
+        if len(exact["candidates"]) >= topk:
+            exact["candidates"] = exact["candidates"][:topk]
+            self.last_search_profile["fts_skipped_exact_sufficient"] = True
+            return exact
         if not compiled:
             exact["candidates"] = exact["candidates"][:topk]
             if exact["status"] == "not_found":
                 exact["warnings"].append("too_short")
             return exact
-        # FTS scores rank documents; the first document of an entry in this ordering
-        # represents its best score. Bound row scans, including duplicates from an
-        # entry with many documents; never load unbounded query results into memory.
-        rows = self._execute(
-            f"SELECT e.*,bm25(search_fts) AS score, d.title AS matched_title, "
-            f"substr(d.original,1,4000) AS matched_original, "
-            f"length(d.original)>4000 AS matched_response_truncated, "
-            f"d.source_id AS matched_source_id, d.evidence_id AS matched_evidence_id "
-            f"FROM search_fts JOIN documents d ON d.id=search_fts.document_id "
-            f"JOIN entries e ON e.id=search_fts.entry_id WHERE search_fts MATCH ? "
-            f"AND e.conflicted=0 AND d.status IN ({_TEXT}) AND EXISTS "
-            f"(SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id "
-            f"AND v.status IN ({_ID})) "
-            f"AND (? IS NULL OR e.kind=?) AND (? IS NULL OR e.namespace=?) "
-            f"ORDER BY score,e.kind,e.namespace,e.value,search_fts.rowid LIMIT 10001",
-            (compiled, kind, kind, namespace, namespace))
         candidates = exact["candidates"][:topk]
         seen = {(c["entry_key"]["kind"], c["entry_key"]["namespace"],
                  c["entry_key"]["value"]) for c in candidates}
-        scanned = 0
-        for row in rows:
-            if len(candidates) >= topk:
-                break
-            scanned += 1
-            if scanned > 10000:
-                break
-            identity = (row["kind"], row["namespace"], row["value"])
-            if identity not in seen:
-                candidate = self.describe(row)
-                candidate["matched_by"] = "fts"
-                candidate["score"] = row["score"]
-                candidate["matched_documents"] = [{
-                    "title": row["matched_title"], "original": row["matched_original"],
-                    "response_truncated": bool(row["matched_response_truncated"]),
-                    "source_id": row["matched_source_id"],
-                    "evidence_id": row["matched_evidence_id"]}]
-                candidate["source_id"] = row["matched_source_id"]
-                candidate["evidence_id"] = row["matched_evidence_id"]
-                candidates.append(candidate)
-                seen.add(identity)
-            if len(candidates) >= topk:
-                break
+        started = time.perf_counter()
+        rows = self._execute(SEARCH_SQL, (compiled, kind, namespace))
+        self.last_search_profile["fts_execute_first_row_s"] = time.perf_counter() - started
+        started = time.perf_counter()
+        try:
+            selected, scanned, truncated = select_rows(rows, seen, topk - len(candidates),
+                                                        self._check_deadline)
+        finally:
+            rows.close()
+        self.last_search_profile.update(scanned_rows=scanned, selected_identities=len(selected),
+                                        fts_select_s=time.perf_counter() - started)
+        self.last_search_profile["identity_field_assembly_s"] = 0.0
+        self.last_search_profile["matched_document_read_s"] = 0.0
+        for row in selected:
+            started = time.perf_counter()
+            candidate = self.describe(row)
+            self.last_search_profile["identity_field_assembly_s"] += time.perf_counter() - started
+            started = time.perf_counter()
+            document = self._execute(
+                "SELECT title,substr(original,1,4000) AS original,length(original)>4000 AS truncated,"
+                "source_id,evidence_id FROM documents WHERE id=?", (row["document_id"],)).fetchone()
+            self.last_search_profile["matched_document_read_s"] += time.perf_counter() - started
+            self.last_search_profile["materialized_matched_documents"] += 1
+            self.last_search_profile["returned_matched_body_utf8_bytes"] += len(document["original"].encode("utf-8"))
+            candidate["matched_by"] = "fts"
+            candidate["score"] = row["score"]
+            candidate["matched_documents"] = [{"title": document["title"],
+                "original": document["original"], "response_truncated": bool(document["truncated"]),
+                "source_id": document["source_id"], "evidence_id": document["evidence_id"]}]
+            candidate["source_id"] = document["source_id"]
+            candidate["evidence_id"] = document["evidence_id"]
+            candidates.append(candidate)
         exact["candidates"] = candidates
         if exact["status"] == "not_found":
             exact["status"] = "found" if candidates else "not_found"
-        if scanned > 10000 and len(candidates) < topk:
+        if truncated:
             exact["warnings"].append("search_document_scan_limit")
         return exact
 
