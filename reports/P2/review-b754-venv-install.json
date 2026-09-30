@@ -1,0 +1,26 @@
+{
+  "head": "42fa24810040349d05c0f8f0e10f9c7b3363e0b7",
+  "working_tree": "?? reports/P2/review-b754-artifact-manifest.json\n?? reports/P2/review-b754-check-clippy.json\n?? reports/P2/review-b754-check-diff.json\n?? reports/P2/review-b754-check-fmt.json\n?? reports/P2/review-b754-check-pytest.json\n?? reports/P2/review-b754-check-release.json\n?? reports/P2/review-b754-check-ruff.json\n?? reports/P2/review-b754-check-rust-test.json\n?? reports/P2/review-b754-parity-v1.json\n?? reports/P2/review-b754-release-build.json\n?? reports/P2/review-b754-venv-bootstrap.json\n?? reports/P2/review-b754-venv-create.json\n?? reports/P2/review-b754-wheel-build.json\n?? tools/check_numeric_artifacts.py\n",
+  "argv": [
+    "dist/p2-review-42fa248-venv/Scripts/python.exe",
+    "-m",
+    "pip",
+    "install",
+    "--no-index",
+    "--no-deps",
+    "dist/p2-review-42fa248/sakura_knowledge-0.2.0-py3-none-any.whl"
+  ],
+  "exit": 0,
+  "elapsed_s": 1.2878813999705017,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "UHJvY2Vzc2luZyAuXGRpc3RccDItcmV2aWV3LTQyZmEyNDhcc2FrdXJhX2tub3dsZWRnZS0wLjIuMC1weTMtbm9uZS1hbnkud2hsDQpJbnN0YWxsaW5nIGNvbGxlY3RlZCBwYWNrYWdlczogc2FrdXJhLWtub3dsZWRnZQ0KU3VjY2Vzc2Z1bGx5IGluc3RhbGxlZCBzYWt1cmEta25vd2xlZGdlLTAuMi4wDQo=",
+  "stdout_sha256": "0c2f77bd1b43d56e110d385646c979f5bcb0f93e4c4ce8fc8c3d491721dd8b7a",
+  "stdout": "Processing .\\dist\\p2-review-42fa248\\sakura_knowledge-0.2.0-py3-none-any.whl\r\nInstalling collected packages: sakura-knowledge\r\nSuccessfully installed sakura-knowledge-0.2.0\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

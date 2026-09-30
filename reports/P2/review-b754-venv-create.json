@@ -1,0 +1,24 @@
+{
+  "head": "42fa24810040349d05c0f8f0e10f9c7b3363e0b7",
+  "working_tree": "?? reports/P2/review-b754-artifact-manifest.json\n?? reports/P2/review-b754-check-clippy.json\n?? reports/P2/review-b754-check-diff.json\n?? reports/P2/review-b754-check-fmt.json\n?? reports/P2/review-b754-check-pytest.json\n?? reports/P2/review-b754-check-release.json\n?? reports/P2/review-b754-check-ruff.json\n?? reports/P2/review-b754-check-rust-test.json\n?? reports/P2/review-b754-parity-v1.json\n?? reports/P2/review-b754-release-build.json\n?? reports/P2/review-b754-wheel-build.json\n?? tools/check_numeric_artifacts.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "venv",
+    "--without-pip",
+    "dist/p2-review-42fa248-venv"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.1312855000142008,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

@@ -1,0 +1,19 @@
+{
+  "parity": {
+    "required": 151,
+    "attempted": 151,
+    "passed": 151,
+    "actually_compared": 135,
+    "not_compared": 16,
+    "error_contract_verified": 16,
+    "overall": "PASS"
+  },
+  "formal_retries": 0,
+  "inner_budget_s": 5,
+  "outer_timeout_s": 15,
+  "formal_stream_hashes": 604,
+  "artifact_abc_pairs": 10,
+  "artifact_abc_stream_hashes": 40,
+  "status": "PASS",
+  "scope": "Raw stream hashes and actual JSON independently recomputed, not receipt-byte binding; committed receipt binding follows evidence commit"
+}

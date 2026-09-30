@@ -1,0 +1,28 @@
+{
+  "head": "42fa24810040349d05c0f8f0e10f9c7b3363e0b7",
+  "working_tree": "?? reports/P2/review-b754-artifact-manifest.json\n?? reports/P2/review-b754-check-clippy.json\n?? reports/P2/review-b754-check-diff.json\n?? reports/P2/review-b754-check-fmt.json\n?? reports/P2/review-b754-check-pytest.json\n?? reports/P2/review-b754-check-ruff.json\n?? reports/P2/review-b754-check-rust-test.json\n?? reports/P2/review-b754-parity-v1.json\n?? reports/P2/review-b754-release-build.json\n?? reports/P2/review-b754-wheel-build.json\n?? tools/check_numeric_artifacts.py\n",
+  "argv": [
+    "cargo",
+    "build",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--release",
+    "--locked",
+    "--examples",
+    "--bin",
+    "sknow-rs"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.27424379996955395,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "ICAgIEZpbmlzaGVkIGByZWxlYXNlYCBwcm9maWxlIFtvcHRpbWl6ZWRdIHRhcmdldChzKSBpbiAwLjE5cwo=",
+  "stderr_sha256": "09f2b93c4bce5bfb43dca18ca8d9c1dca2831c7d2ffb73b00b96f8f73a607f86",
+  "stderr": "    Finished `release` profile [optimized] target(s) in 0.19s\n"
+}

@@ -1,0 +1,332 @@
+{
+  "receipt": "review-b754-perf-v1.json",
+  "sha256": "9b514227ce6a45f8eb481e13c3c86d630365949fed52d7bec7e6c49a4c10d9ed",
+  "bytes": 34444609,
+  "measured": 960,
+  "warmups": 32,
+  "full_json_pairs": 496,
+  "raw_stream_hashes": 996,
+  "status": "PASS",
+  "summary": [
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "exact",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0005091999191790819,
+      "p95_s": 0.0008672000840306282
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "alias",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0004772001411765814,
+      "p95_s": 0.0009119999594986439
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "ambiguous",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0007877000607550144,
+      "p95_s": 0.001388800097629428
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "missing",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 9.709992446005344e-05,
+      "p95_s": 0.00024349987506866455
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "fts_cjk",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.02234679996035993,
+      "p95_s": 0.030859800055623055
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "S18",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.3141479999758303,
+      "p95_s": 0.39325169986113906
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "introduce",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.001097500091418624,
+      "p95_s": 0.0018188999965786934
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "python",
+      "workload": "tag_unmapped",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0009519997984170914,
+      "p95_s": 0.0017343999352306128
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "exact",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.000321,
+      "p95_s": 0.0005648
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "alias",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0002953,
+      "p95_s": 0.0005151
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "ambiguous",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0006669,
+      "p95_s": 0.0012475
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "missing",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 9.62e-05,
+      "p95_s": 0.0001424
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "fts_cjk",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0193728,
+      "p95_s": 0.029238
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "S18",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.2405415,
+      "p95_s": 0.2850683
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "introduce",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0006258,
+      "p95_s": 0.0009173
+    },
+    {
+      "mode": "reused_connection",
+      "runtime": "rust",
+      "workload": "tag_unmapped",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0005723,
+      "p95_s": 0.0009518
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "exact",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.12713019992224872,
+      "p95_s": 0.23092289990745485
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "alias",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.12643689988180995,
+      "p95_s": 0.22836349997669458
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "ambiguous",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.1269638000521809,
+      "p95_s": 0.237690000096336
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "missing",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.12649909988977015,
+      "p95_s": 0.2428867998532951
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "fts_cjk",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.14607329992577434,
+      "p95_s": 0.15518940007314086
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "S18",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.34513340005651116,
+      "p95_s": 0.36460789991542697
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "introduce",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.12924550008028746,
+      "p95_s": 0.2412959998473525
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "python",
+      "workload": "tag_unmapped",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.12748860009014606,
+      "p95_s": 0.24777220003306866
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "exact",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.036916600074619055,
+      "p95_s": 0.04947940004058182
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "alias",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.03685160004533827,
+      "p95_s": 0.040024199988693
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "ambiguous",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.03733520000241697,
+      "p95_s": 0.04276370001025498
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "missing",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.03589980001561344,
+      "p95_s": 0.04812099994160235
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "fts_cjk",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.05474189994856715,
+      "p95_s": 0.060097800102084875
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "S18",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.21869420004077256,
+      "p95_s": 0.23169129993766546
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "introduce",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.03686539991758764,
+      "p95_s": 0.03968799998983741
+    },
+    {
+      "mode": "independent_cli",
+      "runtime": "rust",
+      "workload": "tag_unmapped",
+      "attempted": 30,
+      "success": 30,
+      "failed_rounds": [],
+      "p50_s": 0.0379095000680536,
+      "p95_s": 0.04170770011842251
+    }
+  ]
+}

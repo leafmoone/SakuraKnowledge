@@ -1,0 +1,9 @@
+{
+  "path": "build/snapshot-full-20bf5b3/knowledge.sqlite",
+  "bytes": 21516320768,
+  "sha256": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073",
+  "unchanged": true,
+  "elapsed_s": 22.015948199899867,
+  "method": "read-only complete byte hash after validation",
+  "rebuilt": false
+}
