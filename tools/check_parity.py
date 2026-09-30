@@ -1,30 +1,14 @@
-"""C-stage parity harness: Python reference vs Rust runtime (sknow-rs).
+"""Formal full-JSON parity, no retries, fixed optional warmups.
 
-Runs the locked case set (tools/parity_cases.py, 148 deterministic cases
-bound to the frozen snapshot 20bf5b3) on BOTH runtimes and checks:
-  (a) python output == rust output (full semantic JSON equality), and
-  (b) both match the independently locked expectations.
-
-Modes:
-  value          - success cases; (a)+(b) required.
-  error          - validation failures; both must fail with the locked
-                   message (python ValueError text == rust stderr message).
-  budget_limited - cases whose Python reference run can exceed its own 5 s
-                   per-operation budget (documented reference limitation);
-                   the rust side must equal the locked reference
-                   expectation; python-side budget failures are recorded
-                   with attempt counts, never papered over.
-  cli            - CLI-level comparisons (argv/exit/stderr contract).
-  runtime_error  - both sides must fail at runtime; exit codes and error
-                   TYPE compared; raw messages recorded.
-
-Budget handling: a query_budget_exceeded abort is retried (the 5 s budget is
-per-operation and a cold 21.5 GB FTS working set can be evicted between
-operations). Every retry is recorded per case.
+Each invocation has a 15s host-process hard limit; this never replaces the
+runtime's 5s operation budget. Missing values and all timeouts fail. Raw
+bytes (base64 + hashes), argv, exit and time survive even malformed output.
+Historical receipts and case tables are not rewritten by this runner.
 """
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -37,317 +21,171 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "tools"))
 
-from parity_cases import CASES, N_CASES
+from parity_cases import CASES
+from parity_policy import classify, summarize
 
 from sakura_knowledge.api import Knowledge
 
-SNAPSHOT = "snapshot-full-20bf5b3"
-PYTHON_ATTEMPTS = 12
-RUST_ATTEMPTS = 25
-DB = None  # set in main
+DB = None
+HARD_TIMEOUT_S = 15
 
 
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
-    with open(path, "rb") as f:
+    with path.open("rb") as f:
         for chunk in iter(lambda: f.read(1 << 22), b""):
             h.update(chunk)
     return h.hexdigest()
 
 
-def is_budget(err: object) -> bool:
-    return "query_budget_exceeded" in repr(err)
-
-
 def run_python(op: str, args: dict):
     with Knowledge(DB) as api:
-        if op == "lookup":
-            return api.lookup(args["query"], kind=args.get("kind"),
-                              namespace=args.get("namespace"))
         if op == "lookup_key":
-            return api.lookup(key={"kind": args["kind"], "namespace": args["namespace"],
-                                   "value": args["value"]})
-        if op == "search":
-            return api.search(args["query"], topk=args.get("topk", 20),
-                              kind=args.get("kind"), namespace=args.get("namespace"))
+            return api.lookup(key={k: args[k] for k in ("kind", "namespace", "value")})
         if op == "related":
-            return api.related({"kind": args["kind"], "namespace": args["namespace"],
-                                "value": args["value"]},
-                               relation=args.get("relation"),
-                               kind=args.get("kind_filter"), limit=args.get("limit", 20))
-        if op == "ask":
-            return api.ask(args["query"], kind=args.get("kind"),
-                           namespace=args.get("namespace"),
-                           target_tag_namespace=args.get("target_tag_namespace"))
-        if op == "inspect":
-            return api.inspect()
-        raise ValueError(f"unknown op {op}")
-
-
-def run_python_attempts(op: str, args: dict, attempts: int = PYTHON_ATTEMPTS):
-    last = None
-    for n in range(1, attempts + 1):
-        t0 = time.monotonic()
-        try:
-            v = run_python(op, args)
-            return {"value": v, "attempts": n, "elapsed_s": round(time.monotonic() - t0, 3)}
-        except ValueError as e:
-            if not is_budget(e):
-                return {"error": str(e), "attempts": n,
-                        "elapsed_s": round(time.monotonic() - t0, 3)}
-            last = e
-    return {"error": str(last), "attempts": attempts,
-            "budget_exhausted": True}
+            return api.related({k: args[k] for k in ("kind", "namespace", "value")},
+                               relation=args.get("relation"), kind=args.get("kind_filter"),
+                               limit=args.get("limit", 20))
+        return getattr(api, op)(**args)
 
 
 def rust_argv(op: str, args: dict) -> list[str]:
     dbp = str(DB)
     if op == "inspect":
         return ["inspect", dbp]
-    if op == "lookup":
-        cmd = ["lookup", dbp, args["query"]]
-        if args.get("kind"):
-            cmd += ["--kind", args["kind"]]
-        if args.get("namespace"):
-            cmd += ["--namespace", args["namespace"]]
-        return cmd
     if op == "lookup_key":
-        return ["lookup", dbp, args["value"], "--key",
-                "--kind", args["kind"], "--namespace", args["namespace"]]
-    if op == "search":
-        cmd = ["search", dbp, args["query"], "--topk", str(args.get("topk", 20))]
-        if args.get("kind"):
-            cmd += ["--kind", args["kind"]]
-        if args.get("namespace"):
-            cmd += ["--namespace", args["namespace"]]
-        return cmd
+        return ["lookup", dbp, args["value"], "--key", "--kind", args["kind"],
+                "--namespace", args["namespace"]]
     if op == "related":
         cmd = ["related", dbp, args["kind"], args["namespace"], args["value"],
                "--limit", str(args.get("limit", 20))]
-        if args.get("relation"):
-            cmd += ["--relation", args["relation"]]
-        if args.get("kind_filter"):
-            cmd += ["--kind", args["kind_filter"]]
+        for key, flag in (("relation", "--relation"), ("kind_filter", "--kind")):
+            if args.get(key):
+                cmd += [flag, args[key]]
         return cmd
-    if op == "ask":
-        cmd = ["ask", dbp, args["query"]]
-        if args.get("kind"):
-            cmd += ["--kind", args["kind"]]
-        if args.get("namespace"):
-            cmd += ["--namespace", args["namespace"]]
-        if args.get("target_tag_namespace"):
-            cmd += ["--target-tag-namespace", args["target_tag_namespace"]]
-        return cmd
-    raise ValueError(f"unknown op {op}")
+    cmd = [op, dbp, args["query"]]
+    if op == "search":
+        cmd += ["--topk", str(args.get("topk", 20))]
+    for key in ("kind", "namespace", "target_tag_namespace"):
+        if args.get(key) is not None:
+            cmd += ["--" + key.replace("_", "-"), args[key]]
+    return cmd
 
 
-def run_rust_attempts(bin_path: Path, op: str, args: dict,
-                      attempts: int = RUST_ATTEMPTS):
-    """Every attempt is recorded raw (exit, elapsed, stderr bytes as text).
-    A budget-exhausted case therefore carries its full failure trail."""
-    cmd = [str(bin_path)] + rust_argv(op, args)
-    last = None
-    trail = []
-    for n in range(1, attempts + 1):
-        t0 = time.monotonic()
-        p = subprocess.run(cmd, capture_output=True, check=False)
-        el = round(time.monotonic() - t0, 3)
-        out = p.stdout.decode("utf-8", errors="strict")
-        errt = p.stderr.decode("utf-8", errors="strict")
-        trail.append({"attempt": n, "exit": p.returncode, "elapsed_s": el,
-                      "stdout_bytes": len(p.stdout), "stderr": errt.strip()})
-        if p.returncode == 0:
-            body = json.loads(out) if out.strip() else {}
-            return {"value": body, "exit": 0, "attempts": n, "elapsed_s": el,
-                    "argv": cmd, "stderr": errt.strip(), "attempt_trail": trail}
+def capture(cmd: list[str], timeout_s: float = HARD_TIMEOUT_S) -> dict:
+    env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
+               PYTHONPATH=str(ROOT / "src"))
+    start = time.perf_counter()
+    timed_out = False
+    try:
+        p = subprocess.run(cmd, capture_output=True, env=env, timeout=timeout_s,
+                           check=False)
+        out, err, code = p.stdout, p.stderr, p.returncode
+    except subprocess.TimeoutExpired as exc:
+        out, err, code = exc.stdout or b"", exc.stderr or b"", None
+        timed_out = True
+    result = {"argv": cmd, "exit": code, "elapsed_s": time.perf_counter() - start,
+              "outer_timeout": timed_out, "timeout": timed_out, "attempted": 1,
+              "succeeded": 0, "other_error": 0}
+    for stream, data in (("stdout", out), ("stderr", err)):
+        result[stream + "_base64"] = base64.b64encode(data).decode("ascii")
+        result[stream + "_sha256"] = hashlib.sha256(data).hexdigest()
+        result[stream + "_bytes"] = len(data)
         try:
-            err = json.loads(errt)
-        except (ValueError, TypeError):
-            err = {"raw": errt.strip()}
-        if err.get("message") == "query_budget_exceeded":
-            last = err
-            continue
-        return {"error": err, "exit": p.returncode, "attempts": n,
-                "elapsed_s": el, "argv": cmd, "stderr": errt.strip(),
-                "attempt_trail": trail}
-    return {"error": last, "exit": 2, "attempts": attempts,
-            "budget_exhausted": True, "argv": cmd, "attempt_trail": trail}
-
-
-def diff(py_val, rs_val, path="$"):
-    problems = []
-    if isinstance(py_val, dict) and isinstance(rs_val, dict):
-        for k in sorted(set(py_val) | set(rs_val)):
-            p = f"{path}.{k}"
-            if k not in rs_val:
-                problems.append({"path": p, "kind": "missing_in_rust", "python": py_val[k]})
-            elif k not in py_val:
-                problems.append({"path": p, "kind": "extra_in_rust", "rust": rs_val[k]})
+            result[stream] = data.decode("utf-8", errors="strict")
+        except UnicodeDecodeError as exc:
+            result["decode_error"] = str(exc)
+    if not timed_out:
+        try:
+            if "decode_error" in result:
+                raise ValueError("not UTF-8")
+            body = json.loads(result["stdout"] if code == 0 else result["stderr"])
+            if code == 0:
+                result["value"] = body
+                result["succeeded"] = 1
             else:
-                problems += diff(py_val[k], rs_val[k], p)
-    elif isinstance(py_val, list) and isinstance(rs_val, list):
-        if len(py_val) != len(rs_val):
-            problems.append({"path": path, "kind": "length",
-                             "python": len(py_val), "rust": len(rs_val)})
+                result["error"] = body
+                result["timeout"] = (isinstance(body, dict)
+                                     and body.get("message") == "query_budget_exceeded")
+        except (ValueError, KeyError) as exc:
+            result["error"] = {"message": "invalid JSON output", "detail": str(exc)}
+    result["other_error"] = int(not result["succeeded"] and not result["timeout"])
+    return result
+
+
+def diff(a, b, path="$"):
+    problems = []
+    if isinstance(a, dict) and isinstance(b, dict):
+        for key in sorted(set(a) | set(b)):
+            if key not in a or key not in b:
+                problems.append({"path": f"{path}.{key}", "kind": "missing_key"})
+            else:
+                problems.extend(diff(a[key], b[key], f"{path}.{key}"))
+    elif isinstance(a, list) and isinstance(b, list):
+        if len(a) != len(b):
+            problems.append({"path": path, "kind": "length", "python": len(a), "rust": len(b)})
+        for i, (x, y) in enumerate(zip(a, b)):
+            problems.extend(diff(x, y, f"{path}[{i}]"))
+    elif type(a) is not type(b) or a != b:
+        problems.append({"path": path, "kind": "value", "python": a, "rust": b})
+    return problems
+
+
+def check_expect(value: dict, expect: dict) -> list[dict]:
+    problems = []
+    for key, want in expect.items():
+        if key == "n_candidates":
+            got = len(value.get("candidates") or [])
+        elif key == "n_relations":
+            got = len(value.get("relations") or [])
+        elif key.startswith("first_candidate_"):
+            first = (value.get("candidates") or [{}])[0]
+            got = first.get("entry_key" if key == "first_candidate_key" else "matched_by")
         else:
-            for i, (a, b) in enumerate(zip(py_val, rs_val)):
-                problems += diff(a, b, f"{path}[{i}]")
+            got = value.get(key)
+        if got != want:
+            problems.append({"path": key, "kind": "expect", "want": want, "got": got})
+    return problems
+
+
+def python_cmd(op: str, args: dict) -> list[str]:
+    return [sys.executable, str(Path(__file__).resolve()), "--python-child",
+            str(DB), op, json.dumps(args, ensure_ascii=True)]
+
+
+def run_case(case, bin_path: Path) -> dict:
+    cid, op, args, expect, mode = case
+    entry = {"case_id": cid, "op": op, "args": args, "expect": expect, "mode": mode}
+    if mode not in ("cli", "runtime_error"):
+        py = capture(python_cmd(op, args))
+        rs = capture([str(bin_path)] + rust_argv(op, args))
+        entry.update(classify(py, rs, mode, expect, diff, check_expect))
     else:
-        if py_val != rs_val:
-            problems.append({"path": path, "kind": "value",
-                             "python": py_val, "rust": rs_val})
-    return problems
-
-
-def check_expect(v: dict, expect: dict) -> list[dict]:
-    problems = []
-    if "status" not in expect and "error" not in expect:
-        # Full-dict expectation (inspect): verify every key exactly.
-        for kk, vv in expect.items():
-            if v.get(kk) != vv:
-                problems.append({"path": f"$.{kk}", "kind": "expect",
-                                 "want": vv, "got": v.get(kk)})
-        return problems
-    for k, want in expect.items():
-        if k in ("status", "matched_by", "query_template", "mapping_status"):
-            got = v.get(k)
-            if got != want:
-                problems.append({"path": f"$.{k}", "kind": "expect",
-                                 "want": want, "got": got})
-        elif k == "warnings":
-            got = v.get("warnings", [])
-            if got != want:
-                problems.append({"path": "$.warnings", "kind": "expect",
-                                 "want": want, "got": got})
-        elif k == "n_candidates":
-            got = len(v.get("candidates") or [])
-            if got != want:
-                problems.append({"path": "$.n_candidates", "kind": "expect",
-                                 "want": want, "got": got})
-        elif k == "n_relations":
-            got = len(v.get("relations") or [])
-            if got != want:
-                problems.append({"path": "$.n_relations", "kind": "expect",
-                                 "want": want, "got": got})
-        elif k == "entry_key" or k == "tag_key":
-            got = v.get(k)
-            if got != want:
-                problems.append({"path": f"$.{k}", "kind": "expect",
-                                 "want": want, "got": got})
-        elif k == "first_candidate_key":
-            cands = v.get("candidates") or []
-            got = cands[0]["entry_key"] if cands else None
-            if got != want:
-                problems.append({"path": "$.first_candidate_key", "kind": "expect",
-                                 "want": want, "got": got})
-        elif k == "first_candidate_matched_by":
-            cands = v.get("candidates") or []
-            got = cands[0].get("matched_by") if cands else None
-            if got != want:
-                problems.append({"path": "$.first_candidate_matched_by",
-                                 "kind": "expect", "want": want, "got": got})
-    return problems
-
-
-def run_cli_case(op: str, args: dict, expect: dict, bin_path: Path) -> dict:
-    def subst(a: str) -> str:
-        if a == "DB":
-            return str(DB)
-        if a == "DB_MISSING":
-            return "db_missing_xyz_9271.sqlite"
-        return a
-
-    py_argv = [subst(a) for a in args["argv_py"]]
-    rs_argv = [subst(a) for a in args["argv_rs"]]
-    env = dict(os.environ)
-    env["PYTHONPATH"] = str(ROOT / "src")
-    env["PYTHONIOENCODING"] = "utf-8"
-    py_cmd = [sys.executable, "-c",
-              ("import sys; from sakura_knowledge.cli import main; "
-              "sys.exit(main(sys.argv[1:]))")] + py_argv
-    rs_cmd = [str(bin_path)] + rs_argv
-    t0 = time.monotonic()
-    pp = subprocess.run(py_cmd, capture_output=True, text=True, encoding="utf-8",
-                        cwd=str(ROOT), env=env, check=False)
-    py_el = round(time.monotonic() - t0, 3)
-    t0 = time.monotonic()
-    rp = subprocess.run(rs_cmd, capture_output=True, text=True, encoding="utf-8",
-                        check=False)
-    rs_el = round(time.monotonic() - t0, 3)
-    entry = {
-        "op": op, "mode": "cli", "args": args,
-        "python": {"argv": py_cmd, "exit": pp.returncode, "elapsed_s": py_el,
-                   "stdout": pp.stdout.strip()[:2000],
-                   "stderr": pp.stderr.strip()[:2000]},
-        "rust": {"argv": rs_cmd, "exit": rp.returncode, "elapsed_s": rs_el,
-                 "stdout": rp.stdout.strip()[:2000],
-                 "stderr": rp.stderr.strip()[:2000]},
-    }
-    problems = []
-    for proc, key in ((pp, "py"), (rp, "rs")):
-        want_exit = expect[f"exit_{key}"]
-        if proc.returncode != want_exit:
-            problems.append({"path": f"$.exit_{key}", "kind": "expect",
-                             "want": want_exit, "got": proc.returncode})
-        for field, jkey in (("stderr_error", "error"), ("stderr_message", "message")):
-            want = expect.get(f"{field}_{key}")
-            if want is None:
-                continue
-            try:
-                err = json.loads(proc.stderr)
-            except (ValueError, TypeError):
-                err = {}
-            got = err.get(jkey)
-            if got != want:
-                problems.append({"path": f"$.stderr_{key}.{jkey}", "kind": "expect",
-                                 "want": want, "got": got})
-        if expect.get("stdout_empty") and proc.stdout.strip():
-            problems.append({"path": f"$.stdout_{key}", "kind": "must_be_empty"})
-    entry["problems"] = problems
-    entry["status"] = "EQUAL" if not problems else "MISMATCH"
+        def subst(argv):
+            return [str(DB) if a == "DB" else
+                    str(DB.parent / "missing-parity-input.sqlite") if a == "DB_MISSING"
+                    else a for a in argv]
+        py = capture([sys.executable, "-c", ("import sys; from sakura_knowledge.cli import main; "
+                      "sys.exit(main(sys.argv[1:]))")] + subst(args["argv_py"]))
+        rs = capture([str(bin_path)] + subst(args["argv_rs"]))
+        problems = []
+        for side, rec in (("py", py), ("rs", rs)):
+            if rec["timeout"] or rec["exit"] != expect[f"exit_{side}"]:
+                problems.append({"kind": "exit_or_timeout", "side": side})
+            if rec.get("stdout", ""):
+                problems.append({"kind": "stdout_not_empty", "side": side})
+            error = rec.get("error", {})
+            for field in ("error", "message"):
+                key = f"stderr_{side}_{field}"
+                if key in expect and error.get(field) != expect[key]:
+                    problems.append({"kind": key, "want": expect[key], "got": error.get(field)})
+            if rec.get("decode_error") or not isinstance(error, dict) or "error" not in error:
+                problems.append({"kind": "invalid_error_json", "side": side})
+        entry.update(status="EXPECTED_ERROR_FAIL" if problems else "EXPECTED_ERROR_PASS",
+                     problems=problems, passed=not problems, semantic_compared=False,
+                     error_contract_verified=not problems)
+    entry.update(python=py, rust=rs)
     return entry
-
-
-def warmup(bin_path: Path) -> dict:
-    """Warm OS page cache + FTS working sets for all search queries.
-
-    Each warm-up query is retried until it completes (a budget abort still
-    populates the OS cache for the next attempt). Recorded for the receipt.
-    """
-    heavy = sorted({args["query"]
-                    for _, op, args, _, mode in CASES
-                    if op == "search" and mode in ("value", "budget_limited")})
-    rec = {"python": [], "rust": []}
-    with Knowledge(DB) as warm:
-        for q in heavy:
-            ok = False
-            for n in range(1, 25):
-                try:
-                    warm.search(q, topk=20)
-                    rec["python"].append({"query": q, "attempts": n, "ok": True})
-                    ok = True
-                    break
-                except ValueError as e:
-                    if not is_budget(e):
-                        rec["python"].append({"query": q, "attempts": n, "ok": False,
-                                              "error": str(e)})
-                        break
-            if not ok:
-                rec["python"].append({"query": q, "attempts": 25, "ok": False,
-                                      "error": "query_budget_exceeded"})
-    for q in heavy:
-        ok = False
-        for n in range(1, 25):
-            p = subprocess.run([str(bin_path), "search", str(DB), q, "--topk", "20"],
-                               capture_output=True, text=True, encoding="utf-8",
-                               check=False)
-            if p.returncode == 0 or "query_budget_exceeded" not in (p.stderr or ""):
-                rec["rust"].append({"query": q, "attempts": n, "ok": p.returncode == 0})
-                ok = True
-                break
-        if not ok:
-            rec["rust"].append({"query": q, "attempts": 25, "ok": False})
-    return rec
 
 
 def main() -> int:
@@ -355,144 +193,39 @@ def main() -> int:
     ap.add_argument("--db", required=True)
     ap.add_argument("--bin", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--warmup-rounds", type=int, choices=range(3), default=0)
     args = ap.parse_args()
     global DB
-    DB = Path(args.db)
-    bin_path = Path(args.bin)
-
-    warm = warmup(bin_path)
-
-    report = {
-        "snapshot": SNAPSHOT,
-        "n_cases": N_CASES,
-        "db_sha256": sha256(DB),
-        "rust_bin_sha256": sha256(bin_path),
-        "python_git_sha": subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True,
-            check=False).stdout.strip(),
-        "warmup": warm,
-        "cases": [],
-    }
-    ref_budget_failures = []
-    partial_budget = []
-    rust_budget_failures = []
-    for cid, op, op_args, expect, mode in CASES:
-        if mode in ("cli", "runtime_error"):
-            entry = run_cli_case(op, op_args, expect, bin_path)
-            entry["case_id"] = cid
-        else:
-            entry = {"case_id": cid, "op": op, "mode": mode, "args": op_args,
-                     "expect": expect}
-            py = run_python_attempts(op, op_args)
-            rs = run_rust_attempts(bin_path, op, op_args)
-            entry["python"] = py
-            entry["rust"] = rs
-            problems = []
-            if mode == "error":
-                pymsg = py.get("error")
-                rsmsg = (rs.get("error") or {}).get("message")
-                if pymsg != expect["error"]:
-                    problems.append({"path": "$.python.error", "kind": "expect",
-                                     "want": expect["error"], "got": pymsg})
-                if rsmsg != expect["error"]:
-                    problems.append({"path": "$.rust.stderr.message", "kind": "expect",
-                                     "want": expect["error"], "got": rsmsg})
-                if rs.get("exit") != 2:
-                    problems.append({"path": "$.rust.exit", "kind": "expect",
-                                     "want": 2, "got": rs.get("exit")})
-            elif "value" in py and "value" in rs:
-                problems += diff(py["value"], rs["value"])
-                problems += check_expect(py["value"], expect)
-                problems += check_expect(rs["value"], expect)
-                status = "EQUAL" if not problems else "MISMATCH"
-            elif (mode == "budget_limited" and "error" in rs
-                    and is_budget((rs.get("error") or {}).get("message", ""))
-                    and "value" in py):
-                # Rust runtime exhausted the 5 s per-operation budget after
-                # all retries while the Python reference completed; the
-                # reference value is verified against the locked
-                # expectation and the Rust budget failure is recorded.
-                # This is a Rust FAILURE on its own 5 s budget, not semantic
-                # equality: Rust produced no value to compare. The Python
-                # reference is still checked so the sample stays diagnosable.
-                problems += check_expect(py["value"], expect)
-                problems.append({"path": "$.rust", "kind": "rust_budget_exceeded",
-                                 "attempts": rs.get("attempts"),
-                                 "message": (rs.get("error") or {}).get("message")})
-                status = "RUST_BUDGET_EXCEEDED"
-                rust_budget_failures.append(
-                    {"case_id": cid, "query": op_args.get("query"),
-                     "rust_attempts": rs.get("attempts")})
-            elif mode == "budget_limited" and is_budget(py.get("error", "")) \
-                    and "error" in rs and is_budget(
-                        (rs.get("error") or {}).get("message", "")):
-                # Both runtimes exhausted the 5 s per-operation budget after
-                # all warm-up retries. Documented PARTIAL, not a parity
-                # failure: the query working set (10001 rows x substr(4000)
-                # over scattered BLOB pages of the 21.5 GB file) exceeds the
-                # RAM page-cache window on this host for both runtimes.
-                status = "BUDGET_LIMITED_PARTIAL"
-                partial_budget.append(
-                    {"case_id": cid, "query": op_args.get("query"),
-                     "python_attempts": py.get("attempts"),
-                     "rust_attempts": rs.get("attempts")})
-            elif mode == "budget_limited" and is_budget(py.get("error", "")) \
-                    and "value" in rs:
-                # Python reference exhausted its own 5 s budget after retries;
-                # verify the Rust side against the locked reference
-                # expectation and record the limitation honestly.
-                problems += check_expect(rs["value"], expect)
-                status = "EQUAL_RUST_VS_LOCKED_EXPECTED"
-                ref_budget_failures.append(
-                    {"case_id": cid, "query": op_args.get("query"),
-                     "python_attempts": py.get("attempts")})
-            else:
-                if "error" in py:
-                    problems.append({"path": "$.python", "kind": "unexpected_error",
-                                     "error": py["error"]})
-                if "error" in rs:
-                    problems.append({"path": "$.rust", "kind": "unexpected_error",
-                                     "error": rs["error"]})
-                status = "ERROR"
-            entry["problems"] = problems
-            entry["status"] = status
-        report["cases"].append(entry)
-
-    n_equal = sum(1 for c in report["cases"] if c["status"] == "EQUAL")
-    n_rust_locked = sum(1 for c in report["cases"]
-                        if c["status"] == "EQUAL_RUST_VS_LOCKED_EXPECTED")
-    n_partial = sum(1 for c in report["cases"]
-                    if c["status"] == "BUDGET_LIMITED_PARTIAL")
-    n_py_locked = sum(1 for c in report["cases"]
-                      if c["status"] == "EQUAL_PYTHON_VS_LOCKED_EXPECTED")
-    n_rust_budget = sum(1 for c in report["cases"]
-                        if c["status"] == "RUST_BUDGET_EXCEEDED")
-    n_bad = (len(report["cases"]) - n_equal - n_rust_locked
-             - n_py_locked - n_partial - n_rust_budget)
-    report["summary"] = {
-        "n_cases": N_CASES,
-        "equal": n_equal,
-        "equal_rust_vs_locked_expected": n_rust_locked,
-        "equal_python_vs_locked_expected": n_py_locked,
-        "budget_limited_partial": n_partial,
-        "failures": n_bad,
-        "python_reference_budget_failures": ref_budget_failures,
-        "rust_reference_budget_failures": rust_budget_failures,
-        "budget_limited_partial_cases": partial_budget,
-        "rust_budget_exceeded": n_rust_budget,
-        "semantic_equal_all_cases": n_equal == N_CASES,
-        # PASS only if every case is fully EQUAL-compared or covered by a
-        # documented partial with no Rust-side failure. A Rust budget
-        # failure is a failure sample, so overall is FAIL.
-        "overall": "PASS" if n_bad == 0 and n_rust_budget == 0 else "FAIL",
-    }
-    out = Path(args.out)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    with open(out, "w", encoding="utf-8") as f:
-        json.dump(report, f, ensure_ascii=False, indent=2)
-    print(json.dumps(report["summary"], ensure_ascii=False))
+    DB = Path(args.db).resolve()
+    binary, output = Path(args.bin).resolve(), Path(args.out)
+    if output.exists():
+        raise FileExistsError(f"receipt must use new path: {output}")
+    report = {"mode": "formal", "retries": 0, "outer_timeout_s": HARD_TIMEOUT_S,
+              "inner_budget_s": 5, "warmup_rounds": args.warmup_rounds,
+              "warmup": [], "cases": [], "db_sha256": sha256(DB),
+              "rust_bin_sha256": sha256(binary)}
+    for _ in range(args.warmup_rounds):
+        for case in CASES:
+            report["warmup"].append(run_case(case, binary))
+    for case in CASES:
+        report["cases"].append(run_case(case, binary))
+    report["summary"] = summarize(report["cases"], len(CASES))
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with output.open("x", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=True, indent=2)
+    print(json.dumps(report["summary"]))
     return 0 if report["summary"]["overall"] == "PASS" else 1
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    if len(sys.argv) > 1 and sys.argv[1] == "--python-child":
+        DB = Path(sys.argv[2])
+        try:
+            result = run_python(sys.argv[3], json.loads(sys.argv[4]))
+            print(json.dumps(result, ensure_ascii=True))
+        except Exception as exc:
+            print(json.dumps({"error": type(exc).__name__, "message": str(exc)},
+                             ensure_ascii=True), file=sys.stderr)
+            raise SystemExit(2) from exc
+    else:
+        raise SystemExit(main())
