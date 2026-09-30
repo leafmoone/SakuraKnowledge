@@ -169,10 +169,16 @@ def main():
     # a compatible edge or changing the original alias steps/outgoing scopes.
     quarantines_by_target={}
     for record in lookup:
-        if record['matched_by']=='native_exact' and record['target'] is not None:
-            refs=[ref for ref in record['evidence_chain'] if ref['role']=='wiki_association_quarantined']
-            if refs:
-                quarantines_by_target[tuple(record['target'][k] for k in ('kind','namespace','value'))]=refs
+        for ref in record['evidence_chain']:
+            if ref['role']=='wiki_association_quarantined':
+                # A native spelling may itself be an alias. Its own Wiki proof
+                # belongs to ref.tag_key, not record.target; never last-writer.
+                owner_key=tuple(ref['tag_key'][k] for k in ('kind','namespace','value'))
+                owned=quarantines_by_target.setdefault(owner_key,[])
+                if ref not in owned:
+                    owned.append(ref)
+    for owned in quarantines_by_target.values():
+        owned.sort(key=lambda ref:json.dumps(ref,ensure_ascii=False,sort_keys=True,separators=(',',':')))
     for record in lookup:
         if record['canonical_status']=='canonical' and record['target'] is not None:
             target_key=tuple(record['target'][k] for k in ('kind','namespace','value'))

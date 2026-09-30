@@ -60,8 +60,12 @@ Changed Wiki versions return no description and retain a quarantine proof with t
 unequal dates on every canonical route (native, official aliases including all
 intermediate inputs, and verified entity_tag target canonicalization). After Wiki
 cut comparison, the compiler copies only the terminal's actual quarantine refs to
-canonical projections with the same typed target, deduplicated; original directed
-steps/scopes remain unchanged. This is not a compatible Wiki association and does
+canonical projections with the same typed target, deduplicated. Reference ownership
+is the reference's own typed `tag_key`, never the containing projection's target or
+last native record. A native spelling can itself redirect: its own quarantine stays
+local as an original observation, but must not be propagated as the canonical
+terminal's evidence. Accumulate all owner-matching refs deterministically rather
+than overwriting a target bucket; original directed steps/scopes remain unchanged. This is not a compatible Wiki association and does
 not enable conflicting descriptions. Native existence remains independent. Empty/generic role names or
 wiki_key alone do not establish a description's identity association.
 Implication is not alias. Generated/draft/name-only/candidate evidence creates no
