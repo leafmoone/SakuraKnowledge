@@ -1,0 +1,2485 @@
+{
+  "kind": "formal gold acceptance",
+  "policy": {
+    "outer_timeout_s": 15,
+    "inner_budget_s": 5,
+    "retries": 0,
+    "warmup_rounds": 0,
+    "failure_action": "STOP; no retry/refreeze/relabel"
+  },
+  "retries": 0,
+  "source_commit": "9dfa610640eca1e32b6da89f78f3d4aff6062adf",
+  "database": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+    "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
+    "bytes": 21718736896
+  },
+  "frozen_expected": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\full-retry1-real-gold.json",
+    "sha256": "a27828b021849d5859b4bbf8a508dc0557787c34aa33ebb056974ff97a76f96e",
+    "bytes": 283128
+  },
+  "freeze_before_accept": {
+    "kind": "all independent expectations frozen before Rust acceptance",
+    "created_ns": 1790789089989204500,
+    "gold": {
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\full-retry1-real-gold.json",
+      "sha256": "a27828b021849d5859b4bbf8a508dc0557787c34aa33ebb056974ff97a76f96e",
+      "bytes": 283128
+    },
+    "P2": {
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\full-retry1-P2-frozen-expected.json",
+      "sha256": "36f6462acf5d26faf6ee2a13633ce5128c2829314ba26c5470f204c136bca539",
+      "bytes": 337222
+    },
+    "db": {
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+      "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
+      "bytes": 21718736896
+    },
+    "binary": {
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+      "sha256": "2ceb812f9cae3c6bb315854fd773ea8373b9a6b3ecbe126a7d310006028dc0d7",
+      "bytes": 5128767
+    },
+    "policy": {
+      "outer_timeout_s": 15,
+      "inner_budget_s": 5,
+      "retries": 0,
+      "warmup_rounds": 0,
+      "failure_action": "STOP; no retry/refreeze/relabel"
+    },
+    "frozen_marker_raw": {
+      "path": "reports/P3/raw/d358cc938272f87e869b0ea44427f3c66409e7df3fab0ce1ec41ab981250e808.raw",
+      "sha256": "d358cc938272f87e869b0ea44427f3c66409e7df3fab0ce1ec41ab981250e808",
+      "bytes": 1015
+    }
+  },
+  "records": [
+    {
+      "case_id": "G01",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "hatsune_miku",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.1646493999287486,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/5c48c1fa10c4d80e7e21552e0aa5ec37ccc9c5942598635f8f45a3818a7b1f72.raw",
+          "sha256": "5c48c1fa10c4d80e7e21552e0aa5ec37ccc9c5942598635f8f45a3818a7b1f72",
+          "bytes": 8710
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G02",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "hakurei_reimu",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.04030090011656284,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/ddac687380d34e8f8c3acc80da3c49078b30111151d4b760207fce0481fd0ea1.raw",
+          "sha256": "ddac687380d34e8f8c3acc80da3c49078b30111151d4b760207fce0481fd0ea1",
+          "bytes": 7199
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G03",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "kirisame_marisa",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03740719985216856,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/683eac759a89b532c6cf6636c64870862a100ae885452038a5cd822afae9cb96.raw",
+          "sha256": "683eac759a89b532c6cf6636c64870862a100ae885452038a5cd822afae9cb96",
+          "bytes": 6170
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G04",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "rem_(re:zero)",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03749739984050393,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/b39da47a529d20f084546489a33da2609bd480abc1416f2193166bd1a6747783.raw",
+          "sha256": "b39da47a529d20f084546489a33da2609bd480abc1416f2193166bd1a6747783",
+          "bytes": 5249
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G05",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "ram_(re:zero)",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.04237369983457029,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/c9f934e4400d0dbd409a5ff697bcd001da52b6ce7262069184f090887b4cb1aa.raw",
+          "sha256": "c9f934e4400d0dbd409a5ff697bcd001da52b6ce7262069184f090887b4cb1aa",
+          "bytes": 5257
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G06",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "gotoh_hitori",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.037623299984261394,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/743f195a1cfc25c30df9b22d86d5d7503eb7993a130875ce7b7873e56881cbcc.raw",
+          "sha256": "743f195a1cfc25c30df9b22d86d5d7503eb7993a130875ce7b7873e56881cbcc",
+          "bytes": 5997
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G07",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "bocchi_the_rock!",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.037732699885964394,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/a7c42f12096174680b16c838652455dc710d084011e175e50d473825e684ee7b.raw",
+          "sha256": "a7c42f12096174680b16c838652455dc710d084011e175e50d473825e684ee7b",
+          "bytes": 5710
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G08",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "ijichi_nijika",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03668919997289777,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/eb7de51860639136e2fa830d90bea03b7564ab080557fce070bb8a696466c1b8.raw",
+          "sha256": "eb7de51860639136e2fa830d90bea03b7564ab080557fce070bb8a696466c1b8",
+          "bytes": 2351
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G09",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "kita_ikuyo",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03852210007607937,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/98e95e42fa22ed9a40b280aa1fa0234b502243678f37959dfc9d720c6f3bca0b.raw",
+          "sha256": "98e95e42fa22ed9a40b280aa1fa0234b502243678f37959dfc9d720c6f3bca0b",
+          "bytes": 5149
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G10",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "ayanami_rei",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.0369488000869751,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/1aebb027eab28860e893c41cd2a0077b0d67d7c752893d481d77396468a8ad5a.raw",
+          "sha256": "1aebb027eab28860e893c41cd2a0077b0d67d7c752893d481d77396468a8ad5a",
+          "bytes": 4891
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G11",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "souryuu_asuka_langley",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.039271000074222684,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/5c9600474287dd467d874fdee2ad67a68bdef2a25aeab783b35a4a0c84a59140.raw",
+          "sha256": "5c9600474287dd467d874fdee2ad67a68bdef2a25aeab783b35a4a0c84a59140",
+          "bytes": 5906
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G12",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "suzumiya_haruhi",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.038241100031882524,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/17a2175d6a36520cebec67eef55fa76980c91896862d7ef5a83965325ddcbff3.raw",
+          "sha256": "17a2175d6a36520cebec67eef55fa76980c91896862d7ef5a83965325ddcbff3",
+          "bytes": 6074
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G13",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "kaname_madoka",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.041469099931418896,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/da5c8fe7bbb0ec051c8520ceee89ec3c4922e6ae45638b331fb86bac955e0c2d.raw",
+          "sha256": "da5c8fe7bbb0ec051c8520ceee89ec3c4922e6ae45638b331fb86bac955e0c2d",
+          "bytes": 6947
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G14",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "akemi_homura",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03752309991978109,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/c2294c7dbdcca0b052a742d6a75b93bbf7f54ff78ccc1e03020324494cd6b4cf.raw",
+          "sha256": "c2294c7dbdcca0b052a742d6a75b93bbf7f54ff78ccc1e03020324494cd6b4cf",
+          "bytes": 6911
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G15",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "sakura_miku",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03933930001221597,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/d2c13e1786e92223f077d5b65c19ad3f77e6d3a37c4fd5d6972986289e207650.raw",
+          "sha256": "d2c13e1786e92223f077d5b65c19ad3f77e6d3a37c4fd5d6972986289e207650",
+          "bytes": 5748
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G16",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "megurine_luka",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03947669989429414,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/00c1335a7d7ce137c226a073a4256f0e21c503a570b82429c796929134197c2f.raw",
+          "sha256": "00c1335a7d7ce137c226a073a4256f0e21c503a570b82429c796929134197c2f",
+          "bytes": 8179
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G17",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "kagamine_rin",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03930890001356602,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/3b4f61d83d9bbe182a2b580cf76ccdf9239d2a071dcb00f824a818d30f719359.raw",
+          "sha256": "3b4f61d83d9bbe182a2b580cf76ccdf9239d2a071dcb00f824a818d30f719359",
+          "bytes": 6135
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G18",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "kagamine_len",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.0404559001326561,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/a773e1dfbb07c908914874c3b1c8d657d84aba263aba56171a756a46c4871884.raw",
+          "sha256": "a773e1dfbb07c908914874c3b1c8d657d84aba263aba56171a756a46c4871884",
+          "bytes": 6078
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G19",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "artoria_pendragon_(fate)",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.04001839994452894,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/db77206c4504f44ab7567143ca126a221172a7b51ab32355ad75606023403f87.raw",
+          "sha256": "db77206c4504f44ab7567143ca126a221172a7b51ab32355ad75606023403f87",
+          "bytes": 7181
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G20",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "tohsaka_rin",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03800869989208877,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/d0e1410a5b2f7e98a6ac9e66c3ef8dcf098dedff91b2eccd661b6de2ae9310ab.raw",
+          "sha256": "d0e1410a5b2f7e98a6ac9e66c3ef8dcf098dedff91b2eccd661b6de2ae9310ab",
+          "bytes": 7254
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G21",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "后藤一里",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03655559988692403,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/78eb55e9f2bb6f6924559679972a75d98d6eca913639ad14b2d8ea0f8b74e96c.raw",
+          "sha256": "78eb55e9f2bb6f6924559679972a75d98d6eca913639ad14b2d8ea0f8b74e96c",
+          "bytes": 6390
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G22",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "喜多郁代",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.04052509996108711,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/e366b5eb046862ae65c422e29a047fab4e92de98363f051b491a627ecb4cbd3a.raw",
+          "sha256": "e366b5eb046862ae65c422e29a047fab4e92de98363f051b491a627ecb4cbd3a",
+          "bytes": 5544
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G23",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "孤独摇滚",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.04314650013111532,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/8815a60b5671f48f4ca210425c0a3fc36e3c6269411095550035597172669e32.raw",
+          "sha256": "8815a60b5671f48f4ca210425c0a3fc36e3c6269411095550035597172669e32",
+          "bytes": 6099
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G24",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "阿尔托莉雅",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.042445699917152524,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/480dfaeede2d7fb0e0aa076970dfe4857512c0bd3710eb25ed79a36267b66579.raw",
+          "sha256": "480dfaeede2d7fb0e0aa076970dfe4857512c0bd3710eb25ed79a36267b66579",
+          "bytes": 7566
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G25",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "拉姆",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03880609991028905,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/2baa65ceda71da124d270dacf2888d786e4c158d6f879e86e067493f05d64dc7.raw",
+          "sha256": "2baa65ceda71da124d270dacf2888d786e4c158d6f879e86e067493f05d64dc7",
+          "bytes": 5635
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G26",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "雷姆",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.039313399931415915,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/f5aca6c56dc0305411a208b1c5fa4f80418d9a552551eff6dc65684f90bdc79f.raw",
+          "sha256": "f5aca6c56dc0305411a208b1c5fa4f80418d9a552551eff6dc65684f90bdc79f",
+          "bytes": 5627
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G27",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "鹿目圆",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03922450006939471,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/8c7d30cf40880e26f5baa328721c24d077884c61e127f1b8b425cbd78351f9f2.raw",
+          "sha256": "8c7d30cf40880e26f5baa328721c24d077884c61e127f1b8b425cbd78351f9f2",
+          "bytes": 7331
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G28",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "晓美焰",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03669990017078817,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/a0335715c556feba660736db3023d94ffb8b80d3567e5c0b328b80d1e2f47ecd.raw",
+          "sha256": "a0335715c556feba660736db3023d94ffb8b80d3567e5c0b328b80d1e2f47ecd",
+          "bytes": 7296
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G29",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "魔法少女小圆",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.039094300009310246,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/68fc479bc0417a766f5e8a212d7e061ef521c819ebe5f5d6b349efbf3008429a.raw",
+          "sha256": "68fc479bc0417a766f5e8a212d7e061ef521c819ebe5f5d6b349efbf3008429a",
+          "bytes": 8888
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G30",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "樱初音",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.042572799837216735,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/6356be1be9fa977659517ce60d4d6e0e4ae5e56cc7fa1be1f860605213bcd6d9.raw",
+          "sha256": "6356be1be9fa977659517ce60d4d6e0e4ae5e56cc7fa1be1f860605213bcd6d9",
+          "bytes": 6134
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G31",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "远坂凛",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.037168100010603666,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/668cb2071dc52c8ba301b68e33883dbf76862b18f8d6406ad2422efe2dc8a24c.raw",
+          "sha256": "668cb2071dc52c8ba301b68e33883dbf76862b18f8d6406ad2422efe2dc8a24c",
+          "bytes": 7640
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G32",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "巡音流歌",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03712590015493333,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/daa478803113a5587f2576b4f3704f6d53c4e012d0c5a3b7a7a69ce69f01dd16.raw",
+          "sha256": "daa478803113a5587f2576b4f3704f6d53c4e012d0c5a3b7a7a69ce69f01dd16",
+          "bytes": 8567
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G33",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "镜音连",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03632709989324212,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/ee4d804cd66af2e82095cde65a59fc0ebf2e1abeefe67c5d245ccb88feba63a7.raw",
+          "sha256": "ee4d804cd66af2e82095cde65a59fc0ebf2e1abeefe67c5d245ccb88feba63a7",
+          "bytes": 6461
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G34",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "镜音铃",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.036961999954655766,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/22a60ae37d7ce8613a6f3985b1dafe8db44c4433eb2130be62b23ee355359980.raw",
+          "sha256": "22a60ae37d7ce8613a6f3985b1dafe8db44c4433eb2130be62b23ee355359980",
+          "bytes": 6518
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G35",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "初音未来",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03652349999174476,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/8e963015fcb590e7ed26ccb5cb8567f37c123606b34cf8736ed78180723981ff.raw",
+          "sha256": "8e963015fcb590e7ed26ccb5cb8567f37c123606b34cf8736ed78180723981ff",
+          "bytes": 9099
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G36",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "puella_magi_madoka_magica",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.037597799906507134,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/8e9d4fe395810562378e78d1a42e9a8bcc3ca6dc2e555e852411d6f5a815e9dd.raw",
+          "sha256": "8e9d4fe395810562378e78d1a42e9a8bcc3ca6dc2e555e852411d6f5a815e9dd",
+          "bytes": 9426
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G37",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "ぼ喜多",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03734249994158745,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/070df0145c6c872a1d50a2545d7138728263e360f76851811f625ce31e44c6af.raw",
+          "sha256": "070df0145c6c872a1d50a2545d7138728263e360f76851811f625ce31e44c6af",
+          "bytes": 865
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "tag_ambiguous",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G38",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "madohomu",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03744350001215935,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/989867b80c732caf3a00925dc26ac5f8e7592df1e24802cf66bf2d170ef68206.raw",
+          "sha256": "989867b80c732caf3a00925dc26ac5f8e7592df1e24802cf66bf2d170ef68206",
+          "bytes": 867
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "tag_ambiguous",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G39",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "镜音リンレン",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03669760003685951,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/0c7edcd95f37279c61bdb0565dcb5ea83dc24fe3a984471b5385dce203c5cbdf.raw",
+          "sha256": "0c7edcd95f37279c61bdb0565dcb5ea83dc24fe3a984471b5385dce203c5cbdf",
+          "bytes": 876
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "tag_ambiguous",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G40",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "鏡音",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03537279996089637,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/cfd93dde00b4f5eebb626e5b443790ac454669c3af6b29428a3c64162d25b8cf.raw",
+          "sha256": "cfd93dde00b4f5eebb626e5b443790ac454669c3af6b29428a3c64162d25b8cf",
+          "bytes": 864
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "tag_ambiguous",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G41",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "ネギトロ",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.0373454000800848,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/28a86884c8093e3660616109297fb08ba905e2014cbaa60930b5eac9549d46dc.raw",
+          "sha256": "28a86884c8093e3660616109297fb08ba905e2014cbaa60930b5eac9549d46dc",
+          "bytes": 871
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "tag_ambiguous",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G42",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "初音未来",
+          "--kind",
+          "character",
+          "--namespace",
+          "moegirl.character",
+          "--key",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 4.1410971998702735,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/ad0f991588a8b48dee4f6bc79a49e03158605900d07d7ed5c1dfb6a9b9929bce.raw",
+          "sha256": "ad0f991588a8b48dee4f6bc79a49e03158605900d07d7ed5c1dfb6a9b9929bce",
+          "bytes": 800
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "entity_found_tag_unmapped",
+      "historical_behavior_problems": [],
+      "source_delta": {
+        "rule": "complete source-indexed typed identity expansion only",
+        "contract_anchor": "lines 8-13,40-48",
+        "original_expected": {
+          "status": "entity_found_tag_unmapped",
+          "tag_key": null
+        },
+        "full_identity_count": 1,
+        "complete_identities": [
+          {
+            "entry_id": 2720271,
+            "entry_key": {
+              "kind": "character",
+              "namespace": "moegirl.character",
+              "value": "初音未来"
+            },
+            "identity_evidence": [
+              {
+                "source_id": "moegirl-complete-5072f7cf3e3e",
+                "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:7457",
+                "status": "source_backed"
+              }
+            ],
+            "matching_alias_evidence": []
+          }
+        ],
+        "added_keys": [
+          {
+            "kind": "character",
+            "namespace": "moegirl.character",
+            "value": "初音未来"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G43",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "hatsune_miku",
+          "--kind",
+          "tag",
+          "--namespace",
+          "local.tag_aggregate",
+          "--key",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.8873961998615414,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/eee26cbda162a44b260403e495c01a8aedc8228e728bfb8341b54508c902e79a.raw",
+          "sha256": "eee26cbda162a44b260403e495c01a8aedc8228e728bfb8341b54508c902e79a",
+          "bytes": 796
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "entity_found_tag_unmapped",
+      "historical_behavior_problems": [],
+      "source_delta": {
+        "rule": "complete source-indexed typed identity expansion only",
+        "contract_anchor": "lines 8-13,40-48",
+        "original_expected": {
+          "status": "entity_found_tag_unmapped",
+          "tag_key": null
+        },
+        "full_identity_count": 1,
+        "complete_identities": [
+          {
+            "entry_id": 3096604,
+            "entry_key": {
+              "kind": "tag",
+              "namespace": "local.tag_aggregate",
+              "value": "hatsune_miku"
+            },
+            "identity_evidence": [
+              {
+                "source_id": "tag_wiki-complete-a2eb055c578d",
+                "evidence_id": "tag_wiki-complete-a2eb055c578d:a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef:line:36736",
+                "status": "source_backed"
+              }
+            ],
+            "matching_alias_evidence": []
+          }
+        ],
+        "added_keys": [
+          {
+            "kind": "tag",
+            "namespace": "local.tag_aggregate",
+            "value": "hatsune_miku"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G44",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "puella_magi_madoka_magica",
+          "--category",
+          "4",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.044420700054615736,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/6c35caa384c70c1d9252370f1925c01dc9c2ef854645538452173b3869a7c30d.raw",
+          "sha256": "6c35caa384c70c1d9252370f1925c01dc9c2ef854645538452173b3869a7c30d",
+          "bytes": 723
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "not_found",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G45",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "5655",
+          "--kind",
+          "page",
+          "--namespace",
+          "danbooru.wiki",
+          "--key",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 1.5181730999611318,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/867225c0ad3c1e270c13cb3372e99e589b156f19d4acacbbeb7f38c7dec12075.raw",
+          "sha256": "867225c0ad3c1e270c13cb3372e99e589b156f19d4acacbbeb7f38c7dec12075",
+          "bytes": 775
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "entity_found_tag_unmapped",
+      "historical_behavior_problems": [],
+      "source_delta": {
+        "rule": "complete source-indexed typed identity expansion only",
+        "contract_anchor": "lines 8-13,40-48",
+        "original_expected": {
+          "status": "entity_found_tag_unmapped",
+          "tag_key": null
+        },
+        "full_identity_count": 1,
+        "complete_identities": [
+          {
+            "entry_id": 2765831,
+            "entry_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "5655"
+            },
+            "identity_evidence": [
+              {
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:1460",
+                "status": "source_backed"
+              }
+            ],
+            "matching_alias_evidence": []
+          }
+        ],
+        "added_keys": [
+          {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "5655"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G46",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "hatsune_miku",
+          "--kind",
+          "character",
+          "--namespace",
+          "moegirl.character",
+          "--key",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.3573735000099987,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/e2455a4ac2a74f7658e59e7c49faa5af4152c30e783ea4ec267556cff04349f4.raw",
+          "sha256": "e2455a4ac2a74f7658e59e7c49faa5af4152c30e783ea4ec267556cff04349f4",
+          "bytes": 713
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "not_found",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G47",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "151534",
+          "--kind",
+          "page",
+          "--namespace",
+          "danbooru.wiki",
+          "--key",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.5289869999978691,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/51f6e4b35b123b0ce148df02ad850665ff7c940989d54fb01508f8384640e029.raw",
+          "sha256": "51f6e4b35b123b0ce148df02ad850665ff7c940989d54fb01508f8384640e029",
+          "bytes": 779
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "entity_found_tag_unmapped",
+      "historical_behavior_problems": [],
+      "source_delta": {
+        "rule": "complete source-indexed typed identity expansion only",
+        "contract_anchor": "lines 8-13,40-48",
+        "original_expected": {
+          "status": "entity_found_tag_unmapped",
+          "tag_key": null
+        },
+        "full_identity_count": 1,
+        "complete_identities": [
+          {
+            "entry_id": 2909579,
+            "entry_key": {
+              "kind": "page",
+              "namespace": "danbooru.wiki",
+              "value": "151534"
+            },
+            "identity_evidence": [
+              {
+                "source_id": "danbooru-complete-a26a3829dd42",
+                "evidence_id": "danbooru-complete-a26a3829dd42:a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5:line:145208",
+                "status": "source_backed"
+              }
+            ],
+            "matching_alias_evidence": []
+          }
+        ],
+        "added_keys": [
+          {
+            "kind": "page",
+            "namespace": "danbooru.wiki",
+            "value": "151534"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G48",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "konpaku_youmu",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.03863460011780262,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/54929a83588b2f7a3f7b972d7c88cb38f390d9bdca8cc2150125c5add87a6aa0.raw",
+          "sha256": "54929a83588b2f7a3f7b972d7c88cb38f390d9bdca8cc2150125c5add87a6aa0",
+          "bytes": 2341
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G49",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "hatsune_miku",
+          "--category",
+          "3",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.038362199906259775,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/e258bde6df30a977aefe291cf92c9dae92a3ff45eb9daa4ceb08feaaf7dd4937.raw",
+          "sha256": "e258bde6df30a977aefe291cf92c9dae92a3ff45eb9daa4ceb08feaaf7dd4937",
+          "bytes": 710
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "not_found",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G50",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "madoka_kaname",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.037589400075376034,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/f860d5ca04664227b8e5cb5a7c6a2000df8dd0c39cf13b089c5c8d68b2096846.raw",
+          "sha256": "f860d5ca04664227b8e5cb5a7c6a2000df8dd0c39cf13b089c5c8d68b2096846",
+          "bytes": 7339
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G51",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "265",
+          "--kind",
+          "subject",
+          "--namespace",
+          "bangumi.subject",
+          "--key",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 3.503872700035572,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/51b1c8ae96b193e25860e4e31d69fde6db8ef503e334acfcbe8f3bcff584ca9c.raw",
+          "sha256": "51b1c8ae96b193e25860e4e31d69fde6db8ef503e334acfcbe8f3bcff584ca9c",
+          "bytes": 778
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "entity_found_tag_unmapped",
+      "historical_behavior_problems": [],
+      "source_delta": {
+        "rule": "complete source-indexed typed identity expansion only",
+        "contract_anchor": "lines 8-13,40-48",
+        "original_expected": {
+          "status": "entity_found_tag_unmapped",
+          "tag_key": null,
+          "descriptions_empty": true
+        },
+        "full_identity_count": 1,
+        "complete_identities": [
+          {
+            "entry_id": 243,
+            "entry_key": {
+              "kind": "subject",
+              "namespace": "bangumi.subject",
+              "value": "265"
+            },
+            "identity_evidence": [
+              {
+                "source_id": "bangumi-complete-6a75aefb769a",
+                "evidence_id": "bangumi-complete-6a75aefb769a:6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4:line:243",
+                "status": "source_backed"
+              }
+            ],
+            "matching_alias_evidence": []
+          }
+        ],
+        "added_keys": [
+          {
+            "kind": "subject",
+            "namespace": "bangumi.subject",
+            "value": "265"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G52",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "初音未来",
+          "--kind",
+          "character",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 1.2147595998831093,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/8244db3f47c8f0a2d80c12a8eda4ab281f1081def0aaf5c1a49528630601b4ed.raw",
+          "sha256": "8244db3f47c8f0a2d80c12a8eda4ab281f1081def0aaf5c1a49528630601b4ed",
+          "bytes": 1089
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "entity_ambiguous",
+      "historical_behavior_problems": [],
+      "source_delta": {
+        "rule": "complete source-indexed typed identity expansion only",
+        "contract_anchor": "lines 8-13,40-48",
+        "original_expected": {
+          "status": "entity_ambiguous",
+          "tag_key": null,
+          "candidates": [
+            {
+              "kind": "character",
+              "namespace": "moegirl.character",
+              "value": "初音未来"
+            },
+            {
+              "kind": "character",
+              "namespace": "moegirl.character",
+              "value": "松方结"
+            },
+            {
+              "kind": "character",
+              "namespace": "moegirl.character",
+              "value": "珐露珊"
+            },
+            {
+              "kind": "character",
+              "namespace": "moegirl.character",
+              "value": "阴阳师手游:丑时之女"
+            }
+          ],
+          "descriptions_empty": true
+        },
+        "full_identity_count": 4,
+        "complete_identities": [
+          {
+            "entry_id": 2720271,
+            "entry_key": {
+              "kind": "character",
+              "namespace": "moegirl.character",
+              "value": "初音未来"
+            },
+            "identity_evidence": [
+              {
+                "source_id": "moegirl-complete-5072f7cf3e3e",
+                "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:7457",
+                "status": "source_backed"
+              }
+            ],
+            "matching_alias_evidence": [
+              {
+                "text": "初音未来",
+                "source_id": "moegirl-complete-5072f7cf3e3e",
+                "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:7457",
+                "status": "source_backed"
+              }
+            ]
+          },
+          {
+            "entry_id": 2734934,
+            "entry_key": {
+              "kind": "character",
+              "namespace": "moegirl.character",
+              "value": "松方结"
+            },
+            "identity_evidence": [
+              {
+                "source_id": "moegirl-complete-5072f7cf3e3e",
+                "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:22120",
+                "status": "source_backed"
+              }
+            ],
+            "matching_alias_evidence": [
+              {
+                "text": "初音未来",
+                "source_id": "moegirl-complete-5072f7cf3e3e",
+                "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:22120",
+                "status": "source_backed"
+              }
+            ]
+          },
+          {
+            "entry_id": 2741372,
+            "entry_key": {
+              "kind": "character",
+              "namespace": "moegirl.character",
+              "value": "珐露珊"
+            },
+            "identity_evidence": [
+              {
+                "source_id": "moegirl-complete-5072f7cf3e3e",
+                "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:28558",
+                "status": "source_backed"
+              }
+            ],
+            "matching_alias_evidence": [
+              {
+                "text": "初音未来",
+                "source_id": "moegirl-complete-5072f7cf3e3e",
+                "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:28558",
+                "status": "source_backed"
+              }
+            ]
+          },
+          {
+            "entry_id": 2754643,
+            "entry_key": {
+              "kind": "character",
+              "namespace": "moegirl.character",
+              "value": "阴阳师手游:丑时之女"
+            },
+            "identity_evidence": [
+              {
+                "source_id": "moegirl-complete-5072f7cf3e3e",
+                "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:41829",
+                "status": "source_backed"
+              }
+            ],
+            "matching_alias_evidence": [
+              {
+                "text": "初音未来",
+                "source_id": "moegirl-complete-5072f7cf3e3e",
+                "evidence_id": "moegirl-complete-5072f7cf3e3e:5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d:line:41829",
+                "status": "source_backed"
+              }
+            ]
+          }
+        ],
+        "added_keys": []
+      }
+    },
+    {
+      "case_id": "G53",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "haruhi_suzumiya",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.041414299979805946,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/b754e5ee17e008c9ffab529fa252a2c2cc0d555359127912b1e8261ea811cbfa.raw",
+          "sha256": "b754e5ee17e008c9ffab529fa252a2c2cc0d555359127912b1e8261ea811cbfa",
+          "bytes": 1265
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "canonical_unknown",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G54",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "soryu_asuka_langley",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.04462180007249117,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/24a754f7f73138ffde61510b43b2f34c6e8b0cff7b5986b46451c3822e20b12f.raw",
+          "sha256": "24a754f7f73138ffde61510b43b2f34c6e8b0cff7b5986b46451c3822e20b12f",
+          "bytes": 1281
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "canonical_unknown",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    },
+    {
+      "case_id": "G55",
+      "rust": {
+        "argv": [
+          "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+          "resolve-tag",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "ijichi_nijika",
+          "--target-namespace",
+          "danbooru.tag"
+        ],
+        "exit": 0,
+        "elapsed_s": 0.039691600017249584,
+        "outer_timeout": false,
+        "timeout": false,
+        "attempted": 1,
+        "succeeded": 1,
+        "other_error": 0,
+        "stdout": {
+          "path": "reports/P3/raw/eb7de51860639136e2fa830d90bea03b7564ab080557fce070bb8a696466c1b8.raw",
+          "sha256": "eb7de51860639136e2fa830d90bea03b7564ab080557fce070bb8a696466c1b8",
+          "bytes": 2351
+        },
+        "stderr": {
+          "path": "reports/P3/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "outer_timeout_s": 15,
+        "inner_budget_s": 5
+      },
+      "passed": true,
+      "problems": [],
+      "wrong_resolved": false,
+      "actual_status": "resolved",
+      "historical_behavior_problems": [],
+      "source_delta": null
+    }
+  ],
+  "preservation_problems": [],
+  "attempted": 55,
+  "passed": 55,
+  "wrong_resolved": 0,
+  "positive_denominator": 39,
+  "nonresolved_denominator": 16,
+  "status": "PASS"
+}

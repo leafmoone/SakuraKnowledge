@@ -1,0 +1,31 @@
+{
+  "head": "9dfa610640eca1e32b6da89f78f3d4aff6062adf",
+  "working_tree": "?? reports/P3/full-retry1-attempt.json\n?? reports/P3/full-retry1-check-release.json\n?? reports/P3/full-retry1-gate.json\n?? reports/P3/full-retry1-venv-create.json\n?? reports/P3/full-retry1-wheel-build.json\n",
+  "argv": [
+    "dist/p3-retry1-9dfa610/venv/Scripts/python.exe",
+    "-m",
+    "pip",
+    "install",
+    "--no-index",
+    "--no-deps",
+    "dist/p3-retry1-9dfa610/sakura_knowledge-0.2.0-py3-none-any.whl"
+  ],
+  "exit": 0,
+  "elapsed_s": 1.3551073998678476,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 300,
+    "effective": 300,
+    "disabled": false
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "UHJvY2Vzc2luZyAuXGRpc3RccDMtcmV0cnkxLTlkZmE2MTBcc2FrdXJhX2tub3dsZWRnZS0wLjIuMC1weTMtbm9uZS1hbnkud2hsDQpJbnN0YWxsaW5nIGNvbGxlY3RlZCBwYWNrYWdlczogc2FrdXJhLWtub3dsZWRnZQ0KU3VjY2Vzc2Z1bGx5IGluc3RhbGxlZCBzYWt1cmEta25vd2xlZGdlLTAuMi4wDQo=",
+  "stdout_sha256": "96b3e8e66aeebeb9127a708eac72db733ef19ce68d72e240aa76b6d7db2aace2",
+  "stdout": "Processing .\\dist\\p3-retry1-9dfa610\\sakura_knowledge-0.2.0-py3-none-any.whl\r\nInstalling collected packages: sakura-knowledge\r\nSuccessfully installed sakura-knowledge-0.2.0\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

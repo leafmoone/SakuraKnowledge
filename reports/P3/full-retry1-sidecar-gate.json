@@ -1,0 +1,71 @@
+{
+  "kind": "quiescent read-only sidecar gate",
+  "database": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+    "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
+    "bytes": 21718736896
+  },
+  "sidecars_before": {
+    "-wal": {
+      "exists": true,
+      "bytes": 0,
+      "mtime_ns": 1790789111942010400
+    },
+    "-shm": {
+      "exists": true,
+      "bytes": 32768,
+      "mtime_ns": 1790789126017776200,
+      "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "header_copies_equal": true,
+      "version": 3007000,
+      "initialized": 1,
+      "mx_frame": 0
+    },
+    "-journal": {
+      "exists": false
+    }
+  },
+  "sidecars_after": {
+    "-wal": {
+      "exists": true,
+      "bytes": 0,
+      "mtime_ns": 1790789111942010400
+    },
+    "-shm": {
+      "exists": true,
+      "bytes": 32768,
+      "mtime_ns": 1790789126017776200,
+      "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "header_copies_equal": true,
+      "version": 3007000,
+      "initialized": 1,
+      "mx_frame": 0
+    },
+    "-journal": {
+      "exists": false
+    }
+  },
+  "retry1_lock_absent": true,
+  "historical_attempt_lock_untouched": true,
+  "process_observation": {
+    "command": [
+      "powershell.exe",
+      "-NoProfile",
+      "-Command",
+      "$ErrorActionPreference=\"Stop\"; Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name,CommandLine | ConvertTo-Json -Depth 3"
+    ],
+    "exit": 0,
+    "matched_related_processes": [],
+    "limitations": [
+      "Command-line inspection is not complete handle enumeration",
+      "Process silence does not prove no writer; TOCTOU remains",
+      "Read-only reader is not classified as writer; active related processes conservatively block"
+    ]
+  },
+  "limitations": [
+    "Whole hash proves bytes only at check time",
+    "Empty WAL alone is not an immutable snapshot proof",
+    "No permissions changed and no exclusive handle acquired"
+  ],
+  "created_ns": 1790789950939956500
+}

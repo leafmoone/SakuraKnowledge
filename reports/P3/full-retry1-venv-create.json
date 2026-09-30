@@ -1,0 +1,28 @@
+{
+  "head": "9dfa610640eca1e32b6da89f78f3d4aff6062adf",
+  "working_tree": "?? reports/P3/full-retry1-attempt.json\n?? reports/P3/full-retry1-check-release.json\n?? reports/P3/full-retry1-gate.json\n?? reports/P3/full-retry1-wheel-build.json\n",
+  "argv": [
+    "python",
+    "-m",
+    "venv",
+    "dist/p3-retry1-9dfa610/venv"
+  ],
+  "exit": 0,
+  "elapsed_s": 6.1647685000207275,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 300,
+    "effective": 300,
+    "disabled": false
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

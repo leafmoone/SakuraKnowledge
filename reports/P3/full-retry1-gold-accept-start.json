@@ -1,0 +1,36 @@
+{
+  "kind": "all independent expectations frozen before Rust acceptance",
+  "created_ns": 1790789089989204500,
+  "gold": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\full-retry1-real-gold.json",
+    "sha256": "a27828b021849d5859b4bbf8a508dc0557787c34aa33ebb056974ff97a76f96e",
+    "bytes": 283128
+  },
+  "P2": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\full-retry1-P2-frozen-expected.json",
+    "sha256": "36f6462acf5d26faf6ee2a13633ce5128c2829314ba26c5470f204c136bca539",
+    "bytes": 337222
+  },
+  "db": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+    "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
+    "bytes": 21718736896
+  },
+  "binary": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-retry1-9dfa610\\source\\rust\\target\\release\\sknow-rs.exe",
+    "sha256": "2ceb812f9cae3c6bb315854fd773ea8373b9a6b3ecbe126a7d310006028dc0d7",
+    "bytes": 5128767
+  },
+  "policy": {
+    "outer_timeout_s": 15,
+    "inner_budget_s": 5,
+    "retries": 0,
+    "warmup_rounds": 0,
+    "failure_action": "STOP; no retry/refreeze/relabel"
+  },
+  "frozen_marker_raw": {
+    "path": "reports/P3/raw/d358cc938272f87e869b0ea44427f3c66409e7df3fab0ce1ec41ab981250e808.raw",
+    "sha256": "d358cc938272f87e869b0ea44427f3c66409e7df3fab0ce1ec41ab981250e808",
+    "bytes": 1015
+  }
+}

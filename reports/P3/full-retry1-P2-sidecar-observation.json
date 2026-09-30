@@ -1,0 +1,39 @@
+{
+  "status": "STOP_BEFORE_P2_RUNTIME",
+  "observed_host_time": "2026-10-01T01:26:10.2144436+08:00",
+  "provenance": "Actual read-only metadata/process diagnostic output transcribed. Full stdout/stderr not locally archived. No resampling for this receipt.",
+  "gold_receipt": "reports/P3/full-retry1-real-acceptance.json",
+  "gold_status": "PASS",
+  "gold_attempted": 55,
+  "gold_passed": 55,
+  "gold_wrong_resolved": 0,
+  "gold_timeouts": 0,
+  "gold_preservation_problems": [],
+  "gold_database_sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
+  "P2_failed_command_receipt": "reports/P3/full-retry1-P2-command.json",
+  "P2_exit": 1,
+  "P2_elapsed_s": 0.14546289993450046,
+  "P2_stderr_sha256": "d5b8009753e2fc58e913842585bf959817a140d8cd0bbfaddc2c6602eecf8539",
+  "P2_failure": "ValueError: published database has live SQLite sidecars; STOP",
+  "P2_runtime_cases_started": 0,
+  "published_directory_metadata": [
+    {"Name": "build_report.json", "Length": 2144, "LastWriteTime_epoch_ms": 1790788189601},
+    {"Name": "knowledge.sqlite", "Length": 21718736896, "LastWriteTime_epoch_ms": 1790786750952},
+    {"Name": "knowledge.sqlite-shm", "Length": 32768, "LastWriteTime_epoch_ms": 1790789126017},
+    {"Name": "knowledge.sqlite-wal", "Length": 0, "LastWriteTime_epoch_ms": 1790789111942},
+    {"Name": "sources.lock.json", "Length": 34066, "LastWriteTime_epoch_ms": 1790788189601}
+  ],
+  "process_query": "Win32_Process CommandLine contains full-authorized-retry1, excluding diagnostic powershell/bash; no matching process returned",
+  "limitations": [
+    "Command-line filtering is not a complete open-handle proof or a guarantee against future readers",
+    "Database hash preservation is from completed gold's after-check, not a fresh hash invented at metadata sampling time",
+    "Likely ordinary read-only WAL sidecars, but this observation is not authorization to delete or ignore files",
+    "No active database SQL connection/checkpoint/write/cleanup performed"
+  ],
+  "source_reference": "rust/src/lib.rs:172 opens using OpenFlags::SQLITE_OPEN_READ_ONLY, not immutable URI",
+  "formal_action": "STOP; preserve original P2 FAIL and sidecars; no automatic repeated validation or performance run",
+  "P2_compatibility": "NOT_RUN",
+  "FULL_performance": "NOT_RUN",
+  "FULL_external_artifact_validation": "NOT_RUN",
+  "build_retry": "PROHIBITED_WITHOUT_FRESH_AUTHORIZATION"
+}

@@ -1,6 +1,34 @@
 # Stage Status (SakuraKnowledge)
 
-## Current authorized P3 — NOT_READY / WAITING_REVIEW (formal attempt failed; STOP)
+## Current authorized P3 retry1 — NOT_READY / STOP (P2 S02 budget failure)
+
+- Retry1 build code: `9dfa610640eca1e32b6da89f78f3d4aff6062adf`.
+  The independently authorized retry1 completed once, wrapper exit0 in
+  13984.489062299952 seconds, no deadline, no automatic retry. Original attempt1
+  host-timeout evidence/partial/lock remain unchanged; total formal attempts2.
+- Published `build/p3-full-authorized-retry1/knowledge.sqlite`: 21718736896 bytes,
+  SHA256 `61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9`.
+  Manifest SHA256 `373fcb69731db877929c102b75292142c0ccff1b5f6075310acc03432ddb6b8b`.
+  Builder integrity/FK/FTS/accounting checks passed; projection352/nativeWiki28/
+  verified entity_tag0/capability1. WAL checkpoint [0,0,0]; old bytes protected.
+- FULL gold frozen before Rust and actual55/55 PASS, wrong resolved0, timeouts0,
+  39positive/16nonresolved. Original path-spelling gate FAIL retained separately.
+- FULL P2: **151 attempted / 150 passed**, 134 complete-value comparisons and16
+  error contracts verified. S02 `search "ONE PIECE" --topk20 --kind episode`
+  exceeded unchanged5s Rust budget: exit2, `query_budget_exceeded`, elapsed
+  5.172278400044888 seconds. No timeout retry, changed expected or increased budget.
+  Original empty-sidecar gate FAIL retained; explicitly authorized gate-only
+  continuation rejected nonempty WAL/journal/hash changes and did not delete sidecars.
+- FULL dual-mode performance/source-external runtime: **NOT_RUN after actual P2 FAIL**.
+  Fresh9dfa wheel/binary/venv, prior synthetic ABC and owner/quarantine fixture
+  receipts do not substitute for missing FULL performance/external validation.
+- User chose A for WAL repair: isolated synthetic experiment only under
+  `build/p3-wal-batch-repair-A/`; 11+55 tests passed, never applied to dev/runtime
+  or this build. No new formal build, main merge, GET, P4, Pool or SakuraTool changes.
+- See `reports/P3/FULL_RETRY1_STOP_REPORT.md` and `full-retry1-*` for exact raw
+  commands, original failures and limitations. Completion is not claimed.
+
+## Historical original authorized P3 — NOT_READY (formal attempt failed; STOP)
 
 - P1/P2: **CLOSED_AND_MERGED**. P2 fixed review `894dc6a73bfd42f18cc7648e8ab7481aae211ab1`
   APPROVE / NO_BLOCKING_FINDINGS within authorized Windows targeted/artifact scope.

@@ -1,0 +1,16 @@
+{
+  "kind": "cancelled_unused_collector_preparation",
+  "job_id": "agent_worker_82c83e0c",
+  "ownership": "worker tool delegated by this controller; scope tools/p3_retry1_delivery.py, tools/p3_retry1_bind.py, tests/test_p3_retry1_delivery.py",
+  "authorization": "Root authorized precise stop_task cancellation of unused collector preparation only; not any build or runtime",
+  "tool_result": "Cancelled sub-agent: agent_worker_82c83e0c",
+  "automatic_event": "Tool agent_worker_82c83e0c cancelled",
+  "cancelled_not_paused": true,
+  "resumability_claimed": false,
+  "files_preserved_not_staged": ["tools/p3_retry1_delivery.py", "tools/p3_retry1_bind.py", "tests/test_p3_retry1_delivery.py"],
+  "reason": "P2 runtime failed; STOP-only delivery uses separate stop_audit and stop_bind. Preparation tools are unfinished and not part of fixed STOP submission.",
+  "limitations": "Cancellation acknowledgement does not constitute a global process/handle audit. Earlier Ruff sampled syntax/import problems in those files; they are not assumed fixed or PASS.",
+  "no_build_or_runtime_termination": true,
+  "no_file_removal_or_revert": true,
+  "working_tree_boundary": "Excluded untracked files remain; do not claim CLEAN tree. Binder reports exact excluded set and rejects other modifications."
+}

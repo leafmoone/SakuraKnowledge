@@ -1,0 +1,34 @@
+{
+  "head": "9dfa610640eca1e32b6da89f78f3d4aff6062adf",
+  "working_tree": "?? reports/P3/full-retry1-attempt.json\n?? reports/P3/full-retry1-check-release.json\n?? reports/P3/full-retry1-gate.json\n",
+  "argv": [
+    "python",
+    "-m",
+    "pip",
+    "wheel",
+    "--no-deps",
+    "--no-build-isolation",
+    "--no-index",
+    "--wheel-dir",
+    "dist/p3-retry1-9dfa610",
+    "dist/p3-retry1-9dfa610/source"
+  ],
+  "exit": 0,
+  "elapsed_s": 2.691393000073731,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 300,
+    "effective": 300,
+    "disabled": false
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "UHJvY2Vzc2luZyAuXGRpc3RccDMtcmV0cnkxLTlkZmE2MTBcc291cmNlDQogIFByZXBhcmluZyBtZXRhZGF0YSAocHlwcm9qZWN0LnRvbWwpOiBzdGFydGVkDQogIFByZXBhcmluZyBtZXRhZGF0YSAocHlwcm9qZWN0LnRvbWwpOiBmaW5pc2hlZCB3aXRoIHN0YXR1cyAnZG9uZScNCkJ1aWxkaW5nIHdoZWVscyBmb3IgY29sbGVjdGVkIHBhY2thZ2VzOiBzYWt1cmEta25vd2xlZGdlDQogIEJ1aWxkaW5nIHdoZWVsIGZvciBzYWt1cmEta25vd2xlZGdlIChweXByb2plY3QudG9tbCk6IHN0YXJ0ZWQNCiAgQnVpbGRpbmcgd2hlZWwgZm9yIHNha3VyYS1rbm93bGVkZ2UgKHB5cHJvamVjdC50b21sKTogZmluaXNoZWQgd2l0aCBzdGF0dXMgJ2RvbmUnDQogIENyZWF0ZWQgd2hlZWwgZm9yIHNha3VyYS1rbm93bGVkZ2U6IGZpbGVuYW1lPXNha3VyYV9rbm93bGVkZ2UtMC4yLjAtcHkzLW5vbmUtYW55LndobCBzaXplPTMzNjQxIHNoYTI1Nj02NTE3ZWE0NGY1YjZmOWIyNjc5Y2RiYjQ4ZTQ2ODI1ZmQyMDRmYzg4NzliYmFjMmM2Yjc3MjE2N2RhN2JmYzQ1DQogIFN0b3JlZCBpbiBkaXJlY3Rvcnk6IEM6XFVzZXJzXFBDXEFwcERhdGFcTG9jYWxcVGVtcFxwaXAtZXBoZW0td2hlZWwtY2FjaGUtbXloeDJtcmJcd2hlZWxzXGM2XDIyXGE4XGVkOTRmNmM5NjAyYjU4YzkwNmM0MTFmZjBlYzcxZjAyYjE5ZmY2YjE5OGNjYzBkNjE0DQpTdWNjZXNzZnVsbHkgYnVpbHQgc2FrdXJhLWtub3dsZWRnZQ0K",
+  "stdout_sha256": "b3f7d7b44658493944365db95dc53eb9199a27685302fbe3a57066ebae3cf561",
+  "stdout": "Processing .\\dist\\p3-retry1-9dfa610\\source\r\n  Preparing metadata (pyproject.toml): started\r\n  Preparing metadata (pyproject.toml): finished with status 'done'\r\nBuilding wheels for collected packages: sakura-knowledge\r\n  Building wheel for sakura-knowledge (pyproject.toml): started\r\n  Building wheel for sakura-knowledge (pyproject.toml): finished with status 'done'\r\n  Created wheel for sakura-knowledge: filename=sakura_knowledge-0.2.0-py3-none-any.whl size=33641 sha256=6517ea44f5b6f9b2679cdbb48e46825fd204fc8879bbac2c6b772167da7bfc45\r\n  Stored in directory: C:\\Users\\PC\\AppData\\Local\\Temp\\pip-ephem-wheel-cache-myhx2mrb\\wheels\\c6\\22\\a8\\ed94f6c9602b58c906c411ff0ec71f02b19ff6b198ccc0d614\r\nSuccessfully built sakura-knowledge\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

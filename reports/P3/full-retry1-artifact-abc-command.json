@@ -1,0 +1,32 @@
+{
+  "head": "9dfa610640eca1e32b6da89f78f3d4aff6062adf",
+  "working_tree": "?? reports/P3/full-retry1-attempt.json\n?? reports/P3/full-retry1-check-release.json\n?? reports/P3/full-retry1-gate.json\n?? reports/P3/full-retry1-owner-release-command.json\n?? reports/P3/full-retry1-owner-release.json\n?? reports/P3/full-retry1-quarantine-release-command.json\n?? reports/P3/full-retry1-quarantine-release.json\n?? reports/P3/full-retry1-venv-create.json\n?? reports/P3/full-retry1-venv-install.json\n?? reports/P3/full-retry1-wheel-build.json\n",
+  "argv": [
+    "python",
+    "tools/check_numeric_artifacts.py",
+    "--python",
+    "dist/p3-retry1-9dfa610/venv/Scripts/python.exe",
+    "--rust",
+    "dist/p3-retry1-9dfa610/source/rust/target/release/sknow-rs.exe",
+    "--out",
+    "reports/P3/full-retry1-artifact-abc.json"
+  ],
+  "exit": 0,
+  "elapsed_s": 2.6944186999462545,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 300,
+    "effective": 300,
+    "disabled": false
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJzdGF0dXMiOiAiUEFTUyIsICJwYWlycyI6IDEwfQ0K",
+  "stdout_sha256": "586126ef631893db8fb73b29e7ab2549e1fb7c6aad9ba66c76f881b8e269ee5b",
+  "stdout": "{\"status\": \"PASS\", \"pairs\": 10}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

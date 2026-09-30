@@ -19,6 +19,7 @@ def main():
         parser.add_argument('--'+flag,type=Path,required=True)
     parser.add_argument('--samples',type=int,default=30)
     parser.add_argument('--review-cf807',action='store_true')
+    parser.add_argument('--snapshot-scope',choices=('PILOT','FULLSNAPSHOT'),default='PILOT')
     args=parser.parse_args()
     if args.out.exists():raise FileExistsError(args.out)
     if args.samples!=30:raise ValueError('protocol fixed at30 samples')
@@ -83,12 +84,16 @@ def main():
                             'failed_rounds':[r['round'] for r in rows if not r['success']],
                             'p50_s':percentile(.5),'p95_s':percentile(.95)})
     passed=all(r['success'] for r in records)
+    from sakura_knowledge.storage import digest
     save(args.out,{'status':'PASS' if passed else 'FAIL','samples':30,'workloads':ids,'retries':0,
+                   'snapshot_scope':args.snapshot_scope,'database_sha256':digest(args.db),
+                   'gold_sha256':digest(args.gold),'binary_sha256':digest(args.bin),
+                   'reused_binary_sha256':digest(args.reused_bin),
                    'measured':sum(not r['warmup'] for r in records),'warmups':sum(r['warmup'] for r in records),
                    'records':records,'reused_processes':processes,'summary':summary,
                    'protocol':{'inner_s':5,'cli_outer_s':15,'reused_batch_outer_s':600,
                                'percentile':'nearest rank on successful samples, attempts/failures separate',
-                               'rss':'NOT_RUN for P3 resolver-specific pilot; no peak-memory claim',
+                               'rss':'NOT_RUN for P3 resolver-specific measurement; no peak-memory claim',
                                'raw':'content-addressed files retained once locally, receipt hashes reference them'}})
     print(json.dumps({'status':'PASS' if passed else 'FAIL','measured':len(workloads)*30*2,'warmups':len(workloads)*2,'summary':summary}))
     return 0 if passed else 1

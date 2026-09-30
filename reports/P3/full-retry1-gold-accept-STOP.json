@@ -1,0 +1,17 @@
+{
+  "status": "STOP",
+  "policy": {
+    "outer_timeout_s": 15,
+    "inner_budget_s": 5,
+    "retries": 0,
+    "warmup_rounds": 0,
+    "failure_action": "STOP; no retry/refreeze/relabel"
+  },
+  "records": [],
+  "problems": [
+    {
+      "kind": "ValueError",
+      "message": "changed frozen input: reports/P3/raw/1baec8c77094a2207174ab95959591a867448126e05ef40c7a3d151050395a50.raw"
+    }
+  ]
+}
