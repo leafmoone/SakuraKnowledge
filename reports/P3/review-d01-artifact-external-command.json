@@ -1,0 +1,35 @@
+{
+  "head": "8a5b3d23695a43970d1902d6d6dea7c9e7dd1882",
+  "working_tree": " M tools/p3_quarantine_9d5_delivery.py\n?? reports/P3/review-d01-candidates.jsonl\n?? reports/P3/review-d01-check-clippy.json\n?? reports/P3/review-d01-check-diff.json\n?? reports/P3/review-d01-check-fmt.json\n?? reports/P3/review-d01-check-pytest.json\n?? reports/P3/review-d01-check-release.json\n?? reports/P3/review-d01-check-ruff.json\n?? reports/P3/review-d01-check-rust-test.json\n?? reports/P3/review-d01-decisions.jsonl\n?? reports/P3/review-d01-input-compilation.json\n?? reports/P3/review-d01-input-compile-command.json\n?? reports/P3/review-d01-owner-after.json\n?? reports/P3/review-d01-owner-before.json\n?? reports/P3/review-d01-owner-release-command.json\n?? reports/P3/review-d01-owner-release.json\n?? reports/P3/review-d01-quarantine-release-command.json\n?? reports/P3/review-d01-quarantine-release.json\n?? reports/P3/review-d01-real-input-equality.json\n?? reports/P3/review-d01-release-acceptance-command.json\n?? reports/P3/review-d01-release-acceptance.json\n?? reports/P3/review-d01-source_manifest.json\n?? reports/P3/review-d01-venv-create.json\n?? reports/P3/review-d01-venv-install.json\n?? reports/P3/review-d01-wheel-build.json\n?? tools/p3_quarantine_owner_d01_delivery.py\n",
+  "argv": [
+    "python",
+    "tools/p3_check_artifacts.py",
+    "--python",
+    "dist/p3-owner-8a5b3d2/venv/Scripts/python.exe",
+    "--bin",
+    "dist/p3-owner-8a5b3d2/source/rust/target/release/sknow-rs.exe",
+    "--wheel",
+    "dist/p3-owner-8a5b3d2/sakura_knowledge-0.2.0-py3-none-any.whl",
+    "--db",
+    "build/p3-review-cf807-final-pilot/knowledge.sqlite",
+    "--gold",
+    "reports/P3/review-cf807-real-gold.json",
+    "--out",
+    "reports/P3/review-d01-artifact-external.json",
+    "--source-commit",
+    "8a5b3d23695a43970d1902d6d6dea7c9e7dd1882"
+  ],
+  "exit": 0,
+  "elapsed_s": 4.652130299946293,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJzdGF0dXMiOiAiUEFTUyIsICJQMnBhaXJzIjogOCwgIlJ1c3RyZXNvbHZlciI6IDU1LCAiZXh0ZXJuYWwiOiB0cnVlfQ0K",
+  "stdout_sha256": "21d3ef31f649954c5eb1beedde42c28495ca7b3695acd2ef32bcb067eaf92dd9",
+  "stdout": "{\"status\": \"PASS\", \"P2pairs\": 8, \"Rustresolver\": 55, \"external\": true}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

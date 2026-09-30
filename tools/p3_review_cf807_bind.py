@@ -53,7 +53,8 @@ def main():
     baseline=args.baseline;source=args.source;output=args.out
     head=git('rev-parse','HEAD').decode().strip();rows,refs,streams=inventory(head)
     assert git('diff','--name-only',source,head,'--','src','rust','tools/p3_compile_inputs.py',
-               'tools/p3_accept_quarantine_9d5.py','tests/test_p3_quarantine_9d5.py').strip()==b''
+               'tools/p3_accept_quarantine_9d5.py','tests/test_p3_quarantine_9d5.py',
+               'tools/p3_accept_quarantine_owner_d01.py','tests/test_p3_quarantine_owner_d01.py').strip()==b''
     assert git('diff','--name-only',baseline,head,'--','reports/P1','reports/P2','src/sakura_knowledge',
                'tools/parity_cases.py','tools/parity_repair_expected.py').strip()==b''
     historical=git('ls-tree','-r','--name-only',baseline,'reports/P3').decode().splitlines()

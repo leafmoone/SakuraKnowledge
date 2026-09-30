@@ -1,0 +1,23 @@
+{
+  "head": "8a5b3d23695a43970d1902d6d6dea7c9e7dd1882",
+  "working_tree": "?? reports/P3/review-d01-owner-after.json\n?? reports/P3/review-d01-owner-before.json\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "exit": 0,
+  "elapsed_s": 23.02559500001371,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgMjclXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgNTUlXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgODMlXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KMjYwIHBhc3NlZCBpbiAyMi41MHMNCg==",
+  "stdout_sha256": "a4453e447416595848b69462b6c6d3ebea8d40bac229b48538b81c47a8a5c91d",
+  "stdout": "........................................................................ [ 27%]\r\n........................................................................ [ 55%]\r\n........................................................................ [ 83%]\r\n............................................                             [100%]\r\n260 passed in 22.50s\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

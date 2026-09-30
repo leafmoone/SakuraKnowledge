@@ -1,0 +1,26 @@
+{
+  "head": "8a5b3d23695a43970d1902d6d6dea7c9e7dd1882",
+  "working_tree": " M docs/STAGE_STATUS.md\n M tools/p3_quarantine_9d5_delivery.py\n M tools/p3_review_cf807_bind.py\n?? reports/P3/REVIEW_D01_OWNER_REPORT.md\n?? reports/P3/review-d01-artifact-abc-command.json\n?? reports/P3/review-d01-artifact-abc.json\n?? reports/P3/review-d01-artifact-external-command.json\n?? reports/P3/review-d01-artifact-external.json\n?? reports/P3/review-d01-artifact-manifest.json\n?? reports/P3/review-d01-candidates.jsonl\n?? reports/P3/review-d01-check-clippy.json\n?? reports/P3/review-d01-check-diff.json\n?? reports/P3/review-d01-check-fmt.json\n?? reports/P3/review-d01-check-pytest.json\n?? reports/P3/review-d01-check-release.json\n?? reports/P3/review-d01-check-ruff.json\n?? reports/P3/review-d01-check-rust-test.json\n?? reports/P3/review-d01-collection-command.json\n?? reports/P3/review-d01-decisions.jsonl\n?? reports/P3/review-d01-delivery.json\n?? reports/P3/review-d01-full-candidate-gate.json\n?? reports/P3/review-d01-input-compilation.json\n?? reports/P3/review-d01-input-compile-command.json\n?? reports/P3/review-d01-old151-command.json\n?? reports/P3/review-d01-old151.json\n?? reports/P3/review-d01-owner-after.json\n?? reports/P3/review-d01-owner-before.json\n?? reports/P3/review-d01-owner-release-command.json\n?? reports/P3/review-d01-owner-release.json\n?? reports/P3/review-d01-performance-command.json\n?? reports/P3/review-d01-performance.json\n?? reports/P3/review-d01-quarantine-release-command.json\n?? reports/P3/review-d01-quarantine-release.json\n?? reports/P3/review-d01-real-input-equality.json\n?? reports/P3/review-d01-release-acceptance-command.json\n?? reports/P3/review-d01-release-acceptance.json\n?? reports/P3/review-d01-source_manifest.json\n?? reports/P3/review-d01-venv-create.json\n?? reports/P3/review-d01-venv-install.json\n?? reports/P3/review-d01-wheel-build.json\n?? tools/p3_quarantine_owner_d01_delivery.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "ruff",
+    "check",
+    "src",
+    "tests",
+    "tools"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.6378234000876546,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "QWxsIGNoZWNrcyBwYXNzZWQhCg==",
+  "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+  "stdout": "All checks passed!\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

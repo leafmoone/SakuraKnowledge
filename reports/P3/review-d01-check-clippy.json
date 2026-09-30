@@ -1,0 +1,28 @@
+{
+  "head": "8a5b3d23695a43970d1902d6d6dea7c9e7dd1882",
+  "working_tree": "?? reports/P3/review-d01-check-diff.json\n?? reports/P3/review-d01-check-fmt.json\n?? reports/P3/review-d01-check-pytest.json\n?? reports/P3/review-d01-check-ruff.json\n?? reports/P3/review-d01-check-rust-test.json\n?? reports/P3/review-d01-owner-after.json\n?? reports/P3/review-d01-owner-before.json\n",
+  "argv": [
+    "cargo",
+    "clippy",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.7858599000610411,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "ICAgIEZpbmlzaGVkIGBkZXZgIHByb2ZpbGUgW3Vub3B0aW1pemVkICsgZGVidWdpbmZvXSB0YXJnZXQocykgaW4gMC40N3MK",
+  "stderr_sha256": "4618eeba4e21359898995b7f544b56cd4d474efe9641525e1447388aaa8fabe6",
+  "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.47s\n"
+}

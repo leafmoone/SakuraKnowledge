@@ -20,9 +20,14 @@
   actual terminal Wiki quarantine omitted on canonical aliases. Authorized 15-line
   compiler-only repair source/artifact `229c2ddcc43c0d3919d44a4ea823f6a999a48a57`;
   independent rawcompiler+normalbuilder eight completeJSON paths before5FAIL/3PASS,
-  after8PASS, fullpytest242. Code awaits fixed-SHA review. All historical P3 receipts
-  remain unchanged; new paths `reports/P3/review-9d5-*` and
-  `REVIEW_9D5_QUARANTINE_REPORT.md`. Overall P3 remains NOT_READY regardless of code review.
+  after8PASS, fullpytest242; fixed delivery `d01b23c...` then found owner/target
+  conflation when nativeC itself aliases to A. Same authorized residual only:
+  source/artifact `8a5b3d23695a43970d1902d6d6dea7c9e7dd1882` aggregates quarantine
+  refs by their own typed tag_key, not containing projection.target/last-writer.
+  New dualnative/doublecut fixture18completeJSON paths in both raworders before18FAIL,
+  after18+prior8=26PASS; fullpytest260. Code awaits fixed-SHA review. All historical
+  P3 receipts remain unchanged; new paths `reports/P3/review-d01-*` and
+  `REVIEW_D01_OWNER_REPORT.md`. Overall P3 remains NOT_READY regardless of code review.
 - Real pilot:30 native tags,28 compatible same-source Wiki links,352 assessments;
   451entries/222FTS,874input records all accounted. 100candidate decisions,0verified
   cross-source entity_tag/0human_verified. Two changed Wiki versions quarantined.

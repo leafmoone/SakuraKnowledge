@@ -1,0 +1,29 @@
+{
+  "head": "8a5b3d23695a43970d1902d6d6dea7c9e7dd1882",
+  "working_tree": "?? reports/P3/review-d01-check-clippy.json\n?? reports/P3/review-d01-check-diff.json\n?? reports/P3/review-d01-check-fmt.json\n?? reports/P3/review-d01-check-pytest.json\n?? reports/P3/review-d01-check-release.json\n?? reports/P3/review-d01-check-ruff.json\n?? reports/P3/review-d01-check-rust-test.json\n?? reports/P3/review-d01-owner-after.json\n?? reports/P3/review-d01-owner-before.json\n",
+  "argv": [
+    "python",
+    "-m",
+    "pip",
+    "wheel",
+    "--no-deps",
+    "--no-build-isolation",
+    "--no-index",
+    "--wheel-dir",
+    "dist/p3-owner-8a5b3d2",
+    "dist/p3-owner-8a5b3d2/source"
+  ],
+  "exit": 0,
+  "elapsed_s": 3.2313574000727385,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "UHJvY2Vzc2luZyAuXGRpc3RccDMtb3duZXItOGE1YjNkMlxzb3VyY2UNCiAgUHJlcGFyaW5nIG1ldGFkYXRhIChweXByb2plY3QudG9tbCk6IHN0YXJ0ZWQNCiAgUHJlcGFyaW5nIG1ldGFkYXRhIChweXByb2plY3QudG9tbCk6IGZpbmlzaGVkIHdpdGggc3RhdHVzICdkb25lJw0KQnVpbGRpbmcgd2hlZWxzIGZvciBjb2xsZWN0ZWQgcGFja2FnZXM6IHNha3VyYS1rbm93bGVkZ2UNCiAgQnVpbGRpbmcgd2hlZWwgZm9yIHNha3VyYS1rbm93bGVkZ2UgKHB5cHJvamVjdC50b21sKTogc3RhcnRlZA0KICBCdWlsZGluZyB3aGVlbCBmb3Igc2FrdXJhLWtub3dsZWRnZSAocHlwcm9qZWN0LnRvbWwpOiBmaW5pc2hlZCB3aXRoIHN0YXR1cyAnZG9uZScNCiAgQ3JlYXRlZCB3aGVlbCBmb3Igc2FrdXJhLWtub3dsZWRnZTogZmlsZW5hbWU9c2FrdXJhX2tub3dsZWRnZS0wLjIuMC1weTMtbm9uZS1hbnkud2hsIHNpemU9MzM2NDEgc2hhMjU2PTM2ZDQ1ZGQwMWM4MTA5ZTI2OGQxNzY4N2Y4M2Q3NzcxNGUwMGU2NTJhNTEyMTk5NmNkMjMyYzcyYjc4ZDZmOTINCiAgU3RvcmVkIGluIGRpcmVjdG9yeTogQzpcVXNlcnNcUENcQXBwRGF0YVxMb2NhbFxUZW1wXHBpcC1lcGhlbS13aGVlbC1jYWNoZS10dWZvb2EzeVx3aGVlbHNcNmVcZGNcZmRcMzI4ZTVhNWU4ZjgxNTZmMzg3Y2M2MmFmYjNiMWNiYjVhYTFhZjI1YzIzMTg2ZTYxZTcNClN1Y2Nlc3NmdWxseSBidWlsdCBzYWt1cmEta25vd2xlZGdlDQo=",
+  "stdout_sha256": "8926aaf9503a69814b53eef2f236c8255187c6bdc702635d0f8f4dd81ab7fcd5",
+  "stdout": "Processing .\\dist\\p3-owner-8a5b3d2\\source\r\n  Preparing metadata (pyproject.toml): started\r\n  Preparing metadata (pyproject.toml): finished with status 'done'\r\nBuilding wheels for collected packages: sakura-knowledge\r\n  Building wheel for sakura-knowledge (pyproject.toml): started\r\n  Building wheel for sakura-knowledge (pyproject.toml): finished with status 'done'\r\n  Created wheel for sakura-knowledge: filename=sakura_knowledge-0.2.0-py3-none-any.whl size=33641 sha256=36d45dd01c8109e268d17687f83d77714e00e652a5121996cd232c72b78d6f92\r\n  Stored in directory: C:\\Users\\PC\\AppData\\Local\\Temp\\pip-ephem-wheel-cache-tufooa3y\\wheels\\6e\\dc\\fd\\328e5a5e8f8156f387cc62afb3b1cbb5aa1af25c23186e61e7\r\nSuccessfully built sakura-knowledge\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

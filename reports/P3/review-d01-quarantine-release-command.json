@@ -1,0 +1,25 @@
+{
+  "head": "8a5b3d23695a43970d1902d6d6dea7c9e7dd1882",
+  "working_tree": " M tools/p3_quarantine_9d5_delivery.py\n?? reports/P3/review-d01-candidates.jsonl\n?? reports/P3/review-d01-check-clippy.json\n?? reports/P3/review-d01-check-diff.json\n?? reports/P3/review-d01-check-fmt.json\n?? reports/P3/review-d01-check-pytest.json\n?? reports/P3/review-d01-check-release.json\n?? reports/P3/review-d01-check-ruff.json\n?? reports/P3/review-d01-check-rust-test.json\n?? reports/P3/review-d01-decisions.jsonl\n?? reports/P3/review-d01-input-compilation.json\n?? reports/P3/review-d01-input-compile-command.json\n?? reports/P3/review-d01-owner-after.json\n?? reports/P3/review-d01-owner-before.json\n?? reports/P3/review-d01-owner-release-command.json\n?? reports/P3/review-d01-owner-release.json\n?? reports/P3/review-d01-real-input-equality.json\n?? reports/P3/review-d01-source_manifest.json\n?? reports/P3/review-d01-venv-create.json\n?? reports/P3/review-d01-venv-install.json\n?? reports/P3/review-d01-wheel-build.json\n?? tools/p3_quarantine_owner_d01_delivery.py\n",
+  "argv": [
+    "python",
+    "tools/p3_accept_quarantine_9d5.py",
+    "--bin",
+    "dist/p3-owner-8a5b3d2/source/rust/target/release/sknow-rs.exe",
+    "--out",
+    "reports/P3/review-d01-quarantine-release.json"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.7868952001444995,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJuYXRpdmVfdGFncyI6IDEsICJvZmZpY2lhbF9hbGlhc19yZWNvcmRzIjogMiwgInBpbG90X25hbWVzcGFjZV9yZWNvcmRfY291bnRzIjoge30sICJjcm9zc19zb3VyY2VfY2FuZGlkYXRlcyI6IDAsICJjcm9zc19zb3VyY2VfdmVyaWZpZWQiOiAwfQ0KeyJzdGF0dXMiOiAiUEFTUyIsICJwYXNzZWQiOiA4LCAiYXR0ZW1wdGVkIjogOCwgInJldHJpZXMiOiAwfQ0K",
+  "stdout_sha256": "965d7528f05666e64d547dd05e495a9d0bf0767bf483f0bf50ed94f26872585b",
+  "stdout": "{\"native_tags\": 1, \"official_alias_records\": 2, \"pilot_namespace_record_counts\": {}, \"cross_source_candidates\": 0, \"cross_source_verified\": 0}\r\n{\"status\": \"PASS\", \"passed\": 8, \"attempted\": 8, \"retries\": 0}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

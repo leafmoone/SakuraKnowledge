@@ -1,0 +1,27 @@
+{
+  "head": "8a5b3d23695a43970d1902d6d6dea7c9e7dd1882",
+  "working_tree": " M tools/p3_quarantine_9d5_delivery.py\n?? reports/P3/review-d01-artifact-external-command.json\n?? reports/P3/review-d01-artifact-external.json\n?? reports/P3/review-d01-candidates.jsonl\n?? reports/P3/review-d01-check-clippy.json\n?? reports/P3/review-d01-check-diff.json\n?? reports/P3/review-d01-check-fmt.json\n?? reports/P3/review-d01-check-pytest.json\n?? reports/P3/review-d01-check-release.json\n?? reports/P3/review-d01-check-ruff.json\n?? reports/P3/review-d01-check-rust-test.json\n?? reports/P3/review-d01-decisions.jsonl\n?? reports/P3/review-d01-input-compilation.json\n?? reports/P3/review-d01-input-compile-command.json\n?? reports/P3/review-d01-owner-after.json\n?? reports/P3/review-d01-owner-before.json\n?? reports/P3/review-d01-owner-release-command.json\n?? reports/P3/review-d01-owner-release.json\n?? reports/P3/review-d01-quarantine-release-command.json\n?? reports/P3/review-d01-quarantine-release.json\n?? reports/P3/review-d01-real-input-equality.json\n?? reports/P3/review-d01-release-acceptance-command.json\n?? reports/P3/review-d01-release-acceptance.json\n?? reports/P3/review-d01-source_manifest.json\n?? reports/P3/review-d01-venv-create.json\n?? reports/P3/review-d01-venv-install.json\n?? reports/P3/review-d01-wheel-build.json\n?? tools/p3_quarantine_owner_d01_delivery.py\n",
+  "argv": [
+    "python",
+    "tools/check_numeric_artifacts.py",
+    "--python",
+    "dist/p3-owner-8a5b3d2/venv/Scripts/python.exe",
+    "--rust",
+    "dist/p3-owner-8a5b3d2/source/rust/target/release/sknow-rs.exe",
+    "--out",
+    "reports/P3/review-d01-artifact-abc.json"
+  ],
+  "exit": 0,
+  "elapsed_s": 2.686259499983862,
+  "status": "PASS",
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJzdGF0dXMiOiAiUEFTUyIsICJwYWlycyI6IDEwfQ0K",
+  "stdout_sha256": "586126ef631893db8fb73b29e7ab2549e1fb7c6aad9ba66c76f881b8e269ee5b",
+  "stdout": "{\"status\": \"PASS\", \"pairs\": 10}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

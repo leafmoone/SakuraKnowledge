@@ -23,14 +23,19 @@ def git(*args):return subprocess.check_output(['git',*args])
 def receipt(name):return json.loads((ROOT/(PREFIX+name+'.json')).read_text(encoding='utf-8'))
 
 
-def main():
+def main(owner_receipt=None):
     checks={}
     for name in ('pytest','ruff','diff','fmt','rust-test','clippy','release'):
         r=receipt('check-'+name);assert r['exit']==0 and r['head']==SOURCE
         checks[name]={'path':str(ROOT/(PREFIX+'check-'+name+'.json')),'sha256':digest(ROOT/(PREFIX+'check-'+name+'.json')),'exit':0}
     equality=receipt('real-input-equality');assert equality['exit']==0
     equality_value=json.loads(equality['stdout']);assert equality_value['status']=='PASS'
-    assert all(r['identical'] for r in equality_value['real_inputs_unchanged'])
+    equal_files=equality_value['real_inputs_unchanged'] if 'real_inputs_unchanged' in equality_value else equality_value['files']
+    assert all(r['identical'] for r in equal_files)
+    owner=receipt(owner_receipt) if owner_receipt else None
+    if owner is not None:
+        assert owner['status']=='PASS' and owner['passed']==owner['attempted']==18 and owner['retries']==0
+        assert all(r['passed'] and r['quarantine_owners']==r['expected_owners'] for r in owner['records'])
     real=receipt('release-acceptance');old=receipt('old151');perf=receipt('performance')
     quarantine=receipt('quarantine-release');external=receipt('artifact-external');abc=receipt('artifact-abc')
     assert real['passed']==55 and real['wrong_resolved']==0 and old['summary']['passed']==151
@@ -83,7 +88,7 @@ def main():
     assert digest(gate['old_snapshot']['path'])==gate['old_snapshot']['sha256']=='4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073'
     mainsha=git('rev-parse','main').decode().strip();assert mainsha=='894dc6a73bfd42f18cc7648e8ab7481aae211ab1'
     save(ROOT/(PREFIX+'artifact-manifest.json'),{'source_commit':SOURCE,'artifacts':artifacts,'wheel_modules':modules,
-        'origin':'fresh git archive229 release/examples/wheel/newvenv; no relabeled outputs; realpilot/data unchanged byhash',
+        'origin':f'fresh git archive {SOURCE} release/examples/wheel/newvenv; no relabeled outputs; realpilot/data unchanged byhash',
         'UTF8_external_environment':external['environment']})
     save(ROOT/(PREFIX+'full-candidate-gate.json'),{'status':'BLOCKED','overall_P3':'NOT_READY','candidate_build':'NOT_RUN','attempts':0,
         'necessary_verified_entity_tag_real_positive':False,'verified_entity_tag':0,'candidate_count':100,'human_verified':0,
@@ -91,10 +96,14 @@ def main():
         'new_GETs':0,'new_human_review':0,'full_build_authorized':False,
         'blocker':'Need genuine cross-source ID/link evidence or actual scoped human decisions. Do not automatically launch/retry build.'})
     save(ROOT/(PREFIX+'delivery.json'),{'overall_P3':'BLOCKED/NOT_READY','code_review_state':'PENDING_REVIEW','review_base':BASE,
-        'source_artifact_commit':SOURCE,'single_repair':'actual canonical terminal Wiki quarantine propagated to same typed target projections after cut comparison',
+        'source_artifact_commit':SOURCE,'single_repair':('quarantine reference own typed tag_key aggregated/deduplicated, no nativealias target overwrite or foreign quarantine propagation' if owner else 'actual canonical terminal Wiki quarantine propagated to same typed target projections after cut comparison'),
         'closed_items':'typedendpoint/category,realgold,redirect not reopened; Rust/Pythonpublic/src all byteunchanged',
         'quarantine_fixture':{'cases':8,'passed':8,'fullJSON_expected_and_oracle':True,'normal_builder_atomic':True,
                               'paths':'A/B/C ordinary+explicit and verifiedheroA/heroC','synthetic_not_real_verified_positive':True},
+        'owner_fixture':({'cases':18,'passed':18,'fullJSON_independent_expected_and_oracle':True,
+                          'orders':['original','reversed'],'paths':'A/B/C ordinary+explicit and verifiedheroA/B/C',
+                          'canonical_target':'A','invariant':'A/B and heroA/B contain A/Wiki9 quarantine only; C/heroC retain original C/Wiki19 plus terminal A/Wiki9',
+                          'normal_builder_atomic':True,'synthetic_not_real_verified_positive':True} if owner else None),
         'checks':checks,'real55':{k:real[k] for k in ('passed','positive_denominator','nonresolved_denominator','wrong_resolved')},
         'old151':old['summary'],'external':{'P2pairs':8,'Rustresolver':55,'ABCpairs':10,'UTF8_verified':True},
         'performance':{'scope':'UNCHANGED_REALPILOT_ONLY','workloads':13,'measured':780,'fixed_warmups':26,'retries':0,
@@ -103,12 +112,12 @@ def main():
         'artifacts':artifacts,'raw_unique_verified':len(refs),'embedded_streams_verified':streams,'raw_inventory':list(refs.values()),
         'inventory_boundary':'precollection-output/command,binding; finalclosedset independentlyverified',
         'prior_P3_files_unchanged':len(historic),'realpilot_input_protection':'original fiveinputs,old55gold,publishedpilot,old21.5GB actualSHA match',
-        'recompiled_real_inputs_byte_identical':equality_value['real_inputs_unchanged'],'realpilot_rebuilt':False,
+        'recompiled_real_inputs_byte_identical':equal_files,'realpilot_rebuilt':False,
         'overall_blocker':{'verified_entity_tag':0,'candidate':100,'human':0,'fullcandidate_attempts':0},
         'limitations':['0GET/0human/0fullcandidate','Linux/Pi/Pool/dbstat/fullhumanfacts/RSS/fullrefreshNOT_RUN',
                        'raw licenseunknown localonly','No main/P4/Pythonproductionresolver'],
-        'failures':'initialbefore8FAIL containedwrongfixturelinkeID+globalprojection assertions; correctedbefore5FAIL3PASS preservesrealbug; no historicalreceipt rewritten'})
-    print(json.dumps({'status':'BLOCKED','checks':7,'quarantine_fullJSON_cases':8,'realgold':55,'old151':151,
+        'failures':('newbefore18FAIL real ownervscanonicaltarget bug; after26PASS includes prior8; historicalfailedreceiptsunchanged' if owner else 'initialbefore8FAIL containedwrongfixturelinkeID+globalprojection assertions; correctedbefore5FAIL3PASS preservesrealbug; no historicalreceipt rewritten')})
+    print(json.dumps({'status':'BLOCKED','checks':7,'quarantine_fullJSON_cases':8,'owner_fullJSON_cases':18 if owner else 0,'realgold':55,'old151':151,
                       'raw_unique':len(refs),'embedded_streams':streams,'artifacts':artifacts[:3]}))
 
 
