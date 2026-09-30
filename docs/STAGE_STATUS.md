@@ -1,6 +1,22 @@
 # Stage Status (SakuraKnowledge)
 
-## Current f99a115 nine-finding repair — READY_FOR_REVIEW / WAITING_REVIEW
+## Current b7547a A-C repair — READY_FOR_REVIEW / WAITING_REVIEW
+
+New submission evidence: `reports/P2/review-b754-delivery.json`, with per-finding
+mapping `review-b754-findings.md`. This proposes review, not external approval.
+Prior b7547a review was CHANGES_REQUIRED for A-C; earlier nine fixes remain closed.
+
+- Reference/implementation/clean artifact source: `42fa24810040349d05c0f8f0e10f9c7b3363e0b7`.
+- A-C independent17 tests pass; corrected baseline13FAIL/4PASS retained. Initial
+  stale-fixture FAIL is explicitly invalid reproduction evidence, not hidden.
+- Final pytest167/Rust5; seven checks exit0; formal151=135fullvalue+16error, no retries.
+- New960/960 measured performance successes plus32fixedwarmups;496pairs/996hashes verified.
+- New source-external8 real-query pairs and10 A-C fixture pairs pass on installed wheel/binary.
+- New24-receipt exact Gitblob binding at `74ebf585101150f5a714319d6a2082bf99665de4`.
+- Snapshot/main/P1/old receipts unchanged; no R4 reopening or P3. Artifacts local-only.
+- Linux/Pi/full human facts/dbstat/Pool/live refresh NOT_RUN. Final dev SHA independently verified after push.
+
+## Historical f99a115 nine-finding repair — b7547a review required A-C follow-up
 
 Submission evidence: `reports/P2/review-f99-delivery.json` and
 `reports/P2/review-f99-nine-findings.md`. This proposes readiness, not external approval.

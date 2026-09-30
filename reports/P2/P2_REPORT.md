@@ -1,6 +1,41 @@
 # P2 Report — Rust read-only runtime and contract hardening
 
-## Current f99a115 nine-finding repair: READY_FOR_REVIEW / WAITING_REVIEW
+## Current b7547a A-C repair: READY_FOR_REVIEW / WAITING_REVIEW
+
+New delivery: [`review-b754-delivery.json`](review-b754-delivery.json).
+Per-finding implementation/test IDs/receipts: [`review-b754-findings.md`](review-b754-findings.md).
+Prior b7547a review was CHANGES_REQUIRED for A-C; no aggregate PASS substitutes
+for the new independent scalar/inspect cases. External approval remains NOT_RUN.
+
+Reference/implementation/clean artifact source `42fa24810040349d05c0f8f0e10f9c7b3363e0b7`;
+evidence commit `74ebf585101150f5a714319d6a2082bf99665de4`. Final binding hashes24
+exact committed Git blobs, separately recording checkout bytes. Source runtime
+is unchanged after clean builds; artifacts are new local-only files.
+
+- A: local bounded parse_int never converts more than20characters; no global digits
+  guard changes.5001digit± projected/ignored fixtures preserve raw and identity.
+- B: finite float projected values, not raw lexeme lengths, receive byte budgets;
+  overflow null/truncated/present, invalid JSON constants rejected. Raw unchanged.
+- C: every outer successful Rust public response, including inspect, passes total
+  cap; oversized snapshot identity fails explicitly without truncation or panic.
+- Correct baseline13FAIL/4PASS; after17PASS. First fixture run is retained FAIL but
+  explicitly invalid defect evidence because writer checkpoint was missing.
+- Final pytest167/Rust5; all seven check exits0. Formal151=135fullvalue+16error,
+  no retries/timeouts,604 raw streams verified.10 A-C source-external artifact pairs
+  plus8 frozen-source CLI pairs pass; collector command exits0 with explicit UTF-8.
+- Performance960/960 measured+32fixed excluded warmups;496 JSON pairs/996rawhashes.
+  S18 p50/p95 seconds: reused Python0.3141/0.3933, Rust0.2405/0.2851;
+  independent CLI Python0.3451/0.3646, Rust0.2187/0.2317, each30/30 successful.
+  Inner5s, CLI outer15s, reused whole-batch600s unchanged. No retries; failures
+  would remain in attempted counts. RSS sampled, no disk-cold/universal-speedup claim.
+- Final snapshot21516320768bytes SHA256
+  `4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073` unchanged.
+
+No old receipt/raw/P1/main edits, no R4 reopening, no Pool/P3/live refresh. Existing
+Linux/Pi/full human facts/dbstat/Pool/live NOT_RUN unchanged. Final submission SHA
+is supplied after normal push/independent ls-remote verification, not self-embedded.
+
+## Historical f99a115 nine-finding repair — b7547a review required A-C follow-up
 
 Delivery: [`review-f99-delivery.json`](review-f99-delivery.json).
 Independent per-finding test IDs and implementation: [`review-f99-nine-findings.md`](review-f99-nine-findings.md).

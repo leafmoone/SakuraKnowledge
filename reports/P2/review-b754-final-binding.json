@@ -1,0 +1,201 @@
+{
+  "schema": "committed-receipt-binding-v1",
+  "commit": "74ebf585101150f5a714319d6a2082bf99665de4",
+  "hash_rule": "SHA256 of exact git show COMMIT:PATH bytes; no newline/JSON normalization",
+  "worktree_rule": "observed checkout bytes only; never substituted for committed bytes",
+  "artifact_rule": "metadata correction does not rebuild or change historical artifacts",
+  "entries": {
+    "reports/P2/review-b754-after-v1.json": {
+      "git_blob_oid": "8485c53b648ed9b8f150c0f69e6d47ecebdaceda",
+      "committed_sha256": "5e068a768e26879f148b9b26ef667350cf78752f9127c92cfceca9688eb6d94b",
+      "committed_size_bytes": 1059,
+      "worktree_sha256": "5e068a768e26879f148b9b26ef667350cf78752f9127c92cfceca9688eb6d94b",
+      "worktree_size_bytes": 1059,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-artifact-abc-command.json": {
+      "git_blob_oid": "1f7df76080c2c3550e835e188457d2e63580dea5",
+      "committed_sha256": "d4172c81f53cc42e406a0cbce2daf8385f1ec0d080c26799130bfba0dd7cb399",
+      "committed_size_bytes": 1567,
+      "worktree_sha256": "d4172c81f53cc42e406a0cbce2daf8385f1ec0d080c26799130bfba0dd7cb399",
+      "worktree_size_bytes": 1567,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-artifact-abc.json": {
+      "git_blob_oid": "878fe019e0e94a604bc0c0adfbe16e0d491996bf",
+      "committed_sha256": "2387f274de56c9e1a24a4c27fdcd1563baa8b85e250cddb04a17731a50ab477b",
+      "committed_size_bytes": 105707,
+      "worktree_sha256": "2387f274de56c9e1a24a4c27fdcd1563baa8b85e250cddb04a17731a50ab477b",
+      "worktree_size_bytes": 105707,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-artifact-cli.json": {
+      "git_blob_oid": "ee3057e7f35af0be68f0e97f7be45a5abe9cc169",
+      "committed_sha256": "c7e657a820bf1dc10b4f6317d88e8059bfaf854c2d387e1abef991ac4dfbacb6",
+      "committed_size_bytes": 450770,
+      "worktree_sha256": "c7e657a820bf1dc10b4f6317d88e8059bfaf854c2d387e1abef991ac4dfbacb6",
+      "worktree_size_bytes": 450770,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-artifact-manifest.json": {
+      "git_blob_oid": "341d1129a31cdf4c2ce16a53c69c7d20d4206f0e",
+      "committed_sha256": "cde600b4f66d1ab5b7a03c01505168ed2585a84f1a37ac3558720f6290e44c70",
+      "committed_size_bytes": 509,
+      "worktree_sha256": "cde600b4f66d1ab5b7a03c01505168ed2585a84f1a37ac3558720f6290e44c70",
+      "worktree_size_bytes": 509,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-before-v2.json": {
+      "git_blob_oid": "e2e30e32767782575351f127cd18e9748468cf58",
+      "committed_sha256": "64c6878e53ca703572a2bf6f97d767e90db0eb0de8edcf74c0f9c418742c0bb4",
+      "committed_size_bytes": 27526,
+      "worktree_sha256": "64c6878e53ca703572a2bf6f97d767e90db0eb0de8edcf74c0f9c418742c0bb4",
+      "worktree_size_bytes": 27526,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-before.json": {
+      "git_blob_oid": "5bc3cce0ef4f63a88c6bfabdc1bad2d535d68aa1",
+      "committed_sha256": "9ebd3c9751de82288732bf9819b3482746b56f5c5d9b4764c7972901b3e94543",
+      "committed_size_bytes": 97975,
+      "worktree_sha256": "9ebd3c9751de82288732bf9819b3482746b56f5c5d9b4764c7972901b3e94543",
+      "worktree_size_bytes": 97975,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-check-clippy.json": {
+      "git_blob_oid": "7b01364adfc27680a5df377d4e2672dab53927aa",
+      "committed_sha256": "3e97110e163d1309fd0a0801f6dcb30c7a1be50388655e357e4c22397949c9a4",
+      "committed_size_bytes": 1284,
+      "worktree_sha256": "3e97110e163d1309fd0a0801f6dcb30c7a1be50388655e357e4c22397949c9a4",
+      "worktree_size_bytes": 1284,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-check-diff.json": {
+      "git_blob_oid": "6b9dd45932ff854853ad12e8e6c0764257daa4b0",
+      "committed_sha256": "309fdee481058f785134df93adc3d7e6b9617caf855057b1651a9badae692aa8",
+      "committed_size_bytes": 869,
+      "worktree_sha256": "309fdee481058f785134df93adc3d7e6b9617caf855057b1651a9badae692aa8",
+      "worktree_size_bytes": 869,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-check-fmt.json": {
+      "git_blob_oid": "9662ed21101f4b28c016a2c2aa7dd1d43123073d",
+      "committed_sha256": "68207cedeb0aad06a5e7aef7630aea3499b41dfd926711c74ab03e85939746ff",
+      "committed_size_bytes": 971,
+      "worktree_sha256": "68207cedeb0aad06a5e7aef7630aea3499b41dfd926711c74ab03e85939746ff",
+      "worktree_size_bytes": 971,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-check-pytest.json": {
+      "git_blob_oid": "c587553567a6a5d8ae2acadc6289a63f6acd1c7a",
+      "committed_sha256": "d93cc5b41593e608ee8f218a6d750f848ff0bacef3eb7d8ee0b7c49c168d928c",
+      "committed_size_bytes": 1420,
+      "worktree_sha256": "d93cc5b41593e608ee8f218a6d750f848ff0bacef3eb7d8ee0b7c49c168d928c",
+      "worktree_size_bytes": 1420,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-check-release.json": {
+      "git_blob_oid": "dbe053d236033755d121d02a753df2035cf19073",
+      "committed_sha256": "aca5e8c5d79660058846e448d373dbd72c9942aab7f506286ad4698c62f6a410",
+      "committed_size_bytes": 1314,
+      "worktree_sha256": "aca5e8c5d79660058846e448d373dbd72c9942aab7f506286ad4698c62f6a410",
+      "worktree_size_bytes": 1314,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-check-ruff.json": {
+      "git_blob_oid": "c4ca3bd97be39aaa210eb61c1af58e7f0bae36bf",
+      "committed_sha256": "ca2527f12a2d5d3ae653921460910c75be54150ba9914addef71d2cf17579c5c",
+      "committed_size_bytes": 926,
+      "worktree_sha256": "ca2527f12a2d5d3ae653921460910c75be54150ba9914addef71d2cf17579c5c",
+      "worktree_size_bytes": 926,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-check-rust-test.json": {
+      "git_blob_oid": "8856986a58bf435881aa732d653d9908ec79cf8d",
+      "committed_sha256": "7672115b7390e0aa72d0b4335876eea90f39dd0e808406be6abe660e26bd577e",
+      "committed_size_bytes": 3165,
+      "worktree_sha256": "7672115b7390e0aa72d0b4335876eea90f39dd0e808406be6abe660e26bd577e",
+      "worktree_size_bytes": 3165,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-output-verification.json": {
+      "git_blob_oid": "33c1e3ef72018d5a5be2d7597e610c6e04430ccd",
+      "committed_sha256": "e65d2e728ef1e41aef5bb59bfd589fa921d2c786eb0dc4b5badbf28d15b554d9",
+      "committed_size_bytes": 530,
+      "worktree_sha256": "e65d2e728ef1e41aef5bb59bfd589fa921d2c786eb0dc4b5badbf28d15b554d9",
+      "worktree_size_bytes": 530,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-parity-v1.json": {
+      "git_blob_oid": "a26725bc73fe5a7baa07546523a04951601d2c6f",
+      "committed_sha256": "c4c67029ba3cde2872f6d9eb0cffada58936e969c91fbe1d1ddbba11e595622c",
+      "committed_size_bytes": 18514838,
+      "worktree_sha256": "c4c67029ba3cde2872f6d9eb0cffada58936e969c91fbe1d1ddbba11e595622c",
+      "worktree_size_bytes": 18514838,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-perf-v1.json": {
+      "git_blob_oid": "f04f48eae55365bf8a090cf7eaa71f4a3fa51146",
+      "committed_sha256": "9b514227ce6a45f8eb481e13c3c86d630365949fed52d7bec7e6c49a4c10d9ed",
+      "committed_size_bytes": 34444609,
+      "worktree_sha256": "9b514227ce6a45f8eb481e13c3c86d630365949fed52d7bec7e6c49a4c10d9ed",
+      "worktree_size_bytes": 34444609,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-perf-verification.json": {
+      "git_blob_oid": "23335c3eebac238e7aa4190ac3c3c8df7b969339",
+      "committed_sha256": "e3dfda329574787c3fe000935294dd2b5a37c8e016bef583e1c795098f555fd2",
+      "committed_size_bytes": 7939,
+      "worktree_sha256": "e3dfda329574787c3fe000935294dd2b5a37c8e016bef583e1c795098f555fd2",
+      "worktree_size_bytes": 7939,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-release-build.json": {
+      "git_blob_oid": "5b781ecbe2ac5cdcc08ae6557b0853718b2e4560",
+      "committed_sha256": "df1b5aef827ed429c07ff3a02413ebb45dcc11fcb5f1a5dc26054b6697e88d6b",
+      "committed_size_bytes": 1021,
+      "worktree_sha256": "df1b5aef827ed429c07ff3a02413ebb45dcc11fcb5f1a5dc26054b6697e88d6b",
+      "worktree_size_bytes": 1021,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-snapshot-final.json": {
+      "git_blob_oid": "41ff0597d254465adcd5750072db80b94e244a4d",
+      "committed_sha256": "904772e23e47f1870065e20efdeb9ae6afb918d41f8b5539149d8b1a517e8fba",
+      "committed_size_bytes": 301,
+      "worktree_sha256": "904772e23e47f1870065e20efdeb9ae6afb918d41f8b5539149d8b1a517e8fba",
+      "worktree_size_bytes": 301,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-venv-bootstrap.json": {
+      "git_blob_oid": "6db3e3fa701aff39a98b89471c9160eb788b1de4",
+      "committed_sha256": "3c991e9f9e01adeec21455e29ab060e3ab78451795f0e6aaf883942dae9a6658",
+      "committed_size_bytes": 1702,
+      "worktree_sha256": "3c991e9f9e01adeec21455e29ab060e3ab78451795f0e6aaf883942dae9a6658",
+      "worktree_size_bytes": 1702,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-venv-create.json": {
+      "git_blob_oid": "6f2a1e312cae942f9425de5bde97f1b144ab6d02",
+      "committed_sha256": "35f661db725dead45bddbf69cfd97b5818332965aaea52d7245ae94036ecd93a",
+      "committed_size_bytes": 1148,
+      "worktree_sha256": "35f661db725dead45bddbf69cfd97b5818332965aaea52d7245ae94036ecd93a",
+      "worktree_size_bytes": 1148,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-venv-install.json": {
+      "git_blob_oid": "cb4b66609b326264b41b8f6987ad9d0f553cbc3d",
+      "committed_sha256": "74637c908af85d63088956e5e41b469a5cd23c39dc13d4457d31d59812529163",
+      "committed_size_bytes": 1758,
+      "worktree_sha256": "74637c908af85d63088956e5e41b469a5cd23c39dc13d4457d31d59812529163",
+      "worktree_size_bytes": 1758,
+      "worktree_equals_committed": true
+    },
+    "reports/P2/review-b754-wheel-build.json": {
+      "git_blob_oid": "47f7f865e7d99af31f46df57ecac984590645e0d",
+      "committed_sha256": "42763985be3210cbfaac927eb862eff17e585c6394fa5087bc8d244f725fc3c1",
+      "committed_size_bytes": 2365,
+      "worktree_sha256": "42763985be3210cbfaac927eb862eff17e585c6394fa5087bc8d244f725fc3c1",
+      "worktree_size_bytes": 2365,
+      "worktree_equals_committed": true
+    }
+  }
+}
