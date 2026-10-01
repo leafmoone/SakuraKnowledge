@@ -1,0 +1,291 @@
+{
+  "schema": "p4-selection-v2-recompute",
+  "scope": "quality_only",
+  "models": {
+    "a": {
+      "gates": {
+        "lexical.recall_at_10": {
+          "baseline": 1.0,
+          "value": 1.0,
+          "minimum": 0.9666666666666667,
+          "pass": true
+        },
+        "lexical.mrr_at_10": {
+          "baseline": 1.0,
+          "value": 1.0,
+          "minimum": 0.97,
+          "pass": true
+        },
+        "lexical.ndcg_at_10": {
+          "baseline": 1.0,
+          "value": 1.0,
+          "minimum": 0.97,
+          "pass": true
+        },
+        "semantic.recall_at_10": {
+          "baseline": 0.975,
+          "value": 1.0,
+          "minimum": 1.0,
+          "pass": true
+        },
+        "semantic.mrr_at_10": {
+          "baseline": 0.9410714285714286,
+          "value": 0.9875,
+          "minimum": 0.9410714285714286,
+          "pass": true
+        },
+        "semantic.ndcg_at_10": {
+          "baseline": 0.9491065771726198,
+          "value": 0.9907732438392864,
+          "minimum": 0.9491065771726198,
+          "pass": true
+        },
+        "crosslingual.recall_at_10": {
+          "baseline": 0.1,
+          "value": 0.1,
+          "minimum": 0.2,
+          "pass": false
+        },
+        "crosslingual.mrr_at_10": {
+          "baseline": 0.07777777777777778,
+          "value": 0.075,
+          "minimum": 0.07777777777777778,
+          "pass": false
+        },
+        "crosslingual.ndcg_at_10": {
+          "baseline": 0.08333333333333333,
+          "value": 0.08102255193577977,
+          "minimum": 0.08333333333333333,
+          "pass": false
+        },
+        "overall.identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "overall.negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "lexical.identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "semantic.identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "crosslingual.identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "ambiguous_negative.identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "ambiguous_negative.negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        }
+      },
+      "failures": [
+        "crosslingual.recall_at_10",
+        "crosslingual.mrr_at_10",
+        "crosslingual.ndcg_at_10"
+      ],
+      "pass": false
+    },
+    "b": {
+      "gates": {
+        "lexical.recall_at_10": {
+          "baseline": 1.0,
+          "value": 1.0,
+          "minimum": 0.9666666666666667,
+          "pass": true
+        },
+        "lexical.mrr_at_10": {
+          "baseline": 1.0,
+          "value": 1.0,
+          "minimum": 0.97,
+          "pass": true
+        },
+        "lexical.ndcg_at_10": {
+          "baseline": 1.0,
+          "value": 1.0,
+          "minimum": 0.97,
+          "pass": true
+        },
+        "semantic.recall_at_10": {
+          "baseline": 0.975,
+          "value": 1.0,
+          "minimum": 1.0,
+          "pass": true
+        },
+        "semantic.mrr_at_10": {
+          "baseline": 0.9410714285714286,
+          "value": 0.965625,
+          "minimum": 0.9410714285714286,
+          "pass": true
+        },
+        "semantic.ndcg_at_10": {
+          "baseline": 0.9491065771726198,
+          "value": 0.9736598657589297,
+          "minimum": 0.9491065771726198,
+          "pass": true
+        },
+        "crosslingual.recall_at_10": {
+          "baseline": 0.1,
+          "value": 0.7333333333333333,
+          "minimum": 0.2,
+          "pass": true
+        },
+        "crosslingual.mrr_at_10": {
+          "baseline": 0.07777777777777778,
+          "value": 0.36124338624338626,
+          "minimum": 0.07777777777777778,
+          "pass": true
+        },
+        "crosslingual.ndcg_at_10": {
+          "baseline": 0.08333333333333333,
+          "value": 0.45227262372514204,
+          "minimum": 0.08333333333333333,
+          "pass": true
+        },
+        "overall.identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "overall.negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "lexical.identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "semantic.identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "crosslingual.identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "ambiguous_negative.identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        },
+        "ambiguous_negative.negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "maximum": 0,
+          "pass": true
+        }
+      },
+      "failures": [],
+      "pass": true
+    }
+  },
+  "quality_only_selected_model": {
+    "label": "b",
+    "repository": "BAAI/bge-m3",
+    "revision": "5617a9f61b028005a4858fdac845db406aefb181"
+  },
+  "status": "UNIQUE_QUALITY_PASS",
+  "frozen_limitations": {
+    "semantic": {
+      "baseline_recall10": 0.975,
+      "uncapped_target": 1.075,
+      "capped_target": 1.0,
+      "cap_active": true
+    },
+    "crosslingual": {
+      "baseline_recall10": 0.1,
+      "uncapped_target": 0.2,
+      "capped_target": 0.2,
+      "cap_active": false
+    },
+    "dense_to_hybrid_crosslingual": {
+      "A": {
+        "dense_recall10": 0.06666666666666667,
+        "hybrid_recall10": 0.1
+      },
+      "B": {
+        "dense_recall10": 0.8666666666666667,
+        "hybrid_recall10": 0.7333333333333333
+      }
+    }
+  },
+  "retrieval_rerun": false,
+  "embedding_rerun": false,
+  "gold_changed": false,
+  "fusion_changed": false,
+  "fusion_rerun": false,
+  "cpu_evidence": "NOT_RUN",
+  "full_build": "NOT_RUN",
+  "source_receipt_sha256": "05c44cfffab21235fd584c1fa289b976179a1b7ae92bfd06875b79c449ee2284",
+  "source": {
+    "path": "reports/P4/continuation-pilot-quality.json",
+    "commit": "ffff13b",
+    "sha256": "05c44cfffab21235fd584c1fa289b976179a1b7ae92bfd06875b79c449ee2284",
+    "expected_sha256": "05c44cfffab21235fd584c1fa289b976179a1b7ae92bfd06875b79c449ee2284",
+    "valid": true
+  },
+  "input_hash_validations": {
+    "gold": {
+      "path": "reports/P4/retrieval-gold.json",
+      "expected_sha256": "ae6fcc98021de5f5b4c905b5f35a438c6670005327e0276fd751d9cffe4635ba",
+      "actual_sha256": "ae6fcc98021de5f5b4c905b5f35a438c6670005327e0276fd751d9cffe4635ba",
+      "valid": true
+    },
+    "corpus": {
+      "path": "build/p4/continuation-pilot-v1.jsonl",
+      "expected_sha256": "19f8e7bf18e55a5d1587a10fb0f743d0cd0a65c16a1fcefaf8aa391a28bab1fe",
+      "actual_sha256": "19f8e7bf18e55a5d1587a10fb0f743d0cd0a65c16a1fcefaf8aa391a28bab1fe",
+      "valid": true
+    },
+    "lexical": {
+      "path": "build/p4/continuation-lexical-results-v1.json",
+      "expected_sha256": "a5050522c31f4f1b0c76eb48aa2bc4d4188b12b1de3329fefe076b33e2b1714b",
+      "actual_sha256": "a5050522c31f4f1b0c76eb48aa2bc4d4188b12b1de3329fefe076b33e2b1714b",
+      "valid": true
+    },
+    "dense_a": {
+      "path": "build/p4/continuation-dense-a-query.json",
+      "expected_sha256": "21c3d349f034ce38a5bece375c6f3d85cbc5cb13f8dcd9e5bd39de1a3b05bd15",
+      "actual_sha256": "21c3d349f034ce38a5bece375c6f3d85cbc5cb13f8dcd9e5bd39de1a3b05bd15",
+      "valid": true
+    },
+    "dense_b": {
+      "path": "build/p4/continuation-dense-b-query.json",
+      "expected_sha256": "a4095400262aeaf1dba9dee5308f8667ca1fcef9a594921d4207e7aa02bf1c46",
+      "actual_sha256": "a4095400262aeaf1dba9dee5308f8667ca1fcef9a594921d4207e7aa02bf1c46",
+      "valid": true
+    },
+    "config": {
+      "path": "configs/p4-benchmark-v1.json",
+      "expected_sha256": "2c687060ac1c50201ae8aee685f05526b88fbb447c441f5fb1d1240800e4ef85",
+      "actual_sha256": "2c687060ac1c50201ae8aee685f05526b88fbb447c441f5fb1d1240800e4ef85",
+      "valid": true
+    },
+    "summary": {
+      "path": "reports/P4/model-freeze-summary.json",
+      "expected_sha256": "fbb66ccbce015172c332558148a36a84645a8c9e9a73561b503a2fe37a6def6e",
+      "actual_sha256": "fbb66ccbce015172c332558148a36a84645a8c9e9a73561b503a2fe37a6def6e",
+      "valid": true
+    }
+  },
+  "score_job_sha256": "0453527ef6825c30c20430fddfbb9866cafe0290204ee62a29b10b8142ee9d4c",
+  "v2_config_sha256": "55224f2a8ea22858fd681dd68322879c2aa8133602892ed0743599ca5e5a3caa"
+}
