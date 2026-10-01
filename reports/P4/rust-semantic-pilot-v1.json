@@ -1,0 +1,3740 @@
+{
+  "schema": "p4-rust-pilot-v1",
+  "status": "PASS",
+  "retries": 0,
+  "warmups": [
+    {
+      "case_id": "P4-001",
+      "status": "PASS",
+      "wall_ms": 264.1308000020217,
+      "response_bytes": 346895,
+      "timings_ms": {
+        "ann": 41.922599999999996,
+        "bm25": 5.1786,
+        "fusion_evidence": 140.48649999999998,
+        "ort": 67.8245,
+        "tokenize": 0.0669,
+        "total": 255.48100000000002
+      }
+    },
+    {
+      "case_id": "P4-002",
+      "status": "PASS",
+      "wall_ms": 296.83229999500327,
+      "response_bytes": 349744,
+      "timings_ms": {
+        "ann": 35.566599999999994,
+        "bm25": 30.272199999999998,
+        "fusion_evidence": 124.7762,
+        "ort": 70.57860000000001,
+        "tokenize": 0.0875,
+        "total": 261.28319999999997
+      }
+    }
+  ],
+  "formal": [
+    {
+      "case_id": "P4-001",
+      "status": "PASS",
+      "wall_ms": 154.82959999644663,
+      "response_bytes": 346863,
+      "timings_ms": {
+        "ann": 38.9394,
+        "bm25": 7.3791,
+        "fusion_evidence": 20.4559,
+        "ort": 74.9119,
+        "tokenize": 0.1684,
+        "total": 141.8603
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999993920556678,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-002",
+      "status": "PASS",
+      "wall_ms": 157.85719999985304,
+      "response_bytes": 349723,
+      "timings_ms": {
+        "ann": 35.3647,
+        "bm25": 31.723399999999998,
+        "fusion_evidence": 16.982400000000002,
+        "ort": 64.5376,
+        "tokenize": 0.0732,
+        "total": 148.6841
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.999999736218105,
+        "cosine": 0.9999999999999999,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-003",
+      "status": "PASS",
+      "wall_ms": 415.47010000795126,
+      "response_bytes": 418351,
+      "timings_ms": {
+        "ann": 59.7962,
+        "bm25": 135.9351,
+        "fusion_evidence": 126.02869999999999,
+        "ort": 80.3642,
+        "tokenize": 0.1819,
+        "total": 402.3091
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000002204768021,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-004",
+      "status": "PASS",
+      "wall_ms": 279.5971000014106,
+      "response_bytes": 298968,
+      "timings_ms": {
+        "ann": 54.873400000000004,
+        "bm25": 1.4004,
+        "fusion_evidence": 130.3963,
+        "ort": 82.1219,
+        "tokenize": 0.1032,
+        "total": 268.898
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998276997464,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-005",
+      "status": "PASS",
+      "wall_ms": 303.00649999117013,
+      "response_bytes": 353237,
+      "timings_ms": {
+        "ann": 48.5137,
+        "bm25": 55.5551,
+        "fusion_evidence": 109.4942,
+        "ort": 80.7086,
+        "tokenize": 0.1242,
+        "total": 294.3988
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000005717474423,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-006",
+      "status": "PASS",
+      "wall_ms": 359.2600000120001,
+      "response_bytes": 339073,
+      "timings_ms": {
+        "ann": 48.7654,
+        "bm25": 87.5103,
+        "fusion_evidence": 126.28580000000001,
+        "ort": 84.4937,
+        "tokenize": 0.09670000000000001,
+        "total": 347.1549
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999508836671,
+        "cosine": 0.9999999999999999,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-007",
+      "status": "PASS",
+      "wall_ms": 270.06599999731407,
+      "response_bytes": 348429,
+      "timings_ms": {
+        "ann": 43.338,
+        "bm25": 26.989800000000002,
+        "fusion_evidence": 110.7435,
+        "ort": 79.723,
+        "tokenize": 0.1121,
+        "total": 260.9102
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999009455415,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-008",
+      "status": "PASS",
+      "wall_ms": 337.42109999002423,
+      "response_bytes": 353081,
+      "timings_ms": {
+        "ann": 47.692,
+        "bm25": 100.2713,
+        "fusion_evidence": 111.77,
+        "ort": 67.7741,
+        "tokenize": 0.1492,
+        "total": 327.6595
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998527326218,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-009",
+      "status": "PASS",
+      "wall_ms": 337.21470000455156,
+      "response_bytes": 334302,
+      "timings_ms": {
+        "ann": 53.864200000000004,
+        "bm25": 52.4262,
+        "fusion_evidence": 125.38830000000002,
+        "ort": 95.0274,
+        "tokenize": 0.13019999999999998,
+        "total": 326.8394
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000293395987,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-010",
+      "status": "PASS",
+      "wall_ms": 274.17220000643283,
+      "response_bytes": 376230,
+      "timings_ms": {
+        "ann": 54.722,
+        "bm25": 6.7071,
+        "fusion_evidence": 114.1299,
+        "ort": 89.13069999999999,
+        "tokenize": 0.1968,
+        "total": 264.8897
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999664148397,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-011",
+      "status": "PASS",
+      "wall_ms": 243.0142000084743,
+      "response_bytes": 346980,
+      "timings_ms": {
+        "ann": 40.8788,
+        "bm25": 17.4782,
+        "fusion_evidence": 103.1059,
+        "ort": 72.37349999999999,
+        "tokenize": 0.0909,
+        "total": 233.9296
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000148440279,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-012",
+      "status": "PASS",
+      "wall_ms": 320.4678999900352,
+      "response_bytes": 348792,
+      "timings_ms": {
+        "ann": 39.5664,
+        "bm25": 100.32000000000001,
+        "fusion_evidence": 94.1405,
+        "ort": 77.55969999999999,
+        "tokenize": 0.1157,
+        "total": 311.70459999999997
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999997611020304,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-013",
+      "status": "PASS",
+      "wall_ms": 222.4671000003582,
+      "response_bytes": 322108,
+      "timings_ms": {
+        "ann": 45.1706,
+        "bm25": 0.6262000000000001,
+        "fusion_evidence": 98.5676,
+        "ort": 68.92710000000001,
+        "tokenize": 0.0799,
+        "total": 213.3739
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999996457472577,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-014",
+      "status": "PASS",
+      "wall_ms": 222.84800000488758,
+      "response_bytes": 320572,
+      "timings_ms": {
+        "ann": 41.3873,
+        "bm25": 1.703,
+        "fusion_evidence": 101.38510000000001,
+        "ort": 68.7315,
+        "tokenize": 0.0655,
+        "total": 213.2764
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000531766266,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-015",
+      "status": "PASS",
+      "wall_ms": 364.3092999991495,
+      "response_bytes": 360777,
+      "timings_ms": {
+        "ann": 49.7075,
+        "bm25": 126.9968,
+        "fusion_evidence": 90.77300000000001,
+        "ort": 86.2164,
+        "tokenize": 0.1237,
+        "total": 353.8201
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998833388422,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-016",
+      "status": "PASS",
+      "wall_ms": 237.57219999970403,
+      "response_bytes": 370692,
+      "timings_ms": {
+        "ann": 40.5047,
+        "bm25": 8.4366,
+        "fusion_evidence": 91.87389999999999,
+        "ort": 86.9338,
+        "tokenize": 0.1813,
+        "total": 227.9335
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000002582245917,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-017",
+      "status": "PASS",
+      "wall_ms": 209.52499999839347,
+      "response_bytes": 296250,
+      "timings_ms": {
+        "ann": 35.3853,
+        "bm25": 0.5786,
+        "fusion_evidence": 95.0415,
+        "ort": 68.3954,
+        "tokenize": 0.08310000000000001,
+        "total": 199.4861
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000003687810888,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-018",
+      "status": "PASS",
+      "wall_ms": 214.5130999997491,
+      "response_bytes": 305104,
+      "timings_ms": {
+        "ann": 39.885400000000004,
+        "bm25": 0.7569,
+        "fusion_evidence": 100.1616,
+        "ort": 65.4914,
+        "tokenize": 0.1257,
+        "total": 206.4248
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.00000007168928,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-019",
+      "status": "PASS",
+      "wall_ms": 257.4278999964008,
+      "response_bytes": 342381,
+      "timings_ms": {
+        "ann": 66.8837,
+        "bm25": 1.1509999999999998,
+        "fusion_evidence": 91.0024,
+        "ort": 86.1403,
+        "tokenize": 0.1472,
+        "total": 245.32780000000002
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000000607824793,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-020",
+      "status": "PASS",
+      "wall_ms": 222.32349999831058,
+      "response_bytes": 292413,
+      "timings_ms": {
+        "ann": 47.7926,
+        "bm25": 0.3463,
+        "fusion_evidence": 74.75519999999999,
+        "ort": 90.1159,
+        "tokenize": 0.0914,
+        "total": 213.1045
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000004500700135,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-021",
+      "status": "PASS",
+      "wall_ms": 218.5042000055546,
+      "response_bytes": 365620,
+      "timings_ms": {
+        "ann": 46.7366,
+        "bm25": 4.9319999999999995,
+        "fusion_evidence": 87.3116,
+        "ort": 69.76050000000001,
+        "tokenize": 0.10840000000000001,
+        "total": 208.8517
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001873605306,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-022",
+      "status": "PASS",
+      "wall_ms": 238.9779999939492,
+      "response_bytes": 340983,
+      "timings_ms": {
+        "ann": 49.9482,
+        "bm25": 5.8491,
+        "fusion_evidence": 92.79129999999999,
+        "ort": 79.10810000000001,
+        "tokenize": 0.0799,
+        "total": 227.7789
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000030231431,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-023",
+      "status": "PASS",
+      "wall_ms": 230.47149999183603,
+      "response_bytes": 353749,
+      "timings_ms": {
+        "ann": 44.0833,
+        "bm25": 6.2979,
+        "fusion_evidence": 89.70060000000001,
+        "ort": 78.90270000000001,
+        "tokenize": 0.1086,
+        "total": 219.09529999999998
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000002589996801,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-024",
+      "status": "PASS",
+      "wall_ms": 217.8698999923654,
+      "response_bytes": 357631,
+      "timings_ms": {
+        "ann": 52.0033,
+        "bm25": 5.534800000000001,
+        "fusion_evidence": 74.9456,
+        "ort": 73.8591,
+        "tokenize": 0.1066,
+        "total": 206.452
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000003128355173,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-025",
+      "status": "PASS",
+      "wall_ms": 225.3020999924047,
+      "response_bytes": 344177,
+      "timings_ms": {
+        "ann": 44.645700000000005,
+        "bm25": 2.5458,
+        "fusion_evidence": 88.67360000000001,
+        "ort": 76.2535,
+        "tokenize": 0.1379,
+        "total": 212.2602
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998466614987,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-026",
+      "status": "PASS",
+      "wall_ms": 222.8612000035355,
+      "response_bytes": 352490,
+      "timings_ms": {
+        "ann": 41.522499999999994,
+        "bm25": 8.0156,
+        "fusion_evidence": 87.3239,
+        "ort": 74.0673,
+        "tokenize": 0.06820000000000001,
+        "total": 211.0
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000000505792819,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-027",
+      "status": "PASS",
+      "wall_ms": 220.21630000381265,
+      "response_bytes": 289093,
+      "timings_ms": {
+        "ann": 42.610099999999996,
+        "bm25": 0.7343000000000001,
+        "fusion_evidence": 79.8996,
+        "ort": 85.00059999999999,
+        "tokenize": 0.1759,
+        "total": 208.4247
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000000400556692,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-028",
+      "status": "PASS",
+      "wall_ms": 306.9629999954486,
+      "response_bytes": 365790,
+      "timings_ms": {
+        "ann": 43.2151,
+        "bm25": 55.838300000000004,
+        "fusion_evidence": 80.0765,
+        "ort": 117.8641,
+        "tokenize": 0.1725,
+        "total": 297.16949999999997
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999995952297192,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-029",
+      "status": "PASS",
+      "wall_ms": 194.8019999981625,
+      "response_bytes": 332330,
+      "timings_ms": {
+        "ann": 39.823699999999995,
+        "bm25": 0.9663,
+        "fusion_evidence": 75.19770000000001,
+        "ort": 70.51209999999999,
+        "tokenize": 0.06830000000000001,
+        "total": 186.5706
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998084654074,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-030",
+      "status": "PASS",
+      "wall_ms": 399.98659999400843,
+      "response_bytes": 351633,
+      "timings_ms": {
+        "ann": 104.2868,
+        "bm25": 7.594,
+        "fusion_evidence": 113.8738,
+        "ort": 164.045,
+        "tokenize": 0.1706,
+        "total": 389.97369999999995
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000002027190935,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-031",
+      "status": "PASS",
+      "wall_ms": 472.10030000132974,
+      "response_bytes": 398342,
+      "timings_ms": {
+        "ann": 67.93299999999999,
+        "bm25": 182.16289999999998,
+        "fusion_evidence": 113.9935,
+        "ort": 96.08609999999999,
+        "tokenize": 0.2523,
+        "total": 460.43149999999997
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999049443556,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-032",
+      "status": "PASS",
+      "wall_ms": 387.4892000021646,
+      "response_bytes": 387780,
+      "timings_ms": {
+        "ann": 49.0863,
+        "bm25": 118.0699,
+        "fusion_evidence": 112.8322,
+        "ort": 94.5296,
+        "tokenize": 0.2501,
+        "total": 374.7712
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000005579037285,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-033",
+      "status": "PASS",
+      "wall_ms": 426.04750000464264,
+      "response_bytes": 406213,
+      "timings_ms": {
+        "ann": 50.0631,
+        "bm25": 167.5052,
+        "fusion_evidence": 85.9496,
+        "ort": 110.5668,
+        "tokenize": 0.18330000000000002,
+        "total": 414.2709
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001931438691,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-034",
+      "status": "PASS",
+      "wall_ms": 343.28820000519045,
+      "response_bytes": 447021,
+      "timings_ms": {
+        "ann": 44.2881,
+        "bm25": 95.70960000000001,
+        "fusion_evidence": 104.0758,
+        "ort": 85.2097,
+        "tokenize": 0.3063,
+        "total": 329.59290000000004
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999431248824,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-035",
+      "status": "PASS",
+      "wall_ms": 423.72639999666717,
+      "response_bytes": 394737,
+      "timings_ms": {
+        "ann": 47.4581,
+        "bm25": 165.8761,
+        "fusion_evidence": 84.92099999999999,
+        "ort": 114.6631,
+        "tokenize": 0.2187,
+        "total": 413.1402
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999123047079,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-036",
+      "status": "PASS",
+      "wall_ms": 345.837599990773,
+      "response_bytes": 387238,
+      "timings_ms": {
+        "ann": 40.143,
+        "bm25": 109.49430000000001,
+        "fusion_evidence": 94.0136,
+        "ort": 92.54650000000001,
+        "tokenize": 0.20350000000000001,
+        "total": 336.40360000000004
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000213444917,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-037",
+      "status": "PASS",
+      "wall_ms": 277.4322999903234,
+      "response_bytes": 388327,
+      "timings_ms": {
+        "ann": 41.119299999999996,
+        "bm25": 57.63,
+        "fusion_evidence": 89.2346,
+        "ort": 81.5434,
+        "tokenize": 0.1424,
+        "total": 269.67229999999995
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000028997644,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-038",
+      "status": "PASS",
+      "wall_ms": 362.7045999892289,
+      "response_bytes": 383820,
+      "timings_ms": {
+        "ann": 40.9001,
+        "bm25": 133.52339999999998,
+        "fusion_evidence": 90.6181,
+        "ort": 86.8735,
+        "tokenize": 0.31070000000000003,
+        "total": 352.2285
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000002865040234,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-039",
+      "status": "PASS",
+      "wall_ms": 302.2259999997914,
+      "response_bytes": 373685,
+      "timings_ms": {
+        "ann": 44.8839,
+        "bm25": 56.330999999999996,
+        "fusion_evidence": 89.8081,
+        "ort": 100.5483,
+        "tokenize": 0.2212,
+        "total": 291.7959
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999996303152656,
+        "cosine": 0.9999999999999999,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-040",
+      "status": "PASS",
+      "wall_ms": 328.0527000024449,
+      "response_bytes": 429346,
+      "timings_ms": {
+        "ann": 44.8896,
+        "bm25": 77.04270000000001,
+        "fusion_evidence": 98.652,
+        "ort": 95.62650000000001,
+        "tokenize": 0.3031,
+        "total": 316.51669999999996
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999997678795637,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-041",
+      "status": "PASS",
+      "wall_ms": 245.99120000493713,
+      "response_bytes": 382330,
+      "timings_ms": {
+        "ann": 41.3433,
+        "bm25": 14.709399999999999,
+        "fusion_evidence": 90.7016,
+        "ort": 89.6206,
+        "tokenize": 0.1844,
+        "total": 236.56199999999998
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999997462272784,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-042",
+      "status": "PASS",
+      "wall_ms": 386.5166000032332,
+      "response_bytes": 385984,
+      "timings_ms": {
+        "ann": 45.1204,
+        "bm25": 143.9953,
+        "fusion_evidence": 81.6824,
+        "ort": 106.7043,
+        "tokenize": 0.1568,
+        "total": 377.6631
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999997231894698,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-043",
+      "status": "PASS",
+      "wall_ms": 286.9751999969594,
+      "response_bytes": 376058,
+      "timings_ms": {
+        "ann": 41.7007,
+        "bm25": 60.4024,
+        "fusion_evidence": 92.16340000000001,
+        "ort": 83.0669,
+        "tokenize": 0.1928,
+        "total": 277.5293
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001095522235,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-044",
+      "status": "PASS",
+      "wall_ms": 285.1783000078285,
+      "response_bytes": 372246,
+      "timings_ms": {
+        "ann": 43.3694,
+        "bm25": 58.852799999999995,
+        "fusion_evidence": 84.7253,
+        "ort": 87.4544,
+        "tokenize": 0.129,
+        "total": 274.53290000000004
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001116607842,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-045",
+      "status": "PASS",
+      "wall_ms": 384.8755000071833,
+      "response_bytes": 404320,
+      "timings_ms": {
+        "ann": 45.039,
+        "bm25": 142.35410000000002,
+        "fusion_evidence": 87.3119,
+        "ort": 100.46239999999999,
+        "tokenize": 0.2309,
+        "total": 375.4006
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000000766713883,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-046",
+      "status": "PASS",
+      "wall_ms": 231.89939999429043,
+      "response_bytes": 355635,
+      "timings_ms": {
+        "ann": 42.7954,
+        "bm25": 9.4442,
+        "fusion_evidence": 83.2312,
+        "ort": 83.9484,
+        "tokenize": 0.2325,
+        "total": 219.6541
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000657374724,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-047",
+      "status": "PASS",
+      "wall_ms": 366.9692999974359,
+      "response_bytes": 378466,
+      "timings_ms": {
+        "ann": 44.7283,
+        "bm25": 133.6177,
+        "fusion_evidence": 84.8574,
+        "ort": 94.8922,
+        "tokenize": 0.1575,
+        "total": 358.25600000000003
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998187411292,
+        "cosine": 0.9999999999999999,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-048",
+      "status": "PASS",
+      "wall_ms": 355.903000003309,
+      "response_bytes": 392076,
+      "timings_ms": {
+        "ann": 47.7106,
+        "bm25": 119.01870000000001,
+        "fusion_evidence": 91.7897,
+        "ort": 87.5789,
+        "tokenize": 0.1817,
+        "total": 346.28209999999996
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998528173542,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-049",
+      "status": "PASS",
+      "wall_ms": 307.50589999661315,
+      "response_bytes": 373010,
+      "timings_ms": {
+        "ann": 48.0003,
+        "bm25": 78.8919,
+        "fusion_evidence": 82.7411,
+        "ort": 88.73870000000001,
+        "tokenize": 0.2783,
+        "total": 298.6529
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001141242743,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-050",
+      "status": "PASS",
+      "wall_ms": 349.4585000007646,
+      "response_bytes": 372333,
+      "timings_ms": {
+        "ann": 39.4148,
+        "bm25": 136.6783,
+        "fusion_evidence": 79.9779,
+        "ort": 84.5735,
+        "tokenize": 0.1313,
+        "total": 340.7789
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999882790265,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-051",
+      "status": "PASS",
+      "wall_ms": 248.58250000397675,
+      "response_bytes": 416957,
+      "timings_ms": {
+        "ann": 40.6478,
+        "bm25": 72.9154,
+        "fusion_evidence": 47.359,
+        "ort": 76.9439,
+        "tokenize": 0.16799999999999998,
+        "total": 238.03740000000002
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999997407547053,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-052",
+      "status": "PASS",
+      "wall_ms": 262.3544999951264,
+      "response_bytes": 371954,
+      "timings_ms": {
+        "ann": 40.1751,
+        "bm25": 61.013,
+        "fusion_evidence": 72.26599999999999,
+        "ort": 77.7635,
+        "tokenize": 0.2008,
+        "total": 251.4215
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000003715261845,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-053",
+      "status": "PASS",
+      "wall_ms": 247.1891000022879,
+      "response_bytes": 373464,
+      "timings_ms": {
+        "ann": 37.013999999999996,
+        "bm25": 61.1777,
+        "fusion_evidence": 64.0004,
+        "ort": 75.0306,
+        "tokenize": 0.244,
+        "total": 237.4694
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000000652566952,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-054",
+      "status": "PASS",
+      "wall_ms": 267.67780000227503,
+      "response_bytes": 384885,
+      "timings_ms": {
+        "ann": 42.4112,
+        "bm25": 66.2333,
+        "fusion_evidence": 63.5999,
+        "ort": 86.52369999999999,
+        "tokenize": 0.3566,
+        "total": 259.1272
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999875174975,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-055",
+      "status": "PASS",
+      "wall_ms": 245.56870000378694,
+      "response_bytes": 381486,
+      "timings_ms": {
+        "ann": 43.4019,
+        "bm25": 32.6686,
+        "fusion_evidence": 77.4461,
+        "ort": 80.3213,
+        "tokenize": 0.3572,
+        "total": 234.1984
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998100394132,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-056",
+      "status": "PASS",
+      "wall_ms": 242.6160000031814,
+      "response_bytes": 373996,
+      "timings_ms": {
+        "ann": 38.345499999999994,
+        "bm25": 60.8072,
+        "fusion_evidence": 59.8527,
+        "ort": 74.2808,
+        "tokenize": 0.2265,
+        "total": 233.5161
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000037495369,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-057",
+      "status": "PASS",
+      "wall_ms": 260.6379999924684,
+      "response_bytes": 388160,
+      "timings_ms": {
+        "ann": 40.5415,
+        "bm25": 70.90209999999999,
+        "fusion_evidence": 61.258399999999995,
+        "ort": 79.2099,
+        "tokenize": 0.1716,
+        "total": 252.08580000000003
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999996245773797,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-058",
+      "status": "PASS",
+      "wall_ms": 250.2544000017224,
+      "response_bytes": 386607,
+      "timings_ms": {
+        "ann": 36.5321,
+        "bm25": 72.3196,
+        "fusion_evidence": 55.3277,
+        "ort": 76.10029999999999,
+        "tokenize": 0.3084,
+        "total": 240.5908
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999381171919,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-059",
+      "status": "PASS",
+      "wall_ms": 301.8985000089742,
+      "response_bytes": 384020,
+      "timings_ms": {
+        "ann": 38.487,
+        "bm25": 80.3578,
+        "fusion_evidence": 88.73920000000001,
+        "ort": 79.7507,
+        "tokenize": 0.23550000000000001,
+        "total": 287.5724
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999903519982,
+        "cosine": 0.9999999999999999,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-060",
+      "status": "PASS",
+      "wall_ms": 350.5053999979282,
+      "response_bytes": 396567,
+      "timings_ms": {
+        "ann": 51.134,
+        "bm25": 74.8745,
+        "fusion_evidence": 68.4832,
+        "ort": 144.53279999999998,
+        "tokenize": 0.2881,
+        "total": 339.3182
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000469817623,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-061",
+      "status": "PASS",
+      "wall_ms": 268.1142999936128,
+      "response_bytes": 389382,
+      "timings_ms": {
+        "ann": 46.7844,
+        "bm25": 77.6421,
+        "fusion_evidence": 47.0597,
+        "ort": 84.8735,
+        "tokenize": 0.2678,
+        "total": 256.63079999999997
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000003590011137,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-062",
+      "status": "PASS",
+      "wall_ms": 290.6608000048436,
+      "response_bytes": 391227,
+      "timings_ms": {
+        "ann": 47.738099999999996,
+        "bm25": 77.0602,
+        "fusion_evidence": 53.2259,
+        "ort": 103.8697,
+        "tokenize": 0.526,
+        "total": 282.4249
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999995579524388,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-063",
+      "status": "PASS",
+      "wall_ms": 249.14529999659862,
+      "response_bytes": 370022,
+      "timings_ms": {
+        "ann": 40.8485,
+        "bm25": 46.053999999999995,
+        "fusion_evidence": 66.4048,
+        "ort": 82.44210000000001,
+        "tokenize": 0.25980000000000003,
+        "total": 236.0117
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000005529524567,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-064",
+      "status": "PASS",
+      "wall_ms": 257.7365000033751,
+      "response_bytes": 418671,
+      "timings_ms": {
+        "ann": 41.0157,
+        "bm25": 60.4103,
+        "fusion_evidence": 59.6209,
+        "ort": 84.887,
+        "tokenize": 0.3196,
+        "total": 246.256
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000003160361444,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-065",
+      "status": "PASS",
+      "wall_ms": 258.2513000088511,
+      "response_bytes": 389808,
+      "timings_ms": {
+        "ann": 42.382999999999996,
+        "bm25": 61.7256,
+        "fusion_evidence": 58.1374,
+        "ort": 82.0835,
+        "tokenize": 0.27349999999999997,
+        "total": 244.60660000000001
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.00000041048702,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-066",
+      "status": "PASS",
+      "wall_ms": 273.1324000051245,
+      "response_bytes": 389461,
+      "timings_ms": {
+        "ann": 42.389900000000004,
+        "bm25": 71.23599999999999,
+        "fusion_evidence": 59.141,
+        "ort": 88.9797,
+        "tokenize": 0.28919999999999996,
+        "total": 262.0397
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001804365986,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-067",
+      "status": "PASS",
+      "wall_ms": 240.18079999950714,
+      "response_bytes": 377070,
+      "timings_ms": {
+        "ann": 40.734899999999996,
+        "bm25": 43.4207,
+        "fusion_evidence": 65.00160000000001,
+        "ort": 81.40690000000001,
+        "tokenize": 0.2526,
+        "total": 230.82
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001334981583,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-068",
+      "status": "PASS",
+      "wall_ms": 262.901400012197,
+      "response_bytes": 402729,
+      "timings_ms": {
+        "ann": 37.2431,
+        "bm25": 72.4881,
+        "fusion_evidence": 56.190400000000004,
+        "ort": 88.4333,
+        "tokenize": 0.27549999999999997,
+        "total": 254.6329
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999996712465657,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-069",
+      "status": "PASS",
+      "wall_ms": 222.07190000335686,
+      "response_bytes": 379877,
+      "timings_ms": {
+        "ann": 36.8968,
+        "bm25": 47.8279,
+        "fusion_evidence": 51.1875,
+        "ort": 74.6733,
+        "tokenize": 0.2139,
+        "total": 210.8021
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000035908123,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-070",
+      "status": "PASS",
+      "wall_ms": 247.2628999967128,
+      "response_bytes": 372126,
+      "timings_ms": {
+        "ann": 37.1371,
+        "bm25": 64.31389999999999,
+        "fusion_evidence": 64.58460000000001,
+        "ort": 69.777,
+        "tokenize": 0.2803,
+        "total": 236.0968
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000005081276613,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-071",
+      "status": "PASS",
+      "wall_ms": 252.5504999939585,
+      "response_bytes": 382047,
+      "timings_ms": {
+        "ann": 41.8735,
+        "bm25": 54.4972,
+        "fusion_evidence": 63.8385,
+        "ort": 81.6515,
+        "tokenize": 0.2981,
+        "total": 242.1615
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998869743002,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-072",
+      "status": "PASS",
+      "wall_ms": 273.51859999180306,
+      "response_bytes": 413374,
+      "timings_ms": {
+        "ann": 39.3138,
+        "bm25": 65.54690000000001,
+        "fusion_evidence": 66.6869,
+        "ort": 92.0341,
+        "tokenize": 0.2256,
+        "total": 263.8093
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000000615649014,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-073",
+      "status": "PASS",
+      "wall_ms": 261.9583000050625,
+      "response_bytes": 411695,
+      "timings_ms": {
+        "ann": 44.6757,
+        "bm25": 64.63579999999999,
+        "fusion_evidence": 60.5943,
+        "ort": 79.86160000000001,
+        "tokenize": 0.3264,
+        "total": 250.0965
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998666353945,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-074",
+      "status": "PASS",
+      "wall_ms": 268.1121999921743,
+      "response_bytes": 437668,
+      "timings_ms": {
+        "ann": 40.789,
+        "bm25": 72.5698,
+        "fusion_evidence": 59.8112,
+        "ort": 83.61970000000001,
+        "tokenize": 0.23650000000000002,
+        "total": 257.0287
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000000468633876,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-075",
+      "status": "PASS",
+      "wall_ms": 267.28349999757484,
+      "response_bytes": 380918,
+      "timings_ms": {
+        "ann": 40.3889,
+        "bm25": 75.1052,
+        "fusion_evidence": 59.9989,
+        "ort": 82.3649,
+        "tokenize": 0.33599999999999997,
+        "total": 258.1967
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998878610656,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-076",
+      "status": "PASS",
+      "wall_ms": 262.30600000417326,
+      "response_bytes": 396622,
+      "timings_ms": {
+        "ann": 39.814,
+        "bm25": 73.0249,
+        "fusion_evidence": 60.764199999999995,
+        "ort": 79.49199999999999,
+        "tokenize": 0.25680000000000003,
+        "total": 253.35410000000002
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001565347765,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-077",
+      "status": "PASS",
+      "wall_ms": 278.5565999947721,
+      "response_bytes": 399472,
+      "timings_ms": {
+        "ann": 45.3575,
+        "bm25": 77.556,
+        "fusion_evidence": 61.1877,
+        "ort": 85.3079,
+        "tokenize": 0.3244,
+        "total": 269.73609999999996
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999383393288,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-078",
+      "status": "PASS",
+      "wall_ms": 250.09899999713525,
+      "response_bytes": 375000,
+      "timings_ms": {
+        "ann": 43.2051,
+        "bm25": 58.6884,
+        "fusion_evidence": 56.7755,
+        "ort": 81.23740000000001,
+        "tokenize": 0.3137,
+        "total": 240.2226
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001279249882,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-079",
+      "status": "PASS",
+      "wall_ms": 257.08039999881294,
+      "response_bytes": 365827,
+      "timings_ms": {
+        "ann": 45.0256,
+        "bm25": 61.115700000000004,
+        "fusion_evidence": 58.651799999999994,
+        "ort": 81.35430000000001,
+        "tokenize": 0.2747,
+        "total": 246.42510000000001
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998314498881,
+        "cosine": 0.9999999999999999,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-080",
+      "status": "PASS",
+      "wall_ms": 399.53919999243226,
+      "response_bytes": 421074,
+      "timings_ms": {
+        "ann": 47.478300000000004,
+        "bm25": 92.6964,
+        "fusion_evidence": 73.4692,
+        "ort": 173.3983,
+        "tokenize": 0.3726,
+        "total": 387.41940000000005
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998891740381,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-081",
+      "status": "PASS",
+      "wall_ms": 314.1565999976592,
+      "response_bytes": 375028,
+      "timings_ms": {
+        "ann": 43.295100000000005,
+        "bm25": 66.2002,
+        "fusion_evidence": 104.2034,
+        "ort": 90.6131,
+        "tokenize": 0.3449,
+        "total": 304.6594
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999663215127,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-082",
+      "status": "PASS",
+      "wall_ms": 264.8864000075264,
+      "response_bytes": 398467,
+      "timings_ms": {
+        "ann": 41.4246,
+        "bm25": 61.0845,
+        "fusion_evidence": 58.175900000000006,
+        "ort": 93.4461,
+        "tokenize": 0.34299999999999997,
+        "total": 254.47769999999997
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000365856142,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-083",
+      "status": "PASS",
+      "wall_ms": 252.99290000111796,
+      "response_bytes": 384475,
+      "timings_ms": {
+        "ann": 42.5195,
+        "bm25": 72.58829999999999,
+        "fusion_evidence": 50.3613,
+        "ort": 77.07809999999999,
+        "tokenize": 0.3676,
+        "total": 242.9192
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999009430178,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-084",
+      "status": "PASS",
+      "wall_ms": 252.46530000003986,
+      "response_bytes": 379966,
+      "timings_ms": {
+        "ann": 38.347300000000004,
+        "bm25": 65.5416,
+        "fusion_evidence": 56.9058,
+        "ort": 81.4365,
+        "tokenize": 0.24899999999999997,
+        "total": 242.48239999999998
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999400916821,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-085",
+      "status": "PASS",
+      "wall_ms": 275.32349999819417,
+      "response_bytes": 399756,
+      "timings_ms": {
+        "ann": 45.247,
+        "bm25": 80.1819,
+        "fusion_evidence": 45.723600000000005,
+        "ort": 93.2422,
+        "tokenize": 0.23809999999999998,
+        "total": 264.6348
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999996778032928,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-086",
+      "status": "PASS",
+      "wall_ms": 150.1016999973217,
+      "response_bytes": 337196,
+      "timings_ms": {
+        "ann": 34.611999999999995,
+        "bm25": 0.4781,
+        "fusion_evidence": 37.81,
+        "ort": 69.6831,
+        "tokenize": 0.10880000000000001,
+        "total": 142.6941
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998590155389,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-087",
+      "status": "PASS",
+      "wall_ms": 210.07210000243504,
+      "response_bytes": 371879,
+      "timings_ms": {
+        "ann": 40.1614,
+        "bm25": 26.278200000000002,
+        "fusion_evidence": 59.2467,
+        "ort": 73.68560000000001,
+        "tokenize": 0.1315,
+        "total": 199.5055
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.999999784088165,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-088",
+      "status": "PASS",
+      "wall_ms": 204.79860001069028,
+      "response_bytes": 354560,
+      "timings_ms": {
+        "ann": 39.4282,
+        "bm25": 18.939799999999998,
+        "fusion_evidence": 58.0151,
+        "ort": 76.53490000000001,
+        "tokenize": 0.107,
+        "total": 193.0277
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000002797501037,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-089",
+      "status": "PASS",
+      "wall_ms": 219.74970000155736,
+      "response_bytes": 380894,
+      "timings_ms": {
+        "ann": 39.8723,
+        "bm25": 18.1662,
+        "fusion_evidence": 51.5979,
+        "ort": 99.5719,
+        "tokenize": 0.2396,
+        "total": 209.4514
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999469973997,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-090",
+      "status": "PASS",
+      "wall_ms": 211.45470000919886,
+      "response_bytes": 401339,
+      "timings_ms": {
+        "ann": 38.8264,
+        "bm25": 11.7657,
+        "fusion_evidence": 63.14490000000001,
+        "ort": 86.37780000000001,
+        "tokenize": 0.1797,
+        "total": 200.2978
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001944287855,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-091",
+      "status": "PASS",
+      "wall_ms": 181.68979999609292,
+      "response_bytes": 355868,
+      "timings_ms": {
+        "ann": 39.2385,
+        "bm25": 3.4665999999999997,
+        "fusion_evidence": 47.6026,
+        "ort": 80.0149,
+        "tokenize": 0.09280000000000001,
+        "total": 170.4177
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999999576646447,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-092",
+      "status": "PASS",
+      "wall_ms": 188.4262000094168,
+      "response_bytes": 347009,
+      "timings_ms": {
+        "ann": 43.6815,
+        "bm25": 1.3032,
+        "fusion_evidence": 43.3558,
+        "ort": 90.92699999999999,
+        "tokenize": 0.14889999999999998,
+        "total": 179.41869999999997
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000000870670782,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-093",
+      "status": "PASS",
+      "wall_ms": 202.97879999270663,
+      "response_bytes": 362107,
+      "timings_ms": {
+        "ann": 37.0587,
+        "bm25": 34.643100000000004,
+        "fusion_evidence": 48.1907,
+        "ort": 74.5911,
+        "tokenize": 0.14889999999999998,
+        "total": 194.6349
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000003602909988,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-094",
+      "status": "PASS",
+      "wall_ms": 223.0113999976311,
+      "response_bytes": 363155,
+      "timings_ms": {
+        "ann": 49.166000000000004,
+        "bm25": 19.1173,
+        "fusion_evidence": 57.4871,
+        "ort": 86.7635,
+        "tokenize": 0.1813,
+        "total": 212.7177
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999993932983511,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-095",
+      "status": "PASS",
+      "wall_ms": 211.5495999896666,
+      "response_bytes": 380535,
+      "timings_ms": {
+        "ann": 41.7733,
+        "bm25": 7.892899999999999,
+        "fusion_evidence": 65.8068,
+        "ort": 85.9793,
+        "tokenize": 0.1219,
+        "total": 201.57659999999998
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000005419674047,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-096",
+      "status": "PASS",
+      "wall_ms": 194.05980000738055,
+      "response_bytes": 363470,
+      "timings_ms": {
+        "ann": 37.2132,
+        "bm25": 18.569599999999998,
+        "fusion_evidence": 49.656600000000005,
+        "ort": 78.2544,
+        "tokenize": 0.11560000000000001,
+        "total": 183.8119
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999996870261323,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-097",
+      "status": "PASS",
+      "wall_ms": 179.16929999773856,
+      "response_bytes": 364467,
+      "timings_ms": {
+        "ann": 37.6647,
+        "bm25": 4.0389,
+        "fusion_evidence": 45.0356,
+        "ort": 82.2122,
+        "tokenize": 0.1842,
+        "total": 169.1389
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000000118355044,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-098",
+      "status": "PASS",
+      "wall_ms": 232.24320000736043,
+      "response_bytes": 404148,
+      "timings_ms": {
+        "ann": 41.7077,
+        "bm25": 34.0574,
+        "fusion_evidence": 66.87469999999999,
+        "ort": 79.4214,
+        "tokenize": 0.1657,
+        "total": 222.22990000000001
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001146226762,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-099",
+      "status": "PASS",
+      "wall_ms": 217.12750000006054,
+      "response_bytes": 412759,
+      "timings_ms": {
+        "ann": 44.716,
+        "bm25": 14.4422,
+        "fusion_evidence": 58.6065,
+        "ort": 87.4988,
+        "tokenize": 0.2164,
+        "total": 205.4829
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000037414084,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-100",
+      "status": "PASS",
+      "wall_ms": 168.57580000942107,
+      "response_bytes": 377627,
+      "timings_ms": {
+        "ann": 38.886700000000005,
+        "bm25": 1.4921,
+        "fusion_evidence": 44.2948,
+        "ort": 75.2744,
+        "tokenize": 0.1124,
+        "total": 160.0634
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000145457812,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-101",
+      "status": "PASS",
+      "wall_ms": 167.71819999848958,
+      "response_bytes": 374143,
+      "timings_ms": {
+        "ann": 41.57340000000001,
+        "bm25": 2.1078,
+        "fusion_evidence": 48.254900000000006,
+        "ort": 65.7759,
+        "tokenize": 0.0932,
+        "total": 157.80749999999998
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999997745055004,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-102",
+      "status": "PASS",
+      "wall_ms": 211.80950000416487,
+      "response_bytes": 366437,
+      "timings_ms": {
+        "ann": 38.8166,
+        "bm25": 54.252,
+        "fusion_evidence": 41.7352,
+        "ort": 67.4198,
+        "tokenize": 0.1248,
+        "total": 202.3516
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000003851293806,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-103",
+      "status": "PASS",
+      "wall_ms": 192.25849999929778,
+      "response_bytes": 358320,
+      "timings_ms": {
+        "ann": 40.5351,
+        "bm25": 29.2981,
+        "fusion_evidence": 34.7703,
+        "ort": 78.06620000000001,
+        "tokenize": 0.1931,
+        "total": 182.86649999999997
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001157049168,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-104",
+      "status": "PASS",
+      "wall_ms": 174.63880000286736,
+      "response_bytes": 368037,
+      "timings_ms": {
+        "ann": 37.7225,
+        "bm25": 29.1574,
+        "fusion_evidence": 31.364299999999997,
+        "ort": 66.6968,
+        "tokenize": 0.08220000000000001,
+        "total": 165.0252
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001380463126,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-105",
+      "status": "PASS",
+      "wall_ms": 202.3205000004964,
+      "response_bytes": 360229,
+      "timings_ms": {
+        "ann": 37.873799999999996,
+        "bm25": 48.537499999999994,
+        "fusion_evidence": 35.846799999999995,
+        "ort": 69.70360000000001,
+        "tokenize": 0.102,
+        "total": 192.0673
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000001081386432,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-106",
+      "status": "PASS",
+      "wall_ms": 149.87480000127107,
+      "response_bytes": 347334,
+      "timings_ms": {
+        "ann": 37.0166,
+        "bm25": 6.3252,
+        "fusion_evidence": 31.3529,
+        "ort": 65.8655,
+        "tokenize": 0.0606,
+        "total": 140.62279999999998
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999996681885105,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-107",
+      "status": "PASS",
+      "wall_ms": 158.615499996813,
+      "response_bytes": 356950,
+      "timings_ms": {
+        "ann": 42.425900000000006,
+        "bm25": 3.0882,
+        "fusion_evidence": 33.22,
+        "ort": 70.2391,
+        "tokenize": 0.1235,
+        "total": 149.0996
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000005131785648,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-108",
+      "status": "PASS",
+      "wall_ms": 212.3654000024544,
+      "response_bytes": 424608,
+      "timings_ms": {
+        "ann": 40.963,
+        "bm25": 48.5006,
+        "fusion_evidence": 41.0835,
+        "ort": 68.1149,
+        "tokenize": 0.11220000000000001,
+        "total": 198.7766
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999997509596263,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-109",
+      "status": "PASS",
+      "wall_ms": 155.16910000587814,
+      "response_bytes": 373181,
+      "timings_ms": {
+        "ann": 37.9749,
+        "bm25": 2.5658,
+        "fusion_evidence": 32.0257,
+        "ort": 71.6274,
+        "tokenize": 0.10569999999999999,
+        "total": 144.30190000000002
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998875249825,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-110",
+      "status": "PASS",
+      "wall_ms": 202.9700999992201,
+      "response_bytes": 382113,
+      "timings_ms": {
+        "ann": 36.1301,
+        "bm25": 37.248799999999996,
+        "fusion_evidence": 50.8814,
+        "ort": 70.243,
+        "tokenize": 0.1129,
+        "total": 194.6184
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.999999738596243,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-111",
+      "status": "PASS",
+      "wall_ms": 241.03289999766275,
+      "response_bytes": 361280,
+      "timings_ms": {
+        "ann": 40.2202,
+        "bm25": 63.55629999999999,
+        "fusion_evidence": 58.1336,
+        "ort": 68.6155,
+        "tokenize": 0.2966,
+        "total": 230.8262
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000002454746189,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-112",
+      "status": "PASS",
+      "wall_ms": 215.61699999438133,
+      "response_bytes": 364581,
+      "timings_ms": {
+        "ann": 39.2834,
+        "bm25": 47.5037,
+        "fusion_evidence": 46.6075,
+        "ort": 73.00370000000001,
+        "tokenize": 0.2741,
+        "total": 206.6749
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000003877713108,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-113",
+      "status": "PASS",
+      "wall_ms": 237.22690000431612,
+      "response_bytes": 412584,
+      "timings_ms": {
+        "ann": 43.0178,
+        "bm25": 56.8817,
+        "fusion_evidence": 51.492200000000004,
+        "ort": 73.30250000000001,
+        "tokenize": 0.2165,
+        "total": 224.9135
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000015270133,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-114",
+      "status": "PASS",
+      "wall_ms": 264.4598000042606,
+      "response_bytes": 341262,
+      "timings_ms": {
+        "ann": 45.8825,
+        "bm25": 68.79050000000001,
+        "fusion_evidence": 53.575900000000004,
+        "ort": 87.9298,
+        "tokenize": 0.2536,
+        "total": 256.43539999999996
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000000381509395,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-115",
+      "status": "PASS",
+      "wall_ms": 237.88269999204203,
+      "response_bytes": 355118,
+      "timings_ms": {
+        "ann": 43.4595,
+        "bm25": 23.249,
+        "fusion_evidence": 81.7157,
+        "ort": 76.04180000000001,
+        "tokenize": 0.1434,
+        "total": 224.6119
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998338333698,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-116",
+      "status": "PASS",
+      "wall_ms": 203.146600004402,
+      "response_bytes": 351635,
+      "timings_ms": {
+        "ann": 45.6064,
+        "bm25": 6.3176,
+        "fusion_evidence": 64.1092,
+        "ort": 76.69879999999999,
+        "tokenize": 0.1199,
+        "total": 192.8549
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.0000003783414244,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-117",
+      "status": "PASS",
+      "wall_ms": 215.05299999262206,
+      "response_bytes": 384615,
+      "timings_ms": {
+        "ann": 44.5987,
+        "bm25": 6.1324,
+        "fusion_evidence": 62.1297,
+        "ort": 89.90679999999999,
+        "tokenize": 0.1912,
+        "total": 202.9629
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998524299586,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-118",
+      "status": "PASS",
+      "wall_ms": 241.40230000193696,
+      "response_bytes": 354901,
+      "timings_ms": {
+        "ann": 38.729,
+        "bm25": 67.52510000000001,
+        "fusion_evidence": 55.3962,
+        "ort": 71.0708,
+        "tokenize": 0.1651,
+        "total": 232.8884
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999997865655812,
+        "cosine": 1.0,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-119",
+      "status": "PASS",
+      "wall_ms": 316.54210000124294,
+      "response_bytes": 351399,
+      "timings_ms": {
+        "ann": 42.7067,
+        "bm25": 146.6796,
+        "fusion_evidence": 37.5525,
+        "ort": 80.04029999999999,
+        "tokenize": 0.1616,
+        "total": 307.14390000000003
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 0.9999998704738611,
+        "cosine": 1.0000000000000002,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    },
+    {
+      "case_id": "P4-120",
+      "status": "PASS",
+      "wall_ms": 205.43149999866728,
+      "response_bytes": 407303,
+      "timings_ms": {
+        "ann": 46.6043,
+        "bm25": 3.5128999999999997,
+        "fusion_evidence": 61.0847,
+        "ort": 82.7543,
+        "tokenize": 0.14320000000000002,
+        "total": 194.1022
+      },
+      "vector": {
+        "max_component_error": 0.0,
+        "norm": 1.000000216962762,
+        "cosine": 0.9999999999999998,
+        "pass": true
+      },
+      "overlap": {
+        "10": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      }
+    }
+  ],
+  "job_sha256": "614bc6e64641a8ee718e30760d3acb4a03e7a8672d91224726446bf0eb38baf0",
+  "policy": {
+    "warmups": 2,
+    "formal": 120,
+    "retries": 0,
+    "resident_max_ms": 5000,
+    "resident_p95_ms": 1000,
+    "response_max_bytes": 524288,
+    "startup_timeout_seconds": 120,
+    "query_timeout_seconds": 5
+  },
+  "bindings_before": "PASS",
+  "bindings_after": "PASS",
+  "memory": {
+    "status": "NOT_AVAILABLE",
+    "reason": "optional; psutil not required"
+  },
+  "opened": {
+    "event": "opened",
+    "open_timings_ms": {
+      "ann": 5.699199999999999,
+      "metadata": 40.2961,
+      "ort": 1805.7506999999998,
+      "tokenizer": 577.6867,
+      "total": 2429.4338
+    },
+    "retries": 0
+  },
+  "startup_wall_ms": 2748.1312999880174,
+  "quality": {
+    "metrics": {
+      "ONNX_DENSE_B": {
+        "overall": {
+          "case_count": 120,
+          "positive_count": 110,
+          "negative_count": 10,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.8181818181818182,
+              "denominator": 110
+            },
+            "recall_at_10": {
+              "value": 0.8772727272727273,
+              "denominator": 110
+            },
+            "recall_at_20": {
+              "value": 0.9,
+              "denominator": 110
+            },
+            "mrr_at_10": {
+              "value": 0.7486580086580087,
+              "denominator": 110
+            },
+            "ndcg_at_10": {
+              "value": 0.7787002950573845,
+              "denominator": 110
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": 1.0,
+            "denominator": 10
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 10
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 120
+          }
+        },
+        "lexical": {
+          "case_count": 30,
+          "positive_count": 30,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.7,
+              "denominator": 30
+            },
+            "recall_at_10": {
+              "value": 0.7666666666666667,
+              "denominator": 30
+            },
+            "recall_at_20": {
+              "value": 0.8,
+              "denominator": 30
+            },
+            "mrr_at_10": {
+              "value": 0.5955555555555555,
+              "denominator": 30
+            },
+            "ndcg_at_10": {
+              "value": 0.6367282888973869,
+              "denominator": 30
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 30
+          }
+        },
+        "semantic": {
+          "case_count": 40,
+          "positive_count": 40,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.95,
+              "denominator": 40
+            },
+            "recall_at_10": {
+              "value": 0.975,
+              "denominator": 40
+            },
+            "recall_at_20": {
+              "value": 0.975,
+              "denominator": 40
+            },
+            "mrr_at_10": {
+              "value": 0.928125,
+              "denominator": 40
+            },
+            "ndcg_at_10": {
+              "value": 0.9394331095982161,
+              "denominator": 40
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 40
+          }
+        },
+        "crosslingual": {
+          "case_count": 30,
+          "positive_count": 30,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.7666666666666667,
+              "denominator": 30
+            },
+            "recall_at_10": {
+              "value": 0.8666666666666667,
+              "denominator": 30
+            },
+            "recall_at_20": {
+              "value": 0.9,
+              "denominator": 30
+            },
+            "mrr_at_10": {
+              "value": 0.6831349206349207,
+              "denominator": 30
+            },
+            "ndcg_at_10": {
+              "value": 0.7268532454080053,
+              "denominator": 30
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 30
+          }
+        },
+        "ambiguous_negative": {
+          "case_count": 20,
+          "positive_count": 10,
+          "negative_count": 10,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.8,
+              "denominator": 10
+            },
+            "recall_at_10": {
+              "value": 0.85,
+              "denominator": 10
+            },
+            "recall_at_20": {
+              "value": 0.9,
+              "denominator": 10
+            },
+            "mrr_at_10": {
+              "value": 0.6866666666666666,
+              "denominator": 10
+            },
+            "ndcg_at_10": {
+              "value": 0.7172262043221884,
+              "denominator": 10
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": 1.0,
+            "denominator": 10
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 10
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 20
+          }
+        }
+      },
+      "ONNX_HYBRID_B": {
+        "overall": {
+          "case_count": 120,
+          "positive_count": 110,
+          "negative_count": 10,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.8636363636363636,
+              "denominator": 110
+            },
+            "recall_at_10": {
+              "value": 0.9136363636363637,
+              "denominator": 110
+            },
+            "recall_at_20": {
+              "value": 0.9590909090909091,
+              "denominator": 110
+            },
+            "mrr_at_10": {
+              "value": 0.7928391053391053,
+              "denominator": 110
+            },
+            "ndcg_at_10": {
+              "value": 0.8190099568766631,
+              "denominator": 110
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": 1.0,
+            "denominator": 10
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 10
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 120
+          }
+        },
+        "lexical": {
+          "case_count": 30,
+          "positive_count": 30,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 1.0,
+              "denominator": 30
+            },
+            "recall_at_10": {
+              "value": 1.0,
+              "denominator": 30
+            },
+            "recall_at_20": {
+              "value": 1.0,
+              "denominator": 30
+            },
+            "mrr_at_10": {
+              "value": 1.0,
+              "denominator": 30
+            },
+            "ndcg_at_10": {
+              "value": 1.0,
+              "denominator": 30
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 30
+          }
+        },
+        "semantic": {
+          "case_count": 40,
+          "positive_count": 40,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.975,
+              "denominator": 40
+            },
+            "recall_at_10": {
+              "value": 1.0,
+              "denominator": 40
+            },
+            "recall_at_20": {
+              "value": 1.0,
+              "denominator": 40
+            },
+            "mrr_at_10": {
+              "value": 0.9614583333333333,
+              "denominator": 40
+            },
+            "ndcg_at_10": {
+              "value": 0.9703866219196432,
+              "denominator": 40
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 40
+          }
+        },
+        "crosslingual": {
+          "case_count": 30,
+          "positive_count": 30,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.6333333333333333,
+              "denominator": 30
+            },
+            "recall_at_10": {
+              "value": 0.7333333333333333,
+              "denominator": 30
+            },
+            "recall_at_20": {
+              "value": 0.8666666666666667,
+              "denominator": 30
+            },
+            "mrr_at_10": {
+              "value": 0.3862433862433862,
+              "denominator": 30
+            },
+            "ndcg_at_10": {
+              "value": 0.4712500717893623,
+              "denominator": 30
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 30
+          }
+        },
+        "ambiguous_negative": {
+          "case_count": 20,
+          "positive_count": 10,
+          "negative_count": 10,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.7,
+              "denominator": 10
+            },
+            "recall_at_10": {
+              "value": 0.85,
+              "denominator": 10
+            },
+            "recall_at_20": {
+              "value": 0.95,
+              "denominator": 10
+            },
+            "mrr_at_10": {
+              "value": 0.7166666666666667,
+              "denominator": 10
+            },
+            "ndcg_at_10": {
+              "value": 0.7138128225966351,
+              "denominator": 10
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": 1.0,
+            "denominator": 10
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 10
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 20
+          }
+        }
+      }
+    },
+    "gates": {
+      "lexical.recall_at_10": {
+        "baseline": 1.0,
+        "value": 1.0,
+        "minimum": 0.9666666666666667,
+        "pass": true
+      },
+      "lexical.mrr_at_10": {
+        "baseline": 1.0,
+        "value": 1.0,
+        "minimum": 0.97,
+        "pass": true
+      },
+      "lexical.ndcg_at_10": {
+        "baseline": 1.0,
+        "value": 1.0,
+        "minimum": 0.97,
+        "pass": true
+      },
+      "semantic.recall_at_10": {
+        "baseline": 0.975,
+        "value": 1.0,
+        "minimum": 1.0,
+        "pass": true
+      },
+      "semantic.mrr_at_10": {
+        "baseline": 0.9410714285714286,
+        "value": 0.9614583333333333,
+        "minimum": 0.9410714285714286,
+        "pass": true
+      },
+      "semantic.ndcg_at_10": {
+        "baseline": 0.9491065771726198,
+        "value": 0.9703866219196432,
+        "minimum": 0.9491065771726198,
+        "pass": true
+      },
+      "crosslingual.recall_at_10": {
+        "baseline": 0.1,
+        "value": 0.7333333333333333,
+        "minimum": 0.2,
+        "pass": true
+      },
+      "crosslingual.mrr_at_10": {
+        "baseline": 0.07777777777777778,
+        "value": 0.3862433862433862,
+        "minimum": 0.07777777777777778,
+        "pass": true
+      },
+      "crosslingual.ndcg_at_10": {
+        "baseline": 0.08333333333333333,
+        "value": 0.4712500717893623,
+        "minimum": 0.08333333333333333,
+        "pass": true
+      },
+      "overall.identity_promotion_error_rate": {
+        "value": 0.0,
+        "maximum": 0,
+        "pass": true
+      },
+      "overall.negative_identity_promotion_error_rate": {
+        "value": 0.0,
+        "maximum": 0,
+        "pass": true
+      },
+      "lexical.identity_promotion_error_rate": {
+        "value": 0.0,
+        "maximum": 0,
+        "pass": true
+      },
+      "semantic.identity_promotion_error_rate": {
+        "value": 0.0,
+        "maximum": 0,
+        "pass": true
+      },
+      "crosslingual.identity_promotion_error_rate": {
+        "value": 0.0,
+        "maximum": 0,
+        "pass": true
+      },
+      "ambiguous_negative.identity_promotion_error_rate": {
+        "value": 0.0,
+        "maximum": 0,
+        "pass": true
+      },
+      "ambiguous_negative.negative_identity_promotion_error_rate": {
+        "value": 0.0,
+        "maximum": 0,
+        "pass": true
+      },
+      "regression.overall.recall_at_10": {
+        "native": 0.9136363636363637,
+        "onnx": 0.9136363636363637,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.overall.mrr_at_10": {
+        "native": 0.7928391053391053,
+        "onnx": 0.7928391053391053,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.overall.ndcg_at_10": {
+        "native": 0.8190099568766631,
+        "onnx": 0.8190099568766631,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.lexical.recall_at_10": {
+        "native": 1.0,
+        "onnx": 1.0,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.lexical.mrr_at_10": {
+        "native": 1.0,
+        "onnx": 1.0,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.lexical.ndcg_at_10": {
+        "native": 1.0,
+        "onnx": 1.0,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.semantic.recall_at_10": {
+        "native": 1.0,
+        "onnx": 1.0,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.semantic.mrr_at_10": {
+        "native": 0.9614583333333333,
+        "onnx": 0.9614583333333333,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.semantic.ndcg_at_10": {
+        "native": 0.9703866219196432,
+        "onnx": 0.9703866219196432,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.crosslingual.recall_at_10": {
+        "native": 0.7333333333333333,
+        "onnx": 0.7333333333333333,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.crosslingual.mrr_at_10": {
+        "native": 0.3862433862433862,
+        "onnx": 0.3862433862433862,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.crosslingual.ndcg_at_10": {
+        "native": 0.4712500717893623,
+        "onnx": 0.4712500717893623,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.ambiguous_negative.recall_at_10": {
+        "native": 0.85,
+        "onnx": 0.85,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.ambiguous_negative.mrr_at_10": {
+        "native": 0.7166666666666667,
+        "onnx": 0.7166666666666667,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "regression.ambiguous_negative.ndcg_at_10": {
+        "native": 0.7138128225966351,
+        "onnx": 0.7138128225966351,
+        "delta": 0.0,
+        "minimum_delta": -0.01,
+        "pass": true
+      },
+      "dense.overall.identity_promotion_error_rate": {
+        "value": 0.0,
+        "pass": true
+      },
+      "dense.overall.negative_identity_promotion_error_rate": {
+        "value": 0.0,
+        "pass": true
+      },
+      "dense.lexical.identity_promotion_error_rate": {
+        "value": 0.0,
+        "pass": true
+      },
+      "dense.lexical.negative_identity_promotion_error_rate": {
+        "value": null,
+        "pass": true
+      },
+      "dense.semantic.identity_promotion_error_rate": {
+        "value": 0.0,
+        "pass": true
+      },
+      "dense.semantic.negative_identity_promotion_error_rate": {
+        "value": null,
+        "pass": true
+      },
+      "dense.crosslingual.identity_promotion_error_rate": {
+        "value": 0.0,
+        "pass": true
+      },
+      "dense.crosslingual.negative_identity_promotion_error_rate": {
+        "value": null,
+        "pass": true
+      },
+      "dense.ambiguous_negative.identity_promotion_error_rate": {
+        "value": 0.0,
+        "pass": true
+      },
+      "dense.ambiguous_negative.negative_identity_promotion_error_rate": {
+        "value": 0.0,
+        "pass": true
+      }
+    },
+    "failures": []
+  },
+  "overlap": {
+    "10": {
+      "macro": 1.0,
+      "minimum": 1.0,
+      "macro_threshold": 0.98,
+      "minimum_threshold": 0.8,
+      "pass": true
+    },
+    "20": {
+      "macro": 1.0,
+      "minimum": 1.0,
+      "macro_threshold": 0.98,
+      "minimum_threshold": 0.8,
+      "pass": true
+    },
+    "100": {
+      "macro": 1.0,
+      "minimum": 1.0,
+      "macro_threshold": 0.95,
+      "minimum_threshold": 0.9,
+      "pass": true
+    }
+  },
+  "latency": {
+    "wall_p95_ms": 387.4892000021646,
+    "resident_p95_ms": 377.6631,
+    "wall_max_ms": 472.10030000132974,
+    "resident_max_ms": 460.43149999999997
+  },
+  "warmups_counts": {
+    "attempted": 2,
+    "failed": 0,
+    "not_run": 0
+  },
+  "formal_counts": {
+    "attempted": 120,
+    "failed": 0,
+    "not_run": 0
+  }
+}

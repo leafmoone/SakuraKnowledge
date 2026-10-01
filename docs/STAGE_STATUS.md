@@ -1,6 +1,16 @@
 # Stage Status (SakuraKnowledge)
 
-## Current P4 — IN_PROGRESS / ANN_V1_RETRY1_PASS_WAITING_REVIEW
+## Current P4 — RUST_SEMANTIC_PILOT_PASS / WAITING_REVIEW
+
+- Dependency/tokenizer120 exact PASS; Rust ORT1.24.1CPU and direct USearch load PASS.
+- Fixed runtime c417655:120/120quality/resident PASS,2warmups,0retry. Dense overlap
+  all1.0, benchmark-v2/regression PASS. Linear total p95 378.150915ms,max460.4315ms.
+- Approved-baseline P2 151/P3 55 PASS,wrong/timeouts/retries0. Default/semantic
+  matrices PASS; pytest1187PASS143SKIP61subtests. Ruff final PASS.
+- Report reports/P4/RUST_SEMANTIC_PILOT_REPORT.md discloses failed wrappers,
+  activation repair and percentile convention. FULL attempts0,packNOT_RUN.
+  Ready for FULL BUILD GATE review only, no automatic build/main merge.
+- Historical ANN/v3 records follow.
 
 - Authorized optional telemetry repair: no psutil installed. Real backend
   preflight PASS, tests53PASS. Old FAIL/config/raw artifacts remain unchanged.

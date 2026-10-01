@@ -1,0 +1,94 @@
+{
+  "schema": "p4-rust-legacy-regression-v1",
+  "status": "PASS",
+  "baseline_identity": "P4_APPROVED_P3_BEHAVIOR_BASELINE_V1",
+  "runtime_sha": "c417655e149b7dce64d0bab376076f2a2f7c7320",
+  "retries": 0,
+  "timeout_count": 0,
+  "wrong_resolved": 0,
+  "pool": false,
+  "external_preservation": false,
+  "counts": {
+    "P2": {
+      "executed": 151,
+      "passed": 151,
+      "whole_values": 135,
+      "error_contracts": 16,
+      "source_assertions": 0,
+      "resolved": 0,
+      "nonresolved": 0,
+      "wrong_resolved": 0
+    },
+    "gold": {
+      "executed": 55,
+      "passed": 55,
+      "whole_values": 55,
+      "error_contracts": 0,
+      "source_assertions": 55,
+      "resolved": 39,
+      "nonresolved": 16,
+      "wrong_resolved": 0
+    }
+  },
+  "environment": {
+    "PATH": "C:/msys64/ucrt64/bin;C:\\msys64\\ucrt64\\bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+    "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+    "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+    "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p4-rust-default-target",
+    "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+    "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe"
+  },
+  "helper": {
+    "bytes": 11884,
+    "sha256": "37a264e55cbb0aa0c993c4af5128efc761dff59bdd87e7d6799f4cbcad722ba7"
+  },
+  "baseline_report": {
+    "bytes": 352929,
+    "sha256": "290e757ab9fa3dfb8e71654426634e55f28eb061dc72d366fac58ce15d74cdda"
+  },
+  "baseline_corpus_manifest": {
+    "bytes": 61574,
+    "sha256": "f5cf6bce10c2d192bb2fbdf2e432d01e90d8e00e25f4aad7530e99b361e396ed"
+  },
+  "snapshot_before": {
+    "bytes": 21718736896,
+    "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9"
+  },
+  "sidecars_before": {
+    "-wal": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "-shm": {
+      "bytes": 32768,
+      "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+    },
+    "-journal": null
+  },
+  "binary": {
+    "path": "build/p4-rust-default-target/release/sknow-rs.exe",
+    "bytes": 5152642,
+    "sha256": "6a7d37a9bf43cbd2525404f0f96f5e1691a872b9b1241ca26b8c705eddf51bdb"
+  },
+  "snapshot_after": {
+    "bytes": 21718736896,
+    "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9"
+  },
+  "sidecars_after": {
+    "-wal": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "-shm": {
+      "bytes": 32768,
+      "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+    },
+    "-journal": null
+  },
+  "local_evidence": {
+    "path": "build/p4-rust-legacy-regression-v1/corpus-manifest.json",
+    "bytes": 91160,
+    "sha256": "1c957d2db8b81a2e8b56923b4a413f8f62f85b93c9d9fb39d43c0f1796b55b47"
+  },
+  "commands_preserved": 221
+}
