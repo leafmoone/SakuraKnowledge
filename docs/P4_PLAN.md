@@ -64,10 +64,24 @@ metrics with undefined denominators are N/A, not invented perfect scores. Report
 negative behavior separately. This is an engineering retrieval benchmark, NOT
 full human source-fact review; the embedding models never create their own labels.
 
-Pilot selection freezes a seed/hash rule, covers Bangumi/Moegirl/Danbooru/tag,
-languages and kinds, retains hard negatives, and reports strata and selection
-limitations. No selection based on future vector performance. Publish a small
-manifest/hash; full projected text and vectors remain local-only.
+Authorized continuation replaces four-source dense coverage with trusted text
+only: bangumi.subject/character/person and danbooru.wiki. Fixed census total
+1295638; pilot quotas respectively26630/8566/3949/10855. Freeze a seed and rank
+SHA256(seed + ':' + document_id) within each stratum. Guaranteed gold targets and
+explicit hard negatives replace worst ordinary samples only within their stratum;
+record reasons and exact quotas. Disclose zero Moegirl/local-tag semantic coverage
+without blocking v1; retain structured/lexical access. Report language/script
+coverage, never use it to change approved quotas or trust. No selection based on
+future vector performance. Publish small manifests/hashes; full text and vectors
+remain local-only. Compare model quality using exact dense first, then qualify
+ANN against exact top100 only after selecting a qualifying model.
+
+Before production src/rust changes, capture P4_APPROVED_P3_BEHAVIOR_BASELINE_V1
+from approved byte-equivalent P3 runtime against unchanged FULL. This new baseline
+is explicitly not original oracle recovery (FULL55 original recovery remains0/55).
+Require P2 151/151 and P3 55/55 including tracked source assertions. Original
+BLOCKED coverage/STOP/DELIVERY evidence remains unchanged. Continuation uses new
+receipts. Stop at the reached gate for review rather than forcing a FULL build.
 
 ## Models, devices and packaging
 

@@ -1,8 +1,7 @@
-"""Offline P4 trusted corpus preparation; no models and no source writes.
+"""Read-only trusted-text census, deterministic quota pilot, and local gold inspection.
 
-Export is deliberately exclusive. Inspect emits source text to stdout for local
-human gold authoring, never to a public report. All commands hash the snapshot
-before opening SQLite. Script labels are heuristics, not language identification.
+Export is exclusive. Inspect emits text locally, never to a public report.
+All snapshot reads verify SHA256 before SQL and again after closing SQLite.
 """
 import argparse
 import hashlib
@@ -16,13 +15,11 @@ from collections import Counter, defaultdict
 from contextlib import closing, contextmanager
 from pathlib import Path
 
-VERSION = "p4-corpus-v1"
-SEED = "sakura-p4-pilot-2026-v1"
-PILOT_SIZE = 50_000
-FLOOR = 100
-FAMILIES = ("bangumi", "moegirl", "danbooru", "local_tag")
-SCRIPTS = ("kana_present", "han_without_kana", "latin_without_han_kana")
 ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_CONFIG = ROOT / "configs/p4-trusted-text-v1.json"
+VERSION = "p4-trusted-text-v1"
+RANK_RULE = "SHA256(seed + ':' + str(document_id))"
+FAMILIES = ("bangumi", "moegirl", "danbooru", "local_tag")
 FIELDS = """d.id AS document_id,d.entry_id,e.kind,e.namespace,e.value,
  d.title,d.original,d.language,d.status,d.source_id,d.evidence_id"""
 TRUST = """e.conflicted=0
@@ -33,7 +30,7 @@ TRUST = """e.conflicted=0
 SCAN = f"""SELECT {FIELDS} FROM search_fts f
  CROSS JOIN documents d ON d.id=f.document_id
  CROSS JOIN entries e ON e.id=d.entry_id
- WHERE f.entry_id=e.id AND {TRUST} ORDER BY f.rowid"""
+ WHERE f.entry_id=e.id AND f.text=d.search_text AND {TRUST} ORDER BY f.rowid"""
 IDENTITY_RESOLUTION = {
     "snapshot": "base_snapshot (SHA256 and byte size verified before opening)",
     "reference": "Each document's identity_proof_ref.entry_id binds entry_evidence.entry_id.",
@@ -57,13 +54,42 @@ def sha256_file(path):
     return h.hexdigest()
 
 
+def load_config(path=DEFAULT_CONFIG):
+    raw = Path(path).read_bytes()
+    config = json.loads(raw)
+    if (config["version"] != VERSION or config["index_episodes"] is not False or
+            config["rank_rule"] != RANK_RULE or not isinstance(config["seed"], str) or
+            not config["seed"].strip() or not config["strata"]):
+        raise ValueError("invalid trusted-text configuration")
+    identities = set()
+    for spec in config["strata"].values():
+        key = tuple(spec[k] for k in ("source_family", "kind", "namespace"))
+        if key in identities or spec["kind"] == "episode":
+            raise ValueError("duplicate or episode stratum")
+        identities.add(key)
+        if any(type(spec[k]) is not int or spec[k] <= 0
+               for k in ("eligible_count", "pilot_quota")):
+            raise ValueError("stratum counts must be positive integers")
+        if spec["pilot_quota"] > spec["eligible_count"]:
+            raise ValueError("quota exceeds census")
+    for total, field in (("eligible_total", "eligible_count"), ("pilot_size", "pilot_quota")):
+        if config[total] != sum(s[field] for s in config["strata"].values()):
+            raise ValueError("configuration total mismatch")
+    return config, hashlib.sha256(raw).hexdigest()
+
+
 def sidecars(path):
     result = {}
     for suffix in ("-wal", "-journal", "-shm"):
         p = Path(str(path) + suffix)
-        result[suffix] = p.stat().st_size if p.exists() else None
-        if suffix != "-shm" and result[suffix]:
+        if not p.exists():
+            result[suffix] = None
+            continue
+        stat = p.stat()
+        if suffix != "-shm" and stat.st_size:
             raise ValueError(f"nonempty SQLite sidecar: {p}")
+        result[suffix] = {"size": stat.st_size, "mtime_ns": stat.st_mtime_ns,
+                          "sha256": sha256_file(p)}
     return result
 
 
@@ -86,13 +112,19 @@ def verified_snapshot(path, expected_sha256, expected_size):
     conn.execute("PRAGMA query_only=ON")
     conn.execute("PRAGMA temp_store=MEMORY")
     try:
-        yield conn, {"sha256": expected_sha256, "size": expected_size,
-                     "sidecars": state}
+        yield conn, {"sha256": expected_sha256, "size": expected_size, "sidecars": state}
     finally:
         conn.close()
-        if ((path.stat().st_size, path.stat().st_mtime_ns) !=
-            (before.st_size, before.st_mtime_ns) or sidecars(path) != state):
+        if (sha256_file(path) != expected_sha256 or
+                (path.stat().st_size, path.stat().st_mtime_ns) !=
+                (before.st_size, before.st_mtime_ns) or sidecars(path) != state):
             raise ValueError("snapshot or sidecars changed during read")
+
+
+def check_policy(conn):
+    policy = conn.execute("SELECT value FROM build_meta WHERE key='index_episodes'").fetchone()
+    if policy is None or policy[0] != "false":
+        raise ValueError("index_episodes policy must be false")
 
 
 def script_label(text):
@@ -111,9 +143,8 @@ def source_metadata(conn):
 
 
 def family(metadata):
-    provider = metadata.get("provider")
     return {"bangumi": "bangumi", "moegirl": "moegirl", "danbooru": "danbooru",
-            "tag_wiki": "local_tag"}.get(provider, "other")
+            "tag_wiki": "local_tag"}.get(metadata.get("provider"), "other")
 
 
 def project(row, sources):
@@ -122,8 +153,7 @@ def project(row, sources):
     sid = result["source_id"]
     if sid not in sources or not result["evidence_id"]:
         raise ValueError("document lacks source/evidence reference")
-    result["identity_proof_ref"] = {"entry_id": result["entry_id"],
-                                    "status": "source_backed"}
+    result["identity_proof_ref"] = {"entry_id": result["entry_id"], "status": "source_backed"}
     result["source_metadata_ref"] = f"sources:{sid}"
     result["source_family"] = family(sources[sid])
     result["script_label"] = script_label((result["title"] or "") + "\n" +
@@ -134,11 +164,10 @@ def project(row, sources):
 def safe_output_path(path, directory):
     root = ROOT.resolve(strict=True)
     allowed = root / directory
-    # Check lexical ancestors before resolving, including allowed roots themselves.
     path = Path(os.path.abspath(path))
     for candidate in (allowed, path):
         for ancestor in (candidate, *candidate.parents):
-            if ancestor.is_symlink() or os.path.isjunction(ancestor):
+            if ancestor.is_symlink() or getattr(os.path, "isjunction", lambda p: False)(ancestor):
                 raise ValueError("output symlink/junction ancestors are forbidden")
     if not allowed.resolve().is_relative_to(root):
         raise ValueError("allowed output root escapes project")
@@ -148,8 +177,8 @@ def safe_output_path(path, directory):
 
 
 def eligible(conn, sources):
-    # Disk B-tree dedup preserves first FTS rowid order without a FULL-sized set.
-    # All scratch writes are local; bounded page cache, no mmap or temp-file spill.
+    check_policy(conn)
+    # Disk B-tree dedup: bounded cache and no FULL-sized Python membership set.
     scratch = safe_output_path(ROOT / "build/p4", "build/p4")
     scratch.mkdir(parents=True, exist_ok=True)
     with (
@@ -168,9 +197,17 @@ def eligible(conn, sources):
                 yield project(row, sources)
 
 
-def rank(document):
-    payload = [VERSION, SEED, document["entry_key"], document["document_id"]]
-    return int.from_bytes(hashlib.sha256(canonical(payload)).digest(), "big")
+def stratum(doc, config):
+    key = (doc["source_family"], doc["entry_key"]["kind"], doc["entry_key"]["namespace"])
+    for name, spec in config["strata"].items():
+        if key == tuple(spec[k] for k in ("source_family", "kind", "namespace")):
+            return name
+    raise ValueError(f"unexpected eligible stratum: {key}")
+
+
+def rank(document, seed):
+    return int.from_bytes(hashlib.sha256(
+        f"{seed}:{document['document_id']}".encode()).digest(), "big")
 
 
 def retain(heap, capacity, score, doc_id):
@@ -206,58 +243,67 @@ def load_mandatory(path):
     return result, hashlib.sha256(raw).hexdigest()
 
 
-def select(conn, sources, size=PILOT_SIZE, mandatory=None, required_kinds=()):
-    if size <= 0:
-        raise ValueError("size must be positive")
+def verify_census(counts, config):
+    expected = {name: spec["eligible_count"] for name, spec in config["strata"].items()}
+    if dict(counts) != expected or sum(counts.values()) != config["eligible_total"]:
+        raise ValueError(f"trusted-text census mismatch: observed={dict(counts)}, expected={expected}")
+
+
+def select(conn, sources, config=None, mandatory=None):
+    config = config if config is not None else load_config()[0]
     mandatory = mandatory or {}
-    global_heap, strata = [], defaultdict(list)
+    heaps = {name: [] for name in config["strata"]}
+    census, found = Counter(), {}
     counts = {k: Counter() for k in ("source_family", "script_label", "kind", "language")}
-    full_hash, count, found = hashlib.sha256(), 0, {}
+    full_hash = hashlib.sha256()
     with closing(eligible(conn, sources)) as documents:
         for doc in documents:
-            count += 1
+            name = stratum(doc, config)
+            census[name] += 1
             full_hash.update(canonical(doc) + b"\n")
-            score, did = rank(doc), doc["document_id"]
-            retain(global_heap, size, score, did)
-            for field in ("source_family", "script_label", "kind"):
+            score, did = rank(doc, config["seed"]), doc["document_id"]
+            retain(heaps[name], config["strata"][name]["pilot_quota"], score, did)
+            for field, labels in counts.items():
                 label = doc["entry_key"]["kind"] if field == "kind" else doc[field]
-                if (field == "kind" or
-                        label in (FAMILIES if field == "source_family" else SCRIPTS)):
-                    retain(strata[(field, label)], FLOOR, score, did)
-                counts[field][label] += 1
-            counts["language"][doc["language"] or "unspecified"] += 1
+                labels[label or "unspecified"] += 1
             if did in mandatory:
                 if mandatory[did]["entry_key"] != doc["entry_key"]:
                     raise ValueError("mandatory entry key mismatch")
-                found[did] = score
+                found[did] = (name, score)
     if set(found) != set(mandatory):
         raise ValueError("mandatory documents not eligible")
-    for field, labels in (("source_family", FAMILIES), ("script_label", SCRIPTS),
-                          ("kind", required_kinds)):
-        for label in labels:
-            if not counts[field][label]:
-                raise ValueError(f"missing required stratum: {field}:{label}")
-    if count < size:
-        raise ValueError(f"insufficient eligible unique documents: {count} < {size}")
-    selected, reasons = dict(found), defaultdict(list)
-    for did in found:
-        reasons[did].append("mandatory:" + mandatory[did]["role"])
-    for (field, label), heap in sorted(strata.items()):
-        for score, did in ordered(heap):
+    verify_census(census, config)
+    selected, reasons, replacements = {}, defaultdict(list), []
+    for name, heap in sorted(heaps.items()):
+        ordinary = {did: score for score, did in ordered(heap)}
+        required = {did: score for did, (label, score) in found.items() if label == name}
+        if len(required) > config["strata"][name]["pilot_quota"]:
+            raise ValueError(f"mandatory inclusions exceed quota: {name}")
+        # Remove only worst-ranked nonmandatory rows, never cross stratum boundaries.
+        victims = sorted((score, did) for did, score in ordinary.items() if did not in required)
+        for did in sorted(required, key=lambda d: (required[d], d)):
+            if did not in ordinary:
+                _, removed = victims.pop()
+                del ordinary[removed]
+                ordinary[did] = required[did]
+                replacements.append({"stratum": name, "included_document_id": did,
+                                     "removed_document_id": removed,
+                                     "role": mandatory[did]["role"],
+                                     "reason": mandatory[did]["reason"]})
+        for did, score in ordinary.items():
             selected[did] = score
-            reasons[did].append(f"floor:{field}:{label}")
-    if len(selected) > size:
-        raise ValueError("mandatory inclusions and fixed floors exceed pilot size")
-    for score, did in ordered(global_heap):
-        if len(selected) == size:
-            break
-        if did not in selected:
-            selected[did] = score
-            reasons[did].append("global_bottom_k")
+            reasons[did].append(f"quota:{name}")
+            if did in required:
+                reasons[did].extend(["mandatory:" + mandatory[did]["role"],
+                                     mandatory[did]["reason"]])
+            else:
+                reasons[did].append("stratum_bottom_k")
     ids = sorted(selected, key=lambda did: (selected[did], did))
-    return ids, reasons, {"eligible_count": count, "eligible_sha256": full_hash.hexdigest(),
+    return ids, reasons, {"eligible_count": sum(census.values()),
+                          "eligible_sha256": full_hash.hexdigest(),
                           "eligible_hash_order": "first consistent FTS rowid per document",
-                          "eligible_strata": counts}
+                          "eligible_census": census, "eligible_strata": counts,
+                          "mandatory_replacements": replacements}
 
 
 def fetch(conn, did, sources):
@@ -273,50 +319,47 @@ def contained_output(path, directory):
     return path
 
 
-def export(conn, binding, corpus, manifest, mandatory_path=None, required_kinds=()):
+def export(conn, binding, corpus, manifest, mandatory_path=None, config_path=DEFAULT_CONFIG):
     corpus = contained_output(corpus, "build/p4")
     manifest = contained_output(manifest, "reports/P4")
+    config, config_hash = load_config(config_path)
+    if any(binding[k] != config["snapshot"][k] for k in ("sha256", "size")):
+        raise ValueError("configuration snapshot binding mismatch")
     mandatory, mandatory_hash = load_mandatory(mandatory_path)
     sources = source_metadata(conn)
-    ids, reasons, audit = select(conn, sources, size=PILOT_SIZE, mandatory=mandatory,
-                                 required_kinds=required_kinds)
-    selected_counts = {k: Counter() for k in
-                       ("source_family", "script_label", "kind", "language")}
+    ids, reasons, audit = select(conn, sources, config, mandatory)
+    selected_counts, selected_census = defaultdict(Counter), Counter()
     corpus.parent.mkdir(parents=True, exist_ok=True)
     manifest.parent.mkdir(parents=True, exist_ok=True)
-    # Reserve both names exclusively; failures intentionally leave partial files
-    # as failure evidence, never replace an existing corpus or receipt.
-    with corpus.open("xb") as out, manifest.open("xb") as receipt:
+    # Failed corpus data remains evidence; manifest published after post-read checks.
+    with corpus.open("xb") as out:
         h = hashlib.sha256()
         for did in ids:
             doc = fetch(conn, did, sources)
-            for field, counts in selected_counts.items():
-                label = (doc["entry_key"]["kind"] if field == "kind" else doc[field])
-                counts[label or "unspecified"] += 1
+            selected_census[stratum(doc, config)] += 1
+            for field in ("source_family", "script_label", "kind", "language"):
+                label = doc["entry_key"]["kind"] if field == "kind" else doc[field]
+                selected_counts[field][label or "unspecified"] += 1
             doc["selection_reasons"] = reasons[did]
             line = canonical(doc) + b"\n"
             out.write(line)
             h.update(line)
-        report = {"version": VERSION, "seed": SEED, "base_snapshot": binding,
+        quotas = {name: spec["pilot_quota"] for name, spec in config["strata"].items()}
+        if dict(selected_census) != quotas or len(ids) != config["pilot_size"]:
+            raise ValueError("selected quota mismatch")
+        report = {"version": VERSION, "seed": config["seed"], "base_snapshot": binding,
+                  "config_sha256": config_hash, "configuration": config,
                   "index_episodes": False, "selected_count": len(ids),
                   "corpus_sha256": h.hexdigest(), "corpus_path": str(corpus.relative_to(ROOT)),
-                  "rank_rule": "SHA256(canonical JSON [version,seed,typed entry key,document ID])",
-                  "selected_order": "rank ascending, document ID ascending",
-                  "source_family_floor": FLOOR, "script_floor": FLOOR, "kind_floor": FLOOR,
-                  "required_families": FAMILIES, "required_scripts": SCRIPTS,
-                  "required_kinds": sorted(set(required_kinds)),
-                  "identity_proof_resolution": IDENTITY_RESOLUTION,
-                  "family_provider_map": {"bangumi": "bangumi", "moegirl": "moegirl",
-                                          "danbooru": "danbooru", "tag_wiki": "local_tag"},
-                  "selected_strata": selected_counts, "sources": sources,
+                  "rank_rule": RANK_RULE, "selected_order": "rank ascending, document ID ascending",
+                  "selected_census": selected_census, "selected_strata": selected_counts,
+                  "identity_proof_resolution": IDENTITY_RESOLUTION, "sources": sources,
                   "mandatory_input_sha256": mandatory_hash,
                   "mandatory_inclusions": list(mandatory.values()),
+                  "semantic_ineligible": config["semantic_ineligible"],
                   "embedding_fields": ["title", "original"],
                   "limitations": ["Script labels are heuristic, not authoritative languages.",
-                                  "Observed kinds receive floors; absent kinds are not inferred.",
-                                  "Floors use min(100, available); infeasible unions fail.",
                                   "No model/vector-based sampling."], **audit}
-        receipt.write(canonical(report) + b"\n")
     return report
 
 
@@ -326,12 +369,11 @@ def main(argv=None):
     parser.add_argument("--sha256", required=True)
     parser.add_argument("--size", type=int, required=True)
     commands = parser.add_subparsers(dest="command", required=True)
-    exp = commands.add_parser("export", help="exclusive 50,000-document local pilot export")
+    exp = commands.add_parser("export", help="exclusive quota pilot export")
+    exp.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     exp.add_argument("--corpus", type=Path, required=True)
     exp.add_argument("--manifest", type=Path, required=True)
-    exp.add_argument("--mandatory", type=Path)
-    exp.add_argument("--required-kind", action="append", default=[],
-                     help="require a nonempty eligible kind (repeatable; no inferred population)")
+    exp.add_argument("--mandatory", type=Path, required=True)
     inspect = commands.add_parser("inspect", help="local source excerpts for human gold authoring")
     inspect.add_argument("--document-id", type=int, action="append")
     inspect.add_argument("--family", choices=FAMILIES)
@@ -344,10 +386,7 @@ def main(argv=None):
         parser.error("limit and excerpt-chars must be positive")
     with verified_snapshot(args.snapshot, args.sha256, args.size) as (conn, binding):
         if args.command == "export":
-            report = export(conn, binding, args.corpus, args.manifest, args.mandatory,
-                            args.required_kind)
-            print(json.dumps({"selected_count": report["selected_count"],
-                              "corpus_sha256": report["corpus_sha256"]}))
+            report = export(conn, binding, args.corpus, args.manifest, args.mandatory, args.config)
         else:
             sources, emitted = source_metadata(conn), 0
             with closing(eligible(conn, sources)) as documents:
@@ -373,6 +412,12 @@ def main(argv=None):
                     emitted += 1
                     if emitted == args.limit:
                         break
+    if args.command == "export":
+        manifest = contained_output(args.manifest, "reports/P4")
+        with manifest.open("xb") as receipt:
+            receipt.write(canonical(report) + b"\n")
+        print(json.dumps({"selected_count": report["selected_count"],
+                          "corpus_sha256": report["corpus_sha256"]}))
 
 
 if __name__ == "__main__":

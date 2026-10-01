@@ -3,6 +3,10 @@
   "base_sha": "269e34eeeac920c29f2d684cfe37c93a95c73057",
   "snapshot_sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
   "pilot_documents": 50000,
+  "corpus_contract": "configs/p4-trusted-text-v1.json",
+  "pilot_dense_reference": "exact_normalized_dot_product_no_ann",
+  "pilot_bm25_population": "same_frozen_50000_documents",
+  "cpu_feasibility_min_formal_samples_per_workload": 30,
   "case_counts": {"lexical": 30, "semantic": 40, "crosslingual": 30, "ambiguous_negative": 20},
   "chunking": {"version": "paragraph-model-tokenizer-v1", "max_chunk_tokens": 384, "overlap_tokens": 64},
   "fusion": {"method": "rrf", "k": 60, "branch_depth": 100, "exact_alias_pinned": true},
@@ -33,8 +37,8 @@
   "device_contract": {"required_baseline": "cpu", "gpu": "explicit_optional", "silent_fallback": false},
   "model_root": "model/",
   "models": [
-    {"label": "MODEL_A", "repo": "intfloat/multilingual-e5-small", "revision": null, "status": "NOT_FROZEN"},
-    {"label": "MODEL_B", "repo": "BAAI/bge-m3", "revision": null, "status": "NOT_FROZEN"}
+    {"label": "MODEL_A", "repo": "intfloat/multilingual-e5-small", "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3", "status": "ASSETS_FROZEN", "contract": "configs/p4-model-a-contract.json"},
+    {"label": "MODEL_B", "repo": "BAAI/bge-m3", "revision": "5617a9f61b028005a4858fdac845db406aefb181", "status": "ASSETS_FROZEN", "contract": "configs/p4-model-b-contract.json"}
   ],
   "full_semantic_build_max_attempts": 1,
   "human_source_fact_review": "NOT_RUN"

@@ -1,4 +1,5 @@
-"""Static checks of the existing engineering draft, not corpus trust or freeze approval."""
+"""Static checks of unchanged engineering labels, now source-validated and frozen."""
+import hashlib
 import json
 import re
 from collections import Counter
@@ -23,7 +24,10 @@ def draft():
 
 def test_draft_metadata_and_base_receipt(draft):
     assert draft["schema_version"] == "p4-source-gold-v1"
-    assert draft["status"] == "DRAFT_PRE_EMBEDDING"
+    assert draft["status"] == "FROZEN_PRE_EMBEDDING"
+    raw = (ROOT / 'reports/P4/retrieval-gold.json').read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == (
+        'ae6fcc98021de5f5b4c905b5f35a438c6670005327e0276fd751d9cffe4635ba')
     assert draft["base_snapshot_sha256"] == BASE_SHA256
     assert draft["base_snapshot_bytes"] == 21718736896
     assert draft["baseline_receipt"] == "reports/P4/initial-snapshot-check.json"

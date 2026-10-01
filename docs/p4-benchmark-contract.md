@@ -20,6 +20,30 @@ not an unbiased estimate of naturally sampled target coverage. Audit source,
 kind and language/script coverage. Keep same selected documents for both models;
 chunk boundaries may differ under their separately frozen tokenizers.
 
+## Authorized continuation: trusted text only
+
+The user revoked four-source semantic coverage after reviewing preparation at
+`e9ffff87acceb9fa16798a0db76597b605997282`. The v1 corpus is solely current legal
+FTS documents with trusted document status, source-backed entry identity,
+non-conflicted entries, and index_episodes=false. Fixed census: bangumi.subject
+690068, bangumi.character221960, bangumi.person102338, danbooru.wiki281272.
+Moegirl semantic text coverage0 (no trusted document rows), local-tag coverage0
+(no_reference/unverified_draft only) are disclosed limitations; exact/alias and
+structured access remain available. No raw payload summaries or trust upgrades.
+
+Pilot quotas respectively26630/8566/3949/10855, total50000. Within each text
+stratum rank SHA256(seed + ':' + document_id); configuration binds the seed.
+Guaranteed gold/hard-negative inclusions replace the last ordinary ranked sample
+in the same stratum only; all reasons recorded. Language/scripts are reported,
+not a justification to alter these quotas. Both models use identical documents.
+
+Model-quality pilot uses exact normalized dense ranking, not ANN. BM25 uses only
+this same50000-document corpus. ANN spike happens only after model qualification,
+with exact top100 as reference. All numeric selection thresholds below unchanged.
+CPU query feasibility separately measures reused and fresh process workloads,
+at least30 formal samples each, fixed warmups recorded separately, failures counted.
+GPU bulk embeddings cannot substitute for this CPU evidence. No disk-cold claim.
+
 ## Ranking
 
 Evaluate entry-level relevance. Deduplicate chunk/document hits to their typed

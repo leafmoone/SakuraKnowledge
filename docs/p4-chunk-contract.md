@@ -13,7 +13,9 @@ Pre-embedding specification; no runtime or measured quality claim.
 3. Paragraph boundaries are ends of maximal runs of at least two LF characters.
    Convert each boundary to the first token whose start offset is >= boundary.
    Exclude boundary zero and duplicate positions. Title participates as the first
-   paragraph and is NOT repeated on later chunks.
+   paragraph and is NOT separately prepended to later chunks. Its canonical token
+   positions may recur through the mandatory64-position overlap below; this does
+   not inject a fresh title copy or override overlap.
 4. From start token s choose hard_end=min(s+384,total). If not the final window,
    choose the greatest paragraph boundary b with s+64 < b <= hard_end; if none,
    use hard_end. Thus oversized paragraphs split at the token window limit.
@@ -46,5 +48,9 @@ Pre-embedding specification; no runtime or measured quality claim.
    CRLF, oversized paragraphs, short paragraphs and deterministic repeated runs.
 
 Overlap counts canonical token positions, not bytes or characters. All slice
-hashes and source offsets allow exact reconstruction from the immutable document.
+hashes and source offsets allow exact reconstruction of each slice from the
+immutable document. Tokenizer-unrepresented leading/trailing whitespace may lie
+outside slices; source document bytes remain retained, and no represented token
+positions may be silently dropped. Concatenated chunks are not a byte-identical
+reconstruction of the full document (overlap is intentional).
 Sidecar integrity independently joins chunk -> document -> entry and source.

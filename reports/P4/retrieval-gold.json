@@ -1,6 +1,6 @@
 {
   "schema_version": "p4-source-gold-v1",
-  "status": "DRAFT_PRE_EMBEDDING",
+  "status": "FROZEN_PRE_EMBEDDING",
   "base_snapshot_sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
   "base_snapshot_bytes": 21718736896,
   "baseline_receipt": "reports/P4/initial-snapshot-check.json",

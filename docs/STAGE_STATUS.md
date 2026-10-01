@@ -1,6 +1,6 @@
 # Stage Status (SakuraKnowledge)
 
-## Current P4 — IN_PROGRESS / BLOCKED_ON_CORPUS_COVERAGE
+## Current P4 — IN_PROGRESS / AUTHORIZED_TRUSTED_TEXT_CONTINUATION
 
 - P1/P2/P3: **CLOSED_AND_MERGED**, per explicit user authorization.
 - P4 base: `269e34eeeac920c29f2d684cfe37c93a95c73057`. Initial fetch verified
@@ -14,14 +14,22 @@
 - Explicit CPU/GPU device selection; CPU remains the required baseline. Configurable
   model identity/contracts, not hard-coded runtime model names. Downloaded models
   live in project `model/` and remain local-only, as do vectors and ONNX artifacts.
-- Mandatory pilot coverage gate is **BLOCKED**: actual trusted FTS projection has
-  1,295,638 documents (Bangumi character221960/person102338/subject690068;
-  Danbooru wiki281272), but zero Moegirl documents and zero trusted local-tag
-  documents. See `reports/P4/trusted-corpus-coverage-audit.json` (exit2, retained
-  FAIL receipt). Stored local-tag document statuses are no_reference601512 and
-  unverified_draft73377; payload claims cannot upgrade them. No embedding run.
-- Retrieval gold is 120-case **DRAFT_PRE_EMBEDDING**, not an accepted freeze;
-  no compliant 50k pilot, selected model, production semantic runtime or ANN pack.
+- External review of `e9ffff87acceb9fa16798a0db76597b605997282` requires changes;
+  preparation code blocker NONE. User revoked mandatory four-source dense coverage.
+  New authorized text strata: Bangumi subject690068/character221960/person102338
+  and Danbooru wiki281272, total1,295,638. Moegirl/local-tag dense coverage remains
+  zero and explicitly disclosed, not a v1 blocker; their structured access remains.
+  Historical `trusted-corpus-coverage-audit.json`, `STOP_REPORT.md`, `DELIVERY.json`
+  are preserved unchanged as authentic failures under the old contract.
+- Original FULL55 oracle recovery remains0/55. New approved P3 behavior baseline
+  capture is authorized, distinctly labeled, before any production source changes.
+- Unknown-provenance uv.lock moved with byte/hash verification to authorized
+  `../SakuraKnowledge-p4-local-preserve-e9ffff/uv.lock`; external manifest saved.
+  Do not access unrelated P3 preservation. Continuation results are pending.
+- Retrieval gold is 120-case **FROZEN_PRE_EMBEDDING**, source-anchor validation PASS
+  in `reports/P4/continuation-gold-validation.json`; queries/targets unchanged.
+  SHA256 `ae6fcc98021de5f5b4c905b5f35a438c6670005327e0276fd751d9cffe4635ba`.
+  Pilot export, model selection, production semantic runtime and ANN remain pending.
 - FULL semantic build attempts: **0**; FULL semantic pack: **NOT_RUN**. At most one
   attempt after all pilot, Rust, regression, disk, fixed-SHA and snapshot gates pass.
 - P3 external local-only preservation is out of scope: do not read, move, delete or

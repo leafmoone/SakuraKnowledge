@@ -1,5 +1,6 @@
 """Deterministic offline tests: no model, database or downloaded tokenizer."""
 import hashlib
+import itertools
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -127,7 +128,7 @@ def test_retokenization_cannot_progress_fails_explicitly():
 
 
 @pytest.mark.parametrize("offsets", [[(-1, 1)], [(0, 0)], [(0, 999)], [(2, 3), (1, 2)],
-                                    [(0, 3), (1, 2)], [(False, 1)], [(0.0, 1)]])
+                                    [(0, 3), (False, 1)], [(0, 3), (1, 2)], [(0.0, 1)]])
 def test_reject_unsupported_offsets(offsets):
     class Broken:
         def encode(self, text, *, add_special_tokens=False):
@@ -266,3 +267,117 @@ def test_export_duplicate_and_count_failure_leave_no_success_receipt(tmp_path):
     with pytest.raises(chunks.ChunkError, match="count mismatch"):
         chunks.export(*args, root=other)
     assert not (args[2] / "manifest.json").exists()
+
+
+def tiny_tokenizer(kind):
+    """Construct real fast tokenizers entirely offline, without trained model assets."""
+    tokenizers = pytest.importorskip("tokenizers")
+    if kind == "bytes":
+        alphabet = sorted(tokenizers.pre_tokenizers.ByteLevel.alphabet())
+        tokenizer = tokenizers.Tokenizer(tokenizers.models.BPE(
+            vocab={char: i for i, char in enumerate(alphabet)}, merges=[]))
+        tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.ByteLevel(
+            add_prefix_space=False, trim_offsets=False, use_regex=False)
+    else:
+        tokenizer = tokenizers.Tokenizer(tokenizers.models.WordLevel(
+            vocab={"[UNK]": 0, "a": 1, "漢": 2}, unk_token="[UNK]"))
+        tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.WhitespaceSplit()
+    return tokenizer
+
+
+def test_real_byte_offsets_unicode_overlap_and_no_text_loss():
+    tokenizer = tiny_tokenizer("bytes")
+    doc = document("", "漢字 Latin😀e\u0301\r\n" * 130 + "終😀")
+    text = chunks.document_text(doc)
+    offsets = chunks.offsets_for(tokenizer, text)
+    assert len(offsets) == len(text.encode("utf-8")) > len(text)
+    assert any(left == right for left, right in itertools.pairwise(offsets))
+    stats = {}
+    result = project(doc, tokenizer, passage_prefix="", statistics=stats)
+    assert result == project(doc, tokenizer, passage_prefix="")
+    covered = set()
+    for i, chunk in enumerate(result):
+        start, end = chunk["canonical_token_start"], chunk["canonical_token_end"]
+        assert (chunk["char_start"], chunk["char_end"]) == (offsets[start][0], offsets[end - 1][1])
+        assert chunk["text"] == text[chunk["char_start"]:chunk["char_end"]]
+        assert chunk["token_count"] == len(tokenizer.encode(chunk["text"]).ids) <= 384
+        covered.update(range(chunk["char_start"], chunk["char_end"]))
+        if i:
+            assert start == result[i - 1]["canonical_token_end"] - 64
+    assert covered == set(range(len(text)))
+    assert result[-1]["canonical_token_end"] == len(offsets)
+    assert result[-1]["text"].endswith("終😀")
+    assert stats["canonical_token_count"] == len(offsets)
+    assert stats["chunk_canonical_token_count"] == len(offsets) + 64 * (len(result) - 1)
+    assert stats["chunk_token_count"] == sum(c["token_count"] for c in result)
+    assert stats["oversized_paragraph_count"] == 1
+    assert stats["oversized_paragraph_split_count"] == len(result) - 1
+
+
+def test_real_word_tokenizer_paragraph_splits_stats_and_contract_hash(tmp_path):
+    tokenizer = tiny_tokenizer("words")
+    docs = [
+        {**document("", "a " * 800), "source_family": "wiki"},
+        {**document(None, None), "document_id": 18, "source_family": "wiki"},
+        {**document("a " * 100, "漢 " * 100 + "\n\n" + "a " * 100 + "\n\n" + "漢 " * 300),
+         "document_id": 19, "source_family": "tags"},
+    ]
+    args = list(fixture_export(tmp_path, docs))
+    args[3] = tokenizer
+    args[4]["tokenizer_json_sha256"] = chunks.digest(tokenizer.to_str().encode())
+    report = chunks.export(*args, root=tmp_path)
+    rows = [json.loads(line) for line in (args[2] / "chunks.jsonl").read_bytes().splitlines()]
+    assert [(c["canonical_token_start"], c["canonical_token_end"]) for c in rows] == [
+        (0, 384), (320, 704), (640, 800), (0, 300), (236, 600)]
+    assert report["canonical_token_count"] == 1400
+    assert report["chunk_canonical_token_count"] == 1592
+    assert report["chunk_token_count"] == 1592
+    assert report["document_count"] == 3
+    assert report["chunk_count"] == 5
+    assert report["empty_token_document_count"] == 1
+    assert report["oversized_paragraph_count"] == 1
+    assert report["oversized_paragraph_split_count"] == 2
+    assert report["nonparagraph_split_count"] == 2
+    assert report["chunk_text_bytes"] == sum(len(c["text"].encode()) for c in rows)
+    assert report["inference_token_count"] == sum(c["inference_token_count"] for c in rows)
+    assert report["chunks_jsonl_bytes"] == (args[2] / "chunks.jsonl").stat().st_size
+    assert len(report["source_strata"]) == 2
+    for name in chunks.STATISTICS_DEFINITIONS:
+        assert sum(s[name] for s in report["source_strata"]) == report[name]
+    wiki = next(s for s in report["source_strata"] if s["source_family"] == "wiki")
+    assert wiki["document_count"] == 2
+    assert wiki["empty_token_document_count"] == 1
+    assert wiki["oversized_paragraph_split_count"] == 2
+    # Even a query-only change binds a different projection identity, not different slices.
+    args[2] = args[2].with_name("changed-contract")
+    args[5] = {**args[5], "query_prefix": "different query: "}
+    args[4] = {**args[4], "contract": dict(args[5])}
+    changed = chunks.export(*args, root=tmp_path)
+    changed_rows = [json.loads(line) for line in (args[2] / "chunks.jsonl").read_bytes().splitlines()]
+    assert changed["tokenizer_inventory_sha256"] != report["tokenizer_inventory_sha256"]
+    assert [c["text"] for c in changed_rows] == [c["text"] for c in rows]
+    assert all(a["chunk_id"] != b["chunk_id"] for a, b in zip(rows, changed_rows))
+
+
+def test_split_counters_do_not_mislabel_short_paragraph_or_retokenization():
+    stats = {}
+    # Strict >64 rule forces a split in a 350-token paragraph after a 64-token title.
+    project(document("T" * 64, "a" * 350), statistics=stats)
+    assert stats["nonparagraph_split_count"] == 1
+    assert stats["oversized_paragraph_count"] == 0
+    assert stats["oversized_paragraph_split_count"] == 0
+    doc = document("", "a" * 800)
+    result = project(doc, ExpandedSlices(chunks.document_text(doc)), statistics=stats)
+    assert stats["canonical_token_count"] == 800
+    assert stats["chunk_canonical_token_count"] == 800 + 64 * (len(result) - 1)
+    assert stats["chunk_token_count"] == 2 * stats["chunk_canonical_token_count"]
+    assert stats["oversized_paragraph_count"] == 1
+    assert stats["oversized_paragraph_split_count"] == len(result) - 1
+
+
+def test_empty_corpus_statistics(tmp_path):
+    args = fixture_export(tmp_path, [])
+    report = chunks.export(*args, root=tmp_path)
+    assert all(report[name] == 0 for name in chunks.STATISTICS_DEFINITIONS)
+    assert report["source_strata"] == []
+    assert report["chunks_jsonl_bytes"] == 0

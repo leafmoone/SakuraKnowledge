@@ -1,0 +1,27 @@
+{
+  "head": "e9ffff87acceb9fa16798a0db76597b605997282",
+  "working_tree": " M docs/P4_PLAN.md\n M docs/STAGE_STATUS.md\n M docs/p4-benchmark-contract.md\n M tools/p4_corpus.py\n M tools/p4_corpus_audit.py\n?? configs/p4-trusted-text-v1.json\n?? reports/P4/continuation-preflight.json\n?? tests/test_p4_approved_baseline.py\n?? tests/test_p4_validate_gold.py\n?? tools/p4_approved_baseline.py\n?? tools/p4_exact_pilot.py\n?? tools/p4_validate_gold.py\n",
+  "argv": [
+    "python",
+    "-c",
+    "import sys,os,torch,numpy,transformers,tokenizers,json; print(json.dumps({'python':sys.version,'torch':torch.__version__,'numpy':numpy.__version__,'transformers':transformers.__version__,'tokenizers':tokenizers.__version__,'cpu_threads':torch.get_num_threads(),'cuda_available':torch.cuda.is_available(),'cuda_devices':[{'name':torch.cuda.get_device_name(i),'total_memory':torch.cuda.get_device_properties(i).total_memory} for i in range(torch.cuda.device_count())]},ensure_ascii=True))"
+  ],
+  "exit": 0,
+  "elapsed_s": 21.826836599997478,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 120,
+    "effective": 120,
+    "disabled": false
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJweXRob24iOiAiMy4xNC41ICh0YWdzL3YzLjE0LjU6NTYwNzk1MCwgTWF5IDEwIDIwMjYsIDEwOjQzOjUwKSBbTVNDIHYuMTk0NCA2NCBiaXQgKEFNRDY0KV0iLCAidG9yY2giOiAiMi4xMS4wK2N1MTI4IiwgIm51bXB5IjogIjIuNC42IiwgInRyYW5zZm9ybWVycyI6ICI1LjEyLjEiLCAidG9rZW5pemVycyI6ICIwLjIyLjIiLCAiY3B1X3RocmVhZHMiOiA4LCAiY3VkYV9hdmFpbGFibGUiOiB0cnVlLCAiY3VkYV9kZXZpY2VzIjogW3sibmFtZSI6ICJOVklESUEgR2VGb3JjZSBSVFggNDA2MCIsICJ0b3RhbF9tZW1vcnkiOiA4NTg1MjE2MDAwfV19DQo=",
+  "stdout_sha256": "976be571f294988b8a37626142bdd294e443ef6999eb7b413e2e31b6d57797a9",
+  "stdout": "{\"python\": \"3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]\", \"torch\": \"2.11.0+cu128\", \"numpy\": \"2.4.6\", \"transformers\": \"5.12.1\", \"tokenizers\": \"0.22.2\", \"cpu_threads\": 8, \"cuda_available\": true, \"cuda_devices\": [{\"name\": \"NVIDIA GeForce RTX 4060\", \"total_memory\": 8585216000}]}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

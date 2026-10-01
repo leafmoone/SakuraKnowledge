@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import itertools
 import json
 import re
 from bisect import bisect_left, bisect_right
@@ -22,6 +23,22 @@ VERSION = "paragraph-model-tokenizer-v1"
 MAX_TOKENS = 384
 OVERLAP = 64
 ROOT = Path(__file__).resolve().parents[1]
+STATISTICS_DEFINITIONS = {
+    "document_count": "Input documents, including empty token streams.",
+    "chunk_count": "Emitted chunks.",
+    "empty_token_document_count": "Documents whose complete canonical text has no tokens.",
+    "canonical_token_count": "Complete document tokens counted once, without overlap or specials.",
+    "chunk_canonical_token_count": "Sum of chunk canonical spans, including 64-position overlaps.",
+    "chunk_token_count": "Sum of retokenized chunk tokens, including overlap, without prefixes/specials.",
+    "inference_token_count": "Sum of chunk inference tokens, including passage prefix and specials.",
+    "chunk_text_bytes": "Sum of UTF-8 chunk text bytes, including overlap; excludes JSON framing.",
+    "oversized_paragraph_count": "Canonical paragraph token intervals longer than 384, counted once.",
+    "oversized_paragraph_split_count": (
+        "Nonfinal emitted ends strictly inside a canonical paragraph longer than 384; "
+        "one event per end, never recounting a split because its tokens overlap."
+    ),
+    "nonparagraph_split_count": "All nonfinal emitted ends that are not paragraph boundaries.",
+}
 
 
 class Encoding(Protocol):
@@ -105,8 +122,14 @@ def inference_token_count(tokenizer, text, *, prefix, max_sequence_tokens):
 
 
 def project_document(document, tokenizer, *, base_snapshot_sha256,
-                     tokenizer_inventory_sha256, passage_prefix, max_sequence_tokens):
-    """Return chunks in document order; [] explicitly represents an empty stream."""
+                     tokenizer_inventory_sha256, passage_prefix, max_sequence_tokens,
+                     statistics=None):
+    """Return chunks; optionally replace statistics with defined document counters.
+
+    Canonical tokens are unique original positions, not unique vocabulary IDs.
+    Slice token counts can differ from canonical span sizes at Unicode/word edges.
+    Statistics observe the projection and never change its boundaries.
+    """
     valid_hash(base_snapshot_sha256)
     valid_hash(tokenizer_inventory_sha256)
     require(isinstance(passage_prefix, str), "invalid passage prefix")
@@ -128,6 +151,13 @@ def project_document(document, tokenizer, *, base_snapshot_sha256,
     total = len(offsets)
     boundaries = sorted({bisect_left(starts, match.end())
                          for match in re.finditer(r"\n{2,}", text)} - {0})
+    paragraph_edges = sorted({0, total, *boundaries})
+    stats = dict.fromkeys(STATISTICS_DEFINITIONS, 0)
+    stats.update(document_count=1, canonical_token_count=total,
+                 empty_token_document_count=int(total == 0),
+                 oversized_paragraph_count=sum(
+                     right - left > MAX_TOKENS
+                     for left, right in itertools.pairwise(paragraph_edges)))
     chunks, start = [], 0
     while start < total:
         end = min(start + MAX_TOKENS, total)
@@ -161,9 +191,22 @@ def project_document(document, tokenizer, *, base_snapshot_sha256,
                        "document_text_sha256": document_hash, "text": sliced,
                        "char_start": char_start, "char_end": char_end,
                        "token_count": count, "inference_token_count": inference_count})
+        stats["chunk_count"] += 1
+        stats["chunk_canonical_token_count"] += end - start
+        stats["chunk_token_count"] += count
+        stats["inference_token_count"] += inference_count
+        stats["chunk_text_bytes"] += len(sliced.encode("utf-8"))
         if end == total:
             break
+        paragraph = bisect_right(paragraph_edges, end) - 1
+        if paragraph_edges[paragraph] != end:
+            stats["nonparagraph_split_count"] += 1
+            if paragraph_edges[paragraph + 1] - paragraph_edges[paragraph] > MAX_TOKENS:
+                stats["oversized_paragraph_split_count"] += 1
         start = end - OVERLAP
+    if statistics is not None:
+        statistics.clear()
+        statistics.update(stats)
     return chunks
 
 
@@ -191,7 +234,8 @@ def export(corpus, corpus_manifest, output, tokenizer, inventory, contract, *, r
     inventory_hash = digest(canonical(inventory))
     output.mkdir(parents=True, exist_ok=False)
     seen, empty = set(), []
-    count, chunk_hash, input_hash = 0, hashlib.sha256(), hashlib.sha256()
+    totals, strata = dict.fromkeys(STATISTICS_DEFINITIONS, 0), {}
+    jsonl_bytes, chunk_hash, input_hash = 0, hashlib.sha256(), hashlib.sha256()
     with corpus.open("rb") as source, (output / "chunks.jsonl").open("xb") as target:
         for line in source:
             input_hash.update(line)
@@ -199,23 +243,41 @@ def export(corpus, corpus_manifest, output, tokenizer, inventory, contract, *, r
             did = document["document_id"]
             require(type(did) is int and did not in seen, "invalid or duplicate document ID")
             seen.add(did)
+            stats = {}
             chunks = project_document(
                 document, tokenizer, base_snapshot_sha256=snapshot,
                 tokenizer_inventory_sha256=inventory_hash,
                 passage_prefix=contract["passage_prefix"],
-                max_sequence_tokens=contract["max_sequence_tokens"])
+                max_sequence_tokens=contract["max_sequence_tokens"], statistics=stats)
+            family = document.get("source_family")
+            require(family is None or isinstance(family, str), "invalid source_family")
+            stratum = {"source_family": family, "kind": document["entry_key"]["kind"],
+                       "namespace": document["entry_key"]["namespace"]}
+            bucket = strata.setdefault(canonical(stratum), {
+                **stratum, **dict.fromkeys(STATISTICS_DEFINITIONS, 0)})
+            for name, value in stats.items():
+                totals[name] += value
+                bucket[name] += value
             if not chunks:
                 empty.append(did)
             for chunk in chunks:
                 data = canonical(chunk) + b"\n"
                 target.write(data)
                 chunk_hash.update(data)
-                count += 1
+                jsonl_bytes += len(data)
     require(input_hash.hexdigest() == expected, "corpus changed during projection")
     require(len(seen) == corpus_manifest["selected_count"], "corpus document count mismatch")
     report = {"version": VERSION, "base_snapshot_sha256": snapshot,
-              "corpus_sha256": expected, "document_count": len(seen), "chunk_count": count,
-              "empty_token_document_ids": empty, "empty_token_document_count": len(empty),
+              "corpus_sha256": expected, **totals,
+              "empty_token_document_ids": empty,
+              "chunks_jsonl_bytes": jsonl_bytes,
+              "statistics_definitions": STATISTICS_DEFINITIONS,
+              "source_strata": [strata[key] for key in sorted(strata)],
+              "source_strata_definition": (
+                  "Disjoint source_family/kind/namespace groups; null family means absent. "
+                  "Each counter sums to its manifest total. chunks_jsonl_bytes is the exact "
+                  "serialized file size, including metadata and newlines."
+              ),
               "chunks_sha256": chunk_hash.hexdigest(), "tokenizer_inventory": inventory,
               "tokenizer_inventory_sha256": inventory_hash,
               "max_chunk_tokens": MAX_TOKENS, "overlap_tokens": OVERLAP,
