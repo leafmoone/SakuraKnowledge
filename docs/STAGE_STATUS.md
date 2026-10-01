@@ -1,6 +1,16 @@
 # Stage Status (SakuraKnowledge)
 
-## Current P4 — IN_PROGRESS / ONNX_V3_WAITING_REVIEW
+## Current P4 — IN_PROGRESS / ANN_V1_PREPARATION
+
+- User authorizes ANN V1 from256e2f1: BGE-M3_ONNX_FP32 quality/residentCPU PASS.
+  Resident120/120 operation p50 71.96055ms,p95 82.42782ms.
+- Fresh diagnostic122/122 timeouts occurred at setup/provenance validation,
+  before tokenizer/session/query. FAIL_SETUP_VALIDATION; product cold-start
+  NOT_MEASURED, not an ONNX cold-start performance failure.
+- USearch2.26.2 isolated .venv-p4-ann available; fixed4-build16-candidate FP32
+  grid being prepared. No real ANN build/search before contract/tool push.
+  src/rust unchanged; no embedding/export/quantization or FULL execution.
+- Historical v3 preparation and review records follow.
 
 - V3 validates the existing FP32 ONNX artifact only: no export, native reference
   regeneration, passage rebuild, gold/RRF change or model reselection.
