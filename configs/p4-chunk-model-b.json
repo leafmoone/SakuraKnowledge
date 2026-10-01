@@ -1,0 +1,20 @@
+{
+  "contract": {
+    "dimension": 1024,
+    "max_sequence_tokens": 8192,
+    "normalize": true,
+    "passage_prefix": "",
+    "pooling": "cls",
+    "query_prefix": "",
+    "review_note": "Reviewed official BAAI/bge-m3 revision 5617a9f61b028005a4858fdac845db406aefb181 for dense embeddings only. README Specs gives 1024 dimensions and 8192 tokens; FAQ explicitly removes query instructions and dense example uses unprefixed queries/passages. 1_Pooling/config.json explicitly enables CLS only; modules.json includes Normalize. config.json confirms hidden_size 1024; sentence_bert_config.json confirms max_seq_length 8192 (not config max_position_embeddings 8194). Pinned URLs and actual SHA256 hashes: model/p4-pinned-docs-receipt.json and reports/P4/model-freeze-summary.json. Native weights are pytorch_model.bin; never unsafe pickle loading; any later load must explicitly use weights_only=True. MIT is card metadata, not standalone license-file or legal approval.",
+    "source": "explicit_config",
+    "tokenizer_files": [
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "special_tokens_map.json",
+      "sentencepiece.bpe.model"
+    ]
+  },
+  "repository": "BAAI/bge-m3",
+  "revision": "5617a9f61b028005a4858fdac845db406aefb181"
+}
