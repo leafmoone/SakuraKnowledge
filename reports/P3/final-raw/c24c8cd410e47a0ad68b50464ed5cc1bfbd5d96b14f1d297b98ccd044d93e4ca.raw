@@ -1,0 +1,1 @@
+{"status": "PASS", "argv": ["cargo", "clippy", "--manifest-path", "rust/Cargo.toml", "--all-targets", "--locked", "--", "-D", "warnings"], "exit": 0, "elapsed_s": 6.237427100000787}

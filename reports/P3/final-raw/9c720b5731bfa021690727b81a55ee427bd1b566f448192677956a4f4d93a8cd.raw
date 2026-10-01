@@ -1,0 +1,1 @@
+{"status": "PASS", "argv": ["python", "-m", "ruff", "check", "src", "tests", "tools"], "exit": 0, "elapsed_s": 0.15069450000009965}

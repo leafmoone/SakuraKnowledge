@@ -1,6 +1,44 @@
 # Stage Status (SakuraKnowledge)
 
-## Current A-L directed closure — NOT_READY / STOP (G42 performance warmup budget failure)
+## Current final A-I closure — READY_FOR_REVIEW / WAITING_REVIEW
+
+- Final readiness proposal under the explicitly authorized formal-only performance
+  policy; **not self-approval**. See `reports/P3/FINAL_DIRECTED_REPORT.md` and adjacent
+  `final-*.json` receipts for actual commands, source/artifact bindings and failures.
+- Harness fix `7eb371a95b164fe436c91cc4cb8ed97da90bc06e`; fresh artifact source
+  `e19d2278f26c12cba28eaff82a6eed2f0cda62cb`; final checked tool/test source
+  `fef485c1b4a9716251ac70606a666e0ca4fbc18d`. Runtime src/rust remains byte-equivalent
+  in Git to `9d7bd507c62f20ca4d41b26ba7df55ae4e6d8102`. No new snapshot build.
+- Independent read-only old performance recomputation: 900/900 complete formal
+  samples PASS; 30 fixed warmups, 29 PASS/1 diagnostic G42 budget failure retained.
+  Original overall FAIL/raw/SHA unchanged; no performance rerun or extra G42 probe.
+- Fresh source-external FULL151/151 PASS (135 full values/16 exact error contracts),
+  installed Python151/151; single new FULL55/55 PASS, wrong resolved0/timeouts0,
+  G42 gold invocation1. External module/API/help/error/UTF-8 checks PASS.
+- Targeted S02 queried exactly once: exit0/full JSON PASS/profilequery1/0.176008s.
+  **Original phase remains protection FAIL**; original after metadata NOT_SAVED.
+  Independent review is QUERY_PASS_PROTECTION_FAIL, never retroactive protection PASS.
+  Authorized current byte baseline and subsequent whole-file/known-safe sidecar gates
+  PASS; only unchanged-content SHM mtime is diagnostic. Later S02 in151 is its normal
+  case, not a targeted retry. Reviewer must assess this disclosed evidence limitation.
+- Final seven checks at fixed fef485c all exit0: pytest697 PASS/0SKIP, Rust7+1,
+  Ruff/diff/fmt/clippy/release. Initial pytest632PASS/4FAIL missing text_probe is
+  preserved; authorized fixture-only compile left CLI/wheel/source bytes unchanged.
+- GCC16.1 (MSYS2) is a **new toolchain validation**, not historical GCC16.2 equivalence.
+  Original gcc-not-found artifact FAIL and all preparation/preflight failures preserved.
+  Every compilation and pytest child uses explicit contained Cargo target and local
+  PATH/CC/CXX; no global configuration, installation or external target writes.
+- End FULL/oldP2/manifest/original partial+WAL+SHM/private inputs/lock whole hashes PASS.
+  Frozen expected/source facts and prior reports unchanged. Verified entity_tag0 remains
+  OPTIONAL_COVERAGE; no candidate promotion or inferred mappings.
+- **F=WAIVED_BY_USER / NOT_COMPLETED**: no further Pool audit. Historical build-artifact
+  writes YES; Pool tracked-source status/historical attribution UNVERIFIED. No claim of
+  verified Pool cleanliness or responsibility for observed dirty report.
+- Final ordinary dev push/remote equality/cleanliness and fixed-SHA review are required
+  by the committed binding; main remains894. Linux/Pi/Pool integration/live refresh/full
+  human fact review remain NOT_RUN. No main merge/P4 or success approval is claimed.
+
+## Historical A-L directed closure — NOT_READY / STOP (G42 performance warmup budget failure)
 
 - Fixed runtime/artifact source `9d7bd507c62f20ca4d41b26ba7df55ae4e6d8102`.
   Only explicit index_episodes=false plus kind=episode skips FTS after exact/alias

@@ -1,0 +1,389 @@
+{
+  "status": "PASS",
+  "head": "fef485c1b4a9716251ac70606a666e0ca4fbc18d",
+  "artifact_source_commit": "e19d2278f26c12cba28eaff82a6eed2f0cda62cb",
+  "check_series": "fixtureprep1",
+  "fixture": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\final-text-probe-prerequisite.json",
+    "bytes": 27673,
+    "sha256": "31db4fb7f4b415ea4fb2d749bd2a3e3fb8d1263d53bdd2808a4950200adb6c55"
+  },
+  "source_git": {
+    "source_commit": "e19d2278f26c12cba28eaff82a6eed2f0cda62cb",
+    "validation_source_commit": "fef485c1b4a9716251ac70606a666e0ca4fbc18d",
+    "runtime_baseline": "9d7bd507c62f20ca4d41b26ba7df55ae4e6d8102",
+    "clean_source": true,
+    "runtime_src_rust_gitdiff_empty": true,
+    "processes": [
+      {
+        "argv": [
+          "git",
+          "status",
+          "--porcelain",
+          "--untracked-files=all"
+        ],
+        "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+        "exit": 0,
+        "started_ns": 1790838284863715100,
+        "finished_ns": 1790838284929939400,
+        "elapsed_s": 0.0662233000039123,
+        "stdout": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e30c4008bf2132aa8783529968129e961b4f85e86338275adf0ee21166a3eb29.raw",
+          "sha256": "e30c4008bf2132aa8783529968129e961b4f85e86338275adf0ee21166a3eb29",
+          "bytes": 2082
+        },
+        "stderr": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "environment": {
+          "PYTHONUTF8": "1",
+          "PYTHONIOENCODING": "utf-8",
+          "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-final-git-target",
+          "PATH": "C:/msys64/ucrt64/bin;C:/msys64/ucrt64/bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+          "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+          "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+          "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+          "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe",
+          "SKNOW_SEARCH_PROFILE_OUT": null
+        },
+        "child_cargo_target_explicit": false,
+        "target_inside_Knowledge_and_archive": false
+      },
+      {
+        "argv": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+        "exit": 0,
+        "started_ns": 1790838284930907700,
+        "finished_ns": 1790838284969462400,
+        "elapsed_s": 0.03855410000687698,
+        "stdout": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/7dff57aace2d7f0e7d98e3329432524abff0fd7da1b1be8093f2abbac9006ce4.raw",
+          "sha256": "7dff57aace2d7f0e7d98e3329432524abff0fd7da1b1be8093f2abbac9006ce4",
+          "bytes": 41
+        },
+        "stderr": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "environment": {
+          "PYTHONUTF8": "1",
+          "PYTHONIOENCODING": "utf-8",
+          "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-final-git-target",
+          "PATH": "C:/msys64/ucrt64/bin;C:/msys64/ucrt64/bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+          "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+          "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+          "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+          "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe",
+          "SKNOW_SEARCH_PROFILE_OUT": null
+        },
+        "child_cargo_target_explicit": false,
+        "target_inside_Knowledge_and_archive": false
+      },
+      {
+        "argv": [
+          "git",
+          "diff",
+          "--exit-code",
+          "9d7bd507c62f20ca4d41b26ba7df55ae4e6d8102",
+          "e19d2278f26c12cba28eaff82a6eed2f0cda62cb",
+          "--",
+          "src",
+          "rust"
+        ],
+        "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+        "exit": 0,
+        "started_ns": 1790838284969960500,
+        "finished_ns": 1790838285010265500,
+        "elapsed_s": 0.04030439999769442,
+        "stdout": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "environment": {
+          "PYTHONUTF8": "1",
+          "PYTHONIOENCODING": "utf-8",
+          "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-final-git-target",
+          "PATH": "C:/msys64/ucrt64/bin;C:/msys64/ucrt64/bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+          "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+          "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+          "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+          "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe",
+          "SKNOW_SEARCH_PROFILE_OUT": null
+        },
+        "child_cargo_target_explicit": false,
+        "target_inside_Knowledge_and_archive": false
+      },
+      {
+        "argv": [
+          "git",
+          "merge-base",
+          "e19d2278f26c12cba28eaff82a6eed2f0cda62cb",
+          "fef485c1b4a9716251ac70606a666e0ca4fbc18d"
+        ],
+        "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+        "exit": 0,
+        "started_ns": 1790838285010699600,
+        "finished_ns": 1790838285051236400,
+        "elapsed_s": 0.04053629999543773,
+        "stdout": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/0a6bac79485c4fbd2f656da0b60bf74c1690a02e3d186e493f1b3d85d2ab92bf.raw",
+          "sha256": "0a6bac79485c4fbd2f656da0b60bf74c1690a02e3d186e493f1b3d85d2ab92bf",
+          "bytes": 41
+        },
+        "stderr": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "environment": {
+          "PYTHONUTF8": "1",
+          "PYTHONIOENCODING": "utf-8",
+          "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-final-git-target",
+          "PATH": "C:/msys64/ucrt64/bin;C:/msys64/ucrt64/bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+          "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+          "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+          "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+          "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe",
+          "SKNOW_SEARCH_PROFILE_OUT": null
+        },
+        "child_cargo_target_explicit": false,
+        "target_inside_Knowledge_and_archive": false
+      },
+      {
+        "argv": [
+          "git",
+          "diff",
+          "--exit-code",
+          "e19d2278f26c12cba28eaff82a6eed2f0cda62cb",
+          "fef485c1b4a9716251ac70606a666e0ca4fbc18d",
+          "--",
+          "src",
+          "rust",
+          "tools/p3_measure_resolver.py"
+        ],
+        "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+        "exit": 0,
+        "started_ns": 1790838285051692500,
+        "finished_ns": 1790838285091772000,
+        "elapsed_s": 0.04007890000502812,
+        "stdout": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "environment": {
+          "PYTHONUTF8": "1",
+          "PYTHONIOENCODING": "utf-8",
+          "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-final-git-target",
+          "PATH": "C:/msys64/ucrt64/bin;C:/msys64/ucrt64/bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+          "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+          "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+          "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+          "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe",
+          "SKNOW_SEARCH_PROFILE_OUT": null
+        },
+        "child_cargo_target_explicit": false,
+        "target_inside_Knowledge_and_archive": false
+      }
+    ],
+    "new_untracked_final_evidence_exempt": true
+  },
+  "artifacts": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\final-artifacts-retry1.json",
+    "bytes": 66491,
+    "sha256": "978f993ed5c0754eb69b4501d815a4eb0bc66a1846245834608e5c07730581b2"
+  },
+  "argv": [
+    "cargo",
+    "clippy",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--all-targets",
+    "--locked",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit": 0,
+  "elapsed_s": 6.237427100000787,
+  "retries": 0,
+  "stdout": {
+    "path": "reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "stderr": {
+    "path": "reports/P3/final-raw/8da471a59b0b2d4761161548dff1b6f8c04286dd787c14dc73347ef8771887ed.raw",
+    "sha256": "8da471a59b0b2d4761161548dff1b6f8c04286dd787c14dc73347ef8771887ed",
+    "bytes": 758
+  },
+  "environment": {
+    "PYTHONUTF8": "1",
+    "PYTHONIOENCODING": "utf-8",
+    "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-final-checks-e19d2278f26c12cba28eaff82a6eed2f0cda62cb\\rust-target",
+    "SKNOW_RS_TEST_BIN": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1\\source\\rust\\target\\release\\sknow-rs.exe",
+    "PATH": "C:/msys64/ucrt64/bin;C:/msys64/ucrt64/bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+    "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+    "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+    "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+    "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe"
+  },
+  "toolchain": [
+    {
+      "argv": [
+        "C:/msys64/ucrt64/bin/gcc.exe",
+        "--version"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790834913123971400,
+      "finished_ns": 1790834913156405100,
+      "elapsed_s": 0.03243269999802578,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/91bf371446c8855e344dd12cfa61b386f9c421c64dfa0dbe4234b26742e549c0.raw",
+        "sha256": "91bf371446c8855e344dd12cfa61b386f9c421c64dfa0dbe4234b26742e549c0",
+        "bytes": 253
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1\\source\\rust\\target",
+        "PATH": "C:/msys64/ucrt64/bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+        "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+        "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": true,
+      "target_inside_Knowledge_and_archive": true
+    },
+    {
+      "argv": [
+        "C:/msys64/ucrt64/bin/gcc.exe",
+        "-dumpmachine"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790834913162145000,
+      "finished_ns": 1790834913195918400,
+      "elapsed_s": 0.03377260000706883,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/5a93bd82f1f12e8b275a5cb5df82e8bac02d52c05d53b534913d0bc49ac46b9b.raw",
+        "sha256": "5a93bd82f1f12e8b275a5cb5df82e8bac02d52c05d53b534913d0bc49ac46b9b",
+        "bytes": 20
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1\\source\\rust\\target",
+        "PATH": "C:/msys64/ucrt64/bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+        "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+        "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": true,
+      "target_inside_Knowledge_and_archive": true
+    },
+    {
+      "argv": [
+        "C:/msys64/ucrt64/bin/g++.exe",
+        "--version"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790834913201386200,
+      "finished_ns": 1790834913236087900,
+      "elapsed_s": 0.034701399999903515,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/d37e1d6bf894449bc6d02d7736142b49065b955ed6bf27cf8fd18e256fcb4aed.raw",
+        "sha256": "d37e1d6bf894449bc6d02d7736142b49065b955ed6bf27cf8fd18e256fcb4aed",
+        "bytes": 253
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1\\source\\rust\\target",
+        "PATH": "C:/msys64/ucrt64/bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+        "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+        "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": true,
+      "target_inside_Knowledge_and_archive": true
+    },
+    {
+      "argv": [
+        "rustc",
+        "-vV"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790834913242207200,
+      "finished_ns": 1790834913336273700,
+      "elapsed_s": 0.09406429999944521,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/8b63d892652a4bd91bf0a00adc2f2dd0f2b37f00de60f7b0882236ca60a11810.raw",
+        "sha256": "8b63d892652a4bd91bf0a00adc2f2dd0f2b37f00de60f7b0882236ca60a11810",
+        "bytes": 193
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1\\source\\rust\\target",
+        "PATH": "C:/msys64/ucrt64/bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\bin;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0;C:\\windows\\System32\\OpenSSH;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;D:\\ngork;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Tailscale;C:\\Users\\PC\\.cargo\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64;C:\\Users\\PC\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts;C:\\Users\\PC\\.local\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WindowsApps;D:\\cursor\\resources\\app\\bin;D:\\Microsoft VS Code\\bin;C:\\Users\\PC\\AppData\\Roaming\\npm;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\PC\\AppData\\Local\\Python\\bin;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\\aria2-1.37.0-win-64bit-build1;C:\\Users\\PC\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Meta.Zstandard_Microsoft.Winget.Source_8wekyb3d8bbwe\\zstd-v1.5.7-win64;C:\\Users\\PC\\AppData\\Local\\cursor-agent;D:\\Zed\\bin;D:\\mnemon;D:\\mnemon-cli",
+        "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+        "CC_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CXX_x86_64_pc_windows_gnu": "C:/msys64/ucrt64/bin/g++.exe",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": true,
+      "target_inside_Knowledge_and_archive": true
+    }
+  ],
+  "resolved_target": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-final-checks-e19d2278f26c12cba28eaff82a6eed2f0cda62cb\\rust-target",
+  "target_inside_authorized_root": true
+}

@@ -1,0 +1,88 @@
+{
+  "status": "PASS",
+  "source_commit": "e19d2278f26c12cba28eaff82a6eed2f0cda62cb",
+  "whole_binary_hashes_actual": [
+    {
+      "path": "build\\p3-full-authorized-retry1\\knowledge.sqlite",
+      "bytes": 21718736896,
+      "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9"
+    },
+    {
+      "path": "build\\p3-full-retry1-manifest.json",
+      "bytes": 33308,
+      "sha256": "373fcb69731db877929c102b75292142c0ccff1b5f6075310acc03432ddb6b8b"
+    },
+    {
+      "path": "build\\snapshot-full-20bf5b3\\knowledge.sqlite",
+      "bytes": 21516320768,
+      "sha256": "4c5ebae18fc941df3f7b1037539fb084b2af79220bb06b8eb810c43f26b51073"
+    },
+    {
+      "path": "build/.sknow-z7dkmnsi/knowledge.sqlite",
+      "bytes": 2588381184,
+      "sha256": "b04942c44fa914bf4527015f539af3cabb7d7d0aaa15ab037890de3045808786"
+    },
+    {
+      "path": "build/.sknow-z7dkmnsi/knowledge.sqlite-shm",
+      "bytes": 131072,
+      "sha256": "2638bf78f3c6ca00cfcd6f361188ba0babfd74d1847355b19d6f47cd3786a869"
+    },
+    {
+      "path": "build/.sknow-z7dkmnsi/knowledge.sqlite-wal",
+      "bytes": 56378112,
+      "sha256": "74c7a55d86f5261c3f5424f4199f69cf4bd7b78a62958205eaa798f562a6599b"
+    },
+    {
+      "path": "build/.sknow-z7dkmnsi/.inputs/0",
+      "bytes": 4181230274,
+      "sha256": "6a75aefb769a62f0eaa3b58ed76fb172a5dc1922a9e5be40bd7de2ff8343dcc4"
+    },
+    {
+      "path": "build/.sknow-z7dkmnsi/.inputs/1",
+      "bytes": 42165305,
+      "sha256": "5072f7cf3e3ee4e558fb7421aadf9c9b600b8303b8f9c61cf3da9871018ac99d"
+    },
+    {
+      "path": "build/.sknow-z7dkmnsi/.inputs/2",
+      "bytes": 54918174,
+      "sha256": "c8263a5350964534170d833f560fb50758e3a4215e86b8f5c72cd51b72266f1f"
+    },
+    {
+      "path": "build/.sknow-z7dkmnsi/.inputs/3",
+      "bytes": 684875038,
+      "sha256": "a26a3829dd42155848392c0636daebd6ca01acf540d3509fec2ac3219f8596c5"
+    },
+    {
+      "path": "build/.sknow-z7dkmnsi/.inputs/4",
+      "bytes": 1770263797,
+      "sha256": "a2eb055c578d37e82b71df787cd11b7616e77768eb319cf0839831cfdbb28fef"
+    },
+    {
+      "path": "build/.sknow-z7dkmnsi/.inputs/5",
+      "bytes": 1323528,
+      "sha256": "6fbdc0b9462bcfa1931dcdb5dd1694c8cca4b04a3440bd74eb3ee6a582647b16"
+    },
+    {
+      "path": "build/.p3-full-authorized-once.sknow.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "frozen_inputs_unchanged": true,
+  "prep_moved_bytes_unchanged": true,
+  "artifacts_unchanged": true,
+  "artifacts": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\final-artifacts-retry1.json",
+    "bytes": 66491,
+    "sha256": "978f993ed5c0754eb69b4501d815a4eb0bc66a1846245834608e5c07730581b2"
+  },
+  "performance": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\final-performance-recomputed-repair1.json",
+    "bytes": 21158,
+    "sha256": "45d7d9b4d67619bc8ab802500e35195c267de28803bceee068b0df67636bcd9c"
+  },
+  "no_SQL_or_query": true,
+  "no_snapshot_rebuild": true,
+  "performance_reused": "YES",
+  "performance_rerun": "NO"
+}

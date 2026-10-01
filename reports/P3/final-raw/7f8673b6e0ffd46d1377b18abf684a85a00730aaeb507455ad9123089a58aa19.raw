@@ -1,0 +1,1 @@
+{"status": "PASS", "argv": ["cargo", "fmt", "--manifest-path", "rust/Cargo.toml", "--all", "--", "--check"], "exit": 0, "elapsed_s": 1.2799678000010317}
