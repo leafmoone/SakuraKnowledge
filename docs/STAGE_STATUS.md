@@ -22,14 +22,35 @@
   Historical `trusted-corpus-coverage-audit.json`, `STOP_REPORT.md`, `DELIVERY.json`
   are preserved unchanged as authentic failures under the old contract.
 - Original FULL55 oracle recovery remains0/55. New approved P3 behavior baseline
-  capture is authorized, distinctly labeled, before any production source changes.
+  **P4_APPROVED_P3_BEHAVIOR_BASELINE_V1 PASS**: P2 151/151, P3 55/55
+  (39 resolved/16 nonresolved), wrong_resolved0/timeouts0/retries0. Captured before
+  production edits; `reports/P4/continuation-approved-baseline.json` binds evidence.
+- New trusted-text audit **PASS**: exact1295638, all four strata exact,
+  index_episodes=false, matching FTS text, snapshot/sidecars unchanged. See
+  `reports/P4/continuation-trusted-text-audit-command.json`. Old FAIL remains old FAIL.
 - Unknown-provenance uv.lock moved with byte/hash verification to authorized
   `../SakuraKnowledge-p4-local-preserve-e9ffff/uv.lock`; external manifest saved.
   Do not access unrelated P3 preservation. Continuation results are pending.
 - Retrieval gold is 120-case **FROZEN_PRE_EMBEDDING**, source-anchor validation PASS
   in `reports/P4/continuation-gold-validation.json`; queries/targets unchanged.
   SHA256 `ae6fcc98021de5f5b4c905b5f35a438c6670005327e0276fd751d9cffe4635ba`.
-  Pilot export, model selection, production semantic runtime and ANN remain pending.
+  Deterministic50000-document pilot export PASS (fixed stratum quotas,50 mandatory
+  anchor documents); each model-specific projection contains52664 chunks,0 empty.
+  Same-pilot BM25 prepare and120-case query commands exit0; no quality claim yet.
+- Model A first CUDA/float32/batch8 embedding attempt exited1 before first forward:
+  strict raw/HF token-ID mismatch. Failure and partial index are retained.
+  Tokenizer-only diagnosis identifies Transformers5.12.1 backend reconstruction
+  dropping trailing-space ID6; serialization-preserving loader fix applied with
+  strict backend/ID checks. Full tokenizer-only parity PASS for both models:
+  52664 chunks +120 queries each; max passage tokens A388/B386; frozen inputs
+  verified before/after. A corrected build and B first build exit0; separate
+  index hash/shape/normalization checks exit0 (52664x384 /52664x1024).
+  Both120-case exact queries PASS. Original A failure retained.
+  Five-route quality evaluation exit0: STOP/NONE. Both hybrids fail frozen
+  semantic Recall10 +.10 gain (BM25 .975, hybrid1.0, actual gain .025).
+  A also fails crosslingual gains/nonregression. No thresholds or gold changed.
+  CPU qualification, ANN, production runtime NOT_RUN after quality STOP.
+  See reports/P4/CONTINUATION_STOP_REPORT.md; review preparation in progress.
 - FULL semantic build attempts: **0**; FULL semantic pack: **NOT_RUN**. At most one
   attempt after all pilot, Rust, regression, disk, fixed-SHA and snapshot gates pass.
 - P3 external local-only preservation is out of scope: do not read, move, delete or

@@ -1,0 +1,38 @@
+{
+  "head": "a0b7b677b86d0f259ddc3bb35c64313155c2ac67",
+  "working_tree": " M docs/STAGE_STATUS.md\n?? reports/P4/continuation-chunks-a-command.json\n?? tests/test_p4_pilot_score.py\n?? tools/p4_pilot_score.py\n",
+  "argv": [
+    "python",
+    "tools/p4_pilot_lexical.py",
+    "prepare",
+    "--corpus",
+    "build/p4/continuation-pilot-v1.jsonl",
+    "--gold",
+    "reports/P4/retrieval-gold.json",
+    "--manifest",
+    "reports/P4/continuation-pilot-manifest.json",
+    "--snapshot",
+    "build/p3-full-authorized-retry1/knowledge.sqlite",
+    "--output",
+    "build/p4/continuation-lexical-v1.sqlite",
+    "--authorized-frozen"
+  ],
+  "exit": 0,
+  "elapsed_s": 93.02314789999946,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 0,
+    "effective": null,
+    "disabled": true
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJpbmRleCI6IHsic2hhMjU2IjogImM2NjRiM2M4MTE4MTk0MmQyMDIzMjFmZTgxNDQ4ZDJjZmM0ZTAwYWI2NThiODY0NzMyZTc1OGNlN2ExODI5YjMiLCAic2l6ZSI6IDExMTk0Nzc3Nn0sICJtZXRhZGF0YSI6IHsiYmluZGluZ19zaGEyNTYiOiAiOGNiY2FjOTc1ZWJlZGM5NTJkNWQ5Yjg1ZDlkMjEyYTUxZjY5NjViY2Q2MzlhZWRiNzAyMGE0MmIzNjczMDhhMyIsICJjb25maWciOiB7ImRlcHRoX2JlZm9yZV9lbnRyeV9kZWR1cCI6IHRydWUsICJkb2N1bWVudF9kZXB0aCI6IDEwMCwgImZ0c19zY2hlbWEiOiAiQ1JFQVRFIFZJUlRVQUwgVEFCTEUgc2VhcmNoX2Z0cyBVU0lORyBmdHM1KHRleHQsIGRvY3VtZW50X2lkIFVOSU5ERVhFRCwgZW50cnlfaWQgVU5JTkRFWEVEKSIsICJpZGVudGl0eV9hc3NlcnRpb25zIjogIm5vbmU7IGFtYmlndWl0eSBpcyBuZXZlciBjb2xsYXBzZWQiLCAibW9kZWxfc2hhMjU2IjogIjJmMzA0MjQwMGMxNTA4MTA2YTk4MTFhZDM4NTdjMGI5NzVlZjZhNzhkODk2ZjU4ZWFlMGFjMmU2ODQ4MGM3OWYiLCAicGluX2RlcHRoIjogImFsbCBwaW5zIHJldGFpbmVkIHNlcGFyYXRlbHk7IGZpbmFsIHJhbmtpbmcgY2FwcGVkIGF0IDEwMCIsICJwaW5zIjogInZlcmJhdGltIHZhbHVlIG9yIHNvdXJjZV9iYWNrZWQgYWxpYXM7IHRydXN0ZWQgbm9uY29uZmxpY3RlZCBwaWxvdCBlbnRyaWVzIG9ubHk7IHR5cGVkLWtleSBvcmRlciIsICJxdWVyeSI6ICJtb2RlbC5tYXRjaF9xdWVyeTogTkZLQy9jYXNlZm9sZCwgQ0pLIGJpZ3JhbXMsIHF1b3RlZCBPUiIsICJzcWxpdGVfdmVyc2lvbiI6ICIzLjUwLjQiLCAidGV4dCI6ICJzZWFyY2hfdGV4dCgodGl0bGUgKyBTUEFDRSArIG9yaWdpbmFsKVs6MTAwMDAwXSkiLCAidGllcyI6ICJzY29yZSBBU0MsIGtpbmQgQVNDLCBuYW1lc3BhY2UgQVNDLCB2YWx1ZSBBU0MsIGRvY3VtZW50X2lkIEFTQyIsICJ0b2tlbml6ZXIiOiAiRlRTNSBkZWZhdWx0IHVuaWNvZGU2MSByZW1vdmVfZGlhY3JpdGljcz0xIiwgInVuaWNvZGVfdmVyc2lvbiI6ICIxNi4wLjAiLCAidmVyc2lvbiI6ICJwNC1waWxvdC1sZXhpY2FsLXYxIn0sICJjb25maWdfc2hhMjU2IjogIjcwMjg0MWU3Y2IzMjkxODdkZmIwNDc0MjgxNWVlN2M2Y2NhOTUxNjVlOTJiOWIzMDA0MjJhYWViNGVkNGZiOWQiLCAiY29ycHVzIjogeyJzaGEyNTYiOiAiMTlmOGU3YmYxOGU1NWE1ZDE1ODdhMTBmYjBmNzQzZDBjZDBhNjVjMTZhMWZjZWZhZjhhYTM5MWEyOGJhYjFmZSIsICJzaXplIjogNTI5OTYwMjN9LCAiZG9jdW1lbnRfY291bnQiOiA1MDAwMCwgImdvbGQiOiB7InNoYTI1NiI6ICJhZTZmY2M5ODAyMWRlNWY1YjRjOTA1YjVmMzVhNDM4YzY2NzAwMDUzMjdlMDI3NmZkNzUxZDljZmZlNDYzNWJhIiwgInNpemUiOiAyNzYxMjd9LCAibWFuaWZlc3QiOiB7InNoYTI1NiI6ICJhOWE2N2M3MGU1YzczODBjMTRmNDc2OWZjNzJhOTU5NzA0NWY5NTgzNTE4MDY0YzE2NzdkOTFjMTFkNDAwMGM3IiwgInNpemUiOiA0ODg0NX0sICJzbmFwc2hvdCI6IHsic2hhMjU2IjogIjYxNTYyZjJlNzZmYTlhNzdhNDRkMzRhZGNjMjQ4MmY0NGM0ZmE0OTUwMzUyZTg0ZTQxMGI4ODhiMDM1MzE1ZDkiLCAic2l6ZSI6IDIxNzE4NzM2ODk2fSwgInZlcnNpb24iOiAicDQtcGlsb3QtbGV4aWNhbC12MSJ9fQ0K",
+  "stdout_sha256": "2fd71845f2a78d3325a60af1065e5c606a957e816900dfcfbdf52419e62ac571",
+  "stdout": "{\"index\": {\"sha256\": \"c664b3c81181942d202321fe81448d2cfc4e00ab658b864732e758ce7a1829b3\", \"size\": 111947776}, \"metadata\": {\"binding_sha256\": \"8cbcac975ebedc952d5d9b85d9d212a51f6965bcd639aedb7020a42b367308a3\", \"config\": {\"depth_before_entry_dedup\": true, \"document_depth\": 100, \"fts_schema\": \"CREATE VIRTUAL TABLE search_fts USING fts5(text, document_id UNINDEXED, entry_id UNINDEXED)\", \"identity_assertions\": \"none; ambiguity is never collapsed\", \"model_sha256\": \"2f3042400c1508106a9811ad3857c0b975ef6a78d896f58eae0ac2e68480c79f\", \"pin_depth\": \"all pins retained separately; final ranking capped at 100\", \"pins\": \"verbatim value or source_backed alias; trusted nonconflicted pilot entries only; typed-key order\", \"query\": \"model.match_query: NFKC/casefold, CJK bigrams, quoted OR\", \"sqlite_version\": \"3.50.4\", \"text\": \"search_text((title + SPACE + original)[:100000])\", \"ties\": \"score ASC, kind ASC, namespace ASC, value ASC, document_id ASC\", \"tokenizer\": \"FTS5 default unicode61 remove_diacritics=1\", \"unicode_version\": \"16.0.0\", \"version\": \"p4-pilot-lexical-v1\"}, \"config_sha256\": \"702841e7cb329187dfb04742815ee7c6cca95165e92b9b300422aaeb4ed4fb9d\", \"corpus\": {\"sha256\": \"19f8e7bf18e55a5d1587a10fb0f743d0cd0a65c16a1fcefaf8aa391a28bab1fe\", \"size\": 52996023}, \"document_count\": 50000, \"gold\": {\"sha256\": \"ae6fcc98021de5f5b4c905b5f35a438c6670005327e0276fd751d9cffe4635ba\", \"size\": 276127}, \"manifest\": {\"sha256\": \"a9a67c70e5c7380c14f4769fc72a9597045f9583518064c1677d91c11d4000c7\", \"size\": 48845}, \"snapshot\": {\"sha256\": \"61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9\", \"size\": 21718736896}, \"version\": \"p4-pilot-lexical-v1\"}}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

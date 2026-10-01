@@ -14,3 +14,5 @@ reports/P3/final-raw/** -text -diff
 reports/P4/retrieval-gold.json -text
 reports/P4/continuation-*.json -text whitespace=cr-at-eol
 configs/p4-trusted-text-v1.json -text whitespace=cr-at-eol
+configs/p4-chunk-model-*.json -text whitespace=cr-at-eol
+configs/p4-pilot-job-*.json -text whitespace=cr-at-eol

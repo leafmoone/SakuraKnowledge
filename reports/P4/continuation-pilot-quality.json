@@ -1,0 +1,2452 @@
+{
+  "schema": "p4-pilot-score-v1",
+  "bindings": {
+    "gold": "ae6fcc98021de5f5b4c905b5f35a438c6670005327e0276fd751d9cffe4635ba",
+    "lexical": "a5050522c31f4f1b0c76eb48aa2bc4d4188b12b1de3329fefe076b33e2b1714b",
+    "dense_a": "21c3d349f034ce38a5bece375c6f3d85cbc5cb13f8dcd9e5bd39de1a3b05bd15",
+    "dense_b": "a4095400262aeaf1dba9dee5308f8667ca1fcef9a594921d4207e7aa02bf1c46",
+    "config": "2c687060ac1c50201ae8aee685f05526b88fbb447c441f5fb1d1240800e4ef85",
+    "corpus": "19f8e7bf18e55a5d1587a10fb0f743d0cd0a65c16a1fcefaf8aa391a28bab1fe",
+    "summary": "fbb66ccbce015172c332558148a36a84645a8c9e9a73561b503a2fe37a6def6e"
+  },
+  "subset_aliases": {
+    "ambiguous/negative": "ambiguous_negative"
+  },
+  "identity": "EntryKey(namespace,kind,entry_id string); corpus/anchor bound; never source value",
+  "arithmetic_bridge": "fused detail entry.value is entry_id; original source keys retained in raw inputs",
+  "warning": "Retrieval relevance is not verified identity or permission to promote identity.",
+  "full": "NOT_RUN",
+  "selection": {
+    "status": "STOP",
+    "selected": "NONE",
+    "quality_gate_failures": {
+      "a": [
+        "semantic.recall_at_10",
+        "crosslingual.recall_at_10",
+        "crosslingual.mrr_at_10",
+        "crosslingual.ndcg_at_10"
+      ],
+      "b": [
+        "semantic.recall_at_10"
+      ]
+    },
+    "reason": "neither hybrid passes the quality gates",
+    "cpu_evidence": {
+      "status": "NOT_RUN",
+      "reason": "no measured hybrid producer exists; self-declared CPU receipts are not accepted; exact total_retrieve omits lexical retrieval and fusion"
+    }
+  },
+  "metrics": {
+    "BM25_ONLY": {
+      "overall": {
+        "case_count": 120,
+        "positive_count": 110,
+        "negative_count": 10,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.7090909090909091,
+            "denominator": 110
+          },
+          "recall_at_10": {
+            "value": 0.7181818181818181,
+            "denominator": 110
+          },
+          "recall_at_20": {
+            "value": 0.7227272727272728,
+            "denominator": 110
+          },
+          "mrr_at_10": {
+            "value": 0.6925108225108225,
+            "denominator": 110
+          },
+          "ndcg_at_10": {
+            "value": 0.6961697828637466,
+            "denominator": 110
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": 1.0,
+          "denominator": 10
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 10
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 120
+        }
+      },
+      "lexical": {
+        "case_count": 30,
+        "positive_count": 30,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "recall_at_10": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "recall_at_20": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "mrr_at_10": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "ndcg_at_10": {
+            "value": 1.0,
+            "denominator": 30
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "case_count": 40,
+        "positive_count": 40,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.95,
+            "denominator": 40
+          },
+          "recall_at_10": {
+            "value": 0.975,
+            "denominator": 40
+          },
+          "recall_at_20": {
+            "value": 0.975,
+            "denominator": 40
+          },
+          "mrr_at_10": {
+            "value": 0.9410714285714286,
+            "denominator": 40
+          },
+          "ndcg_at_10": {
+            "value": 0.9491065771726198,
+            "denominator": 40
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "case_count": 30,
+        "positive_count": 30,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.1,
+            "denominator": 30
+          },
+          "recall_at_10": {
+            "value": 0.1,
+            "denominator": 30
+          },
+          "recall_at_20": {
+            "value": 0.1,
+            "denominator": 30
+          },
+          "mrr_at_10": {
+            "value": 0.07777777777777778,
+            "denominator": 30
+          },
+          "ndcg_at_10": {
+            "value": 0.08333333333333333,
+            "denominator": 30
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "case_count": 20,
+        "positive_count": 10,
+        "negative_count": 10,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.7,
+            "denominator": 10
+          },
+          "recall_at_10": {
+            "value": 0.7,
+            "denominator": 10
+          },
+          "recall_at_20": {
+            "value": 0.75,
+            "denominator": 10
+          },
+          "mrr_at_10": {
+            "value": 0.62,
+            "denominator": 10
+          },
+          "ndcg_at_10": {
+            "value": 0.6114413028107345,
+            "denominator": 10
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": 1.0,
+          "denominator": 10
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 10
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 20
+        }
+      }
+    },
+    "EXACT_DENSE_MODEL_A": {
+      "overall": {
+        "case_count": 120,
+        "positive_count": 110,
+        "negative_count": 10,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.6590909090909091,
+            "denominator": 110
+          },
+          "recall_at_10": {
+            "value": 0.6954545454545454,
+            "denominator": 110
+          },
+          "recall_at_20": {
+            "value": 0.7136363636363636,
+            "denominator": 110
+          },
+          "mrr_at_10": {
+            "value": 0.6352633477633478,
+            "denominator": 110
+          },
+          "ndcg_at_10": {
+            "value": 0.6463137105054733,
+            "denominator": 110
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": 1.0,
+          "denominator": 10
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 10
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 120
+        }
+      },
+      "lexical": {
+        "case_count": 30,
+        "positive_count": 30,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.8333333333333334,
+            "denominator": 30
+          },
+          "recall_at_10": {
+            "value": 0.8666666666666667,
+            "denominator": 30
+          },
+          "recall_at_20": {
+            "value": 0.8666666666666667,
+            "denominator": 30
+          },
+          "mrr_at_10": {
+            "value": 0.7888888888888889,
+            "denominator": 30
+          },
+          "ndcg_at_10": {
+            "value": 0.8072520101084936,
+            "denominator": 30
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "case_count": 40,
+        "positive_count": 40,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.925,
+            "denominator": 40
+          },
+          "recall_at_10": {
+            "value": 0.975,
+            "denominator": 40
+          },
+          "recall_at_20": {
+            "value": 1.0,
+            "denominator": 40
+          },
+          "mrr_at_10": {
+            "value": 0.9063492063492063,
+            "denominator": 40
+          },
+          "ndcg_at_10": {
+            "value": 0.9224055709035057,
+            "denominator": 40
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "case_count": 30,
+        "positive_count": 30,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.06666666666666667,
+            "denominator": 30
+          },
+          "recall_at_10": {
+            "value": 0.06666666666666667,
+            "denominator": 30
+          },
+          "recall_at_20": {
+            "value": 0.1,
+            "denominator": 30
+          },
+          "mrr_at_10": {
+            "value": 0.06666666666666667,
+            "denominator": 30
+          },
+          "ndcg_at_10": {
+            "value": 0.06666666666666667,
+            "denominator": 30
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "case_count": 20,
+        "positive_count": 10,
+        "negative_count": 10,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.85,
+            "denominator": 10
+          },
+          "recall_at_10": {
+            "value": 0.95,
+            "denominator": 10
+          },
+          "recall_at_20": {
+            "value": 0.95,
+            "denominator": 10
+          },
+          "mrr_at_10": {
+            "value": 0.7958333333333333,
+            "denominator": 10
+          },
+          "ndcg_at_10": {
+            "value": 0.7980725016207015,
+            "denominator": 10
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": 1.0,
+          "denominator": 10
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 10
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 20
+        }
+      }
+    },
+    "RRF_HYBRID_MODEL_A": {
+      "overall": {
+        "case_count": 120,
+        "positive_count": 110,
+        "negative_count": 10,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.740909090909091,
+            "denominator": 110
+          },
+          "recall_at_10": {
+            "value": 0.7454545454545455,
+            "denominator": 110
+          },
+          "recall_at_20": {
+            "value": 0.759090909090909,
+            "denominator": 110
+          },
+          "mrr_at_10": {
+            "value": 0.7325757575757575,
+            "denominator": 110
+          },
+          "ndcg_at_10": {
+            "value": 0.7280984943070214,
+            "denominator": 110
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": 1.0,
+          "denominator": 10
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 10
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 120
+        }
+      },
+      "lexical": {
+        "case_count": 30,
+        "positive_count": 30,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "recall_at_10": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "recall_at_20": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "mrr_at_10": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "ndcg_at_10": {
+            "value": 1.0,
+            "denominator": 30
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "case_count": 40,
+        "positive_count": 40,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 1.0,
+            "denominator": 40
+          },
+          "recall_at_10": {
+            "value": 1.0,
+            "denominator": 40
+          },
+          "recall_at_20": {
+            "value": 1.0,
+            "denominator": 40
+          },
+          "mrr_at_10": {
+            "value": 0.9875,
+            "denominator": 40
+          },
+          "ndcg_at_10": {
+            "value": 0.9907732438392864,
+            "denominator": 40
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "case_count": 30,
+        "positive_count": 30,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.1,
+            "denominator": 30
+          },
+          "recall_at_10": {
+            "value": 0.1,
+            "denominator": 30
+          },
+          "recall_at_20": {
+            "value": 0.13333333333333333,
+            "denominator": 30
+          },
+          "mrr_at_10": {
+            "value": 0.075,
+            "denominator": 30
+          },
+          "ndcg_at_10": {
+            "value": 0.08102255193577977,
+            "denominator": 30
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "case_count": 20,
+        "positive_count": 10,
+        "negative_count": 10,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.85,
+            "denominator": 10
+          },
+          "recall_at_10": {
+            "value": 0.9,
+            "denominator": 10
+          },
+          "recall_at_20": {
+            "value": 0.95,
+            "denominator": 10
+          },
+          "mrr_at_10": {
+            "value": 0.8833333333333333,
+            "denominator": 10
+          },
+          "ndcg_at_10": {
+            "value": 0.8029228062127505,
+            "denominator": 10
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": 1.0,
+          "denominator": 10
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 10
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 20
+        }
+      }
+    },
+    "EXACT_DENSE_MODEL_B": {
+      "overall": {
+        "case_count": 120,
+        "positive_count": 110,
+        "negative_count": 10,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.8363636363636363,
+            "denominator": 110
+          },
+          "recall_at_10": {
+            "value": 0.8954545454545455,
+            "denominator": 110
+          },
+          "recall_at_20": {
+            "value": 0.9181818181818182,
+            "denominator": 110
+          },
+          "mrr_at_10": {
+            "value": 0.760021645021645,
+            "denominator": 110
+          },
+          "ndcg_at_10": {
+            "value": 0.7917064455853244,
+            "denominator": 110
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": 1.0,
+          "denominator": 10
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 10
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 120
+        }
+      },
+      "lexical": {
+        "case_count": 30,
+        "positive_count": 30,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.7666666666666667,
+            "denominator": 30
+          },
+          "recall_at_10": {
+            "value": 0.8333333333333334,
+            "denominator": 30
+          },
+          "recall_at_20": {
+            "value": 0.8666666666666667,
+            "denominator": 30
+          },
+          "mrr_at_10": {
+            "value": 0.6372222222222222,
+            "denominator": 30
+          },
+          "ndcg_at_10": {
+            "value": 0.6844175074998333,
+            "denominator": 30
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "case_count": 40,
+        "positive_count": 40,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.95,
+            "denominator": 40
+          },
+          "recall_at_10": {
+            "value": 0.975,
+            "denominator": 40
+          },
+          "recall_at_20": {
+            "value": 0.975,
+            "denominator": 40
+          },
+          "mrr_at_10": {
+            "value": 0.928125,
+            "denominator": 40
+          },
+          "ndcg_at_10": {
+            "value": 0.9394331095982161,
+            "denominator": 40
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "case_count": 30,
+        "positive_count": 30,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.7666666666666667,
+            "denominator": 30
+          },
+          "recall_at_10": {
+            "value": 0.8666666666666667,
+            "denominator": 30
+          },
+          "recall_at_20": {
+            "value": 0.9,
+            "denominator": 30
+          },
+          "mrr_at_10": {
+            "value": 0.6831349206349207,
+            "denominator": 30
+          },
+          "ndcg_at_10": {
+            "value": 0.7268532454080053,
+            "denominator": 30
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "case_count": 20,
+        "positive_count": 10,
+        "negative_count": 10,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.8,
+            "denominator": 10
+          },
+          "recall_at_10": {
+            "value": 0.85,
+            "denominator": 10
+          },
+          "recall_at_20": {
+            "value": 0.9,
+            "denominator": 10
+          },
+          "mrr_at_10": {
+            "value": 0.6866666666666666,
+            "denominator": 10
+          },
+          "ndcg_at_10": {
+            "value": 0.7172262043221884,
+            "denominator": 10
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": 1.0,
+          "denominator": 10
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 10
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 20
+        }
+      }
+    },
+    "RRF_HYBRID_MODEL_B": {
+      "overall": {
+        "case_count": 120,
+        "positive_count": 110,
+        "negative_count": 10,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.8636363636363636,
+            "denominator": 110
+          },
+          "recall_at_10": {
+            "value": 0.9136363636363637,
+            "denominator": 110
+          },
+          "recall_at_20": {
+            "value": 0.9590909090909091,
+            "denominator": 110
+          },
+          "mrr_at_10": {
+            "value": 0.787536075036075,
+            "denominator": 110
+          },
+          "ndcg_at_10": {
+            "value": 0.8150245597097981,
+            "denominator": 110
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": 1.0,
+          "denominator": 10
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 10
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 120
+        }
+      },
+      "lexical": {
+        "case_count": 30,
+        "positive_count": 30,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "recall_at_10": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "recall_at_20": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "mrr_at_10": {
+            "value": 1.0,
+            "denominator": 30
+          },
+          "ndcg_at_10": {
+            "value": 1.0,
+            "denominator": 30
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "case_count": 40,
+        "positive_count": 40,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.975,
+            "denominator": 40
+          },
+          "recall_at_10": {
+            "value": 1.0,
+            "denominator": 40
+          },
+          "recall_at_20": {
+            "value": 1.0,
+            "denominator": 40
+          },
+          "mrr_at_10": {
+            "value": 0.965625,
+            "denominator": 40
+          },
+          "ndcg_at_10": {
+            "value": 0.9736598657589297,
+            "denominator": 40
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "case_count": 30,
+        "positive_count": 30,
+        "negative_count": 0,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.6333333333333333,
+            "denominator": 30
+          },
+          "recall_at_10": {
+            "value": 0.7333333333333333,
+            "denominator": 30
+          },
+          "recall_at_20": {
+            "value": 0.8666666666666667,
+            "denominator": 30
+          },
+          "mrr_at_10": {
+            "value": 0.36124338624338626,
+            "denominator": 30
+          },
+          "ndcg_at_10": {
+            "value": 0.45227262372514204,
+            "denominator": 30
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": null,
+          "denominator": 0
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "case_count": 20,
+        "positive_count": 10,
+        "negative_count": 10,
+        "metrics": {
+          "recall_at_5": {
+            "value": 0.7,
+            "denominator": 10
+          },
+          "recall_at_10": {
+            "value": 0.85,
+            "denominator": 10
+          },
+          "recall_at_20": {
+            "value": 0.95,
+            "denominator": 10
+          },
+          "mrr_at_10": {
+            "value": 0.7166666666666667,
+            "denominator": 10
+          },
+          "ndcg_at_10": {
+            "value": 0.7138128225966351,
+            "denominator": 10
+          }
+        },
+        "negative_nonempty_rate": {
+          "value": 1.0,
+          "denominator": 10
+        },
+        "negative_identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 10
+        },
+        "identity_promotion_error_rate": {
+          "value": 0.0,
+          "denominator": 20
+        }
+      }
+    }
+  },
+  "candidate_counts": {
+    "BM25_ONLY": {
+      "P4-001": 100,
+      "P4-002": 100,
+      "P4-003": 100,
+      "P4-004": 4,
+      "P4-005": 100,
+      "P4-006": 100,
+      "P4-007": 100,
+      "P4-008": 100,
+      "P4-009": 100,
+      "P4-010": 100,
+      "P4-011": 100,
+      "P4-012": 100,
+      "P4-013": 1,
+      "P4-014": 20,
+      "P4-015": 100,
+      "P4-016": 100,
+      "P4-017": 4,
+      "P4-018": 14,
+      "P4-019": 47,
+      "P4-020": 1,
+      "P4-021": 100,
+      "P4-022": 100,
+      "P4-023": 100,
+      "P4-024": 100,
+      "P4-025": 100,
+      "P4-026": 100,
+      "P4-027": 1,
+      "P4-028": 100,
+      "P4-029": 3,
+      "P4-030": 100,
+      "P4-031": 100,
+      "P4-032": 100,
+      "P4-033": 100,
+      "P4-034": 100,
+      "P4-035": 100,
+      "P4-036": 100,
+      "P4-037": 100,
+      "P4-038": 100,
+      "P4-039": 100,
+      "P4-040": 100,
+      "P4-041": 100,
+      "P4-042": 100,
+      "P4-043": 100,
+      "P4-044": 100,
+      "P4-045": 100,
+      "P4-046": 100,
+      "P4-047": 100,
+      "P4-048": 100,
+      "P4-049": 100,
+      "P4-050": 100,
+      "P4-051": 100,
+      "P4-052": 100,
+      "P4-053": 100,
+      "P4-054": 100,
+      "P4-055": 100,
+      "P4-056": 100,
+      "P4-057": 100,
+      "P4-058": 100,
+      "P4-059": 100,
+      "P4-060": 100,
+      "P4-061": 100,
+      "P4-062": 100,
+      "P4-063": 100,
+      "P4-064": 100,
+      "P4-065": 100,
+      "P4-066": 100,
+      "P4-067": 100,
+      "P4-068": 100,
+      "P4-069": 100,
+      "P4-070": 100,
+      "P4-071": 100,
+      "P4-072": 100,
+      "P4-073": 100,
+      "P4-074": 100,
+      "P4-075": 100,
+      "P4-076": 100,
+      "P4-077": 100,
+      "P4-078": 100,
+      "P4-079": 100,
+      "P4-080": 100,
+      "P4-081": 100,
+      "P4-082": 100,
+      "P4-083": 100,
+      "P4-084": 100,
+      "P4-085": 100,
+      "P4-086": 0,
+      "P4-087": 100,
+      "P4-088": 100,
+      "P4-089": 100,
+      "P4-090": 100,
+      "P4-091": 90,
+      "P4-092": 18,
+      "P4-093": 100,
+      "P4-094": 100,
+      "P4-095": 100,
+      "P4-096": 100,
+      "P4-097": 100,
+      "P4-098": 100,
+      "P4-099": 100,
+      "P4-100": 24,
+      "P4-101": 69,
+      "P4-102": 100,
+      "P4-103": 100,
+      "P4-104": 100,
+      "P4-105": 100,
+      "P4-106": 100,
+      "P4-107": 100,
+      "P4-108": 100,
+      "P4-109": 100,
+      "P4-110": 100,
+      "P4-111": 100,
+      "P4-112": 100,
+      "P4-113": 100,
+      "P4-114": 100,
+      "P4-115": 100,
+      "P4-116": 100,
+      "P4-117": 100,
+      "P4-118": 100,
+      "P4-119": 100,
+      "P4-120": 48
+    },
+    "EXACT_DENSE_MODEL_A": {
+      "P4-001": 100,
+      "P4-002": 100,
+      "P4-003": 100,
+      "P4-004": 100,
+      "P4-005": 100,
+      "P4-006": 100,
+      "P4-007": 100,
+      "P4-008": 100,
+      "P4-009": 100,
+      "P4-010": 100,
+      "P4-011": 100,
+      "P4-012": 100,
+      "P4-013": 100,
+      "P4-014": 100,
+      "P4-015": 100,
+      "P4-016": 100,
+      "P4-017": 100,
+      "P4-018": 100,
+      "P4-019": 100,
+      "P4-020": 100,
+      "P4-021": 100,
+      "P4-022": 100,
+      "P4-023": 100,
+      "P4-024": 100,
+      "P4-025": 100,
+      "P4-026": 100,
+      "P4-027": 100,
+      "P4-028": 100,
+      "P4-029": 100,
+      "P4-030": 100,
+      "P4-031": 100,
+      "P4-032": 100,
+      "P4-033": 100,
+      "P4-034": 100,
+      "P4-035": 100,
+      "P4-036": 100,
+      "P4-037": 100,
+      "P4-038": 100,
+      "P4-039": 100,
+      "P4-040": 100,
+      "P4-041": 100,
+      "P4-042": 100,
+      "P4-043": 100,
+      "P4-044": 100,
+      "P4-045": 100,
+      "P4-046": 100,
+      "P4-047": 100,
+      "P4-048": 100,
+      "P4-049": 100,
+      "P4-050": 100,
+      "P4-051": 100,
+      "P4-052": 100,
+      "P4-053": 100,
+      "P4-054": 100,
+      "P4-055": 100,
+      "P4-056": 100,
+      "P4-057": 100,
+      "P4-058": 100,
+      "P4-059": 100,
+      "P4-060": 100,
+      "P4-061": 100,
+      "P4-062": 100,
+      "P4-063": 100,
+      "P4-064": 100,
+      "P4-065": 100,
+      "P4-066": 100,
+      "P4-067": 100,
+      "P4-068": 100,
+      "P4-069": 100,
+      "P4-070": 100,
+      "P4-071": 100,
+      "P4-072": 100,
+      "P4-073": 100,
+      "P4-074": 100,
+      "P4-075": 100,
+      "P4-076": 100,
+      "P4-077": 100,
+      "P4-078": 100,
+      "P4-079": 100,
+      "P4-080": 100,
+      "P4-081": 100,
+      "P4-082": 100,
+      "P4-083": 100,
+      "P4-084": 100,
+      "P4-085": 100,
+      "P4-086": 100,
+      "P4-087": 100,
+      "P4-088": 100,
+      "P4-089": 100,
+      "P4-090": 100,
+      "P4-091": 100,
+      "P4-092": 100,
+      "P4-093": 100,
+      "P4-094": 100,
+      "P4-095": 100,
+      "P4-096": 100,
+      "P4-097": 100,
+      "P4-098": 100,
+      "P4-099": 100,
+      "P4-100": 100,
+      "P4-101": 100,
+      "P4-102": 100,
+      "P4-103": 100,
+      "P4-104": 100,
+      "P4-105": 100,
+      "P4-106": 100,
+      "P4-107": 100,
+      "P4-108": 100,
+      "P4-109": 100,
+      "P4-110": 100,
+      "P4-111": 100,
+      "P4-112": 100,
+      "P4-113": 100,
+      "P4-114": 100,
+      "P4-115": 100,
+      "P4-116": 100,
+      "P4-117": 100,
+      "P4-118": 100,
+      "P4-119": 100,
+      "P4-120": 100
+    },
+    "RRF_HYBRID_MODEL_A": {
+      "P4-001": 197,
+      "P4-002": 188,
+      "P4-003": 177,
+      "P4-004": 103,
+      "P4-005": 179,
+      "P4-006": 196,
+      "P4-007": 193,
+      "P4-008": 195,
+      "P4-009": 197,
+      "P4-010": 195,
+      "P4-011": 194,
+      "P4-012": 195,
+      "P4-013": 100,
+      "P4-014": 112,
+      "P4-015": 195,
+      "P4-016": 183,
+      "P4-017": 103,
+      "P4-018": 110,
+      "P4-019": 140,
+      "P4-020": 100,
+      "P4-021": 183,
+      "P4-022": 193,
+      "P4-023": 179,
+      "P4-024": 194,
+      "P4-025": 197,
+      "P4-026": 181,
+      "P4-027": 100,
+      "P4-028": 184,
+      "P4-029": 101,
+      "P4-030": 192,
+      "P4-031": 187,
+      "P4-032": 198,
+      "P4-033": 185,
+      "P4-034": 178,
+      "P4-035": 193,
+      "P4-036": 197,
+      "P4-037": 188,
+      "P4-038": 189,
+      "P4-039": 199,
+      "P4-040": 197,
+      "P4-041": 192,
+      "P4-042": 188,
+      "P4-043": 188,
+      "P4-044": 189,
+      "P4-045": 185,
+      "P4-046": 198,
+      "P4-047": 188,
+      "P4-048": 194,
+      "P4-049": 188,
+      "P4-050": 194,
+      "P4-051": 151,
+      "P4-052": 198,
+      "P4-053": 198,
+      "P4-054": 198,
+      "P4-055": 191,
+      "P4-056": 197,
+      "P4-057": 191,
+      "P4-058": 194,
+      "P4-059": 192,
+      "P4-060": 196,
+      "P4-061": 196,
+      "P4-062": 196,
+      "P4-063": 187,
+      "P4-064": 193,
+      "P4-065": 194,
+      "P4-066": 197,
+      "P4-067": 167,
+      "P4-068": 196,
+      "P4-069": 197,
+      "P4-070": 176,
+      "P4-071": 199,
+      "P4-072": 200,
+      "P4-073": 200,
+      "P4-074": 186,
+      "P4-075": 200,
+      "P4-076": 198,
+      "P4-077": 200,
+      "P4-078": 200,
+      "P4-079": 200,
+      "P4-080": 188,
+      "P4-081": 200,
+      "P4-082": 198,
+      "P4-083": 200,
+      "P4-084": 199,
+      "P4-085": 200,
+      "P4-086": 100,
+      "P4-087": 194,
+      "P4-088": 196,
+      "P4-089": 190,
+      "P4-090": 195,
+      "P4-091": 189,
+      "P4-092": 115,
+      "P4-093": 199,
+      "P4-094": 196,
+      "P4-095": 194,
+      "P4-096": 198,
+      "P4-097": 194,
+      "P4-098": 194,
+      "P4-099": 191,
+      "P4-100": 124,
+      "P4-101": 165,
+      "P4-102": 187,
+      "P4-103": 198,
+      "P4-104": 177,
+      "P4-105": 183,
+      "P4-106": 178,
+      "P4-107": 172,
+      "P4-108": 187,
+      "P4-109": 190,
+      "P4-110": 198,
+      "P4-111": 200,
+      "P4-112": 200,
+      "P4-113": 196,
+      "P4-114": 195,
+      "P4-115": 200,
+      "P4-116": 200,
+      "P4-117": 200,
+      "P4-118": 198,
+      "P4-119": 199,
+      "P4-120": 148
+    },
+    "EXACT_DENSE_MODEL_B": {
+      "P4-001": 100,
+      "P4-002": 100,
+      "P4-003": 100,
+      "P4-004": 100,
+      "P4-005": 100,
+      "P4-006": 100,
+      "P4-007": 100,
+      "P4-008": 100,
+      "P4-009": 100,
+      "P4-010": 100,
+      "P4-011": 100,
+      "P4-012": 100,
+      "P4-013": 100,
+      "P4-014": 100,
+      "P4-015": 100,
+      "P4-016": 100,
+      "P4-017": 100,
+      "P4-018": 100,
+      "P4-019": 100,
+      "P4-020": 100,
+      "P4-021": 100,
+      "P4-022": 100,
+      "P4-023": 100,
+      "P4-024": 100,
+      "P4-025": 100,
+      "P4-026": 100,
+      "P4-027": 100,
+      "P4-028": 100,
+      "P4-029": 100,
+      "P4-030": 100,
+      "P4-031": 100,
+      "P4-032": 100,
+      "P4-033": 100,
+      "P4-034": 100,
+      "P4-035": 100,
+      "P4-036": 100,
+      "P4-037": 100,
+      "P4-038": 100,
+      "P4-039": 100,
+      "P4-040": 100,
+      "P4-041": 100,
+      "P4-042": 100,
+      "P4-043": 100,
+      "P4-044": 100,
+      "P4-045": 100,
+      "P4-046": 100,
+      "P4-047": 100,
+      "P4-048": 100,
+      "P4-049": 100,
+      "P4-050": 100,
+      "P4-051": 100,
+      "P4-052": 100,
+      "P4-053": 100,
+      "P4-054": 100,
+      "P4-055": 100,
+      "P4-056": 100,
+      "P4-057": 100,
+      "P4-058": 100,
+      "P4-059": 100,
+      "P4-060": 100,
+      "P4-061": 100,
+      "P4-062": 100,
+      "P4-063": 100,
+      "P4-064": 100,
+      "P4-065": 100,
+      "P4-066": 100,
+      "P4-067": 100,
+      "P4-068": 100,
+      "P4-069": 100,
+      "P4-070": 100,
+      "P4-071": 100,
+      "P4-072": 100,
+      "P4-073": 100,
+      "P4-074": 100,
+      "P4-075": 100,
+      "P4-076": 100,
+      "P4-077": 100,
+      "P4-078": 100,
+      "P4-079": 100,
+      "P4-080": 100,
+      "P4-081": 100,
+      "P4-082": 100,
+      "P4-083": 100,
+      "P4-084": 100,
+      "P4-085": 100,
+      "P4-086": 100,
+      "P4-087": 100,
+      "P4-088": 100,
+      "P4-089": 100,
+      "P4-090": 100,
+      "P4-091": 100,
+      "P4-092": 100,
+      "P4-093": 100,
+      "P4-094": 100,
+      "P4-095": 100,
+      "P4-096": 100,
+      "P4-097": 100,
+      "P4-098": 100,
+      "P4-099": 100,
+      "P4-100": 100,
+      "P4-101": 100,
+      "P4-102": 100,
+      "P4-103": 100,
+      "P4-104": 100,
+      "P4-105": 100,
+      "P4-106": 100,
+      "P4-107": 100,
+      "P4-108": 100,
+      "P4-109": 100,
+      "P4-110": 100,
+      "P4-111": 100,
+      "P4-112": 100,
+      "P4-113": 100,
+      "P4-114": 100,
+      "P4-115": 100,
+      "P4-116": 100,
+      "P4-117": 100,
+      "P4-118": 100,
+      "P4-119": 100,
+      "P4-120": 100
+    },
+    "RRF_HYBRID_MODEL_B": {
+      "P4-001": 196,
+      "P4-002": 189,
+      "P4-003": 170,
+      "P4-004": 103,
+      "P4-005": 190,
+      "P4-006": 191,
+      "P4-007": 192,
+      "P4-008": 196,
+      "P4-009": 197,
+      "P4-010": 193,
+      "P4-011": 196,
+      "P4-012": 196,
+      "P4-013": 100,
+      "P4-014": 112,
+      "P4-015": 197,
+      "P4-016": 182,
+      "P4-017": 103,
+      "P4-018": 111,
+      "P4-019": 141,
+      "P4-020": 100,
+      "P4-021": 180,
+      "P4-022": 188,
+      "P4-023": 181,
+      "P4-024": 188,
+      "P4-025": 196,
+      "P4-026": 193,
+      "P4-027": 100,
+      "P4-028": 183,
+      "P4-029": 102,
+      "P4-030": 188,
+      "P4-031": 184,
+      "P4-032": 193,
+      "P4-033": 181,
+      "P4-034": 195,
+      "P4-035": 191,
+      "P4-036": 186,
+      "P4-037": 193,
+      "P4-038": 187,
+      "P4-039": 197,
+      "P4-040": 188,
+      "P4-041": 198,
+      "P4-042": 192,
+      "P4-043": 196,
+      "P4-044": 194,
+      "P4-045": 181,
+      "P4-046": 196,
+      "P4-047": 190,
+      "P4-048": 195,
+      "P4-049": 188,
+      "P4-050": 197,
+      "P4-051": 153,
+      "P4-052": 193,
+      "P4-053": 197,
+      "P4-054": 189,
+      "P4-055": 185,
+      "P4-056": 192,
+      "P4-057": 156,
+      "P4-058": 176,
+      "P4-059": 170,
+      "P4-060": 195,
+      "P4-061": 187,
+      "P4-062": 173,
+      "P4-063": 183,
+      "P4-064": 187,
+      "P4-065": 177,
+      "P4-066": 190,
+      "P4-067": 156,
+      "P4-068": 193,
+      "P4-069": 196,
+      "P4-070": 157,
+      "P4-071": 196,
+      "P4-072": 199,
+      "P4-073": 196,
+      "P4-074": 191,
+      "P4-075": 199,
+      "P4-076": 199,
+      "P4-077": 198,
+      "P4-078": 197,
+      "P4-079": 197,
+      "P4-080": 185,
+      "P4-081": 200,
+      "P4-082": 198,
+      "P4-083": 197,
+      "P4-084": 199,
+      "P4-085": 199,
+      "P4-086": 100,
+      "P4-087": 198,
+      "P4-088": 200,
+      "P4-089": 198,
+      "P4-090": 199,
+      "P4-091": 190,
+      "P4-092": 108,
+      "P4-093": 200,
+      "P4-094": 200,
+      "P4-095": 197,
+      "P4-096": 199,
+      "P4-097": 199,
+      "P4-098": 200,
+      "P4-099": 193,
+      "P4-100": 124,
+      "P4-101": 164,
+      "P4-102": 189,
+      "P4-103": 194,
+      "P4-104": 176,
+      "P4-105": 185,
+      "P4-106": 187,
+      "P4-107": 190,
+      "P4-108": 178,
+      "P4-109": 188,
+      "P4-110": 193,
+      "P4-111": 199,
+      "P4-112": 199,
+      "P4-113": 197,
+      "P4-114": 200,
+      "P4-115": 199,
+      "P4-116": 199,
+      "P4-117": 200,
+      "P4-118": 198,
+      "P4-119": 199,
+      "P4-120": 145
+    }
+  },
+  "paired_vs_bm25": {
+    "EXACT_DENSE_MODEL_A": {
+      "overall": {
+        "recall_at_5": {
+          "mean_delta": -0.05,
+          "denominator": 110
+        },
+        "recall_at_10": {
+          "mean_delta": -0.022727272727272728,
+          "denominator": 110
+        },
+        "recall_at_20": {
+          "mean_delta": -0.00909090909090909,
+          "denominator": 110
+        },
+        "mrr_at_10": {
+          "mean_delta": -0.05724747474747475,
+          "denominator": 110
+        },
+        "ndcg_at_10": {
+          "mean_delta": -0.04985607235827348,
+          "denominator": 110
+        }
+      },
+      "lexical": {
+        "recall_at_5": {
+          "mean_delta": -0.16666666666666666,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "mean_delta": -0.13333333333333333,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "mean_delta": -0.13333333333333333,
+          "denominator": 30
+        },
+        "mrr_at_10": {
+          "mean_delta": -0.2111111111111111,
+          "denominator": 30
+        },
+        "ndcg_at_10": {
+          "mean_delta": -0.19274798989150638,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "recall_at_5": {
+          "mean_delta": -0.025,
+          "denominator": 40
+        },
+        "recall_at_10": {
+          "mean_delta": 0.0,
+          "denominator": 40
+        },
+        "recall_at_20": {
+          "mean_delta": 0.025,
+          "denominator": 40
+        },
+        "mrr_at_10": {
+          "mean_delta": -0.034722222222222224,
+          "denominator": 40
+        },
+        "ndcg_at_10": {
+          "mean_delta": -0.02670100626911403,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "recall_at_5": {
+          "mean_delta": -0.03333333333333333,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "mean_delta": -0.03333333333333333,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "mrr_at_10": {
+          "mean_delta": -0.01111111111111111,
+          "denominator": 30
+        },
+        "ndcg_at_10": {
+          "mean_delta": -0.016666666666666666,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "recall_at_5": {
+          "mean_delta": 0.15,
+          "denominator": 10
+        },
+        "recall_at_10": {
+          "mean_delta": 0.25,
+          "denominator": 10
+        },
+        "recall_at_20": {
+          "mean_delta": 0.2,
+          "denominator": 10
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.17583333333333334,
+          "denominator": 10
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.18663119880996698,
+          "denominator": 10
+        }
+      }
+    },
+    "RRF_HYBRID_MODEL_A": {
+      "overall": {
+        "recall_at_5": {
+          "mean_delta": 0.031818181818181815,
+          "denominator": 110
+        },
+        "recall_at_10": {
+          "mean_delta": 0.02727272727272727,
+          "denominator": 110
+        },
+        "recall_at_20": {
+          "mean_delta": 0.03636363636363636,
+          "denominator": 110
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.04006493506493507,
+          "denominator": 110
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.03192871144327472,
+          "denominator": 110
+        }
+      },
+      "lexical": {
+        "recall_at_5": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "recall_at_5": {
+          "mean_delta": 0.05,
+          "denominator": 40
+        },
+        "recall_at_10": {
+          "mean_delta": 0.025,
+          "denominator": 40
+        },
+        "recall_at_20": {
+          "mean_delta": 0.025,
+          "denominator": 40
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.04642857142857143,
+          "denominator": 40
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.04166666666666667,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "recall_at_5": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "mean_delta": 0.03333333333333333,
+          "denominator": 30
+        },
+        "mrr_at_10": {
+          "mean_delta": -0.002777777777777777,
+          "denominator": 30
+        },
+        "ndcg_at_10": {
+          "mean_delta": -0.0023107813975535648,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "recall_at_5": {
+          "mean_delta": 0.15,
+          "denominator": 10
+        },
+        "recall_at_10": {
+          "mean_delta": 0.2,
+          "denominator": 10
+        },
+        "recall_at_20": {
+          "mean_delta": 0.2,
+          "denominator": 10
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.2633333333333333,
+          "denominator": 10
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.19148150340201595,
+          "denominator": 10
+        }
+      }
+    },
+    "EXACT_DENSE_MODEL_B": {
+      "overall": {
+        "recall_at_5": {
+          "mean_delta": 0.12727272727272726,
+          "denominator": 110
+        },
+        "recall_at_10": {
+          "mean_delta": 0.17727272727272728,
+          "denominator": 110
+        },
+        "recall_at_20": {
+          "mean_delta": 0.19545454545454546,
+          "denominator": 110
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.06751082251082251,
+          "denominator": 110
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.09553666272157775,
+          "denominator": 110
+        }
+      },
+      "lexical": {
+        "recall_at_5": {
+          "mean_delta": -0.23333333333333334,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "mean_delta": -0.16666666666666666,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "mean_delta": -0.13333333333333333,
+          "denominator": 30
+        },
+        "mrr_at_10": {
+          "mean_delta": -0.3627777777777778,
+          "denominator": 30
+        },
+        "ndcg_at_10": {
+          "mean_delta": -0.3155824925001667,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "recall_at_5": {
+          "mean_delta": 0.0,
+          "denominator": 40
+        },
+        "recall_at_10": {
+          "mean_delta": 0.0,
+          "denominator": 40
+        },
+        "recall_at_20": {
+          "mean_delta": 0.0,
+          "denominator": 40
+        },
+        "mrr_at_10": {
+          "mean_delta": -0.01294642857142857,
+          "denominator": 40
+        },
+        "ndcg_at_10": {
+          "mean_delta": -0.009673467574403675,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "recall_at_5": {
+          "mean_delta": 0.6666666666666666,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "mean_delta": 0.7666666666666667,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "mean_delta": 0.8,
+          "denominator": 30
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.6053571428571428,
+          "denominator": 30
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.6435199120746721,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "recall_at_5": {
+          "mean_delta": 0.1,
+          "denominator": 10
+        },
+        "recall_at_10": {
+          "mean_delta": 0.15,
+          "denominator": 10
+        },
+        "recall_at_20": {
+          "mean_delta": 0.15,
+          "denominator": 10
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.06666666666666667,
+          "denominator": 10
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.10578490151145392,
+          "denominator": 10
+        }
+      }
+    },
+    "RRF_HYBRID_MODEL_B": {
+      "overall": {
+        "recall_at_5": {
+          "mean_delta": 0.15454545454545454,
+          "denominator": 110
+        },
+        "recall_at_10": {
+          "mean_delta": 0.19545454545454546,
+          "denominator": 110
+        },
+        "recall_at_20": {
+          "mean_delta": 0.23636363636363636,
+          "denominator": 110
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.09502525252525253,
+          "denominator": 110
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.11885477684605147,
+          "denominator": 110
+        }
+      },
+      "lexical": {
+        "recall_at_5": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.0,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "recall_at_5": {
+          "mean_delta": 0.025,
+          "denominator": 40
+        },
+        "recall_at_10": {
+          "mean_delta": 0.025,
+          "denominator": 40
+        },
+        "recall_at_20": {
+          "mean_delta": 0.025,
+          "denominator": 40
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.02455357142857143,
+          "denominator": 40
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.02455328858630989,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "recall_at_5": {
+          "mean_delta": 0.5333333333333333,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "mean_delta": 0.6333333333333333,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "mean_delta": 0.7666666666666667,
+          "denominator": 30
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.2834656084656085,
+          "denominator": 30
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.3689392903918087,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "recall_at_5": {
+          "mean_delta": 0.0,
+          "denominator": 10
+        },
+        "recall_at_10": {
+          "mean_delta": 0.15,
+          "denominator": 10
+        },
+        "recall_at_20": {
+          "mean_delta": 0.2,
+          "denominator": 10
+        },
+        "mrr_at_10": {
+          "mean_delta": 0.09666666666666666,
+          "denominator": 10
+        },
+        "ndcg_at_10": {
+          "mean_delta": 0.10237151978590063,
+          "denominator": 10
+        }
+      }
+    }
+  },
+  "document_anchor_recall": {
+    "BM25_ONLY": {
+      "overall": {
+        "recall_at_5": {
+          "value": 0.7090909090909091,
+          "denominator": 110
+        },
+        "recall_at_10": {
+          "value": 0.7181818181818181,
+          "denominator": 110
+        },
+        "recall_at_20": {
+          "value": 0.7227272727272728,
+          "denominator": 110
+        }
+      },
+      "lexical": {
+        "recall_at_5": {
+          "value": 1.0,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "value": 1.0,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "value": 1.0,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "recall_at_5": {
+          "value": 0.95,
+          "denominator": 40
+        },
+        "recall_at_10": {
+          "value": 0.975,
+          "denominator": 40
+        },
+        "recall_at_20": {
+          "value": 0.975,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "recall_at_5": {
+          "value": 0.1,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "value": 0.1,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "value": 0.1,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "recall_at_5": {
+          "value": 0.7,
+          "denominator": 10
+        },
+        "recall_at_10": {
+          "value": 0.7,
+          "denominator": 10
+        },
+        "recall_at_20": {
+          "value": 0.75,
+          "denominator": 10
+        }
+      }
+    },
+    "EXACT_DENSE_MODEL_A": {
+      "overall": {
+        "recall_at_5": {
+          "value": 0.6590909090909091,
+          "denominator": 110
+        },
+        "recall_at_10": {
+          "value": 0.6954545454545454,
+          "denominator": 110
+        },
+        "recall_at_20": {
+          "value": 0.7136363636363636,
+          "denominator": 110
+        }
+      },
+      "lexical": {
+        "recall_at_5": {
+          "value": 0.8333333333333334,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "value": 0.8666666666666667,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "value": 0.8666666666666667,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "recall_at_5": {
+          "value": 0.925,
+          "denominator": 40
+        },
+        "recall_at_10": {
+          "value": 0.975,
+          "denominator": 40
+        },
+        "recall_at_20": {
+          "value": 1.0,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "recall_at_5": {
+          "value": 0.06666666666666667,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "value": 0.06666666666666667,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "value": 0.1,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "recall_at_5": {
+          "value": 0.85,
+          "denominator": 10
+        },
+        "recall_at_10": {
+          "value": 0.95,
+          "denominator": 10
+        },
+        "recall_at_20": {
+          "value": 0.95,
+          "denominator": 10
+        }
+      }
+    },
+    "RRF_HYBRID_MODEL_A": {
+      "overall": {
+        "recall_at_5": {
+          "value": 0.740909090909091,
+          "denominator": 110
+        },
+        "recall_at_10": {
+          "value": 0.7454545454545455,
+          "denominator": 110
+        },
+        "recall_at_20": {
+          "value": 0.759090909090909,
+          "denominator": 110
+        }
+      },
+      "lexical": {
+        "recall_at_5": {
+          "value": 1.0,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "value": 1.0,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "value": 1.0,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "recall_at_5": {
+          "value": 1.0,
+          "denominator": 40
+        },
+        "recall_at_10": {
+          "value": 1.0,
+          "denominator": 40
+        },
+        "recall_at_20": {
+          "value": 1.0,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "recall_at_5": {
+          "value": 0.1,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "value": 0.1,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "value": 0.13333333333333333,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "recall_at_5": {
+          "value": 0.85,
+          "denominator": 10
+        },
+        "recall_at_10": {
+          "value": 0.9,
+          "denominator": 10
+        },
+        "recall_at_20": {
+          "value": 0.95,
+          "denominator": 10
+        }
+      }
+    },
+    "EXACT_DENSE_MODEL_B": {
+      "overall": {
+        "recall_at_5": {
+          "value": 0.8363636363636363,
+          "denominator": 110
+        },
+        "recall_at_10": {
+          "value": 0.8954545454545455,
+          "denominator": 110
+        },
+        "recall_at_20": {
+          "value": 0.9181818181818182,
+          "denominator": 110
+        }
+      },
+      "lexical": {
+        "recall_at_5": {
+          "value": 0.7666666666666667,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "value": 0.8333333333333334,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "value": 0.8666666666666667,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "recall_at_5": {
+          "value": 0.95,
+          "denominator": 40
+        },
+        "recall_at_10": {
+          "value": 0.975,
+          "denominator": 40
+        },
+        "recall_at_20": {
+          "value": 0.975,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "recall_at_5": {
+          "value": 0.7666666666666667,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "value": 0.8666666666666667,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "value": 0.9,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "recall_at_5": {
+          "value": 0.8,
+          "denominator": 10
+        },
+        "recall_at_10": {
+          "value": 0.85,
+          "denominator": 10
+        },
+        "recall_at_20": {
+          "value": 0.9,
+          "denominator": 10
+        }
+      }
+    },
+    "RRF_HYBRID_MODEL_B": {
+      "overall": {
+        "recall_at_5": {
+          "value": 0.8636363636363636,
+          "denominator": 110
+        },
+        "recall_at_10": {
+          "value": 0.9136363636363637,
+          "denominator": 110
+        },
+        "recall_at_20": {
+          "value": 0.9590909090909091,
+          "denominator": 110
+        }
+      },
+      "lexical": {
+        "recall_at_5": {
+          "value": 1.0,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "value": 1.0,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "value": 1.0,
+          "denominator": 30
+        }
+      },
+      "semantic": {
+        "recall_at_5": {
+          "value": 0.975,
+          "denominator": 40
+        },
+        "recall_at_10": {
+          "value": 1.0,
+          "denominator": 40
+        },
+        "recall_at_20": {
+          "value": 1.0,
+          "denominator": 40
+        }
+      },
+      "crosslingual": {
+        "recall_at_5": {
+          "value": 0.6333333333333333,
+          "denominator": 30
+        },
+        "recall_at_10": {
+          "value": 0.7333333333333333,
+          "denominator": 30
+        },
+        "recall_at_20": {
+          "value": 0.8666666666666667,
+          "denominator": 30
+        }
+      },
+      "ambiguous_negative": {
+        "recall_at_5": {
+          "value": 0.7,
+          "denominator": 10
+        },
+        "recall_at_10": {
+          "value": 0.85,
+          "denominator": 10
+        },
+        "recall_at_20": {
+          "value": 0.95,
+          "denominator": 10
+        }
+      }
+    }
+  },
+  "document_policy": "BM25 raw documents; dense winning chunks; hybrid provenance of first K entries; pins alone supply no documents",
+  "negative_policy": "empty targets are N/A (null); excluded from relevance means; no promotions created"
+}

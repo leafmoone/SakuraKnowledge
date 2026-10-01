@@ -1,0 +1,40 @@
+{
+  "head": "6ee8234c768a00b7f4a09ab9dbd18632f87792e0",
+  "working_tree": " M docs/STAGE_STATUS.md\n?? reports/P4/continuation-pilot-export-command.json\n?? reports/P4/continuation-pilot-manifest.json\n?? tests/test_p4_lexical_guards.py\n?? tests/test_p4_pilot_lexical.py\n?? tests/test_p4_pilot_score.py\n?? tools/p4_lexical_guards.py\n?? tools/p4_pilot_lexical.py\n?? tools/p4_pilot_score.py\n",
+  "argv": [
+    "python",
+    "tools/p4_chunks.py",
+    "--corpus",
+    "build/p4/continuation-pilot-v1.jsonl",
+    "--corpus-manifest",
+    "reports/P4/continuation-pilot-manifest.json",
+    "--model-config",
+    "configs/p4-chunk-model-a.json",
+    "--tokenizer-json",
+    "model/intfloat--multilingual-e5-small/614241f622f53c4eeff9890bdc4f31cfecc418b3/tokenizer.json",
+    "--tokenizer-sha256",
+    "0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39",
+    "--tokenizers-version",
+    "0.22.2",
+    "--output",
+    "build/p4/continuation-chunks-a-v1"
+  ],
+  "exit": 0,
+  "elapsed_s": 43.5638672999994,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 0,
+    "effective": null,
+    "disabled": true
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJjaHVua19jb3VudCI6IDUyNjY0LCAiZW1wdHlfdG9rZW5fZG9jdW1lbnRfY291bnQiOiAwLCAiY2h1bmtzX3NoYTI1NiI6ICI3MWZlN2NlYTE5OTNjODc1YmE2NTc4ZDFiNTJjODUyZmQ5YTU5YzRmMzk0MzJjNWM4YzZiZWNiMGU3MTRkM2Y5In0NCg==",
+  "stdout_sha256": "8b56006ad2500904ac1bc38413b4f37f7a1c51cebdf417b3055031dbe6d5cf58",
+  "stdout": "{\"chunk_count\": 52664, \"empty_token_document_count\": 0, \"chunks_sha256\": \"71fe7cea1993c875ba6578d1b52c852fd9a59c4f39432c5c8c6becb0e714d3f9\"}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}
