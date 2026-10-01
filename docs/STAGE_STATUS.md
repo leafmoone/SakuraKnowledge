@@ -1,6 +1,15 @@
 # Stage Status (SakuraKnowledge)
 
-## Current P4 — IN_PROGRESS / ANN_V1_FAILED_WAITING_REVIEW
+## Current P4 — IN_PROGRESS / ANN_V1_RETRY1_PASS_WAITING_REVIEW
+
+- Authorized optional telemetry repair: no psutil installed. Real backend
+  preflight PASS, tests53PASS. Old FAIL/config/raw artifacts remain unchanged.
+- Retry1 exit0:16 candidates,12PASS,1920formal/32warmups,zero actual failures
+  or not-run. SelectedM16/Eadd256/ef128,macroRecall10/20/100 .9925/.9916667/.97725,
+  minima .9/.9/.91; pure search p95 4.65615ms. Benchmark-v2/regression PASS.
+- ProcessRSS NOT_AVAILABLE, index memory285778304bytes, acceleration serial.
+  See reports/P4/ANN_V1_RETRY1_REPORT.md. Ready for next gate, not production.
+  Rust NOT_STARTED, FULL attempts0. Stop for review; historical record follows.
 
 - User authorizes ANN V1 from256e2f1: BGE-M3_ONNX_FP32 quality/residentCPU PASS.
   Resident120/120 operation p50 71.96055ms,p95 82.42782ms.
