@@ -1,0 +1,9 @@
+{
+  "export_manifest": "build/p4/bge-onnx-v2/manifest.json",
+  "export_manifest_sha256": "b981d9c2b8f02691a200b9b88da8c778abcbaaaa3d49d0376f88590c89fbbb03",
+  "job": "configs/p4-cpu-native-b-v2.json",
+  "job_sha256": "a8d7774308a0de9864302d00aa856edbad564d3ab72f3b5739d06f1ad3eeb83e",
+  "output": "reports/P4/onnx-cpu-v3-retry1.json",
+  "quality_receipt": "reports/P4/onnx-quality-v3-retry1.json",
+  "quality_receipt_sha256": "a74e3fb5fee45d6849e1e5030900ff00c6dd9378ce2fa1377d378a92af3e3d01"
+}
