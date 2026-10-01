@@ -1,6 +1,6 @@
 # Stage Status (SakuraKnowledge)
 
-## Current P4 — IN_PROGRESS
+## Current P4 — IN_PROGRESS / BLOCKED_ON_CORPUS_COVERAGE
 
 - P1/P2/P3: **CLOSED_AND_MERGED**, per explicit user authorization.
 - P4 base: `269e34eeeac920c29f2d684cfe37c93a95c73057`. Initial fetch verified
@@ -14,6 +14,14 @@
 - Explicit CPU/GPU device selection; CPU remains the required baseline. Configurable
   model identity/contracts, not hard-coded runtime model names. Downloaded models
   live in project `model/` and remain local-only, as do vectors and ONNX artifacts.
+- Mandatory pilot coverage gate is **BLOCKED**: actual trusted FTS projection has
+  1,295,638 documents (Bangumi character221960/person102338/subject690068;
+  Danbooru wiki281272), but zero Moegirl documents and zero trusted local-tag
+  documents. See `reports/P4/trusted-corpus-coverage-audit.json` (exit2, retained
+  FAIL receipt). Stored local-tag document statuses are no_reference601512 and
+  unverified_draft73377; payload claims cannot upgrade them. No embedding run.
+- Retrieval gold is 120-case **DRAFT_PRE_EMBEDDING**, not an accepted freeze;
+  no compliant 50k pilot, selected model, production semantic runtime or ANN pack.
 - FULL semantic build attempts: **0**; FULL semantic pack: **NOT_RUN**. At most one
   attempt after all pilot, Rust, regression, disk, fixed-SHA and snapshot gates pass.
 - P3 external local-only preservation is out of scope: do not read, move, delete or
