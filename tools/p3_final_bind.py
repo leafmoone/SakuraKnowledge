@@ -332,6 +332,8 @@ def gates(head, evidence):
     prerequisites = {}
     for phase in plan['phases']:
         path = 'reports/P3/final-' + phase + '.json'
+        if phase == 'external':
+            path = 'reports/P3/final-external-repair1.json'
         rec = load(path)
         s02_review = phase == 'S02' and rec['status'] == 'FAIL'
         if s02_review:

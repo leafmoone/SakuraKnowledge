@@ -91,7 +91,8 @@ def gates(tmp_path, monkeypatch):
         else:
             rec.update(extra_query_probes=0, source_external_verified=True, gold55_serves=['D', 'E'],
                        G42_gold_count=1, FULL_151_receipt=prerequisites['P2'], FULL_55_receipt=prerequisites['gold'])
-        prerequisites[phase] = put(tmp_path, 'reports/P3/final-' + phase + '.json', rec)
+        stem = phase + ('-repair1' if phase == 'external' else '')
+        prerequisites[phase] = put(tmp_path, 'reports/P3/final-' + stem + '.json', rec)
     raw = put(tmp_path, 'reports/P3/final-raw/empty.raw', b'')
     commands = {'pytest': ['python', '-m', 'pytest', '-q'], 'ruff': ['python', '-m', 'ruff', 'check', '.'],
                 'diff': ['git', 'diff', '--check'],
@@ -127,8 +128,8 @@ def test_all_gates_pass_without_reading_any_database(gates):
     ('final-P2', 'timeouts', 1),
     ('final-gold', 'wrong_resolved', 1),
     ('final-gold', 'retries', 1),
-    ('final-external', 'source_commit', 'c' * 40),
-    ('final-external', 'FULL_55_receipt', {}),
+    ('final-external-repair1', 'source_commit', 'c' * 40),
+    ('final-external-repair1', 'FULL_55_receipt', {}),
     ('final-check-release', 'status', 'FAIL'),
     ('final-F-user-waiver', 'SAKURAPOOL_TRACKED_SOURCE_MODIFIED', 'NO'),
     ('final-F-user-waiver', 'audit_completion', 'COMPLETED'),

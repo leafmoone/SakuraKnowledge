@@ -27,8 +27,8 @@ from p3_final_artifacts import (
     source_git,
     verify_artifacts,
 )
-from p3_final_protection import compare
-from p3_retry1_sidecar_audit import metadata, verify_snapshot
+from p3_final_protection import compare, verify_snapshot
+from p3_retry1_sidecar_audit import metadata
 
 PHASES = ('S02', 'P2', 'gold', 'external')
 PROFILE_SINK = ROOT / 'build/p3-final-S02-profile.json'
@@ -135,6 +135,8 @@ def runplan(artifacts, frozen_gold, frozen_p2, performance, coverage, db):
 
 def require_pass(phase, plan):
     path = REPORTS / ('final-' + phase + '.json')
+    if phase == 'external':
+        path = REPORTS / 'final-external-repair1.json'
     receipt = load(path)
     if phase == 'S02' and receipt['status'] == 'FAIL':
         review_path = REPORTS / 'final-S02-independent-review.json'
@@ -240,10 +242,19 @@ def external(artifacts, plan, cwd):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('phase', choices=PHASES)
+    parser.add_argument('--external-preflight-repair', action='store_true')
     args = parser.parse_args()
+    if args.external_preflight_repair and args.phase != 'external':
+        raise ValueError('only no-query external process-encoding preflight repair is allowed')
     configure_helpers()
-    out, marker = (REPORTS / ('final-' + args.phase + suffix)
-                   for suffix in ('.json', '-start.json'))
+    stem = 'final-' + args.phase + ('-repair1' if args.external_preflight_repair else '')
+    out, marker = (REPORTS / (stem + suffix) for suffix in ('.json', '-start.json'))
+    if args.external_preflight_repair:
+        failed = load(REPORTS / 'final-external.json')
+        if (failed.get('exception', {}).get('type') != 'UnicodeDecodeError' or
+                failed.get('status') != 'FAIL' or 'readonly_gate_before' in failed or
+                'processes' in failed):
+            raise ValueError('original external attempt must have failed in preflight before runtime')
     if out.exists() or marker.exists():
         raise FileExistsError('phase already recorded or reserved; no retry')
     artifacts = load(REPORTS / 'final-artifacts-retry1.json')

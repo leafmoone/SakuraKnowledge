@@ -166,6 +166,40 @@ def recorded(tmp_path, sidecars, full, monkeypatch):
     return receipt, case, plan, stdout, b'', profile_bytes, source
 
 
+@pytest.mark.parametrize('fault', ['none', 'invalid_utf8', 'related_writer', 'nonzero', 'stderr'])
+def test_process_gate_explicit_utf8_retains_bytes_and_rejects_errors(monkeypatch, fault):
+    rows = [{'Name': '程序.exe', 'CommandLine': '无关进程'}]
+    if fault == 'related_writer':
+        rows[0]['CommandLine'] = str(protection.TARGET.parent) + ' writer'
+    data = b'\xc9' if fault == 'invalid_utf8' else json.dumps(rows, ensure_ascii=False).encode()
+    seen, retained = [], []
+
+    class Proc:
+        returncode = 1 if fault == 'nonzero' else 0
+        stdout = data
+        stderr = b'error' if fault == 'stderr' else b''
+
+    def fake_run(argv, **kwargs):
+        seen.append(argv)
+        assert kwargs == {'capture_output': True, 'timeout': 30, 'check': False}
+        return Proc()
+
+    def fake_store(stream, **kwargs):
+        retained.append(stream)
+        return {'bytes': len(stream), 'path': 'synthetic', 'sha256': 'synthetic'}
+
+    monkeypatch.setattr(protection.subprocess, 'run', fake_run)
+    monkeypatch.setattr(protection, 'store', fake_store)
+    if fault == 'none':
+        result = protection.process_observation(protection.TARGET)
+        assert result['exit'] == 0 and result['matched_related_processes'] == []
+    else:
+        with pytest.raises((ValueError, UnicodeDecodeError)):
+            protection.process_observation(protection.TARGET)
+    assert seen[0][3].startswith('[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false;')
+    assert retained == [data, Proc.stderr]
+
+
 def test_review_never_retroactively_passes_protection(recorded):
     before = copy.deepcopy(recorded)
     result = protection.review_s02(*recorded)

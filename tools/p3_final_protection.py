@@ -14,9 +14,10 @@ import time
 from pathlib import Path
 
 import p3_close_validate as helpers
-from p3_evidence import verify
+from p3_evidence import store, verify
 from p3_final_artifacts import REPORTS, ROOT, binding, check_binding, create_new, verify_artifacts
-from p3_retry1_sidecar_audit import TARGET, validate_metadata, verify_snapshot
+from p3_retry1_sidecar_audit import TARGET, validate_metadata
+from p3_retry1_sidecar_audit import verify_snapshot as _verify_snapshot
 
 FULL_BYTES = 21718736896
 FULL_SHA256 = '61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9'
@@ -111,6 +112,33 @@ def _artifacts():
     verify_artifacts(report)
     check_binding(ref)
     return report, ref
+
+
+def process_observation(db):
+    script = ('[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false; '
+              '$ErrorActionPreference="Stop"; Get-CimInstance Win32_Process | '
+              'Select-Object ProcessId,ParentProcessId,Name,CommandLine | ConvertTo-Json -Depth 3')
+    argv = ['powershell.exe', '-NoProfile', '-Command', script]
+    proc = subprocess.run(argv, capture_output=True, timeout=30, check=False)
+    refs = {k: store(getattr(proc, k), root=Path('reports/P3/final-raw')) for k in ('stdout', 'stderr')}
+    if proc.returncode != 0 or proc.stderr:
+        raise ValueError('UTF-8 process inspection failed; BLOCKED')
+    rows = json.loads(proc.stdout.decode('utf-8-sig', errors='strict'))
+    rows = rows if isinstance(rows, list) else [rows]
+    watched = (str(db.parent).lower(), db.parent.as_posix().lower(), 'p3_full_candidate_retry1.py')
+    permitted = ('p3_retry1_sidecar_audit.py', 'record_check.py', 'bash.exe', 'powershell.exe')
+    hits = [row for row in rows if any(w in (row.get('CommandLine') or '').lower() for w in watched)
+            and not any(w in (row.get('CommandLine') or '').lower() for w in permitted)]
+    if hits:
+        raise ValueError('related process still active; cannot establish quiescent gate')
+    return {'command': argv, 'exit': proc.returncode, **refs, 'encoding': 'explicit UTF-8, strict decode',
+            'matched_related_processes': hits,
+            'limitations': ['Command-line inspection is not complete handle enumeration',
+                            'Process silence does not prove no writer; TOCTOU remains']}
+
+
+def verify_snapshot(db, expected):
+    return _verify_snapshot(db, expected, inspect_process=process_observation)
 
 
 def readonly_baseline():
