@@ -1,0 +1,43 @@
+{
+  "schema": "p4-onnx-representation-contract-v3",
+  "inherits": "configs/p4-onnx-representation-v2.json",
+  "export_manifest_sha256": "b981d9c2b8f02691a200b9b88da8c778abcbaaaa3d49d0376f88590c89fbbb03",
+  "export_directory": "build/p4/bge-onnx-v2",
+  "reexport": false,
+  "native_reference_regeneration": false,
+  "queries": 120,
+  "matrix_shape": [52664, 1024],
+  "passage_count": 128,
+  "passage_batch_sizes": [1, 8],
+  "ranking_diagnostics_only": true,
+  "ordered_at": [10, 100],
+  "overlap_at": [10, 20, 100],
+  "common_id_score_error_at": [10, 100],
+  "quality": {
+    "v2_capped_gates": true,
+    "identity_promotion_errors": 0,
+    "regression_reference": "RRF_HYBRID_MODEL_B",
+    "regression_metrics": ["recall_at_10", "mrr_at_10", "ndcg_at_10"],
+    "minimum_delta": -0.01,
+    "subsets": ["overall", "lexical", "semantic", "crosslingual", "ambiguous_negative"],
+    "rounding": false
+  },
+  "output": "reports/P4/onnx-quality-v3.json",
+  "raw_directory": "build/p4/onnx-quality-v3",
+  "performance": {
+    "fresh_process": "diagnostic_only",
+    "resident": "required_later_gate",
+    "rationale": "Persistent SakuraTool amortizes model/session initialization; fresh startup is diagnostic, not the resident operation gate.",
+    "rust_cli": "required_later_gate",
+    "qualified_by_this_run": false
+  },
+  "frozen_sha256": {
+    "configs/p4-onnx-representation-v2.json": "aeae2ef0ec3c2ec81c8d66cb8c711b63eee78097c8790774959addc8ca3694bc",
+    "tools/p4_onnx_agreement.py": "b6ce8d2074e88d6e6783020636d338e928adae5457f47e3b480cbdc796fad29a",
+    "tools/p4_pilot_score.py": "b16651377e9c4e846decc5bb7612b031912491cc5c7de9a40fc0ec4bccb6fc17",
+    "tools/p4_retrieval_metrics.py": "1af82429798e8e9efcf8b6c56ecab13dec0f008cfd4278605117fd553e31a4fe",
+    "tools/p4_exact_pilot.py": "f17c7c4ed335939fd96c1559ee25a9d4ace0e8845ebae02bddf0709f7a247756",
+    "tools/p4_selection_v2.py": "73cbd2c4b647c5af075b1547f6ba80265a5d9fbe81e6f816cd18cb38cba5b362",
+    "reports/P4/continuation-pilot-quality.json": "05c44cfffab21235fd584c1fa289b976179a1b7ae92bfd06875b79c449ee2284"
+  }
+}
