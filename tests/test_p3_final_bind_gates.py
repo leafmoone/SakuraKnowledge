@@ -20,6 +20,7 @@ def put(root, name, value):
 @pytest.fixture
 def gates(tmp_path, monkeypatch):
     monkeypatch.setattr(final, 'ROOT', tmp_path)
+    monkeypatch.setattr(final.final_validate, 'REPORTS', tmp_path / 'reports/P3')
 
     def forbidden(*args, **kwargs):
         pytest.fail('no actual process, SQLite, or whole database read allowed')

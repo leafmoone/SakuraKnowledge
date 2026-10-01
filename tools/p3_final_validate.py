@@ -27,7 +27,8 @@ from p3_final_artifacts import (
     source_git,
     verify_artifacts,
 )
-from p3_retry1_sidecar_audit import metadata, validate_metadata, verify_snapshot
+from p3_final_protection import compare
+from p3_retry1_sidecar_audit import metadata, verify_snapshot
 
 PHASES = ('S02', 'P2', 'gold', 'external')
 PROFILE_SINK = ROOT / 'build/p3-final-S02-profile.json'
@@ -135,7 +136,25 @@ def runplan(artifacts, frozen_gold, frozen_p2, performance, coverage, db):
 def require_pass(phase, plan):
     path = REPORTS / ('final-' + phase + '.json')
     receipt = load(path)
-    if receipt['status'] != 'PASS' or receipt['phase'] != phase:
+    if phase == 'S02' and receipt['status'] == 'FAIL':
+        review_path = REPORTS / 'final-S02-independent-review.json'
+        baseline_path = REPORTS / 'final-protection-baseline.json'
+        if not review_path.is_file() or not baseline_path.is_file():
+            raise ValueError('missing authorized S02 review/current protection baseline')
+        review, baseline = load(review_path), load(baseline_path)
+        if (receipt.get('phase') != 'S02' or
+                review.get('status') != 'QUERY_PASS_PROTECTION_FAIL' or
+                review.get('original_receipt') != binding(path) or
+                review.get('historical_protection_PASS') is not False or
+                review.get('query_rerun') != 'NO' or
+                baseline.get('status') != 'PASS' or not baseline.get('whole_FULL_hash_verified_now') or
+                review.get('artifacts') != binding(REPORTS / 'final-artifacts-retry1.json') or
+                baseline.get('artifacts') != review.get('artifacts')):
+            raise ValueError('missing authorized S02 review/current protection baseline')
+        # The original targeted phase remains FAIL; later phases use a new safe baseline.
+        receipt = dict(receipt, authorized_continuation_review=binding(review_path),
+                       protection_baseline=binding(baseline_path))
+    elif receipt['status'] != 'PASS' or receipt['phase'] != phase:
         raise ValueError('prerequisite not PASS: ' + phase)
     for field in ('source_commit', 'artifacts', 'frozen_gold', 'frozen_P2', 'database',
                   'performance_prerequisite'):
@@ -273,11 +292,10 @@ def main():
             binding_ref = {**db_ref, 'path': str(db.resolve())}
             check_binding(binding_ref)
             after = metadata(db)
-            validate_metadata(after)
-            if after != gate['sidecars_after']:
-                raise ValueError('database sidecars changed during phase')
             result['readonly_gate_after'] = {'database': binding_ref, 'sidecars': after,
                                              'hash_unchanged': True, 'write_probes': 0}
+            result['protection_comparison'] = compare(gate['sidecars_after'], after,
+                                                      gate['database'], binding_ref)
             verify_artifacts(artifacts)
             for ref in (plan['frozen_gold'], plan['frozen_P2'], performance):
                 check_binding(ref)

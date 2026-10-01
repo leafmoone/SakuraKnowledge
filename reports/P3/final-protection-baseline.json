@@ -1,0 +1,117 @@
+{
+  "status": "PASS",
+  "database": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+    "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
+    "bytes": 21718736896
+  },
+  "diagnostics": [],
+  "excluded_invariant_fields": [
+    "-shm.mtime_ns"
+  ],
+  "SHM_content_SHA_strict": true,
+  "kind": "current read-only FULL protection baseline",
+  "started_ns": 1790836735918559900,
+  "finished_ns": 1790836758279082200,
+  "readonly_gate": {
+    "kind": "quiescent read-only sidecar gate",
+    "database": {
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+      "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
+      "bytes": 21718736896
+    },
+    "sidecars_before": {
+      "-wal": {
+        "exists": true,
+        "bytes": 0,
+        "mtime_ns": 1790789111942010400
+      },
+      "-shm": {
+        "exists": true,
+        "bytes": 32768,
+        "mtime_ns": 1790835531990676600,
+        "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "header_copies_equal": true,
+        "version": 3007000,
+        "initialized": 1,
+        "mx_frame": 0
+      },
+      "-journal": {
+        "exists": false
+      }
+    },
+    "sidecars_after": {
+      "-wal": {
+        "exists": true,
+        "bytes": 0,
+        "mtime_ns": 1790789111942010400
+      },
+      "-shm": {
+        "exists": true,
+        "bytes": 32768,
+        "mtime_ns": 1790835531990676600,
+        "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "header_copies_equal": true,
+        "version": 3007000,
+        "initialized": 1,
+        "mx_frame": 0
+      },
+      "-journal": {
+        "exists": false
+      }
+    },
+    "retry1_lock_absent": true,
+    "historical_attempt_lock_untouched": true,
+    "process_observation": {
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-Command",
+        "$ErrorActionPreference=\"Stop\"; Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name,CommandLine | ConvertTo-Json -Depth 3"
+      ],
+      "exit": 0,
+      "matched_related_processes": [],
+      "limitations": [
+        "Command-line inspection is not complete handle enumeration",
+        "Process silence does not prove no writer; TOCTOU remains",
+        "Read-only reader is not classified as writer; active related processes conservatively block"
+      ]
+    },
+    "limitations": [
+      "Whole hash proves bytes only at check time",
+      "Empty WAL alone is not an immutable snapshot proof",
+      "No permissions changed and no exclusive handle acquired"
+    ],
+    "created_ns": 1790836758144797500
+  },
+  "artifacts": {
+    "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\final-artifacts-retry1.json",
+    "bytes": 66491,
+    "sha256": "978f993ed5c0754eb69b4501d815a4eb0bc66a1846245834608e5c07730581b2"
+  },
+  "frozen_inputs": {
+    "gold": {
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\full-retry1-real-gold.json",
+      "bytes": 283128,
+      "sha256": "a27828b021849d5859b4bbf8a508dc0557787c34aa33ebb056974ff97a76f96e"
+    },
+    "P2": {
+      "path": "D:\\SakuraTool\\SakuraKnowledge\\reports\\P3\\full-retry1-P2-frozen-expected.json",
+      "bytes": 337222,
+      "sha256": "36f6462acf5d26faf6ee2a13633ce5128c2829314ba26c5470f204c136bca539"
+    }
+  },
+  "whole_FULL_hash_verified_now": true,
+  "historical_protection_PASS": false,
+  "SQL_queries": 0,
+  "query_rerun": "NO",
+  "write_probes": 0,
+  "process_inspection_status": "existing verify_snapshot process gate passed",
+  "limitations": [
+    "Whole hash proves bytes only at check time",
+    "Empty WAL alone is not an immutable snapshot proof",
+    "No permissions changed and no exclusive handle acquired",
+    "Existing process gate records status, not raw process enumeration bytes",
+    "This baseline is now, not saved metadata from the original S02 after-check"
+  ]
+}

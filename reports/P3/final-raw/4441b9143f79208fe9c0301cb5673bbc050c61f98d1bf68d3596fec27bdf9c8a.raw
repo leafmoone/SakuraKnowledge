@@ -1,0 +1,2 @@
+usage: p3_final_validate.py [-h] {S02,P2,gold,external}
+p3_final_validate.py: error: unrecognized arguments: --phase

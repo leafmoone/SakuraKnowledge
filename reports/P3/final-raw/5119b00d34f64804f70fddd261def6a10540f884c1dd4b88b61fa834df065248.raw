@@ -1,0 +1,34 @@
+I001 [*] Import block is un-sorted or un-formatted
+  --> tools\p3_final_bind.py:13:1
+   |
+11 |   No command recorded in a receipt is ever executed by this helper.
+12 |   """
+13 | / import argparse
+14 | | import base64
+15 | | import hashlib
+16 | | import json
+17 | | import re
+18 | | import subprocess
+19 | | from pathlib import Path
+20 | |
+21 | | import p3_close_validate as helpers
+22 | | import p3_measure_resolver as policy
+23 | | from p3_evidence import save
+24 | | import p3_final_validate as final_validate
+25 | | from p3_final_artifacts import verify_artifacts
+   | |_______________________________________________^
+26 |
+27 |   ROOT = Path(__file__).resolve().parents[1]
+   |
+help: Organize imports
+   |
+21 | import p3_close_validate as helpers
+22 + import p3_final_validate as final_validate
+23 | import p3_measure_resolver as policy
+24 | from p3_evidence import save
+   - import p3_final_validate as final_validate
+25 | from p3_final_artifacts import verify_artifacts
+   |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.

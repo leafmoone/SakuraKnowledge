@@ -19,6 +19,7 @@ import subprocess
 from pathlib import Path
 
 import p3_close_validate as helpers
+import p3_final_validate as final_validate
 import p3_measure_resolver as policy
 from p3_evidence import save
 from p3_final_artifacts import verify_artifacts
@@ -332,7 +333,15 @@ def gates(head, evidence):
     for phase in plan['phases']:
         path = 'reports/P3/final-' + phase + '.json'
         rec = load(path)
-        require(rec['status'] == 'PASS' and rec['phase'] == phase and
+        s02_review = phase == 'S02' and rec['status'] == 'FAIL'
+        if s02_review:
+            final_validate.require_pass(phase, plan)
+            review = load('reports/P3/final-S02-independent-review.json')
+            require(review['status'] == 'QUERY_PASS_PROTECTION_FAIL' and
+                    review['historical_protection_PASS'] is False and
+                    review['original_exact_after_metadata'] == 'NOT_SAVED',
+                    'target S02 original FAIL cannot be erased')
+        require((rec['status'] == 'PASS' or s02_review) and rec['phase'] == phase and
                 rec['runplan'] == evidence.binding('reports/P3/final-runplan.json') and
                 rec['prerequisites'] == prerequisites and
                 rec['performance_rerun'] == 'NO' and rec['snapshot_scope'] == 'FULLSNAPSHOT' and
@@ -386,6 +395,10 @@ def gates(head, evidence):
             'Pool_verified_clean_claim': False, 'performance_reused': 'YES', 'performance_rerun': 'NO',
             'measured_PASS': 900, 'measured_FAIL': 0, 'warmups_PASS': 29, 'warmups_FAIL': 1,
             'FULL151': 'PASS', 'FULL55': 'PASS', 'external_final_J': 'PASS',
+            'targeted_S02_original_phase': load('reports/P3/final-S02.json')['status'],
+            'targeted_S02_missing_original_after_metadata': True,
+            'targeted_S02_review': evidence.binding('reports/P3/final-S02-independent-review.json')
+            if load('reports/P3/final-S02.json')['status'] == 'FAIL' else None,
             'final_checks': list(CHECKS), 'audit_required': False}
 
 

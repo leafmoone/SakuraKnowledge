@@ -365,7 +365,7 @@ def test_failed_child_still_protects_hashes_and_cannot_retry(tmp_path, monkeypat
     monkeypatch.setattr(final, 'static_coverage', lambda *args: {})
     monkeypatch.setattr(final, 'verify_snapshot', lambda *args: (db, {'sidecars_after': {}}))
     monkeypatch.setattr(final, 'metadata', lambda *args: {})
-    monkeypatch.setattr(final, 'validate_metadata', lambda *args: None)
+    monkeypatch.setattr(final, 'compare', lambda *args: {'status': 'PASS', 'diagnostics': []})
 
     def failed_child(*args):
         raise OSError('synthetic child failure')
