@@ -1,0 +1,15 @@
+{
+  "schema": "p4-onnx-quality-v3",
+  "status": "FAIL",
+  "performance_qualified": false,
+  "selection_rerun": false,
+  "reexport": false,
+  "native_reference_regeneration": false,
+  "bm25_queries": 0,
+  "fallback": false,
+  "retries": 0,
+  "queries": [],
+  "passages": [],
+  "ranking": [],
+  "error": "ValueError: commit v3 contract before inference"
+}

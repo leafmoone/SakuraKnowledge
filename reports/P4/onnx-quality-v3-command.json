@@ -1,0 +1,1 @@
+{"command": ["python", "-X", "utf8", "-m", "tools.p4_onnx_quality_v3"], "elapsed_seconds": 0.26864410000416683, "environment": {"PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"}, "exit_code": 1, "schema": "p4-command-receipt-v1", "stderr": "", "stderr_base64": "", "stderr_utf8_valid": true, "stdout": "", "stdout_base64": "", "stdout_utf8_valid": true}

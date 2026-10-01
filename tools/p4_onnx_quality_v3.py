@@ -248,12 +248,14 @@ def execute(receipt):
 
 
 def main(argv=None):
-    argparse.ArgumentParser(description=__doc__).parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', default=OUTPUT)
+    args = parser.parse_args(argv)
     receipt = {'schema': 'p4-onnx-quality-v3', 'status': 'FAIL', 'performance_qualified': False,
                'selection_rerun': False, 'reexport': False, 'native_reference_regeneration': False,
                'bm25_queries': 0, 'fallback': False, 'retries': 0,
                'queries': [], 'passages': [], 'ranking': []}
-    path = exact.local(OUTPUT)
+    path = exact.local(args.output)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open('x', encoding='utf-8') as stream:
         try:
