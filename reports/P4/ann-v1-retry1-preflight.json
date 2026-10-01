@@ -1,0 +1,61 @@
+{
+  "schema": "p4-ann-preflight-v1",
+  "status": "PASS",
+  "usearch": "2.26.2",
+  "synthetic": {
+    "dimension": 4,
+    "metric": "cos",
+    "dtype": "f32",
+    "rows": 8,
+    "queries": 1
+  },
+  "retries": 0,
+  "real_inputs_read": false,
+  "source_sha256_before": {
+    "D:\\SakuraTool\\SakuraKnowledge\\tools\\p4_ann_v1.py": "8ccdfb1b9f73c7d3ffd11de9ba97c42a552be1605a5676d30d2c2fe163249534",
+    "D:\\SakuraTool\\SakuraKnowledge\\tools\\p4_ann_preflight.py": "1bdf1afbbdbeffc91cba0eaffce2c448d6b519c1686015423972d021b9d3e8b7"
+  },
+  "checks": {
+    "add": "PASS",
+    "keys": "PASS",
+    "search": "PASS",
+    "save": "PASS",
+    "load": "PASS"
+  },
+  "index_bytes": 1392,
+  "index_sha256": "6fe2d5a5451ec3d7829172aaeea62821deeabd6bd9568035ba298bbb216ad3ef",
+  "diagnostics": {
+    "memory": {
+      "status": "NOT_AVAILABLE",
+      "reason": "optional telemetry unavailable",
+      "error": "ModuleNotFoundError: No module named 'psutil'"
+    },
+    "index_memory_bytes": {
+      "status": "AVAILABLE",
+      "value": 16818688
+    },
+    "hardware_acceleration": {
+      "status": "AVAILABLE",
+      "value": "serial"
+    }
+  },
+  "loaded_diagnostics": {
+    "memory": {
+      "status": "NOT_AVAILABLE",
+      "reason": "optional telemetry unavailable",
+      "error": "ModuleNotFoundError: No module named 'psutil'"
+    },
+    "index_memory_bytes": {
+      "status": "AVAILABLE",
+      "value": 16860160
+    },
+    "hardware_acceleration": {
+      "status": "AVAILABLE",
+      "value": "serial"
+    }
+  },
+  "source_sha256_after": {
+    "D:\\SakuraTool\\SakuraKnowledge\\tools\\p4_ann_v1.py": "8ccdfb1b9f73c7d3ffd11de9ba97c42a552be1605a5676d30d2c2fe163249534",
+    "D:\\SakuraTool\\SakuraKnowledge\\tools\\p4_ann_preflight.py": "1bdf1afbbdbeffc91cba0eaffce2c448d6b519c1686015423972d021b9d3e8b7"
+  }
+}

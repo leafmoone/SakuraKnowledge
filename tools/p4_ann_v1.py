@@ -1,16 +1,10 @@
-"""Local-only ANN grid; no embedding, exact search, fallback, or retries.
-
-CLI: python -m tools.p4_ann_v1 --config configs/p4-ann-v1.json
-     --config-sha256 HEX
-Contract: {schema: p4-ann-contract-v1, output: reports/P4/ann-v1.json,
-raw_directory: build/p4/ann-v1, inputs: {NAME: {path: PATH, sha256: HEX}}}.
-The six NAME/PATH pairs are fixed in INPUTS. All policy is fixed here.
-"""
+"""Fixed ANN grid; legacy and hash-bound retry1 contracts. No query retries."""
 from __future__ import annotations
 
 import argparse
 import copy
 import importlib.metadata
+import json
 import math
 import platform
 import time
@@ -24,6 +18,11 @@ EntryKey = quality.arithmetic.EntryKey
 CONFIG = 'configs/p4-ann-v1.json'
 RAW = 'build/p4/ann-v1'
 OUTPUT = 'reports/P4/ann-v1.json'
+RETRY_CONFIG = 'configs/p4-ann-v1-retry1.json'
+RETRY_RAW = 'build/p4/ann-v1-retry1'
+RETRY_OUTPUT = 'reports/P4/ann-v1-retry1.json'
+PREFLIGHT = 'reports/P4/ann-v1-retry1-preflight.json'
+RETRY_REASON = 'pre-search optional telemetry dependency failure'
 INPUTS = {
     'vectors': 'build/p4/continuation-dense-b-v1/vectors.npy',
     'mapping': 'build/p4/continuation-dense-b-v1/mapping.sqlite',
@@ -47,16 +46,88 @@ def snapshot(paths):
     return {str(path): exact.sha(path) for path in paths}
 
 
+def save_new(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('x', encoding='utf-8') as stream:
+        json.dump(value, stream, indent=2, allow_nan=False)
+        stream.write('\n')
+
+
+def optional_telemetry(operation):
+    try:
+        value = operation()
+        json.dumps(value, allow_nan=False)
+        return {'status': 'AVAILABLE', 'value': value}
+    except Exception as exc:  # noqa: BLE001 - diagnostics cannot disqualify an index.
+        return {'status': 'NOT_AVAILABLE', 'reason': 'optional telemetry unavailable',
+                'error': f'{type(exc).__name__}: {exc}'}
+
+
+def diagnostics(index):
+    return {'memory': optional_telemetry(exact.rss),
+            'index_memory_bytes': optional_telemetry(lambda: int(index.memory_usage)),
+            'hardware_acceleration': optional_telemetry(lambda: str(index.hardware_acceleration))}
+
+
+def bound_binding(binding, path):
+    exact.require(set(binding) == {'path', 'sha256'} and binding['path'] == path,
+                  f'wrong binding: {path}')
+    exact.bound(exact.local(path), binding['sha256'])
+
+
+def validate_preflight(binding):
+    bound_binding(binding, PREFLIGHT)
+    result = exact.load(exact.local(PREFLIGHT))
+    exact.require(result['schema'] == 'p4-ann-preflight-v1' and result['status'] == 'PASS' and
+                  result['usearch'] == POLICY['usearch'] and result['synthetic'] ==
+                  {'dimension': 4, 'metric': 'cos', 'dtype': 'f32', 'rows': 8, 'queries': 1} and
+                  result['checks'] == {'add': 'PASS', 'keys': 'PASS', 'search': 'PASS',
+                                       'save': 'PASS', 'load': 'PASS'}, 'PASS preflight required')
+    sources = snapshot([exact.local('tools/p4_ann_v1.py'), exact.local('tools/p4_ann_preflight.py')])
+    exact.require(result['source_sha256_before'] == result['source_sha256_after'] == sources,
+                  'preflight harness changed')
+
+
 def validate_contract(config):
-    exact.require(set(config) == {'schema', 'output', 'raw_directory', 'inputs'} and
-                  config['schema'] == 'p4-ann-contract-v1' and config['output'] == OUTPUT and
-                  config['raw_directory'] == RAW, 'unsupported ANN contract')
+    retry = config.get('schema') == 'p4-ann-contract-v1-retry1'
+    fields = {'schema', 'output', 'raw_directory', 'inputs'}
+    if retry:
+        fields |= {'retry_of', 'retry_command', 'retry_reason', 'previous_formal_query_attempts', 'preflight'}
+    exact.require(set(config) == fields and
+                  config['schema'] in ('p4-ann-contract-v1', 'p4-ann-contract-v1-retry1') and
+                  config['output'] == (RETRY_OUTPUT if retry else OUTPUT) and
+                  config['raw_directory'] == (RETRY_RAW if retry else RAW), 'unsupported ANN contract')
     exact.require(set(config['inputs']) == set(INPUTS), 'six input bindings required')
     for name, path in INPUTS.items():
         binding = config['inputs'][name]
         exact.require(set(binding) == {'path', 'sha256'} and binding['path'] == path,
                       f'wrong binding: {name}')
         exact.bound(exact.local(path), binding['sha256'])
+    if retry:
+        bound_binding(config['retry_of'], OUTPUT)
+        bound_binding(config['retry_command'], 'reports/P4/ann-v1-command.json')
+        exact.require(config['retry_reason'] == RETRY_REASON and
+                      type(config['previous_formal_query_attempts']) is int and
+                      config['previous_formal_query_attempts'] == 0, 'invalid retry reason/count')
+        old = exact.load(exact.local(OUTPUT))
+        exact.require(old['schema'] == 'p4-ann-v1' and old['status'] == 'FAIL' and
+                      old.get('selected') is None and len(old['candidates']) == 16 and
+                      len(old['builds']) == 4 and all(b['status'] == 'FAIL' and
+                      'psutil' in b.get('error', '') for b in old['builds']),
+                      'old receipt is not the pre-search telemetry failure')
+        expected = {f'M{m}-Eadd{add}-ef{ef}' for m, add, ef in grid()}
+        exact.require({c['id'] for c in old['candidates']} == expected and
+                      all(c['formal_samples'] == 0 for c in old['candidates']) and
+                      old.get('formal_query_attempts', 0) == 0, 'old searches were attempted')
+        for candidate in old['candidates']:
+            detail = exact.load(exact.local(RAW) / (candidate['id'] + '.json'))
+            exact.require(not detail.get('queries') and not detail.get('warmups'),
+                          'old raw samples were attempted')
+        exact.bound(exact.local(CONFIG), old['config_sha256'])
+        previous = exact.load(exact.local(CONFIG))
+        exact.require(previous['schema'] == 'p4-ann-contract-v1' and
+                      previous['inputs'] == config['inputs'], 'retry inputs changed')
+        validate_preflight(config['preflight'])
 
 
 def load_backend():
@@ -132,7 +203,6 @@ def score_cases(inputs, cases):
 
 
 def quality_result(metrics, baseline):
-    # quality() applies v2 capped gates, all-subset regressions, and dense safety.
     result = quality.quality(metrics, baseline)
     result['metrics'] = {'ANN_DENSE_B': metrics['EXACT_DENSE_MODEL_B'],
                          'ANN_HYBRID_B': metrics['RRF_HYBRID_MODEL_B']}
@@ -154,6 +224,23 @@ def relevance_changes(baseline, actual):
     return rows
 
 
+def counts(candidate, warmups=(), rows=()):
+    for prefix, samples, total in (('formal', rows, 120), ('warmup', warmups, 2)):
+        candidate[prefix + '_samples'] = len(samples)
+        candidate[prefix + '_failures'] = sum(row['status'] != 'PASS' for row in samples)
+        candidate[prefix + '_not_run'] = total - len(samples)
+
+
+def aggregate(receipt):
+    for prefix, total in (('formal', 120), ('warmup', 2)):
+        attempts = sum(c.get(prefix + '_samples', 0) for c in receipt['candidates'])
+        failures = sum(c.get(prefix + '_failures', 0) for c in receipt['candidates'])
+        receipt[prefix + '_query_attempts'] = attempts
+        receipt[prefix + '_query_failures'] = failures
+        receipt[prefix + '_query_not_run'] = len(grid()) * total - attempts
+        receipt[prefix + '_failures'] = failures
+
+
 def measure(index, queries, cases, mapping, clock=time.perf_counter):
     warmups, rows = [], []
     for i in range(2):
@@ -171,15 +258,14 @@ def measure(index, queries, cases, mapping, clock=time.perf_counter):
             elapsed = (clock() - start) * 1000
             exact.require(math.isfinite(elapsed) and elapsed >= 0, 'invalid timing')
             row['search_ms'] = elapsed
-            # All result validation, mapping and dedup are outside the search timer.
+            # Validation, mapping and dedup are outside the search timer.
             row['chunk_keys'] = [int(key) for key in matches.keys]
-            # Nonfinite failures must remain serializable, never abort the remaining grid.
             row['distances'] = [float(d) if math.isfinite(float(d)) else str(float(d))
                                 for d in matches.distances]
             row['hits'] = entry_hits(matches.keys, matches.distances, mapping)
             row['recall'] = recall_rows(row['hits'], case['hits'])
             row['status'] = 'PASS'
-        except Exception as exc:  # noqa: BLE001 - formal failures count; continue once through all queries.
+        except Exception as exc:  # noqa: BLE001 - continue once through all queries.
             row['error'] = f'{type(exc).__name__}: {exc}'
         rows.append(row)
     return warmups, rows
@@ -219,6 +305,26 @@ def prepare(config):
     return inputs, cases, baseline['metrics'], baseline_details
 
 
+def build_index(Index, keys, vectors, path, m, add):
+    index = None
+    build = {'M': m, 'Eadd': add, 'status': 'FAIL'}
+    try:
+        start = time.perf_counter()
+        index = Index(ndim=1024, metric='cos', dtype='f32', connectivity=m,
+                      expansion_add=add, expansion_search=32, multi=False)
+        index.add(keys, vectors, threads=8, copy=True)
+        build['build_seconds'] = time.perf_counter() - start
+        exact.require(len(index) == 52664 and bool(index.contains(keys).all()), 'index keys')
+        exact.require(not path.exists(), 'index overwrite forbidden')
+        index.save(str(path))
+        build.update(index_bytes=path.stat().st_size, index_sha256=exact.sha(path), status='PASS')
+    except Exception as exc:  # noqa: BLE001 - failed build fails its four candidates.
+        build['error'] = f'{type(exc).__name__}: {exc}'
+    if build['status'] == 'PASS':
+        build.update(diagnostics(index))
+    return index, build
+
+
 def execute(config, receipt, raw):
     import numpy as np
 
@@ -239,7 +345,6 @@ def execute(config, receipt, raw):
         exact.require(len(disk) == len(mapping) == 52664, 'mapping rows')
         positions = disk.connection.execute('SELECT min(position), max(position) FROM chunks').fetchone()
         exact.require(positions == (0, 52663), 'mapping row key range')
-        # Validate every row against the frozen corpus before any ANN build.
         corpus = score.Mapping(inputs[1])
         for row in mapping:
             doc = corpus.documents.get(str(row['document_id']))
@@ -249,29 +354,15 @@ def execute(config, receipt, raw):
         keys = np.arange(52664, dtype=np.uint64)
         for m in POLICY['M']:
             for add in POLICY['Eadd']:
-                index = None
-                build = {'M': m, 'Eadd': add, 'status': 'FAIL'}
-                try:
-                    start = time.perf_counter()
-                    index = Index(ndim=1024, metric='cos', dtype='f32', connectivity=m,
-                                  expansion_add=add, expansion_search=32, multi=False)
-                    index.add(keys, vectors, threads=8, copy=True)
-                    build['build_seconds'] = time.perf_counter() - start
-                    exact.require(len(index) == 52664 and bool(index.contains(keys).all()), 'index keys')
-                    path = raw / f'M{m}-Eadd{add}.usearch'
-                    exact.require(not path.exists(), 'index overwrite forbidden')
-                    index.save(str(path))
-                    build.update(status='PASS', index_bytes=path.stat().st_size,
-                                 index_sha256=exact.sha(path), memory=exact.rss(),
-                                 index_memory_bytes=int(index.memory_usage),
-                                 hardware_acceleration=str(index.hardware_acceleration))
-                except Exception as exc:  # noqa: BLE001 - one failed build fails its four candidates.
-                    build['error'] = f'{type(exc).__name__}: {exc}'
+                index, build = build_index(Index, keys, vectors, raw / f'M{m}-Eadd{add}.usearch', m, add)
                 receipt['builds'].append(build)
                 for ef in POLICY['ef']:
                     candidate = {'id': f'M{m}-Eadd{add}-ef{ef}', 'M': m, 'Eadd': add,
                                  'ef': ef, 'status': 'FAIL', 'failures': []}
-                    detail = {'candidate': candidate, 'source': 'ANN; exact schema used only as scorer adapter'}
+                    counts(candidate)
+                    receipt['candidates'].append(candidate)
+                    detail = {'candidate': candidate, 'warmups': [], 'queries': [],
+                              'source': 'ANN; exact schema used only as scorer adapter'}
                     try:
                         exact.require(build['status'] == 'PASS', 'build failed; candidate not retried')
                         candidate['index_bytes'] = build['index_bytes']
@@ -279,8 +370,7 @@ def execute(config, receipt, raw):
                         exact.require(index.expansion_search == ef, 'search expansion mismatch')
                         warmups, rows = measure(index, queries, cases, mapping)
                         detail.update(warmups=warmups, queries=rows)
-                        candidate['formal_failures'] = sum(row['status'] != 'PASS' for row in rows)
-                        candidate['formal_samples'] = len(rows)
+                        counts(candidate, warmups, rows)
                         exact.require(all(row['status'] == 'PASS' for row in warmups + rows), 'search failures')
                         timings = [row['search_ms'] for row in rows]
                         candidate['p50_ms'] = float(np.percentile(timings, 50))
@@ -297,14 +387,12 @@ def execute(config, receipt, raw):
                         candidate['quality'] = gates
                         candidate['failures'].extend(gates['failures'])
                         candidate['status'] = 'FAIL' if candidate['failures'] else 'PASS'
-                    except Exception as exc:  # noqa: BLE001 - retain failed candidates, never rerun.
+                    except Exception as exc:  # noqa: BLE001 - never rerun a candidate.
                         candidate['failures'].append(f'{type(exc).__name__}: {exc}')
-                    candidate.setdefault('formal_samples', 0)
-                    candidate.setdefault('formal_failures', 120)
-                    exact.save(raw / (candidate['id'] + '.json'), detail)
-                    receipt['candidates'].append(candidate)
+                    save_new(raw / (candidate['id'] + '.json'), detail)
                 del index
     finally:
+        aggregate(receipt)
         if disk is not None:
             disk.connection.close()
         for array in (vectors, queries):
@@ -312,47 +400,62 @@ def execute(config, receipt, raw):
                 array._mmap.close()
     receipt['selected'] = choose(receipt['candidates'])
     receipt['failed_candidates'] = sum(row['status'] != 'PASS' for row in receipt['candidates'])
-    receipt['formal_failures'] = sum(row['formal_failures'] for row in receipt['candidates'])
     receipt['status'] = 'PASS' if receipt['selected'] is not None else 'FAIL'
 
 
-def run(config_path, digest):
-    exact.require(config_path == CONFIG, 'fixed ANN config path required')
+def run(config_path, digest, preflight_sha256=None):
+    exact.require(config_path in (CONFIG, RETRY_CONFIG), 'fixed ANN config path required')
     path = exact.local(config_path)
     exact.bound(path, digest)
     config = exact.load(path)
-    exact.require(not exact.local(OUTPUT).exists(), 'summary exists; overwrite forbidden')
-    raw = exact.local(RAW)
+    retry = config_path == RETRY_CONFIG
+    output, raw_name = (RETRY_OUTPUT, RETRY_RAW) if retry else (OUTPUT, RAW)
+    exact.require(config.get('schema') == ('p4-ann-contract-v1-retry1' if retry else 'p4-ann-contract-v1'),
+                  'config path/schema mismatch')
+    exact.require(not exact.local(output).exists(), 'summary exists; overwrite forbidden')
+    raw = exact.local(raw_name)
     raw.mkdir(parents=True, exist_ok=False)
-    receipt = {'schema': 'p4-ann-v1', 'status': 'FAIL', 'policy': POLICY,
+    receipt = {'schema': 'p4-ann-v1-retry1' if retry else 'p4-ann-v1', 'status': 'FAIL', 'policy': POLICY,
                'config_sha256': digest, 'builds': [], 'candidates': [], 'selected': None,
                'performance_scope': 'ANN search only; not end-to-end hybrid qualification',
-               'raw_directory': RAW, 'raw_local_only': True, 'retries': 0,
+               'raw_directory': raw_name, 'raw_local_only': True, 'retries': 0,
                'embedding_rerun': False, 'exact_search_rerun': False}
     before = None
     try:
         validate_contract(config)
+        preflight = config['preflight'] if retry else {'path': PREFLIGHT, 'sha256': preflight_sha256}
+        validate_preflight(preflight)
+        receipt['preflight'] = preflight
+        if retry:
+            receipt.update({k: config[k] for k in ('retry_of', 'retry_command', 'retry_reason',
+                                                  'previous_formal_query_attempts')})
         job = exact.load(exact.local(selection.JOB))
         paths = [path, exact.local(selection.JOB), exact.local(selection.CONFIG),
                  exact.local(selection.SOURCE), *[exact.local(p) for p in INPUTS.values()],
-                 *[exact.local(job[key]) for key in selection.BINDINGS.values()]]
+                 *[exact.local(job[key]) for key in selection.BINDINGS.values()], exact.local(PREFLIGHT),
+                 exact.local('tools/p4_ann_v1.py'), exact.local('tools/p4_ann_preflight.py')]
+        if retry:
+            paths.extend([exact.local(OUTPUT), exact.local('reports/P4/ann-v1-command.json'),
+                          exact.local(CONFIG)])
         before = snapshot(paths)
         receipt['input_sha256_before'] = before
         execute(config, receipt, raw)
     except Exception as exc:  # noqa: BLE001 - persist setup failure, fail closed.
         receipt.update(status='FAIL', error=f'{type(exc).__name__}: {exc}', selected=None)
     finally:
+        aggregate(receipt)
         if before is not None:
             try:
                 after = snapshot(before)
                 receipt['input_sha256_after'] = after
                 exact.require(after == before, 'post-run input hashes changed')
                 validate_contract(config)
+                validate_preflight(preflight)
                 receipt['input_validations'] = {'before': 'PASS', 'after': 'PASS'}
             except Exception as exc:  # noqa: BLE001 - tampering invalidates any selected candidate.
                 receipt.update(status='FAIL', selected=None, post_validation_error=str(exc),
                                input_validations={'before': 'PASS', 'after': 'FAIL'})
-    exact.save(exact.local(OUTPUT), receipt)
+    save_new(exact.local(output), receipt)
     return receipt
 
 
@@ -360,8 +463,9 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', default=CONFIG)
     parser.add_argument('--config-sha256', required=True)
+    parser.add_argument('--preflight-sha256', help='required for legacy contract execution only')
     args = parser.parse_args(argv)
-    return int(run(args.config, args.config_sha256)['status'] != 'PASS')
+    return int(run(args.config, args.config_sha256, args.preflight_sha256)['status'] != 'PASS')
 
 
 if __name__ == '__main__':

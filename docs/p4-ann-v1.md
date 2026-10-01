@@ -49,3 +49,18 @@ verification for review. Rust semantic runtime NOT_STARTED, FULL attempts0.
 Fresh startup diagnostic122/122 timeouts occurred in setup/provenance before
 tokenizer/session/query: FAIL_SETUP_VALIDATION, product cold start NOT_MEASURED.
 Resident CPU120/120 PASS does not change this limitation.
+
+## Authorized harness repair / retry1
+
+Old FAIL receipts/config/raw directory remain immutable. Their1920 default
+formal_failures is PLANNED_BUT_NOT_RUN_DEFAULT_COUNT, not executed failures;
+actual old formal/warmup attempts0. No psutil installation is required.
+Process/peak RSS, index.memory_usage and hardware acceleration are independent
+optional diagnostics returning NOT_AVAILABLE on errors. Build success requires
+add, key/count validation, save, size and hash; telemetry cannot fail it.
+New counts separate attempted, actual failure and not-run for formal/warmups.
+Retry1 contract binds old receipt and command hashes and a real eight-vector
+4D FP32 USearch add/search/save/load preflight. New4 indexes are rebuilt only
+in build/p4/ann-v1-retry1; old indexes never used for official searches.
+Same16-point grid, thresholds, depths and selection; zero query retries.
+Code/contract must be pushed before official retry1 invocation.

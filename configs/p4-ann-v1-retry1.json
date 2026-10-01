@@ -1,0 +1,18 @@
+{
+  "schema": "p4-ann-contract-v1-retry1",
+  "output": "reports/P4/ann-v1-retry1.json",
+  "raw_directory": "build/p4/ann-v1-retry1",
+  "inputs": {
+    "vectors": {"path": "build/p4/continuation-dense-b-v1/vectors.npy", "sha256": "e3a8181933f4ee976a79e28ae978d07d5d6f5ab09b5124f2366953074bcb7261"},
+    "mapping": {"path": "build/p4/continuation-dense-b-v1/mapping.sqlite", "sha256": "8027c11f61ffcfb1a6d7cefbaff65e5ab3a0b2bd3b0c40b82517a4e434b4f2b2"},
+    "queries": {"path": "build/p4/onnx-quality-v3/queries.npy", "sha256": "1c22703d7d0d8f191627554b1f14ac2081d738fe4c6a4d00bfea1532002e3757"},
+    "ranks": {"path": "build/p4/onnx-quality-v3/ranks.json", "sha256": "6daad5b075411f18cb5847e6dd29315cef99a09e694b2048efa7bc3587a14f9e"},
+    "quality_receipt": {"path": "reports/P4/onnx-quality-v3-retry1.json", "sha256": "a74e3fb5fee45d6849e1e5030900ff00c6dd9378ce2fa1377d378a92af3e3d01"},
+    "cpu_receipt": {"path": "reports/P4/onnx-cpu-v3-retry1.json", "sha256": "41da6e1ffab3568e9f94ec5e03c98dca72adabb5bd732c1a1bd7d18907df5264"}
+  },
+  "retry_of": {"path": "reports/P4/ann-v1.json", "sha256": "a52ecd65da6941d568bd416542d3475bd85311420ba8154f2cd57e6557e31f1c"},
+  "retry_command": {"path": "reports/P4/ann-v1-command.json", "sha256": "c34b8d879f11154f097d48a7d39063ee7b410901c90dd2419025906aeb655ba5"},
+  "retry_reason": "pre-search optional telemetry dependency failure",
+  "previous_formal_query_attempts": 0,
+  "preflight": {"path": "reports/P4/ann-v1-retry1-preflight.json", "sha256": "0fe6381d5746f04c550f7883eda38c177f6c961b1a52c71f4781e2eca5eda8bc"}
+}

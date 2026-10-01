@@ -1,4 +1,4 @@
-"""Synthetic policy/adapter tests. Never construct a real USearch index."""
+"""Synthetic ANN policy and execution tests; no USearch import required."""
 from types import SimpleNamespace
 
 import pytest
@@ -179,3 +179,119 @@ def test_backend_version_rejected_before_import(monkeypatch):
     monkeypatch.setattr(ann.importlib.metadata, 'version', lambda name: '0.0.0')
     with pytest.raises(ValueError, match='2.26.2'):
         ann.load_backend()
+
+
+@pytest.mark.parametrize('failure', ['telemetry', 'build', 'ef', 'query'])
+def test_mocked_execute_counts_and_continues_grid(monkeypatch, tmp_path, failure):
+    import numpy as np
+
+    # Shape/provenance setup is mocked: no real vectors, backend, or real grid work.
+    class Matrix:
+        def __init__(self, count):
+            self.shape = (count, 1024)
+            self._mmap = SimpleNamespace(close=lambda: None)
+
+        def __getitem__(self, i):
+            if i >= self.shape[0]:
+                raise IndexError(i)
+            return i
+
+    class Mapping:
+        def __len__(self):
+            return 52664
+
+        def __iter__(self):
+            return iter(())
+
+    class Disk(Mapping):
+        connection = SimpleNamespace(close=lambda: None, execute=lambda sql:
+                                     SimpleNamespace(fetchone=lambda: (0, 52663)))
+
+        def __init__(self, path):
+            pass
+
+        def block(self, start, end):
+            return Mapping()
+
+    searches, additions, ef_settings = [], [], []
+
+    class Index:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+            self.ef = 32
+
+        def __len__(self):
+            return 52664
+
+        def contains(self, keys):
+            return np.ones(len(keys), dtype=bool)
+
+        def add(self, keys, vectors, **kwargs):
+            additions.append(self.kwargs)
+            if failure == 'build':
+                raise RuntimeError('add failed')
+
+        def save(self, path):
+            from pathlib import Path
+            Path(path).write_bytes(b'synthetic')
+
+        @property
+        def expansion_search(self):
+            return self.ef
+
+        @expansion_search.setter
+        def expansion_search(self, value):
+            ef_settings.append(value)
+            if failure == 'ef':
+                raise RuntimeError('ef setter failed')
+            self.ef = value
+
+        def search(self, query, **kwargs):
+            searches.append((query, kwargs))
+            if failure == 'query' and query == 7:
+                raise RuntimeError('query failed')
+            return SimpleNamespace(keys=range(512), distances=[i / 1024 for i in range(512)])
+
+        @property
+        def memory_usage(self):
+            raise RuntimeError('optional property')
+
+        @property
+        def hardware_acceleration(self):
+            raise AttributeError('optional property')
+
+    cases = [{'case_id': str(i), 'hits': hits()} for i in range(120)]
+    monkeypatch.setattr(ann, 'prepare', lambda config: ([None, None], cases, {}, {}))
+    monkeypatch.setattr(ann, 'load_backend', lambda: Index)
+    monkeypatch.setattr(np, 'load', lambda path, **kwargs: Matrix(120 if str(path).endswith('queries.npy') else 52664))
+    monkeypatch.setattr(ann.exact, 'validate_vectors', lambda *args: None)
+    monkeypatch.setattr(ann.exact, 'DiskMapping', Disk)
+    monkeypatch.setattr(ann.score, 'Mapping', lambda value: None)
+    monkeypatch.setattr(ann.exact, 'rss', lambda: (_ for _ in ()).throw(ModuleNotFoundError('psutil')))
+    # Keep real measure/timing/search calls, with only result mapping/scoring mocked.
+    monkeypatch.setattr(ann, 'entry_hits', lambda *args: cases[0]['hits'])
+    monkeypatch.setattr(ann, 'score_cases', lambda *args: ({'metrics': {}}, {}))
+    monkeypatch.setattr(ann, 'quality_result', lambda *args: {'failures': []})
+    monkeypatch.setattr(ann, 'relevance_changes', lambda *args: [])
+    receipt = {'builds': [], 'candidates': []}
+    ann.execute({}, receipt, tmp_path)
+    assert len(additions) == len(receipt['builds']) == 4
+    assert len(receipt['candidates']) == 16
+    assert len(list(tmp_path.glob('*.json'))) == 16
+    if failure in ('build', 'ef'):
+        assert not searches and receipt['status'] == 'FAIL'
+        assert receipt['formal_query_attempts'] == receipt['formal_query_failures'] == 0
+        assert receipt['formal_query_not_run'] == 1920
+        assert receipt['warmup_query_attempts'] == receipt['warmup_query_failures'] == 0
+        assert receipt['warmup_query_not_run'] == 32
+        assert all(c['formal_samples'] == c['formal_failures'] == 0 and c['formal_not_run'] == 120
+                   for c in receipt['candidates'])
+    else:
+        assert len(searches) == 1952 and ef_settings == [32, 64, 128, 256] * 4
+        assert receipt['formal_query_attempts'] == 1920 and receipt['formal_query_not_run'] == 0
+        assert receipt['warmup_query_attempts'] == 32 and receipt['warmup_query_not_run'] == 0
+        assert receipt['formal_query_failures'] == (16 if failure == 'query' else 0)
+        assert receipt['warmup_query_failures'] == 0
+        assert receipt['status'] == ('FAIL' if failure == 'query' else 'PASS')
+        assert all(b['status'] == 'PASS' and b['memory']['status'] == 'NOT_AVAILABLE'
+                   for b in receipt['builds'])
