@@ -1,0 +1,41 @@
+{
+  "head": "740b11b803fac2258e7eeba56dcdaa25785803fd",
+  "working_tree": "?? tests/test_p4_exact_pilot.py\n?? tests/test_p4_lexical_guards.py\n?? tests/test_p4_pilot_lexical.py\n?? tools/p4_exact_pilot.py\n?? tools/p4_lexical_guards.py\n?? tools/p4_pilot_lexical.py\n",
+  "argv": [
+    "python",
+    "tools/p4_corpus.py",
+    "--snapshot",
+    "build/p3-full-authorized-retry1/knowledge.sqlite",
+    "--sha256",
+    "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9",
+    "--size",
+    "21718736896",
+    "export",
+    "--config",
+    "configs/p4-trusted-text-v1.json",
+    "--mandatory",
+    "reports/P4/continuation-pilot-inclusions.json",
+    "--corpus",
+    "build/p4/continuation-pilot-v1.jsonl",
+    "--manifest",
+    "reports/P4/continuation-pilot-manifest.json"
+  ],
+  "exit": 0,
+  "elapsed_s": 225.8678263000038,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 0,
+    "effective": null,
+    "disabled": true
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJzZWxlY3RlZF9jb3VudCI6IDUwMDAwLCAiY29ycHVzX3NoYTI1NiI6ICIxOWY4ZTdiZjE4ZTU1YTVkMTU4N2ExMGZiMGY3NDNkMGNkMGE2NWMxNmExZmNlZmFmOGFhMzkxYTI4YmFiMWZlIn0NCg==",
+  "stdout_sha256": "643a3bfadd7cc95f6cf83bcb33c4c77cc3ccb06907bb0c08885b93d2123d9a70",
+  "stdout": "{\"selected_count\": 50000, \"corpus_sha256\": \"19f8e7bf18e55a5d1587a10fb0f743d0cd0a65c16a1fcefaf8aa391a28bab1fe\"}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}
