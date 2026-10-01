@@ -41,7 +41,8 @@ def main():
                   'created_ns': time.time_ns(), 'CARGO_TARGET_DIR': str(target)})
     started = time.perf_counter()
     proc = subprocess.run(argv, capture_output=True, check=False, env=env, cwd=ROOT)
-    report = {'status': 'PASS' if proc.returncode == 0 else 'FAIL', 'head': artifacts['source_commit'],
+    report = {'status': 'PASS' if proc.returncode == 0 else 'FAIL', 'head': proof['validation_source_commit'],
+              'artifact_source_commit': artifacts['source_commit'],
               'source_git': proof, 'artifacts': binding(path), 'argv': argv, 'exit': proc.returncode,
               'elapsed_s': time.perf_counter()-started, 'retries': 0,
               'stdout': store(proc.stdout, root=Path('reports/P3/final-raw')),

@@ -204,7 +204,7 @@ def test_performance_prerequisite_binds_old_receipt_and_policy_without_executor(
         (tmp_path / 'tools' / name).write_bytes(b'synthetic dependency')
     receipt['verifier_bindings'] = [artifacts.binding(p) for p in
                                     sorted((tmp_path / 'tools').glob('*.py'))]
-    path = tmp_path / 'final-performance-recomputed.json'
+    path = tmp_path / 'final-performance-recomputed-repair1.json'
     artifacts.create_new(path, receipt)
     assert final.performance_prerequisite() == artifacts.binding(path)
     verifier = tmp_path / 'tools/p3_final_recompute.py'

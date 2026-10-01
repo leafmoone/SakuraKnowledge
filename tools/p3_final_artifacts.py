@@ -101,10 +101,22 @@ def source_git(commit, *, allow_evidence=False):
     dirty = outputs[0].decode('utf-8', errors='strict').splitlines()
     if allow_evidence:
         dirty = [line for line in dirty if not line.startswith('?? reports/P3/final-')]
-    if (outputs[1].decode('utf-8', errors='strict').strip() != commit or dirty or
-            outputs[2].strip()):
+    head = outputs[1].decode('utf-8', errors='strict').strip()
+    if head != commit and allow_evidence:
+        # A later verifier-only fix never becomes the artifact's archived source.
+        for argv in (['git', 'merge-base', commit, head],
+                     ['git', 'diff', '--exit-code', commit, head, '--', 'src', 'rust', 'tools/p3_measure_resolver.py']):
+            rec, data = run(argv, env, ROOT)
+            records.append(rec)
+            if rec['exit'] != 0 or (argv[1] == 'merge-base' and data.decode().strip() != commit) or (
+                    argv[1] == 'diff' and data.strip()):
+                raise ValueError('validation source not a runtime/policy-equivalent artifact descendant')
+    elif head != commit:
+        raise ValueError('fixed artifact source must be HEAD')
+    if dirty or outputs[2].strip():
         raise ValueError('fixed HEAD, clean source and unchanged src/rust required')
-    return {'source_commit': commit, 'runtime_baseline': RUNTIME, 'clean_source': True,
+    return {'source_commit': commit, 'validation_source_commit': head,
+            'runtime_baseline': RUNTIME, 'clean_source': True,
             'runtime_src_rust_gitdiff_empty': True, 'processes': records,
             'new_untracked_final_evidence_exempt': allow_evidence}
 

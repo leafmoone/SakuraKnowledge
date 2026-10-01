@@ -1,6 +1,6 @@
 """Final S02 -> P2 -> gold -> external, once only; no performance executor.
 
-Prerequisite final-performance-recomputed.json must attest status PASS,
+Prerequisite final-performance-recomputed-repair1.json must attest status PASS,
 formal_counts (900/900/0), structure_errors [], performance_rerun "NO", and
 byte bindings old_receipt (close-performance.json), policy (the revised
 p3_measure_resolver.py). It is supplied by the separately authorized pure
@@ -58,7 +58,7 @@ def configure_helpers():
 
 
 def performance_prerequisite():
-    path = REPORTS / 'final-performance-recomputed.json'
+    path = REPORTS / 'final-performance-recomputed-repair1.json'
     receipt = load(path)
     if (receipt.get('status') != 'PASS' or receipt.get('performance_rerun') != 'NO' or
             receipt.get('formal_counts') != {'attempted': 900, 'success': 900, 'failed': 0} or

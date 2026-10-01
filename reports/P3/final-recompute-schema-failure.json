@@ -1,0 +1,23 @@
+{
+  "status": "FAIL",
+  "task": "bash_0b07dc2a",
+  "argv": ["python", "tools/p3_final_recompute.py"],
+  "exit": 1,
+  "source_commit": "e19d2278f26c12cba28eaff82a6eed2f0cda62cb",
+  "exception": {"type": "ValueError", "message": "wrong P2 representative"},
+  "location": "p3_final_recompute.py workload(): require(row['op']=='search' and row['mode']=='value')",
+  "frozen_observed_schema": [{"case_id":"S02","op":"search","mode":"budget_limited"},{"case_id":"S18","op":"search","mode":"budget_limited"}],
+  "boundary": "Actual managed tool failure transcribed; full binary stderr/stdout and exact elapsed not locally archived by this invocation, NOT_AVAILABLE. Read-only frozen JSON schema observation, no runtime/SQL/performance rerun.",
+  "new_performance_receipt_created": false,
+  "artifact_retry1": "PASS",
+  "artifact_retry_receipt": "reports/P3/final-artifacts-retry1.json",
+  "performance_rerun": "NO",
+  "original_close_performance_status": "FAIL preserved unchanged",
+  "new_full_S02": "NOT_RUN",
+  "new_FULL151": "NOT_RUN",
+  "new_FULL55": "NOT_RUN",
+  "external": "NOT_RUN",
+  "final_seven_checks": "NOT_RUN",
+  "P3": "NOT_READY",
+  "auto_retry": false
+}

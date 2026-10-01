@@ -52,7 +52,7 @@ def gates(tmp_path, monkeypatch):
     artifact_ref = put(tmp_path, 'reports/P3/final-artifacts-retry1.json', artifacts)
     database = {'path': str(tmp_path / 'database-MUST-NOT-OPEN'), 'bytes': 21718736896, 'sha256': '0' * 64}
     put(tmp_path, 'reports/P3/close-performance.json', {'database': database})
-    perf = put(tmp_path, 'reports/P3/final-performance-recomputed.json', {'status': 'PASS'})
+    perf = put(tmp_path, 'reports/P3/final-performance-recomputed-repair1.json', {'status': 'PASS'})
     monkeypatch.setattr(final, 'performance', lambda evidence: perf)
     monkeypatch.setattr(final, 'protected_refs', lambda: [database])
     protection = {'status': 'PASS', 'source_commit': source, 'whole_binary_hashes_actual': [database],

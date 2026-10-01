@@ -26,8 +26,8 @@ def forbid_runtime(monkeypatch):
     monkeypatch.setattr(verifier, 'save', forbidden)
 
 
-@pytest.fixture
-def proof(tmp_path):
+@pytest.fixture(params=('value', 'budget_limited'))
+def proof(tmp_path, request):
     evidence = verifier.Evidence()
     serial = 0
 
@@ -49,8 +49,8 @@ def proof(tmp_path):
             gold[ident] = {'input': {'id': ident, 'query': ident, 'limit': 20},
                            'oracle_json': raw(encoded(expected[ident]))}
         else:
-            p2[ident] = {'args': {'query': ident, 'topk': 10}, 'op': 'search',
-                         'mode': 'value', 'expected_json': raw(encoded(expected[ident]))}
+            p2[ident] = {'case_id': ident, 'args': {'query': ident, 'topk': 10}, 'op': 'search',
+                         'mode': request.param, 'expected_json': raw(encoded(expected[ident]))}
     requests, values, _ = verifier.workload(gold, p2, evidence)
     responses = [{'case_id': row['id'], 'elapsed_s': (row['round'] + 2) / 100,
                   'value': expected[row['id']]} for row in requests]
@@ -70,17 +70,17 @@ def proof(tmp_path):
     batch['input'] = raw(b'\n'.join(encoded(row) for row in requests) + b'\n')
     records = []
     for mode in verifier.MODES:
-        for index, request in enumerate(requests):
+        for index, sample in enumerate(requests):
             elapsed = responses[index]['elapsed_s'] if mode == verifier.MODES[0] else .1
-            row = {'mode': mode, 'case_id': request['id'], 'round': request['round'],
-                   'warmup': request['warmup'], 'success': not (mode == verifier.MODES[0]
+            row = {'mode': mode, 'case_id': sample['id'], 'round': sample['round'],
+                   'warmup': sample['warmup'], 'success': not (mode == verifier.MODES[0]
                                                              and index == 4),
                    'elapsed_s': elapsed}
             if mode == verifier.MODES[0]:
                 row['process_row'] = index
             else:
-                row['rust'] = process(verifier.commands(binary, database, request), elapsed,
-                                      encoded(expected[request['id']]), 15)
+                row['rust'] = process(verifier.commands(binary, database, sample), elapsed,
+                                      encoded(expected[sample['id']]), 15)
             records.append(row)
     outcome = verifier.policy.evaluate(records, list(verifier.IDS))
     old = {'records': records, 'status': 'FAIL', 'workloads': list(verifier.IDS),
@@ -183,6 +183,46 @@ def test_corrupt_proof_fails_closed(proof, mutation):
         old['status'] = 'PASS'
     with pytest.raises(ValueError):
         evaluate(proof)
+
+
+@pytest.mark.parametrize('fault', ['timeout', 'partial', 'missing', 'wrong_expected'])
+def test_budget_class_never_accepts_actual_formal_failure(proof, fault):
+    old, _, expected, _, _, _, _, raw, _ = proof
+    rec = old['records'][465 + 15 + 13]['rust']  # S02 formal round 0, not a warmup.
+    if fault == 'timeout':
+        rec['exit'] = 2
+        rec['timeout'] = True
+    else:
+        value = copy.deepcopy(expected['S02'])
+        if fault == 'partial':
+            value['status'] = 'BUDGET_LIMITED_PARTIAL'
+        elif fault == 'missing':
+            value = None
+        else:
+            value['payload'][1]['n'] = 999
+        rec['stdout'] = raw(json.dumps(value, ensure_ascii=False).encode())
+    with pytest.raises(ValueError):
+        evaluate(proof)
+
+
+@pytest.mark.parametrize('field,value', [
+    ('mode', 'unknown'), ('mode', 'BUDGET_LIMITED_PARTIAL'),
+    ('op', 'resolve'), ('case_id', 'UNKNOWN'),
+])
+def test_workload_rejects_unknown_class_operation_or_case(proof, field, value):
+    _, requests, expected, evidence, _, _, _, raw, _ = proof
+    gold, p2 = {}, {}
+    for request in requests[:15]:
+        ident = request['id']
+        ref = raw(json.dumps(expected[ident], ensure_ascii=False).encode())
+        if ident.startswith('G'):
+            gold[ident] = {'input': {'query': ident}, 'oracle_json': ref}
+        else:
+            p2[ident] = {'case_id': ident, 'args': {'query': ident}, 'op': 'search',
+                         'mode': 'budget_limited', 'expected_json': ref}
+    p2['S02'][field] = value
+    with pytest.raises(ValueError, match='wrong P2 representative'):
+        verifier.workload(gold, p2, evidence)
 
 
 def test_recursive_references_verified_once_with_each_binding_checked(tmp_path, monkeypatch):

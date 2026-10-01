@@ -17,7 +17,7 @@ from p3_evidence import save, verify
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / 'reports/P3'
 OLD = REPORTS / 'close-performance.json'
-OUT = REPORTS / 'final-performance-recomputed.json'
+OUT = REPORTS / 'final-performance-recomputed-repair1.json'
 POLICY = ROOT / 'tools/p3_measure_resolver.py'
 RUNTIME = '9d7bd507c62f20ca4d41b26ba7df55ae4e6d8102'
 IDS = ('G01', 'G21', 'G36', 'G37', 'G42', 'G43', 'G44', 'G45',
@@ -163,6 +163,14 @@ def frozen_inputs(old, evidence):
     return frozen
 
 
+def complete_value(value):
+    if not isinstance(value, dict) or value.get('status') == 'BUDGET_LIMITED_PARTIAL':
+        return False
+    warnings = value.get('warnings', [])
+    return isinstance(warnings, list) and not any(w in warnings for w in (
+        'response_budget_truncated', 'search_document_scan_limit', 'BUDGET_LIMITED_PARTIAL'))
+
+
 def workload(gold, p2, evidence):
     requests, expected, bindings = [], {}, []
     for ident in IDS:
@@ -171,9 +179,12 @@ def workload(gold, p2, evidence):
         request = (dict(row['input'], id=ident) if ident.startswith('G') else
                    dict(row['args'], id=ident, op='search'))
         if not ident.startswith('G'):
-            require(row['op'] == 'search' and row['mode'] == 'value', 'wrong P2 representative')
+            require(ident in ('S02', 'S18') and row['case_id'] == ident and
+                    row['op'] == 'search' and row['mode'] in ('value', 'budget_limited'),
+                    'wrong P2 representative')
         requests.append(request)
         expected[ident] = decode(evidence.verified(row[key]))
+        require(complete_value(expected[ident]), 'frozen expected is partial or missing')
         bindings.append({'case_id': ident, 'expected_key': key,
                          'reference': evidence.binding(row[key]['path'])})
     return ([dict(row, round=round_, warmup=round_ == -1)
@@ -207,6 +218,8 @@ def process_checks(rec, argv, timeout, evidence, *, batch=False):
             'process exit, timeout, budget or timing differs')
     require(not any(key in rec for key in ('exception', 'decode_error', 'invalid_json')),
             'recorded process error')
+    require(not rec.get('budget_exhausted') and rec.get('status') != 'BUDGET_LIMITED_PARTIAL',
+            'actual partial or budget exhaustion is not formal success')
     require(evidence.verified(rec['stderr']) == b'', 'nonempty process stderr')
     if not batch:
         require(rec['succeeded'] == 1 and rec['other_error'] == 0, 'CLI success counters differ')
@@ -250,14 +263,15 @@ def verify_records(old, requests, expected, evidence, binary, reused, database):
                 else:
                     require(set(response) == {'case_id', 'elapsed_s', 'value'},
                             'unexpected reused response fields/error')
-                success = ('value' in response and same(response['value'], expected[request['id']])
+                success = ('value' in response and complete_value(response['value']) and
+                           same(response['value'], expected[request['id']])
                            and finite_elapsed(response['elapsed_s'], 5))
             else:
                 rec = row['rust']
                 value = decode(process_checks(rec, commands(binary, database, request),
                                               15, evidence))
                 require(same(row['elapsed_s'], rec['elapsed_s']), 'CLI record timing differs')
-                success = prior.usable(rec, value) and same(value, expected[request['id']])
+                success = prior.usable(rec, value) and complete_value(value) and same(value, expected[request['id']])
             require(type(row['success']) is bool and row['success'] == success,
                     'recorded success differs from independent full JSON comparison')
             require(success or (mode_index == 0 and index == 4),

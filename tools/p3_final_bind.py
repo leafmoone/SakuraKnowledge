@@ -104,7 +104,7 @@ def protected_refs():
 
 
 def performance(evidence):
-    path = 'reports/P3/final-performance-recomputed.json'
+    path = 'reports/P3/final-performance-recomputed-repair1.json'
     rec = load(path)
     old = load('reports/P3/close-performance.json')
     for field, expected in (('old_receipt', 'reports/P3/close-performance.json'),
@@ -255,10 +255,11 @@ def boundaries(head):
     return len(old)
 
 
-def check_receipt(name, rec, artifacts, evidence):
+def check_receipt(name, rec, artifacts, evidence, check_source=None):
     source = artifacts['source_commit']
     require(rec['status'] == 'PASS' and type(rec['exit']) is int and rec['exit'] == 0 and
-            rec.get('retries', 0) == 0 and rec.get('head', rec.get('source_commit')) == source,
+            rec.get('retries', 0) == 0 and rec.get('head', rec.get('source_commit')) == (check_source or source) and
+            rec.get('artifact_source_commit', source) == source,
             'final check status/source differs: ' + name)
     require(rec.get('artifacts') in (artifacts, evidence.binding('reports/P3/final-artifacts-retry1.json')),
             'final check artifact binding missing/differs: ' + name)
@@ -365,15 +366,20 @@ def gates(head, evidence):
                     rec['FULL_151_receipt'] == evidence.binding('reports/P3/final-P2.json') and
                     rec['FULL_55_receipt'] == evidence.binding('reports/P3/final-gold.json'), 'external incomplete')
         prerequisites[phase] = evidence.binding(path)
+    check_source = load('reports/P3/final-check-pytest.json')['head']
+    require(git('merge-base', source, check_source).decode().strip() == source,
+            'check source not artifact descendant')
+    require(not git('diff', '--name-only', check_source, head, '--', 'src', 'rust', 'tests', 'tools').strip(),
+            'final validated code changed after seven checks')
     for name in CHECKS:
-        check_receipt(name, load('reports/P3/final-check-' + name + '.json'), artifacts, evidence)
+        check_receipt(name, load('reports/P3/final-check-' + name + '.json'), artifacts, evidence, check_source)
     waiver = load('reports/P3/final-F-user-waiver.json')
     require(waiver['status'] == 'WAIVED_BY_USER' and waiver['audit_completion'] == 'NOT_COMPLETED' and
             waiver['SAKURAPOOL_TRACKED_SOURCE_MODIFIED'] == 'UNVERIFIED' and
             waiver['historical_BUILD_ARTIFACTS_WRITTEN'] == 'YES', 'F waiver misrepresented')
     require(REPORT in tree(head), 'final directed parent report missing')
     return {'historical_reports_unchanged': old_count, 'runtime_artifact_source': source,
-            'PERF_HARNESS_FIX_SHA': policy_commit, 'runtime_baseline': RUNTIME,
+            'PERF_HARNESS_FIX_SHA': policy_commit, 'validation_source': check_source, 'runtime_baseline': RUNTIME,
             'protection_receipt': evidence.binding(PROTECTION), 'performance_receipt': perf,
             'F': 'WAIVED_BY_USER', 'Pool_audit': 'NOT_COMPLETED',
             'SAKURAPOOL_TRACKED_SOURCE_MODIFIED': 'UNVERIFIED', 'historical_BUILD_ARTIFACTS_WRITTEN': 'YES',
