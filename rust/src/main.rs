@@ -40,6 +40,50 @@ fn usage_error(message: &str) -> ExitCode {
     ExitCode::from(2)
 }
 
+#[cfg(feature = "semantic")]
+fn semantic_retrieve(args: &[String]) -> ExitCode {
+    use sakura_knowledge_runtime::semantic::{RetrieveOptions, SemanticEngine};
+    if args.len() < 3 {
+        return usage_error("retrieve requires BASE_DB PACK QUERY");
+    }
+    let mut options = RetrieveOptions::default();
+    let mut i = 3;
+    while i < args.len() {
+        if i + 1 >= args.len() {
+            return usage_error("missing retrieve option value");
+        }
+        match args[i].as_str() {
+            "--limit" => match args[i + 1].parse::<usize>() {
+                Ok(n) => options.limit = n,
+                Err(_) => return usage_error("invalid retrieve limit"),
+            },
+            "--kind" => options.kind = Some(args[i + 1].clone()),
+            "--namespace" => options.namespace = Some(args[i + 1].clone()),
+            _ => return usage_error("unknown retrieve option"),
+        }
+        i += 2;
+    }
+    let result = SemanticEngine::open(&args[0], &args[1])
+        .and_then(|mut engine| engine.retrieve(&args[2], &options));
+    match result {
+        Ok(value) => {
+            let text = value.to_string();
+            if text.len() > 524288 {
+                return usage_error("semantic response exceeds byte budget");
+            }
+            println!("{text}");
+            ExitCode::SUCCESS
+        }
+        Err(error) => {
+            eprintln!(
+                "{}",
+                serde_json::json!({"error":"SemanticError","message":error.to_string()})
+            );
+            ExitCode::from(1)
+        }
+    }
+}
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.is_empty() {
@@ -48,6 +92,10 @@ fn main() -> ExitCode {
     if matches!(args[0].as_str(), "-h" | "--help") {
         println!("{USAGE}");
         return ExitCode::SUCCESS;
+    }
+    #[cfg(feature = "semantic")]
+    if args[0] == "retrieve" {
+        return semantic_retrieve(&args[1..]);
     }
     let cmd = args[0].clone();
     let rest: Vec<String> = args[1..].to_vec();

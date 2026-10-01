@@ -10,6 +10,8 @@ use std::path::Path;
 use std::time::{Duration, Instant};
 mod resolver;
 mod response;
+#[cfg(feature = "semantic")]
+pub mod semantic;
 pub use resolver::TagOptions;
 mod search;
 mod unicode16;

@@ -18,6 +18,11 @@ name = "semantic-dependency-probe"
 path = "src/bin/semantic_dependency_probe.rs"
 required-features = ["semantic"]
 
+[[bin]]
+name = "semantic_pilot"
+path = "src/bin/semantic_pilot.rs"
+required-features = ["semantic"]
+
 [features]
 semantic = ["dep:ort", "dep:tokenizers", "dep:usearch"]
 

@@ -34,7 +34,7 @@ fn runtime_version(dll: &Path) -> Result<String> {
         if module.is_null() {
             return Err(std::io::Error::last_os_error().into());
         }
-        let symbol = GetProcAddress(module, b"OrtGetApiBase\0".as_ptr());
+        let symbol = GetProcAddress(module, c"OrtGetApiBase".as_ptr().cast());
         if symbol.is_null() {
             return Err(std::io::Error::last_os_error().into());
         }
