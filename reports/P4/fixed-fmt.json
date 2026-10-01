@@ -1,0 +1,31 @@
+{
+  "head": "2fb5d248149ebe80861dec8d5a9960240e7719b8",
+  "working_tree": "?? reports/P4/fixed-diff-check.json\n?? reports/P4/fixed-ruff.json\n?? reports/P4/stop-cargo-test.json\n?? reports/P4/stop-clippy.json\n?? reports/P4/stop-diff-check.json\n?? reports/P4/stop-fmt.json\n?? reports/P4/stop-pytest.json\n?? reports/P4/stop-release.json\n?? reports/P4/stop-ruff.json\n?? uv.lock\n",
+  "argv": [
+    "cargo",
+    "fmt",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.3948268000021926,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 300,
+    "effective": 300,
+    "disabled": false
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

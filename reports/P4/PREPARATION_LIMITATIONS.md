@@ -24,6 +24,11 @@ Base: 269e34eeeac920c29f2d684cfe37c93a95c73057.
   not yet proven; it is preserved and not staged or deleted as incidental output.
 - Model API inspection resolves exact revisions but is not completed asset/hash
   freezing. Mutable README fetches were discovery only, not pinned asset evidence.
+- A stop-matrix pytest began at 0ef6992 while a final chunk-contract fix was
+  subsequently made. Retain stop-* as interim evidence, not final fixed-code
+  acceptance. The final matrix uses fixed-* at 2fb5d248149ebe80861dec8d5a9960240e7719b8.
+  A new chunk-path synthetic test initially failed with missing Path import
+  (1 failed/35 passed); corrected, then 36 passed. No model execution involved.
 - No original external P3 preservation bytes are accessed. Any historical expected
   reconstruction must independently match the original byte count and SHA256;
   accepted Rust output alone is not a new independent oracle.

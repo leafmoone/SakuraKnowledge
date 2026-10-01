@@ -1,0 +1,27 @@
+{
+  "head": "0ef6992fb7b949ef259da4839b3f5e410943fc95",
+  "working_tree": "?? configs/p4-model-a-contract.json\n?? configs/p4-model-b-contract.json\n?? reports/P4/model-a-download-command.json\n?? reports/P4/model-a-verify-command.json\n?? reports/P4/model-b-download-command.json\n?? reports/P4/model-b-verify-command.json\n?? reports/P4/model-freeze-summary-command.json\n?? reports/P4/model-freeze-summary.json\n?? reports/P4/model-pinned-docs-command.json\n?? reports/P4/model-reviewed-freeze-command.json\n?? reports/P4/stop-ruff.json\n?? uv.lock\n",
+  "argv": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.05241250000108266,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 300,
+    "effective": 300,
+    "disabled": false
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

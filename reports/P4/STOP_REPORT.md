@@ -30,7 +30,11 @@ semantic runtime or completed P4**. Model/device configuration is specified for
 future CPU/GPU caller selection; it is not evidence of Rust inference support.
 Models are replaceable via matching pinned contracts/packs, not a promise that
 arbitrary incompatible architectures can share vectors. Local assets belong in
-project `model/`, excluded from Git. Production Python and Rust sources remain
+project `model/`, excluded from Git. Both official pinned model downloads and
+local byte verification completed (A 493292828 bytes; B 2293331623 bytes), but no
+weights were deserialized and no embeddings were generated. See
+`model-freeze-summary.json` for actual file inventories, tokenizer hashes,
+revision/contract bindings and license limitations. Production Python and Rust sources remain
 unchanged; no Cargo semantic feature or native dependency was added prematurely.
 
 The 120-case `retrieval-gold.json` remains **DRAFT_PRE_EMBEDDING**. Counts are

@@ -1,0 +1,26 @@
+{
+  "head": "2fb5d248149ebe80861dec8d5a9960240e7719b8",
+  "working_tree": "?? reports/P4/fixed-cargo-test.json\n?? reports/P4/fixed-clippy.json\n?? reports/P4/fixed-diff-check.json\n?? reports/P4/fixed-fmt.json\n?? reports/P4/fixed-release.json\n?? reports/P4/fixed-ruff.json\n?? reports/P4/stop-cargo-test.json\n?? reports/P4/stop-clippy.json\n?? reports/P4/stop-diff-check.json\n?? reports/P4/stop-fmt.json\n?? reports/P4/stop-pytest.json\n?? reports/P4/stop-release.json\n?? reports/P4/stop-ruff.json\n?? uv.lock\n",
+  "argv": [
+    "python",
+    "tools/p4_snapshot_check.py"
+  ],
+  "exit": 0,
+  "elapsed_s": 24.315944000001764,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 0,
+    "effective": null,
+    "disabled": true
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "ew0KICAicGF0aCI6ICJidWlsZC9wMy1mdWxsLWF1dGhvcml6ZWQtcmV0cnkxL2tub3dsZWRnZS5zcWxpdGUiLA0KICAiYnl0ZXMiOiAyMTcxODczNjg5NiwNCiAgInNoYTI1NiI6ICI2MTU2MmYyZTc2ZmE5YTc3YTQ0ZDM0YWRjYzI0ODJmNDRjNGZhNDk1MDM1MmU4NGU0MTBiODg4YjAzNTMxNWQ5IiwNCiAgIm10aW1lX25zIjogMTc5MDc4Njc1MDk1MjE5NDcwMCwNCiAgInNpZGVjYXJzX2JlZm9yZSI6IHsNCiAgICAiLXdhbCI6IHsNCiAgICAgICJleGlzdHMiOiB0cnVlLA0KICAgICAgImJ5dGVzIjogMCwNCiAgICAgICJzaGEyNTYiOiAiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsDQogICAgICAibXRpbWVfbnMiOiAxNzkwNzg5MTExOTQyMDEwNDAwDQogICAgfSwNCiAgICAiLXNobSI6IHsNCiAgICAgICJleGlzdHMiOiB0cnVlLA0KICAgICAgImJ5dGVzIjogMzI3NjgsDQogICAgICAic2hhMjU2IjogImZkNGM5ZmRhOWNkM2Y5YWU3Yzk2MmIwZGRmMzcyMzIyOTRkNTU1ODBlMWFhMTY1YWEwNjEyOWI4NTQ5Mzg5ZWIiLA0KICAgICAgIm10aW1lX25zIjogMTc5MDgzNjkxMDMzNDE1NzEwMA0KICAgIH0sDQogICAgIi1qb3VybmFsIjogew0KICAgICAgImV4aXN0cyI6IGZhbHNlDQogICAgfQ0KICB9LA0KICAic2lkZWNhcnNfYWZ0ZXIiOiB7DQogICAgIi13YWwiOiB7DQogICAgICAiZXhpc3RzIjogdHJ1ZSwNCiAgICAgICJieXRlcyI6IDAsDQogICAgICAic2hhMjU2IjogImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLA0KICAgICAgIm10aW1lX25zIjogMTc5MDc4OTExMTk0MjAxMDQwMA0KICAgIH0sDQogICAgIi1zaG0iOiB7DQogICAgICAiZXhpc3RzIjogdHJ1ZSwNCiAgICAgICJieXRlcyI6IDMyNzY4LA0KICAgICAgInNoYTI1NiI6ICJmZDRjOWZkYTljZDNmOWFlN2M5NjJiMGRkZjM3MjMyMjk0ZDU1NTgwZTFhYTE2NWFhMDYxMjliODU0OTM4OWViIiwNCiAgICAgICJtdGltZV9ucyI6IDE3OTA4MzY5MTAzMzQxNTcxMDANCiAgICB9LA0KICAgICItam91cm5hbCI6IHsNCiAgICAgICJleGlzdHMiOiBmYWxzZQ0KICAgIH0NCiAgfSwNCiAgInN0YXR1cyI6ICJQQVNTIiwNCiAgImRpc2tfZnJlZV9ieXRlcyI6IDQwMzg4ODE2NDg2NCwNCiAgImVsYXBzZWRfc2Vjb25kcyI6IDI0LjIxODgyMTI5OTk5NzIxNywNCiAgInNxbF9vcGVuZWQiOiBmYWxzZSwNCiAgImxpbWl0YXRpb25zIjogWw0KICAgICJNZXRhZGF0YSBjb25zaXN0ZW5jeSBkb2VzIG5vdCBleGNsdWRlIGEgY29uY3VycmVudCB3cml0ZXI7IG9ubHkgb2JzZXJ2ZWQgYnl0ZXMgYXJlIGF0dGVzdGVkLiINCiAgXQ0KfQ0K",
+  "stdout_sha256": "5a32488b1a6dae322e022cd17a4896654efaf27f0767588cb6ce93d5f439c484",
+  "stdout": "{\r\n  \"path\": \"build/p3-full-authorized-retry1/knowledge.sqlite\",\r\n  \"bytes\": 21718736896,\r\n  \"sha256\": \"61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9\",\r\n  \"mtime_ns\": 1790786750952194700,\r\n  \"sidecars_before\": {\r\n    \"-wal\": {\r\n      \"exists\": true,\r\n      \"bytes\": 0,\r\n      \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\r\n      \"mtime_ns\": 1790789111942010400\r\n    },\r\n    \"-shm\": {\r\n      \"exists\": true,\r\n      \"bytes\": 32768,\r\n      \"sha256\": \"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\",\r\n      \"mtime_ns\": 1790836910334157100\r\n    },\r\n    \"-journal\": {\r\n      \"exists\": false\r\n    }\r\n  },\r\n  \"sidecars_after\": {\r\n    \"-wal\": {\r\n      \"exists\": true,\r\n      \"bytes\": 0,\r\n      \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\r\n      \"mtime_ns\": 1790789111942010400\r\n    },\r\n    \"-shm\": {\r\n      \"exists\": true,\r\n      \"bytes\": 32768,\r\n      \"sha256\": \"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\",\r\n      \"mtime_ns\": 1790836910334157100\r\n    },\r\n    \"-journal\": {\r\n      \"exists\": false\r\n    }\r\n  },\r\n  \"status\": \"PASS\",\r\n  \"disk_free_bytes\": 403888164864,\r\n  \"elapsed_seconds\": 24.218821299997217,\r\n  \"sql_opened\": false,\r\n  \"limitations\": [\r\n    \"Metadata consistency does not exclude a concurrent writer; only observed bytes are attested.\"\r\n  ]\r\n}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}
