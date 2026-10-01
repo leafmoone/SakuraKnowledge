@@ -62,7 +62,7 @@ def synthetic(tmp_path, monkeypatch):
             'argv': ['cargo', 'build', '--manifest-path', str(directory / 'source/rust/Cargo.toml'),
                      '--locked', '--release', '--example', 'text_probe'],
             'exit': 0, 'environment': copy.deepcopy(art['environment']),
-            'cargo_target_verified': True, 'retries': 0}}
+            'child_cargo_target_explicit': True, 'target_inside_Knowledge_and_archive': True}}
     return art, receipt, artifact_ref
 
 
@@ -175,7 +175,7 @@ def test_target_must_match_verified_artifact_target_without_retries(synthetic, t
     elif change == 'other-inside':
         proc['environment']['CARGO_TARGET_DIR'] = str(Path(art['directory']) / 'other-target')
     elif change == 'unverified':
-        proc['cargo_target_verified'] = False
+        proc['child_cargo_target_explicit'] = False
     else:
         proc['retries'] = 1
     with pytest.raises(ValueError, match='exact compile contract'):

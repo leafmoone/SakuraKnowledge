@@ -33,7 +33,8 @@ def verify_fixture(art, receipt, artifact_ref):
                         '--release', '--example', 'text_probe'] or proc['exit'] != 0 or
             Path(proc['environment']['CARGO_TARGET_DIR']).resolve() !=
             Path(art['environment']['CARGO_TARGET_DIR']).resolve() or
-            not proc.get('cargo_target_verified') or proc.get('retries') != 0 or
+            proc.get('child_cargo_target_explicit') is not True or
+            proc.get('target_inside_Knowledge_and_archive') is not True or proc.get('retries', 0) != 0 or
             Path(receipt['probe']['path']).resolve() != probe.resolve()):
         raise ValueError('fixture exact compile contract differs')
     for ref in (*receipt['before'].values(), *receipt['after'].values(), receipt['probe']):

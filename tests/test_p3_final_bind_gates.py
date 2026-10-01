@@ -74,7 +74,7 @@ def gates(tmp_path, monkeypatch):
             'argv': ['cargo', 'build', '--manifest-path', str(directory / 'source/rust/Cargo.toml'),
                      '--locked', '--release', '--example', 'text_probe'],
             'environment': copy.deepcopy(artifacts['environment']),
-            'exit': 0, 'cargo_target_verified': True, 'retries': 0}})
+            'exit': 0, 'child_cargo_target_explicit': True, 'target_inside_Knowledge_and_archive': True}})
     put(tmp_path, 'reports/P3/final-check-pytest.json', {'status': 'FAIL', 'exit': 1})
     database = {'path': str(tmp_path / 'database-MUST-NOT-OPEN'), 'bytes': 21718736896,
                 'sha256': '0' * 64}
