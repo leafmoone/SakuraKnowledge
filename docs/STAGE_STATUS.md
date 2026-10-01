@@ -1,6 +1,26 @@
 # Stage Status (SakuraKnowledge)
 
-## Current final A-I closure — READY_FOR_REVIEW / WAITING_REVIEW
+## Current P4 — IN_PROGRESS
+
+- P1/P2/P3: **CLOSED_AND_MERGED**, per explicit user authorization.
+- P4 base: `269e34eeeac920c29f2d684cfe37c93a95c73057`. Initial fetch verified
+  origin/main, origin/dev and local dev at this exact SHA with a clean worktree;
+  development switched to dev. Main requires external fixed-SHA approval.
+- P4 scope: independent hybrid retrieval / RAG evidence sidecar; no generative LLM,
+  no production Python API changes, no P3 snapshot mutation or rebuild.
+- Freeze source-anchored retrieval gold and deterministic 50k-document pilot before
+  embedding benchmarks. Compare pinned official multilingual-e5-small and bge-m3;
+  production Rust semantic implementation is gated on meaningful pilot improvement.
+- Explicit CPU/GPU device selection; CPU remains the required baseline. Configurable
+  model identity/contracts, not hard-coded runtime model names. Downloaded models
+  live in project `model/` and remain local-only, as do vectors and ONNX artifacts.
+- FULL semantic build attempts: **0**; FULL semantic pack: **NOT_RUN**. At most one
+  attempt after all pilot, Rust, regression, disk, fixed-SHA and snapshot gates pass.
+- P3 external local-only preservation is out of scope: do not read, move, delete or
+  commit it. Historical reports below are retained, not rewritten as new passes.
+- No SakuraPool modifications or SakuraTool integration authorized for P4.
+
+## Historical final A-I closure — subsequently APPROVED and merged
 
 - Final readiness proposal under the explicitly authorized formal-only performance
   policy; **not self-approval**. See `reports/P3/FINAL_DIRECTED_REPORT.md` and adjacent

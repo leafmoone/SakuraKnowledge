@@ -10,3 +10,6 @@ dist/
 MEMORY.md
 # P3 source bodies retained once locally; committed receipts bind hashes/paths.
 reports/P3/raw/
+# P4 local-only model downloads, conversion artifacts and semantic packs.
+/model/
+/semantic-pack/

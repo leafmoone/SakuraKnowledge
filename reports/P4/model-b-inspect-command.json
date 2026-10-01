@@ -1,0 +1,30 @@
+{
+  "head": "269e34eeeac920c29f2d684cfe37c93a95c73057",
+  "working_tree": " M .gitignore\n M docs/STAGE_STATUS.md\n?? configs/p4-benchmark-v1.json\n?? docs/P4_PLAN.md\n?? docs/p4-benchmark-contract.md\n?? reports/P4/\n?? tests/test_p4_corpus.py\n?? tests/test_p4_model_assets.py\n?? tests/test_p4_retrieval_metrics.py\n?? tests/test_p4_snapshot_check.py\n?? tools/p4_corpus.py\n?? tools/p4_freeze_gold.py\n?? tools/p4_model_assets.py\n?? tools/p4_retrieval_metrics.py\n?? tools/p4_snapshot_check.py\n?? uv.lock\n",
+  "argv": [
+    "python",
+    "tools/p4_model_assets.py",
+    "inspect",
+    "BAAI/bge-m3",
+    "--output",
+    "model/p4-model-b-metadata.json"
+  ],
+  "exit": 0,
+  "elapsed_s": 2.207301299997198,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 120,
+    "effective": 120,
+    "disabled": false
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout": "",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

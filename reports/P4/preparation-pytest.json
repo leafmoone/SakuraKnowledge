@@ -1,0 +1,28 @@
+{
+  "head": "269e34eeeac920c29f2d684cfe37c93a95c73057",
+  "working_tree": " M .gitignore\n M docs/STAGE_STATUS.md\n?? docs/P4_PLAN.md\n?? docs/p4-benchmark-contract.md\n?? reports/P4/\n?? tests/test_p4_corpus.py\n?? tests/test_p4_model_assets.py\n?? tests/test_p4_retrieval_metrics.py\n?? tests/test_p4_snapshot_check.py\n?? tools/p4_corpus.py\n?? tools/p4_freeze_gold.py\n?? tools/p4_model_assets.py\n?? tools/p4_retrieval_metrics.py\n?? tools/p4_snapshot_check.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "exit": 0,
+  "elapsed_s": 68.59713079999347,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 0,
+    "effective": null,
+    "disabled": true
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "c3Nzc3Nzc3MuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgIDklXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgMTglXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgMjclXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgMzYlXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgNDUlXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgNTUlXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3NzIFsgNjQlXQ0Kc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3MuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uc3Nzc3NzLi5zLi4uLi4uLi4uIFsgNzMlXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4ucy4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgODIlXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi5zc3Nzc3Nzc3Nzc3Nzc3Nzc3NzIFsgOTElXQ0Kc3Nzc3Nzc3Nzc3Nzc3NzLi5zc3Nzc3Nzc3Nzc3MuLi4uLi4uLi4uLnNzc3Nzc3Nzc3Nzc3Nzcy4uLi4uLi4uLiAgICAgICAgIFsxMDAlXQ0KNjU0IHBhc3NlZCwgMTMwIHNraXBwZWQgaW4gNjguMDlzICgwOjAxOjA4KQ0K",
+  "stdout_sha256": "3ff03848d2518df4db12ebbb0015b935d140dbbacd95176701b992b280e484ed",
+  "stdout": "ssssssss................................................................ [  9%]\r\n........................................................................ [ 18%]\r\n........................................................................ [ 27%]\r\n........................................................................ [ 36%]\r\n........................................................................ [ 45%]\r\n........................................................................ [ 55%]\r\n................................................ssssssssssssssssssssssss [ 64%]\r\nsssssssssssssssssssssssssssss.........................ssssss..s......... [ 73%]\r\n........................s............................................... [ 82%]\r\n.....................................................sssssssssssssssssss [ 91%]\r\nsssssssssssssss..ssssssssssss...........sssssssssssssss.........         [100%]\r\n654 passed, 130 skipped in 68.09s (0:01:08)\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}
