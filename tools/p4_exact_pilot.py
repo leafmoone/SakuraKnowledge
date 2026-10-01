@@ -155,26 +155,38 @@ def checked_tokens(raw, wrapper, texts, prefix, maximum):
     return encoded, counts
 
 
+def frozen_tokenizers(directory):
+    """Load a previously verified local tokenizer without model-specific rebuilding."""
+    import tokenizers
+    from transformers import PreTrainedTokenizerFast
+
+    raw = tokenizers.Tokenizer.from_file(str(directory / 'tokenizer.json'))
+    raw.no_truncation()
+    raw.no_padding()
+    wrapper = PreTrainedTokenizerFast.from_pretrained(
+        str(directory), local_files_only=True, trust_remote_code=False)
+    require(wrapper.is_fast, 'fast tokenizer required')
+    wrapper.backend_tokenizer.no_truncation()
+    wrapper.backend_tokenizer.no_padding()
+    require(json.loads(raw.to_str()) ==
+            json.loads(wrapper.backend_tokenizer.to_str()),
+            'frozen tokenizer backend mismatch')
+    return raw, wrapper
+
+
 class LocalEncoder:
     def __init__(self, model, contract, device, threads):
         import tokenizers
         import torch
         import transformers
-        from transformers import AutoModel, AutoTokenizer
+        from transformers import AutoModel
         require(device in ('cpu', 'cuda'), 'unsupported device')
         require(device != 'cuda' or torch.cuda.is_available(), 'requested CUDA unavailable')
         torch.set_num_threads(threads)
         torch.set_num_interop_threads(threads)
         self.torch, self.contract, self.device = torch, contract, device
         directory = local(model['asset_directory'])
-        self.raw = tokenizers.Tokenizer.from_file(str(directory / 'tokenizer.json'))
-        self.raw.no_truncation()
-        self.raw.no_padding()
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            str(directory), local_files_only=True, trust_remote_code=False, use_fast=True)
-        require(self.tokenizer.is_fast, 'fast tokenizer required')
-        self.tokenizer.backend_tokenizer.no_truncation()
-        self.tokenizer.backend_tokenizer.no_padding()
+        self.raw, self.tokenizer = frozen_tokenizers(directory)
         for prefix in (contract['passage_prefix'], contract['query_prefix']):
             checked_tokens(self.raw, self.tokenizer, ['hello 日本語', 'prefix: test'],
                            prefix, contract['max_sequence_tokens'])

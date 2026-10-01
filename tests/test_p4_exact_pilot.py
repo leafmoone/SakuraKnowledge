@@ -191,6 +191,79 @@ def test_real_tokenizer_correspondence_no_models():
 
 
 @pytest.fixture
+def frozen_tokenizer_directory(tmp_path):
+    tokenizers = pytest.importorskip('tokenizers')
+    transformers = pytest.importorskip('transformers')
+    raw = tokenizers.Tokenizer(tokenizers.models.WordLevel(
+        {'[UNK]': 0, '[CLS]': 1, '[SEP]': 2, '[PAD]': 3,
+         'hello': 4, 'query:': 5, ' ': 6, 'passage:': 7}, unk_token='[UNK]'))
+    raw.pre_tokenizer = tokenizers.pre_tokenizers.Split(' ', behavior='isolated')
+    raw.post_processor = tokenizers.processors.TemplateProcessing(
+        single='[CLS] $A [SEP]', special_tokens=[('[CLS]', 1), ('[SEP]', 2)])
+    wrapper = transformers.PreTrainedTokenizerFast(
+        tokenizer_object=raw, unk_token='[UNK]', pad_token='[PAD]',
+        bos_token='[CLS]', eos_token='[SEP]',
+        model_input_names=['input_ids', 'attention_mask'])
+    wrapper.save_pretrained(tmp_path)
+    return tmp_path
+
+
+@pytest.mark.parametrize('prefix', ['passage: ', 'query: '])
+def test_frozen_tokenizer_whitespace_specials_and_padding(frozen_tokenizer_directory, prefix):
+    raw, wrapper = pilot.frozen_tokenizers(frozen_tokenizer_directory)
+    assert json.loads(raw.to_str()) == json.loads(wrapper.backend_tokenizer.to_str())
+    assert raw.padding is None and wrapper.backend_tokenizer.padding is None
+    assert raw.truncation is None and wrapper.backend_tokenizer.truncation is None
+    assert raw.encode('hello ', add_special_tokens=False).ids == [4, 6]
+    texts = ['hello ', 'hello  ', 'hello\t', 'hello\n', ' hello',
+             'hello\u00a0', 'hello\u3000', 'hello\thello',
+             '[CLS] hello [SEP] [PAD]', '', '日本語 ']
+    encoded, counts = pilot.checked_tokens(raw, wrapper, texts, prefix, 100)
+    assert set(encoded) == {'input_ids', 'attention_mask'}
+    assert all(ids[0] == 1 and ids[-1] == 2 for ids in encoded['input_ids'])
+    assert encoded['attention_mask'] == [[1] * n for n in counts]
+    padded = wrapper.pad(encoded, padding=True)
+    for ids, mask, original, count in zip(
+            padded['input_ids'], padded['attention_mask'], encoded['input_ids'], counts):
+        assert ids[:count] == original
+        assert ids[count:] == [wrapper.pad_token_id] * (max(counts) - count)
+        assert mask == [1] * count + [0] * (max(counts) - count)
+
+
+def test_frozen_tokenizer_checks_entire_backend(frozen_tokenizer_directory, monkeypatch):
+    import tokenizers
+    import transformers
+
+    original = transformers.PreTrainedTokenizerFast.from_pretrained
+
+    def changed(*args, **kwargs):
+        assert kwargs == {'local_files_only': True, 'trust_remote_code': False}
+        wrapper = original(*args, **kwargs)
+        wrapper.backend_tokenizer.normalizer = tokenizers.normalizers.Lowercase()
+        return wrapper
+
+    monkeypatch.setattr(transformers.PreTrainedTokenizerFast, 'from_pretrained', changed)
+    with pytest.raises(ValueError, match='frozen tokenizer backend mismatch'):
+        pilot.frozen_tokenizers(frozen_tokenizer_directory)
+
+
+def test_frozen_tokenizer_disables_serialized_padding_and_truncation(frozen_tokenizer_directory):
+    import tokenizers
+
+    path = frozen_tokenizer_directory / 'tokenizer.json'
+    raw = tokenizers.Tokenizer.from_file(str(path))
+    raw.enable_padding(length=20, pad_id=3, pad_token='[PAD]')
+    raw.enable_truncation(max_length=4)
+    raw.save(str(path))
+    raw, wrapper = pilot.frozen_tokenizers(frozen_tokenizer_directory)
+    encoded, counts = pilot.checked_tokens(raw, wrapper, ['hello hello'], 'query: ', 7)
+    assert encoded['input_ids'] == [[1, 5, 6, 4, 6, 4, 2]]
+    assert counts == [7]
+    with pytest.raises(ValueError, match='budget exceeded'):
+        pilot.checked_tokens(raw, wrapper, ['hello hello'], 'query: ', 6)
+
+
+@pytest.fixture
 def frozen_job(tmp_path, monkeypatch):
     monkeypatch.setattr(pilot, 'ROOT', tmp_path)
     def put(name, value):
