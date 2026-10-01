@@ -6,7 +6,15 @@ import time
 from pathlib import Path
 
 from p3_evidence import save, store
-from p3_final_artifacts import ROOT, binding, environment, source_git, verify_artifacts
+from p3_final_artifacts import (
+    ROOT,
+    binding,
+    check_binding,
+    environment,
+    source_git,
+    verify_artifacts,
+)
+from p3_final_fixture import verify_fixture
 
 CHECKS = {
     'pytest': ['python', '-m', 'pytest', '-q'],
@@ -22,14 +30,20 @@ CHECKS = {
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('check', choices=CHECKS)
+    parser.add_argument('--series', choices=('initial', 'fixtureprep1'), default='initial')
     args = parser.parse_args()
-    out = ROOT / ('reports/P3/final-check-' + args.check + '.json')
-    marker = ROOT / ('reports/P3/final-check-' + args.check + '-start.json')
+    stem = 'final-check-' + args.check + ('-fixtureprep1' if args.series == 'fixtureprep1' else '')
+    out = ROOT / ('reports/P3/' + stem + '.json')
+    marker = ROOT / ('reports/P3/' + stem + '-start.json')
     if out.exists() or marker.exists():
         raise FileExistsError('final check already reserved; no automatic retry')
     path = ROOT / 'reports/P3/final-artifacts-retry1.json'
     artifacts = json.loads(path.read_bytes())
     verify_artifacts(artifacts)
+    fixture_path = ROOT / 'reports/P3/final-text-probe-prerequisite.json'
+    fixture = json.loads(fixture_path.read_bytes())
+    verify_fixture(artifacts, fixture, binding(path))
+    check_binding(fixture['probe'])
     proof = source_git(artifacts['source_commit'], allow_evidence=True)
     target = (ROOT / ('build/p3-final-checks-' + artifacts['source_commit']) / 'rust-target').resolve()
     if not target.is_relative_to(ROOT):
@@ -42,7 +56,8 @@ def main():
     started = time.perf_counter()
     proc = subprocess.run(argv, capture_output=True, check=False, env=env, cwd=ROOT)
     report = {'status': 'PASS' if proc.returncode == 0 else 'FAIL', 'head': proof['validation_source_commit'],
-              'artifact_source_commit': artifacts['source_commit'],
+              'artifact_source_commit': artifacts['source_commit'], 'check_series': args.series,
+              'fixture': binding(fixture_path),
               'source_git': proof, 'artifacts': binding(path), 'argv': argv, 'exit': proc.returncode,
               'elapsed_s': time.perf_counter()-started, 'retries': 0,
               'stdout': store(proc.stdout, root=Path('reports/P3/final-raw')),

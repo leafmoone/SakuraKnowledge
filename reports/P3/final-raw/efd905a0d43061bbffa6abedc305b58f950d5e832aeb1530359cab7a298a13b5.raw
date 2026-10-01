@@ -1,0 +1,476 @@
+........................................................................ [ 11%]
+........................................................................ [ 22%]
+........................................................................ [ 33%]
+........................................................................ [ 45%]
+........................................................................ [ 56%]
+........................................................................ [ 67%]
+........................................................................ [ 79%]
+..................................................................FFF... [ 90%]
+................................................F...........             [100%]
+================================== FAILURES ===================================
+__________ test_r2_separator_tokens_match_and_nonempty_fts[a\u30fbb] __________
+
+binary = WindowsPath('D:/SakuraTool/SakuraKnowledge/dist/p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1/source/rust/target/release/sknow-rs.exe')
+tmp_path = WindowsPath('C:/Users/PC/AppData/Local/Temp/pytest-of-PC/pytest-274/test_r2_separator_tokens_match0')
+query = 'a・b'
+
+    @pytest.mark.parametrize("query", ["a・b", "a\u3099b", "a" * 256 + "・"])
+    def test_r2_separator_tokens_match_and_nonempty_fts(binary, tmp_path, query):
+        from sakura_knowledge.model import match_query, tokens
+        expected = ["a", "b"] if len(query) < 10 else ["a" * 256]
+        assert tokens(query) == expected
+        probe = binary.parent / "examples" / "text_probe.exe"
+>       proc = subprocess.run([str(probe)], input=(json.dumps(query)+'\n').encode(),
+                              capture_output=True, timeout=15, check=False)
+
+tests\test_review_f99.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\PC\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py:555: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\PC\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py:1039: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Popen: returncode: None args: ['D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-f...>
+args = 'D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1\\source\\rust\\target\\release\\examples\\text_probe.exe'
+executable = None, preexec_fn = None, close_fds = False, pass_fds = ()
+cwd = None, env = None
+startupinfo = <subprocess.STARTUPINFO object at 0x000001A65EAE8B50>
+creationflags = 0, shell = False, p2cread = Handle(1600), p2cwrite = 11
+c2pread = 12, c2pwrite = Handle(1948), errread = 13, errwrite = Handle(1900)
+unused_restore_signals = True, unused_gid = None, unused_gids = None
+unused_uid = None, unused_umask = -1, unused_start_new_session = False
+unused_process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       unused_restore_signals,
+                       unused_gid, unused_gids, unused_uid,
+                       unused_umask,
+                       unused_start_new_session, unused_process_group):
+        """Execute program (MS Windows version)"""
+    
+        assert not pass_fds, "pass_fds not supported on Windows."
+    
+        if isinstance(args, str):
+            pass
+        elif isinstance(args, bytes):
+            if shell:
+                raise TypeError('bytes args is not allowed on Windows')
+            args = list2cmdline([args])
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = list2cmdline([args])
+        else:
+            args = list2cmdline(args)
+    
+        if executable is not None:
+            executable = os.fsdecode(executable)
+    
+        # Process startup details
+        if startupinfo is None:
+            startupinfo = STARTUPINFO()
+        else:
+            # bpo-34044: Copy STARTUPINFO since it is modified above,
+            # so the caller can reuse it multiple times.
+            startupinfo = startupinfo.copy()
+    
+        use_std_handles = -1 not in (p2cread, c2pwrite, errwrite)
+        if use_std_handles:
+            startupinfo.dwFlags |= _winapi.STARTF_USESTDHANDLES
+            startupinfo.hStdInput = p2cread
+            startupinfo.hStdOutput = c2pwrite
+            startupinfo.hStdError = errwrite
+    
+        attribute_list = startupinfo.lpAttributeList
+        have_handle_list = bool(attribute_list and
+                                "handle_list" in attribute_list and
+                                attribute_list["handle_list"])
+    
+        # If we were given an handle_list or need to create one
+        if have_handle_list or (use_std_handles and close_fds):
+            if attribute_list is None:
+                attribute_list = startupinfo.lpAttributeList = {}
+            handle_list = attribute_list["handle_list"] = \
+                list(attribute_list.get("handle_list", []))
+    
+            if use_std_handles:
+                handle_list += [int(p2cread), int(c2pwrite), int(errwrite)]
+    
+            handle_list[:] = self._filter_handle_list(handle_list)
+    
+            if handle_list:
+                if not close_fds:
+                    warnings.warn("startupinfo.lpAttributeList['handle_list'] "
+                                  "overriding close_fds", RuntimeWarning)
+    
+                # When using the handle_list we always request to inherit
+                # handles but the only handles that will be inherited are
+                # the ones in the handle_list
+                close_fds = False
+    
+        if shell:
+            startupinfo.dwFlags |= _winapi.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = _winapi.SW_HIDE
+            if not executable:
+                # gh-101283: without a fully-qualified path, before Windows
+                # checks the system directories, it first looks in the
+                # application directory, and also the current directory if
+                # NeedCurrentDirectoryForExePathW(ExeName) is true, so try
+                # to avoid executing unqualified "cmd.exe".
+                comspec = os.environ.get('ComSpec')
+                if not comspec:
+                    system_root = os.environ.get('SystemRoot', '')
+                    comspec = os.path.join(system_root, 'System32', 'cmd.exe')
+                    if not os.path.isabs(comspec):
+                        raise FileNotFoundError('shell not found: neither %ComSpec% nor %SystemRoot% is set')
+                if os.path.isabs(comspec):
+                    executable = comspec
+            else:
+                comspec = executable
+    
+            args = '{} /c "{}"'.format (comspec, args)
+    
+        if cwd is not None:
+            cwd = os.fsdecode(cwd)
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        # Start the process
+        try:
+>           hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                                     # no special security
+                                     None, None,
+                                     int(not close_fds),
+                                     creationflags,
+                                     env,
+                                     cwd,
+                                     startupinfo)
+E                                    FileNotFoundError: [WinError 2] 系统找不到指定的文件。
+
+C:\Users\PC\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py:1553: FileNotFoundError
+__________ test_r2_separator_tokens_match_and_nonempty_fts[a\u3099b] __________
+
+binary = WindowsPath('D:/SakuraTool/SakuraKnowledge/dist/p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1/source/rust/target/release/sknow-rs.exe')
+tmp_path = WindowsPath('C:/Users/PC/AppData/Local/Temp/pytest-of-PC/pytest-274/test_r2_separator_tokens_match1')
+query = 'a゙b'
+
+    @pytest.mark.parametrize("query", ["a・b", "a\u3099b", "a" * 256 + "・"])
+    def test_r2_separator_tokens_match_and_nonempty_fts(binary, tmp_path, query):
+        from sakura_knowledge.model import match_query, tokens
+        expected = ["a", "b"] if len(query) < 10 else ["a" * 256]
+        assert tokens(query) == expected
+        probe = binary.parent / "examples" / "text_probe.exe"
+>       proc = subprocess.run([str(probe)], input=(json.dumps(query)+'\n').encode(),
+                              capture_output=True, timeout=15, check=False)
+
+tests\test_review_f99.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\PC\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py:555: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\PC\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py:1039: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Popen: returncode: None args: ['D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-f...>
+args = 'D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1\\source\\rust\\target\\release\\examples\\text_probe.exe'
+executable = None, preexec_fn = None, close_fds = False, pass_fds = ()
+cwd = None, env = None
+startupinfo = <subprocess.STARTUPINFO object at 0x000001A65EAE8750>
+creationflags = 0, shell = False, p2cread = Handle(1848), p2cwrite = 11
+c2pread = 12, c2pwrite = Handle(1700), errread = 13, errwrite = Handle(1928)
+unused_restore_signals = True, unused_gid = None, unused_gids = None
+unused_uid = None, unused_umask = -1, unused_start_new_session = False
+unused_process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       unused_restore_signals,
+                       unused_gid, unused_gids, unused_uid,
+                       unused_umask,
+                       unused_start_new_session, unused_process_group):
+        """Execute program (MS Windows version)"""
+    
+        assert not pass_fds, "pass_fds not supported on Windows."
+    
+        if isinstance(args, str):
+            pass
+        elif isinstance(args, bytes):
+            if shell:
+                raise TypeError('bytes args is not allowed on Windows')
+            args = list2cmdline([args])
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = list2cmdline([args])
+        else:
+            args = list2cmdline(args)
+    
+        if executable is not None:
+            executable = os.fsdecode(executable)
+    
+        # Process startup details
+        if startupinfo is None:
+            startupinfo = STARTUPINFO()
+        else:
+            # bpo-34044: Copy STARTUPINFO since it is modified above,
+            # so the caller can reuse it multiple times.
+            startupinfo = startupinfo.copy()
+    
+        use_std_handles = -1 not in (p2cread, c2pwrite, errwrite)
+        if use_std_handles:
+            startupinfo.dwFlags |= _winapi.STARTF_USESTDHANDLES
+            startupinfo.hStdInput = p2cread
+            startupinfo.hStdOutput = c2pwrite
+            startupinfo.hStdError = errwrite
+    
+        attribute_list = startupinfo.lpAttributeList
+        have_handle_list = bool(attribute_list and
+                                "handle_list" in attribute_list and
+                                attribute_list["handle_list"])
+    
+        # If we were given an handle_list or need to create one
+        if have_handle_list or (use_std_handles and close_fds):
+            if attribute_list is None:
+                attribute_list = startupinfo.lpAttributeList = {}
+            handle_list = attribute_list["handle_list"] = \
+                list(attribute_list.get("handle_list", []))
+    
+            if use_std_handles:
+                handle_list += [int(p2cread), int(c2pwrite), int(errwrite)]
+    
+            handle_list[:] = self._filter_handle_list(handle_list)
+    
+            if handle_list:
+                if not close_fds:
+                    warnings.warn("startupinfo.lpAttributeList['handle_list'] "
+                                  "overriding close_fds", RuntimeWarning)
+    
+                # When using the handle_list we always request to inherit
+                # handles but the only handles that will be inherited are
+                # the ones in the handle_list
+                close_fds = False
+    
+        if shell:
+            startupinfo.dwFlags |= _winapi.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = _winapi.SW_HIDE
+            if not executable:
+                # gh-101283: without a fully-qualified path, before Windows
+                # checks the system directories, it first looks in the
+                # application directory, and also the current directory if
+                # NeedCurrentDirectoryForExePathW(ExeName) is true, so try
+                # to avoid executing unqualified "cmd.exe".
+                comspec = os.environ.get('ComSpec')
+                if not comspec:
+                    system_root = os.environ.get('SystemRoot', '')
+                    comspec = os.path.join(system_root, 'System32', 'cmd.exe')
+                    if not os.path.isabs(comspec):
+                        raise FileNotFoundError('shell not found: neither %ComSpec% nor %SystemRoot% is set')
+                if os.path.isabs(comspec):
+                    executable = comspec
+            else:
+                comspec = executable
+    
+            args = '{} /c "{}"'.format (comspec, args)
+    
+        if cwd is not None:
+            cwd = os.fsdecode(cwd)
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        # Start the process
+        try:
+>           hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                                     # no special security
+                                     None, None,
+                                     int(not close_fds),
+                                     creationflags,
+                                     env,
+                                     cwd,
+                                     startupinfo)
+E                                    FileNotFoundError: [WinError 2] 系统找不到指定的文件。
+
+C:\Users\PC\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py:1553: FileNotFoundError
+_ test_r2_separator_tokens_match_and_nonempty_fts[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\u30fb] _
+
+binary = WindowsPath('D:/SakuraTool/SakuraKnowledge/dist/p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1/source/rust/target/release/sknow-rs.exe')
+tmp_path = WindowsPath('C:/Users/PC/AppData/Local/Temp/pytest-of-PC/pytest-274/test_r2_separator_tokens_match2')
+query = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa・'
+
+    @pytest.mark.parametrize("query", ["a・b", "a\u3099b", "a" * 256 + "・"])
+    def test_r2_separator_tokens_match_and_nonempty_fts(binary, tmp_path, query):
+        from sakura_knowledge.model import match_query, tokens
+        expected = ["a", "b"] if len(query) < 10 else ["a" * 256]
+        assert tokens(query) == expected
+        probe = binary.parent / "examples" / "text_probe.exe"
+>       proc = subprocess.run([str(probe)], input=(json.dumps(query)+'\n').encode(),
+                              capture_output=True, timeout=15, check=False)
+
+tests\test_review_f99.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\PC\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py:555: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\PC\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py:1039: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Popen: returncode: None args: ['D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-f...>
+args = 'D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1\\source\\rust\\target\\release\\examples\\text_probe.exe'
+executable = None, preexec_fn = None, close_fds = False, pass_fds = ()
+cwd = None, env = None
+startupinfo = <subprocess.STARTUPINFO object at 0x000001A65ECCCBD0>
+creationflags = 0, shell = False, p2cread = Handle(1768), p2cwrite = 11
+c2pread = 12, c2pwrite = Handle(1928), errread = 13, errwrite = Handle(1628)
+unused_restore_signals = True, unused_gid = None, unused_gids = None
+unused_uid = None, unused_umask = -1, unused_start_new_session = False
+unused_process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       unused_restore_signals,
+                       unused_gid, unused_gids, unused_uid,
+                       unused_umask,
+                       unused_start_new_session, unused_process_group):
+        """Execute program (MS Windows version)"""
+    
+        assert not pass_fds, "pass_fds not supported on Windows."
+    
+        if isinstance(args, str):
+            pass
+        elif isinstance(args, bytes):
+            if shell:
+                raise TypeError('bytes args is not allowed on Windows')
+            args = list2cmdline([args])
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = list2cmdline([args])
+        else:
+            args = list2cmdline(args)
+    
+        if executable is not None:
+            executable = os.fsdecode(executable)
+    
+        # Process startup details
+        if startupinfo is None:
+            startupinfo = STARTUPINFO()
+        else:
+            # bpo-34044: Copy STARTUPINFO since it is modified above,
+            # so the caller can reuse it multiple times.
+            startupinfo = startupinfo.copy()
+    
+        use_std_handles = -1 not in (p2cread, c2pwrite, errwrite)
+        if use_std_handles:
+            startupinfo.dwFlags |= _winapi.STARTF_USESTDHANDLES
+            startupinfo.hStdInput = p2cread
+            startupinfo.hStdOutput = c2pwrite
+            startupinfo.hStdError = errwrite
+    
+        attribute_list = startupinfo.lpAttributeList
+        have_handle_list = bool(attribute_list and
+                                "handle_list" in attribute_list and
+                                attribute_list["handle_list"])
+    
+        # If we were given an handle_list or need to create one
+        if have_handle_list or (use_std_handles and close_fds):
+            if attribute_list is None:
+                attribute_list = startupinfo.lpAttributeList = {}
+            handle_list = attribute_list["handle_list"] = \
+                list(attribute_list.get("handle_list", []))
+    
+            if use_std_handles:
+                handle_list += [int(p2cread), int(c2pwrite), int(errwrite)]
+    
+            handle_list[:] = self._filter_handle_list(handle_list)
+    
+            if handle_list:
+                if not close_fds:
+                    warnings.warn("startupinfo.lpAttributeList['handle_list'] "
+                                  "overriding close_fds", RuntimeWarning)
+    
+                # When using the handle_list we always request to inherit
+                # handles but the only handles that will be inherited are
+                # the ones in the handle_list
+                close_fds = False
+    
+        if shell:
+            startupinfo.dwFlags |= _winapi.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = _winapi.SW_HIDE
+            if not executable:
+                # gh-101283: without a fully-qualified path, before Windows
+                # checks the system directories, it first looks in the
+                # application directory, and also the current directory if
+                # NeedCurrentDirectoryForExePathW(ExeName) is true, so try
+                # to avoid executing unqualified "cmd.exe".
+                comspec = os.environ.get('ComSpec')
+                if not comspec:
+                    system_root = os.environ.get('SystemRoot', '')
+                    comspec = os.path.join(system_root, 'System32', 'cmd.exe')
+                    if not os.path.isabs(comspec):
+                        raise FileNotFoundError('shell not found: neither %ComSpec% nor %SystemRoot% is set')
+                if os.path.isabs(comspec):
+                    executable = comspec
+            else:
+                comspec = executable
+    
+            args = '{} /c "{}"'.format (comspec, args)
+    
+        if cwd is not None:
+            cwd = os.fsdecode(cwd)
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        # Start the process
+        try:
+>           hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                                     # no special security
+                                     None, None,
+                                     int(not close_fds),
+                                     creationflags,
+                                     env,
+                                     cwd,
+                                     startupinfo)
+E                                    FileNotFoundError: [WinError 2] 系统找不到指定的文件。
+
+C:\Users\PC\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py:1553: FileNotFoundError
+____________________ test_direct_unicode_tokens_and_match _____________________
+
+binary = WindowsPath('D:/SakuraTool/SakuraKnowledge/dist/p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1/source/rust/target/release/sknow-rs.exe')
+
+    def test_direct_unicode_tokens_and_match(binary):
+        from test_repair_semantics import UNICODE_EXPECTED
+    
+        from sakura_knowledge.model import match_query, tokens
+        probe = binary.parent / "examples" / "text_probe.exe"
+>       assert probe.is_file(), "build text_probe example before Rust fixture acceptance"
+E       AssertionError: build text_probe example before Rust fixture acceptance
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = WindowsPath('D:/SakuraTool/SakuraKnowledge/dist/p3-final-e19d2278f26c12cba28eaff82a6eed2f0cda62cb-retry1/source/rust/target/release/examples/text_probe.exe').is_file
+
+tests\test_rust_repair.py:103: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_review_f99.py::test_r2_separator_tokens_match_and_nonempty_fts[a\u30fbb]
+FAILED tests/test_review_f99.py::test_r2_separator_tokens_match_and_nonempty_fts[a\u3099b]
+FAILED tests/test_review_f99.py::test_r2_separator_tokens_match_and_nonempty_fts[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\u30fb]
+FAILED tests/test_rust_repair.py::test_direct_unicode_tokens_and_match - Asse...
+4 failed, 632 passed in 79.36s (0:01:19)

@@ -1,0 +1,7 @@
+usage: sknow [-h] {inspect,sources,build,verify,lookup,search,related,ask} ...
+
+positional arguments:
+  {inspect,sources,build,verify,lookup,search,related,ask}
+
+options:
+  -h, --help            show this help message and exit

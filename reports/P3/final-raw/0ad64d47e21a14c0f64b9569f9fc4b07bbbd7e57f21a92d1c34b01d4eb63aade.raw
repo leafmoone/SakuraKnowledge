@@ -1,0 +1,37 @@
+I001 [*] Import block is un-sorted or un-formatted
+  --> tools\p3_final_check.py:2:1
+   |
+ 1 |   """Run exactly one final code check with artifact bindings and contained child Cargo."""
+ 2 | / import argparse
+ 3 | | import json
+ 4 | | import subprocess
+ 5 | | import time
+ 6 | | from pathlib import Path
+ 7 | |
+ 8 | | from p3_evidence import save, store
+ 9 | | from p3_final_fixture import verify_fixture
+10 | | from p3_final_artifacts import (
+11 | |     ROOT,
+12 | |     binding,
+13 | |     check_binding,
+14 | |     environment,
+15 | |     source_git,
+16 | |     verify_artifacts,
+17 | | )
+   | |_^
+18 |
+19 |   CHECKS = {
+   |
+help: Organize imports
+   |
+8  | from p3_evidence import save, store
+   - from p3_final_fixture import verify_fixture
+9  | from p3_final_artifacts import (
+--------------------------------------------------------------------------------
+16 | )
+17 + from p3_final_fixture import verify_fixture
+18 |
+   |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.

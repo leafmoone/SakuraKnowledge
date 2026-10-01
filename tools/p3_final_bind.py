@@ -23,6 +23,7 @@ import p3_final_validate as final_validate
 import p3_measure_resolver as policy
 from p3_evidence import save
 from p3_final_artifacts import verify_artifacts
+from p3_final_fixture import verify_fixture
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = '1badc465c2fdeae8250bba1ef3c1c8f142c42818'
@@ -244,19 +245,22 @@ def boundaries(head):
     require(not git('diff', '--name-only', RUNTIME, head, '--', 'src', 'rust').strip(),
             'runtime src/rust changed')
     old, current = tree(BASE), tree(head)
+    retained = tree('3d38fe62def6cb4a0f2c16d67c78dfe52f749176')
+    for name, oid in retained.items():
+        require(current.get(name) == oid, 'post-baseline history changed/deleted: ' + name)
     for name, oid in old.items():
         require(current.get(name) == oid, 'historical report changed: ' + name)
     changed = git('diff', '--name-only', BASE, head).decode().splitlines()
     baseline_files = tree(BASE, '.')
     for name in changed:
         allowed = (name.startswith('reports/P3/') and name not in old or
-                   name in (POLICY, '.gitattributes') or name.startswith('tests/') and name not in baseline_files or
+                   name in (POLICY, '.gitattributes', 'docs/STAGE_STATUS.md') or name.startswith('tests/') and name not in baseline_files or
                    name.startswith('tools/p3_final_') and name not in baseline_files)
         require(allowed, 'unauthorized baseline/public/compiler/case change: ' + name)
     return len(old)
 
 
-def check_receipt(name, rec, artifacts, evidence, check_source=None):
+def check_receipt(name, rec, artifacts, evidence, check_source=None, fixture_ref=None):
     source = artifacts['source_commit']
     require(rec['status'] == 'PASS' and type(rec['exit']) is int and rec['exit'] == 0 and
             rec.get('retries', 0) == 0 and rec.get('head', rec.get('source_commit')) == (check_source or source) and
@@ -264,6 +268,9 @@ def check_receipt(name, rec, artifacts, evidence, check_source=None):
             'final check status/source differs: ' + name)
     require(rec.get('artifacts') in (artifacts, evidence.binding('reports/P3/final-artifacts-retry1.json')),
             'final check artifact binding missing/differs: ' + name)
+    if fixture_ref is not None:
+        require(rec.get('check_series') == 'fixtureprep1' and rec.get('fixture') == fixture_ref,
+                'final fixture/check-series binding differs')
     argv = rec['argv']
     require(isinstance(argv, list) and all(isinstance(a, str) for a in argv), 'invalid check argv')
     python = Path(argv[0]).name.lower() if argv else ''
@@ -307,7 +314,8 @@ def gates(head, evidence):
     require(git('merge-base', source, head).decode().strip() == source, 'artifact source not ancestor')
     require(not git('diff', '--name-only', RUNTIME, source, '--', 'src', 'rust').strip(),
             'artifact runtime differs from fixed runtime')
-    require(git('show', source + ':' + POLICY) == absolute(POLICY).read_bytes(), 'policy differs from artifact source')
+    require(git('show', source + ':' + POLICY) == git('show', head + ':' + POLICY),
+            'committed policy differs from artifact source; checkout bytes bound separately by C')
     policy_commit = git('log', '-1', '--format=%H', source, '--', POLICY).decode().strip()
     require(re.fullmatch('[0-9a-f]{40}', policy_commit) is not None, 'missing policy commit')
     perf = performance(evidence)
@@ -377,13 +385,20 @@ def gates(head, evidence):
                     rec['FULL_151_receipt'] == evidence.binding('reports/P3/final-P2.json') and
                     rec['FULL_55_receipt'] == evidence.binding('reports/P3/final-gold.json'), 'external incomplete')
         prerequisites[phase] = evidence.binding(path)
-    check_source = load('reports/P3/final-check-pytest.json')['head']
+    check_source = load('reports/P3/final-check-pytest-fixtureprep1.json')['head']
     require(git('merge-base', source, check_source).decode().strip() == source,
             'check source not artifact descendant')
     require(not git('diff', '--name-only', check_source, head, '--', 'src', 'rust', 'tests', 'tools').strip(),
             'final validated code changed after seven checks')
+    fixture_path = 'reports/P3/final-text-probe-prerequisite.json'
+    fixture_ref = evidence.binding(fixture_path)
+    verify_fixture(artifacts, load(fixture_path), evidence.binding('reports/P3/final-artifacts-retry1.json'))
+    original_pytest = load('reports/P3/final-check-pytest.json')
+    require(original_pytest['status'] == 'FAIL' and original_pytest['exit'] == 1,
+            'original missing-fixture pytest FAIL not preserved')
     for name in CHECKS:
-        check_receipt(name, load('reports/P3/final-check-' + name + '.json'), artifacts, evidence, check_source)
+        check_receipt(name, load('reports/P3/final-check-' + name + '-fixtureprep1.json'),
+                      artifacts, evidence, check_source, fixture_ref)
     waiver = load('reports/P3/final-F-user-waiver.json')
     require(waiver['status'] == 'WAIVED_BY_USER' and waiver['audit_completion'] == 'NOT_COMPLETED' and
             waiver['SAKURAPOOL_TRACKED_SOURCE_MODIFIED'] == 'UNVERIFIED' and

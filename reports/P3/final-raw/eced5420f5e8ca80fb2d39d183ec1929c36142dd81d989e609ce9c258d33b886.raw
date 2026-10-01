@@ -1,0 +1,1 @@
+{"error": "UsageError", "message": "sknow: argument command: invalid choice: 'resolve-tag' (choose from 'inspect', 'sources', 'build', 'verify', 'lookup', 'search', 'related', 'ask')"}
