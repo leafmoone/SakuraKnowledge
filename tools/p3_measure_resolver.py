@@ -1,4 +1,4 @@
-"""Fixed new-resolver dual-mode performance, all failures counted, zero retries."""
+"""Fixed new-resolver dual-mode performance, diagnostic warmups, zero retries."""
 import argparse
 import hashlib
 import json
@@ -11,6 +11,98 @@ from pathlib import Path
 from p3_accept_resolver import check, command
 from p3_evidence import save, store
 from p3_resolver_oracle import result
+
+
+def evaluate(records, workloadids, samples=30):
+    """Evaluate the fixed sample grid without running queries or dropping evidence."""
+    modes = ('reused_connection', 'independent_cli')
+    errors = []
+    if type(samples) is not int or samples != 30:
+        errors.append('protocol fixed at 30 samples')
+    if not isinstance(workloadids, (list, tuple)) or not workloadids:
+        errors.append('workload IDs must be a nonempty sequence')
+        ids = []
+    elif any(not isinstance(case_id, str) or not case_id for case_id in workloadids):
+        errors.append('workload IDs must be nonempty strings')
+        ids = []
+    else:
+        ids = list(dict.fromkeys(workloadids))
+        if len(ids) != len(workloadids):
+            errors.append('duplicate workload IDs')
+    grouped = {(mode, case_id, round_): []
+               for mode in modes for case_id in ids for round_ in range(-1, 30)}
+    if not isinstance(records, (list, tuple)):
+        errors.append('records must be a sequence')
+        rows = []
+    else:
+        rows = records
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            errors.append(f'record {index}: must be an object')
+            continue
+        mode, case_id, round_ = row.get('mode'), row.get('case_id'), row.get('round')
+        if (not isinstance(mode, str) or mode not in modes
+                or not isinstance(case_id, str) or case_id not in ids
+                or type(round_) is not int or round_ not in range(-1, 30)):
+            errors.append(f'record {index}: unexpected mode, case ID, or round')
+            continue
+        grouped[(mode, case_id, round_)].append(row)
+        if type(row.get('warmup')) is not bool or row['warmup'] != (round_ == -1):
+            errors.append(f'record {index}: warmup must match round -1')
+        if type(row.get('success')) is not bool:
+            errors.append(f'record {index}: success must be a boolean')
+        if 'elapsed_s' not in row:
+            errors.append(f'record {index}: missing elapsed_s')
+        elif row.get('success') is True:
+            elapsed = row['elapsed_s']
+            if (type(elapsed) not in (int, float) or not math.isfinite(elapsed)
+                    or elapsed < 0):
+                errors.append(f'record {index}: successful sample requires a finite timing')
+        # Failed attempts may retain absent/invalid runtime timings as diagnostic evidence.
+    for (mode, case_id, round_), entries in grouped.items():
+        if len(entries) != 1:
+            errors.append(f'{mode}/{case_id}/round {round_}: expected once, got {len(entries)}')
+
+    summary = []
+    warmup_summary = []
+    formal_rows = []
+    warmup_rows = []
+    for mode in modes:
+        for case_id in ids:
+            formal = [row for round_ in range(30) for row in grouped[(mode, case_id, round_)]]
+            warmup = grouped[(mode, case_id, -1)]
+            formal_rows.extend(formal)
+            warmup_rows.extend(warmup)
+            timings = sorted(row['elapsed_s'] for row in formal
+                             if row.get('success') is True
+                             and type(row.get('elapsed_s')) in (int, float)
+                             and math.isfinite(row['elapsed_s']) and row['elapsed_s'] >= 0)
+
+            def counts(entries):
+                success = sum(row.get('success') is True for row in entries)
+                return {'attempted': len(entries), 'success': success,
+                        'failed': len(entries) - success}
+
+            def percentile(p, values=timings):
+                return values[max(0, math.ceil(len(values) * p) - 1)] if values else None
+
+            summary.append({'mode': mode, 'case_id': case_id, **counts(formal),
+                            'failed_rounds': [row['round'] for row in formal
+                                              if row.get('success') is not True],
+                            'p50_s': percentile(.5), 'p95_s': percentile(.95)})
+            warmup_summary.append({'mode': mode, 'case_id': case_id, **counts(warmup),
+                                   'failed_rounds': [row['round'] for row in warmup
+                                                     if row.get('success') is not True]})
+    formal_success = sum(row.get('success') is True for row in formal_rows)
+    warmup_success = sum(row.get('success') is True for row in warmup_rows)
+    passed = not errors and formal_success == len(ids) * 30 * len(modes)
+    return {'status': 'PASS' if passed else 'FAIL', 'samples': 30, 'workloads': list(ids),
+            'measured': len(formal_rows), 'warmups': len(warmup_rows), 'records': records,
+            'formal_counts': {'attempted': len(formal_rows), 'success': formal_success,
+                              'failed': len(formal_rows) - formal_success},
+            'warmup_counts': {'attempted': len(warmup_rows), 'success': warmup_success,
+                              'failed': len(warmup_rows) - warmup_success},
+            'summary': summary, 'warmup_summary': warmup_summary, 'structure_errors': errors}
 
 
 def main():
@@ -73,29 +165,21 @@ def main():
             success=False;row={'exit':proc.returncode,'stdout':store(proc.stdout),'stderr':store(proc.stderr),'invalid_json':True}
         records.append(dict(row,mode='independent_cli',case_id=c['id'],round=c['round'],warmup=c['warmup'],
                             success=bool(success),elapsed_s=elapsed,argv=argv))
-    summary=[]
-    for mode in ('reused_connection','independent_cli'):
-        for c in workloads:
-            rows=[r for r in records if r['mode']==mode and r['case_id']==c['id'] and not r['warmup']]
-            timings=sorted(r['elapsed_s'] for r in rows if r['success'])
-            def percentile(p,values=timings):
-                return values[max(0,math.ceil(len(values)*p)-1)] if values else None
-            summary.append({'mode':mode,'case_id':c['id'],'attempted':len(rows),'success':len(timings),
-                            'failed_rounds':[r['round'] for r in rows if not r['success']],
-                            'p50_s':percentile(.5),'p95_s':percentile(.95)})
-    passed=all(r['success'] for r in records)
+    evaluation=evaluate(records,ids,args.samples)
+    passed=evaluation['status']=='PASS'
     from sakura_knowledge.storage import digest
-    save(args.out,{'status':'PASS' if passed else 'FAIL','samples':30,'workloads':ids,'retries':0,
+    save(args.out,{**evaluation,'retries':0,
                    'snapshot_scope':args.snapshot_scope,'database_sha256':digest(args.db),
                    'gold_sha256':digest(args.gold),'binary_sha256':digest(args.bin),
                    'reused_binary_sha256':digest(args.reused_bin),
-                   'measured':sum(not r['warmup'] for r in records),'warmups':sum(r['warmup'] for r in records),
-                   'records':records,'reused_processes':processes,'summary':summary,
+                   'reused_processes':processes,
                    'protocol':{'inner_s':5,'cli_outer_s':15,'reused_batch_outer_s':600,
-                               'percentile':'nearest rank on successful samples, attempts/failures separate',
+                               'percentile':'nearest rank on successful formal samples, attempts/failures separate',
+                               'acceptance':'complete fixed formal grid must pass; complete warmups are diagnostic only',
                                'rss':'NOT_RUN for P3 resolver-specific measurement; no peak-memory claim',
                                'raw':'content-addressed files retained once locally, receipt hashes reference them'}})
-    print(json.dumps({'status':'PASS' if passed else 'FAIL','measured':len(workloads)*30*2,'warmups':len(workloads)*2,'summary':summary}))
+    print(json.dumps({k:evaluation[k] for k in ('status','measured','warmups','formal_counts',
+                                              'warmup_counts','summary','warmup_summary','structure_errors')}))
     return 0 if passed else 1
 
 

@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "head": "1badc465c2fdeae8250bba1ef3c1c8f142c42818",
+  "working_tree_at_start": " M .gitattributes\n M tools/p3_measure_resolver.py\n?? reports/P3/close-raw/31abf29fadbd2af2f236e4221d78c1a0beea023217db5ffd20519d56547b6d87.raw\n?? reports/P3/close-raw/6fc7f7814f83f05457201496812d03bc8031dc189f8d30c2b9b5962ccb71d7f0.raw\n?? reports/P3/final-A-full-hash.json\n?? reports/P3/final-F-pool-audit.json\n?? reports/P3/final-F-pool-specified-audit.json\n?? reports/P3/final-F-user-waiver.json\n?? reports/P3/final-prep-complete-ruff.json\n?? reports/P3/final-prep-complete-tests.json\n?? reports/P3/final-prep-policy-tests.json\n?? reports/P3/final-prep-ruff.json\n?? reports/P3/final-raw/\n?? tests/test_p3_final_bind.py\n?? tests/test_p3_final_bind_gates.py\n?? tests/test_p3_final_protocol.py\n?? tests/test_p3_final_recompute.py\n?? tests/test_p3_measure_formal_policy.py\n?? tools/p3_final_artifacts.py\n?? tools/p3_final_bind.py\n?? tools/p3_final_check.py\n?? tools/p3_final_recompute.py\n?? tools/p3_final_validate.py\n",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/test_p3_measure_formal_policy.py",
+    "tests/test_p3_final_protocol.py",
+    "tests/test_p3_final_recompute.py",
+    "tests/test_p3_final_bind.py",
+    "tests/test_p3_final_bind_gates.py"
+  ],
+  "exit": 0,
+  "elapsed_s": 21.012740800000756,
+  "retries": 0,
+  "stdout": {
+    "path": "reports/P3/close-raw/c8b13b8bdfcd4314c384047a499a284cfc735670ee7015c26e3719ea00a4a80a.raw",
+    "sha256": "c8b13b8bdfcd4314c384047a499a284cfc735670ee7015c26e3719ea00a4a80a",
+    "bytes": 265
+  },
+  "stderr": {
+    "path": "reports/P3/close-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "environment": {
+    "PYTHONUTF8": "1",
+    "PYTHONIOENCODING": "utf-8",
+    "CARGO_TARGET_DIR": "D:/SakuraTool/SakuraKnowledge/rust/target",
+    "SKNOW_RS_TEST_BIN": null
+  },
+  "resolved_target": "D:\\SakuraTool\\SakuraKnowledge\\rust\\target",
+  "target_inside_authorized_root": true
+}

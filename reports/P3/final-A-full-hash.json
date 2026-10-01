@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "baseline": "1badc465c2fdeae8250bba1ef3c1c8f142c42818",
+  "main": "894dc6a73bfd42f18cc7648e8ab7481aae211ab1",
+  "database": {
+    "path": "build\\p3-full-authorized-retry1\\knowledge.sqlite",
+    "bytes": 21718736896,
+    "sha256": "61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9"
+  },
+  "actual_whole_file_read": true,
+  "no_SQL": true
+}

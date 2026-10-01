@@ -8,3 +8,5 @@ reports/P3/*.json -text -diff
 reports/P3/*.jsonl -text -diff
 # A-L new raw streams are stored once and committed byte-verbatim.
 reports/P3/close-raw/** -text -diff
+# Final A-I raw streams retain exact bytes, including UTF-8 and CRLF.
+reports/P3/final-raw/** -text -diff

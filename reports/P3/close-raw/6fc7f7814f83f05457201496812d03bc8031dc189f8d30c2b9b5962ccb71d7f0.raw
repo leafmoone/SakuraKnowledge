@@ -1,0 +1,51 @@
+........................................................................ [ 40%]
+........................................................................ [ 80%]
+...........F......................                                       [100%]
+================================== FAILURES ===================================
+_____________________ test_cargo_external_target_rejected _____________________
+
+check_data = ({'argv': ['cargo', 'test', '--manifest-path', 'rust/Cargo.toml', '--locked'], 'artifacts': {'directory': 'C:\\Users\\...7\\test_cargo_external_target_rej0\\dist\\final\\source', 'source_commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'})
+tmp_path = WindowsPath('C:/Users/PC/AppData/Local/Temp/pytest-of-PC/pytest-257/test_cargo_external_target_rej0')
+
+    def test_cargo_external_target_rejected(check_data, tmp_path):
+        rec, artifacts = check_data
+        rec['argv'] = ['cargo', 'test', '--manifest-path', 'rust/Cargo.toml', '--locked']
+        rec['environment'] = {'CARGO_TARGET_DIR': str(tmp_path / 'external-Pool')}
+        with pytest.raises(ValueError, match='target differs'):
+>           final.check_receipt('rust-test', rec, artifacts, final.Evidence())
+
+tests\test_p3_final_bind.py:166: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\p3_final_bind.py:291: in check_receipt
+    require(target == absolute('rust/target') or (
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False
+message = 'Cargo check target escaped Knowledge or final artifact archive'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: Cargo check target escaped Knowledge or final artifact archive
+
+tools\p3_final_bind.py:40: ValueError
+
+During handling of the above exception, another exception occurred:
+
+check_data = ({'argv': ['cargo', 'test', '--manifest-path', 'rust/Cargo.toml', '--locked'], 'artifacts': {'directory': 'C:\\Users\\...7\\test_cargo_external_target_rej0\\dist\\final\\source', 'source_commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'})
+tmp_path = WindowsPath('C:/Users/PC/AppData/Local/Temp/pytest-of-PC/pytest-257/test_cargo_external_target_rej0')
+
+    def test_cargo_external_target_rejected(check_data, tmp_path):
+        rec, artifacts = check_data
+        rec['argv'] = ['cargo', 'test', '--manifest-path', 'rust/Cargo.toml', '--locked']
+        rec['environment'] = {'CARGO_TARGET_DIR': str(tmp_path / 'external-Pool')}
+>       with pytest.raises(ValueError, match='target differs'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'target differs'
+E         Actual message: 'Cargo check target escaped Knowledge or final artifact archive'
+
+tests\test_p3_final_bind.py:165: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_p3_final_bind.py::test_cargo_external_target_rejected - Ass...
+1 failed, 177 passed in 20.65s
