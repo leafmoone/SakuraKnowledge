@@ -1,6 +1,6 @@
 # Stage Status (SakuraKnowledge)
 
-## Current P4 — IN_PROGRESS / ANN_V1_PREPARATION
+## Current P4 — IN_PROGRESS / ANN_V1_FAILED_WAITING_REVIEW
 
 - User authorizes ANN V1 from256e2f1: BGE-M3_ONNX_FP32 quality/residentCPU PASS.
   Resident120/120 operation p50 71.96055ms,p95 82.42782ms.
@@ -8,7 +8,9 @@
   before tokenizer/session/query. FAIL_SETUP_VALIDATION; product cold-start
   NOT_MEASURED, not an ONNX cold-start performance failure.
 - USearch2.26.2 isolated .venv-p4-ann available; fixed4-build16-candidate FP32
-  grid being prepared. No real ANN build/search before contract/tool push.
+  grid invoked once after contract/tool push86ddf86. Four indexes saved, but
+  build bookkeeping failed: missing isolated psutil for RSS. All16 candidates
+  unqualified; actual query attempts0. No retry. See reports/P4/ANN_V1_REPORT.md.
   src/rust unchanged; no embedding/export/quantization or FULL execution.
 - Historical v3 preparation and review records follow.
 
