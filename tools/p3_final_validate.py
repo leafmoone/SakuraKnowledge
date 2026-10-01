@@ -227,7 +227,7 @@ def main():
                    for suffix in ('.json', '-start.json'))
     if out.exists() or marker.exists():
         raise FileExistsError('phase already recorded or reserved; no retry')
-    artifacts = load(REPORTS / 'final-artifacts.json')
+    artifacts = load(REPORTS / 'final-artifacts-retry1.json')
     verify_artifacts(artifacts)  # Before every phase, not just artifact creation.
     source = source_git(artifacts['source_commit'], allow_evidence=True)
     performance = performance_prerequisite()  # Must precede every runtime command.

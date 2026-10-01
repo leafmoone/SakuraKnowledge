@@ -40,7 +40,11 @@ def check_binding(ref):
 
 def environment(target):
     env = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8',
-               CARGO_TARGET_DIR=str(Path(target).resolve()))
+               CARGO_TARGET_DIR=str(Path(target).resolve()),
+               PATH='C:/msys64/ucrt64/bin' + os.pathsep + os.environ.get('PATH', ''),
+               CC='C:/msys64/ucrt64/bin/gcc.exe', CXX='C:/msys64/ucrt64/bin/g++.exe',
+               CC_x86_64_pc_windows_gnu='C:/msys64/ucrt64/bin/gcc.exe',
+               CXX_x86_64_pc_windows_gnu='C:/msys64/ucrt64/bin/g++.exe')
     for name in ('PYTHONPATH', 'PYTHONHOME', PROFILE):
         env.pop(name, None)
     return env
@@ -70,7 +74,8 @@ def run(argv, env, cwd, *, directory=None):
            'elapsed_s': time.perf_counter() - started,
            'stdout': store(out, root=RAW), 'stderr': store(err, root=RAW),
            'environment': {k: env.get(k) for k in
-                           ('PYTHONUTF8', 'PYTHONIOENCODING', 'CARGO_TARGET_DIR', PROFILE)},
+                           ('PYTHONUTF8', 'PYTHONIOENCODING', 'CARGO_TARGET_DIR', 'PATH', 'CC', 'CXX',
+                            'CC_x86_64_pc_windows_gnu', 'CXX_x86_64_pc_windows_gnu', PROFILE)},
            'child_cargo_target_explicit': target is not None,
            'target_inside_Knowledge_and_archive': target is not None}
     if exception is not None:
@@ -142,7 +147,8 @@ def verify_artifacts(report):
             not report['source_git']['runtime_src_rust_gitdiff_empty']):
         raise ValueError('final artifact/source provenance not PASS')
     directory = Path(report['directory']).resolve()
-    if directory != ROOT.resolve() / ('dist/p3-final-' + report['source_commit']):
+    suffix = '-retry1' if report.get('attempt') == 'retry1' else ''
+    if directory != ROOT.resolve() / ('dist/p3-final-' + report['source_commit'] + suffix):
         raise ValueError('not the fixed final artifact directory')
     if (Path(report['source']).resolve() != directory / 'source' or
             not Path(report['site_packages']).resolve().is_relative_to(directory / 'venv')):
@@ -181,18 +187,25 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source-commit', required=True)
     parser.add_argument('--bench', action='store_true', help='build optional bench, never execute')
+    parser.add_argument('--attempt', choices=('initial', 'retry1'), default='initial')
     args = parser.parse_args()
-    out, marker = REPORTS / 'final-artifacts.json', REPORTS / 'final-artifacts-start.json'
+    suffix = '-retry1' if args.attempt == 'retry1' else ''
+    out = REPORTS / ('final-artifacts' + suffix + '.json')
+    marker = REPORTS / ('final-artifacts' + suffix + '-start.json')
     if out.exists() or marker.exists():
         raise FileExistsError('final artifacts already reserved or recorded')
     source_proof = source_git(args.source_commit)  # Clean BEFORE creating untracked evidence.
     create_new(marker, {'source_commit': args.source_commit, 'created_ns': time.time_ns(),
-                        'runtime_baseline': RUNTIME, 'retries': 0})
+                        'runtime_baseline': RUNTIME, 'retries': 0, 'attempt': args.attempt,
+                        'original_FAIL_preserved': str(REPORTS / 'final-artifacts.json')})
     report = {'status': 'FAIL', 'source_commit': args.source_commit, 'runtime_baseline': RUNTIME,
-              'retries': 0, 'no_snapshot_build': True, 'started_ns': time.time_ns(),
+              'retries': 0, 'authorized_independent_retry': args.attempt == 'retry1', 'attempt': args.attempt,
+              'historical_gcc_version': '16.2.0 retained object comment; exact compiler path unknown',
+              'new_toolchain_not_historical_environment': True,
+              'no_snapshot_build': True, 'started_ns': time.time_ns(),
               'source_git': source_proof, 'processes': []}
     try:
-        directory = ROOT / ('dist/p3-final-' + args.source_commit)
+        directory = ROOT / ('dist/p3-final-' + args.source_commit + suffix)
         directory.mkdir()  # Exclusive fresh archive/build/venv, never reuse old close artifacts.
         source, archive = directory / 'source', directory / 'source.zip'
         target = source / 'rust/target'
@@ -216,7 +229,20 @@ def main():
         ]
         report.update(directory=str(directory.resolve()), source=str(source.resolve()),
                       site_packages=str(site.resolve()),
-                      environment={k: env[k] for k in ('PYTHONUTF8', 'PYTHONIOENCODING', 'CARGO_TARGET_DIR')})
+                      environment={k: env[k] for k in ('PYTHONUTF8', 'PYTHONIOENCODING', 'CARGO_TARGET_DIR', 'PATH', 'CC', 'CXX',
+                                                        'CC_x86_64_pc_windows_gnu', 'CXX_x86_64_pc_windows_gnu')})
+        toolchain = []
+        for argv in ([env['CC'], '--version'], [env['CC'], '-dumpmachine'],
+                     [env['CXX'], '--version'], ['rustc', '-vV']):
+            rec, data = run(argv, env, ROOT, directory=directory)
+            toolchain.append(rec)
+            if rec['exit'] != 0:
+                raise ValueError('compiler metadata check failed; no compilation')
+            if argv[-1] == '-dumpmachine' and data.decode('utf-8').strip() != 'x86_64-w64-mingw32':
+                raise ValueError('unexpected GCC target')
+            if argv == ['rustc', '-vV'] and 'host: x86_64-pc-windows-gnu' not in data.decode('utf-8'):
+                raise ValueError('unexpected Rust target')
+        report['toolchain'] = toolchain
         for argv in commands:
             rec, _ = run(argv, env, ROOT, directory=directory)
             report['processes'].append(rec)

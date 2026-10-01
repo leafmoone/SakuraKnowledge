@@ -27,11 +27,11 @@ def main():
     marker = ROOT / ('reports/P3/final-check-' + args.check + '-start.json')
     if out.exists() or marker.exists():
         raise FileExistsError('final check already reserved; no automatic retry')
-    path = ROOT / 'reports/P3/final-artifacts.json'
+    path = ROOT / 'reports/P3/final-artifacts-retry1.json'
     artifacts = json.loads(path.read_bytes())
     verify_artifacts(artifacts)
     proof = source_git(artifacts['source_commit'], allow_evidence=True)
-    target = (ROOT / 'rust/target').resolve()
+    target = (ROOT / ('build/p3-final-checks-' + artifacts['source_commit']) / 'rust-target').resolve()
     if not target.is_relative_to(ROOT):
         raise ValueError('child Cargo target escaped Knowledge')
     env = environment(target)
@@ -46,7 +46,8 @@ def main():
               'elapsed_s': time.perf_counter()-started, 'retries': 0,
               'stdout': store(proc.stdout, root=Path('reports/P3/final-raw')),
               'stderr': store(proc.stderr, root=Path('reports/P3/final-raw')),
-              'environment': {k: env.get(k) for k in ('PYTHONUTF8', 'PYTHONIOENCODING', 'CARGO_TARGET_DIR', 'SKNOW_RS_TEST_BIN')},
+              'environment': {k: env.get(k) for k in ('PYTHONUTF8', 'PYTHONIOENCODING', 'CARGO_TARGET_DIR', 'SKNOW_RS_TEST_BIN', 'PATH', 'CC', 'CXX', 'CC_x86_64_pc_windows_gnu', 'CXX_x86_64_pc_windows_gnu')},
+              'toolchain': artifacts['toolchain'],
               'resolved_target': str(target), 'target_inside_authorized_root': True}
     save(out, report)
     print(json.dumps({k: report[k] for k in ('status', 'argv', 'exit', 'elapsed_s')}))

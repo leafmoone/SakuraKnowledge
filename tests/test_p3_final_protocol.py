@@ -315,7 +315,7 @@ def test_interrupted_phase_stays_reserved_without_runtime(tmp_path, monkeypatch)
 def test_every_phase_bytechecks_before_inputs_or_runtime(tmp_path, monkeypatch, phase):
     monkeypatch.setattr(final, 'REPORTS', tmp_path)
     monkeypatch.setattr(sys, 'argv', ['p3_final_validate.py', phase])
-    artifacts.create_new(tmp_path / 'final-artifacts.json', {'synthetic': True})
+    artifacts.create_new(tmp_path / 'final-artifacts-retry1.json', {'synthetic': True})
 
     def changed(report):
         raise ValueError('synthetic changed artifact')
@@ -355,7 +355,7 @@ def test_failed_child_still_protects_hashes_and_cannot_retry(tmp_path, monkeypat
     db = tmp_path / 'synthetic.bin'
     db.write_bytes(b'not SQLite')
     art = {'source_commit': 'synthetic', 'binary': {'path': 'not-executed'}}
-    artifacts.create_new(tmp_path / 'final-artifacts.json', art)
+    artifacts.create_new(tmp_path / 'final-artifacts-retry1.json', art)
     monkeypatch.setattr(final, 'verify_artifacts', lambda report: None)
     monkeypatch.setattr(final, 'source_git', lambda *args, **kwargs: {})
     monkeypatch.setattr(final, 'performance_prerequisite', lambda: artifacts.binding(gold))

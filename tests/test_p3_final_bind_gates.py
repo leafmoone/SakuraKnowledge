@@ -49,7 +49,7 @@ def gates(tmp_path, monkeypatch):
     artifacts = {'source_commit': source, 'directory': str(tmp_path / 'dist/final'),
                  'source': str(tmp_path / 'dist/final/source'),
                  'environment': {'CARGO_TARGET_DIR': str(tmp_path / 'dist/final/source/rust/target')}}
-    artifact_ref = put(tmp_path, 'reports/P3/final-artifacts.json', artifacts)
+    artifact_ref = put(tmp_path, 'reports/P3/final-artifacts-retry1.json', artifacts)
     database = {'path': str(tmp_path / 'database-MUST-NOT-OPEN'), 'bytes': 21718736896, 'sha256': '0' * 64}
     put(tmp_path, 'reports/P3/close-performance.json', {'database': database})
     perf = put(tmp_path, 'reports/P3/final-performance-recomputed.json', {'status': 'PASS'})

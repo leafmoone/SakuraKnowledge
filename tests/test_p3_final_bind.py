@@ -121,7 +121,7 @@ def check_data(tmp_path):
     artifacts = {'source_commit': 'a' * 40, 'source': str(tmp_path / 'dist/final/source'),
                  'directory': str(tmp_path / 'dist/final'),
                  'environment': {'CARGO_TARGET_DIR': str(tmp_path / 'dist/final/source/rust/target')}}
-    put(tmp_path / 'reports/P3/final-artifacts.json', artifacts)
+    put(tmp_path / 'reports/P3/final-artifacts-retry1.json', artifacts)
     raw = put(tmp_path / 'reports/P3/final-raw/empty.raw', b'')
     rec = {'status': 'PASS', 'head': artifacts['source_commit'], 'exit': 0, 'retries': 0,
            'argv': ['python', '-m', 'pytest', '-q'], 'artifacts': artifacts,
@@ -177,7 +177,7 @@ def test_protect_exclusive_and_no_db_open(tmp_path, monkeypatch):
     reports.mkdir(parents=True)
     ref = put(tmp_path / 'not-a-database', b'database bytes only')
     put(reports / 'close-preconditions.json', {'preserved_cancelled_prep': []})
-    put(reports / 'final-artifacts.json', {'source_commit': 'a' * 40})
+    put(reports / 'final-artifacts-retry1.json', {'source_commit': 'a' * 40})
     monkeypatch.setattr(final, 'protected_refs', lambda: [ref])
     monkeypatch.setattr(final.helpers, 'validate_inputs', lambda: None)
     monkeypatch.setattr(final, 'verify_artifacts', lambda report: None)

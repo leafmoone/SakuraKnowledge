@@ -1,0 +1,196 @@
+{
+  "status": "FAIL",
+  "source_commit": "7eb371a95b164fe436c91cc4cb8ed97da90bc06e",
+  "runtime_baseline": "9d7bd507c62f20ca4d41b26ba7df55ae4e6d8102",
+  "retries": 0,
+  "no_snapshot_build": true,
+  "started_ns": 1790825781069798500,
+  "source_git": {
+    "source_commit": "7eb371a95b164fe436c91cc4cb8ed97da90bc06e",
+    "runtime_baseline": "9d7bd507c62f20ca4d41b26ba7df55ae4e6d8102",
+    "clean_source": true,
+    "runtime_src_rust_gitdiff_empty": true,
+    "processes": [
+      {
+        "argv": [
+          "git",
+          "status",
+          "--porcelain",
+          "--untracked-files=all"
+        ],
+        "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+        "exit": 0,
+        "started_ns": 1790825780945245200,
+        "finished_ns": 1790825780986268400,
+        "elapsed_s": 0.04102280000006431,
+        "stdout": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "environment": {
+          "PYTHONUTF8": "1",
+          "PYTHONIOENCODING": "utf-8",
+          "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-final-git-target",
+          "SKNOW_SEARCH_PROFILE_OUT": null
+        },
+        "child_cargo_target_explicit": false,
+        "target_inside_Knowledge_and_archive": false
+      },
+      {
+        "argv": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+        "exit": 0,
+        "started_ns": 1790825780986709600,
+        "finished_ns": 1790825781024292900,
+        "elapsed_s": 0.03758340000058524,
+        "stdout": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/aedf4f0535173155604bc2d0cbe9a4efc2ad162d7bf7c3092c3fab5298aa8370.raw",
+          "sha256": "aedf4f0535173155604bc2d0cbe9a4efc2ad162d7bf7c3092c3fab5298aa8370",
+          "bytes": 41
+        },
+        "stderr": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "environment": {
+          "PYTHONUTF8": "1",
+          "PYTHONIOENCODING": "utf-8",
+          "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-final-git-target",
+          "SKNOW_SEARCH_PROFILE_OUT": null
+        },
+        "child_cargo_target_explicit": false,
+        "target_inside_Knowledge_and_archive": false
+      },
+      {
+        "argv": [
+          "git",
+          "diff",
+          "--exit-code",
+          "9d7bd507c62f20ca4d41b26ba7df55ae4e6d8102",
+          "7eb371a95b164fe436c91cc4cb8ed97da90bc06e",
+          "--",
+          "src",
+          "rust"
+        ],
+        "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+        "exit": 0,
+        "started_ns": 1790825781024965200,
+        "finished_ns": 1790825781069104400,
+        "elapsed_s": 0.04413909999857424,
+        "stdout": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "environment": {
+          "PYTHONUTF8": "1",
+          "PYTHONIOENCODING": "utf-8",
+          "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-final-git-target",
+          "SKNOW_SEARCH_PROFILE_OUT": null
+        },
+        "child_cargo_target_explicit": false,
+        "target_inside_Knowledge_and_archive": false
+      }
+    ],
+    "new_untracked_final_evidence_exempt": false
+  },
+  "processes": [
+    {
+      "argv": [
+        "git",
+        "archive",
+        "--format=zip",
+        "--output",
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-7eb371a95b164fe436c91cc4cb8ed97da90bc06e\\source.zip",
+        "7eb371a95b164fe436c91cc4cb8ed97da90bc06e"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790825781071403000,
+      "finished_ns": 1790825783871353100,
+      "elapsed_s": 2.799929600001633,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-7eb371a95b164fe436c91cc4cb8ed97da90bc06e\\source\\rust\\target",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": true,
+      "target_inside_Knowledge_and_archive": true
+    },
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-7eb371a95b164fe436c91cc4cb8ed97da90bc06e\\source\\rust\\Cargo.toml",
+        "--locked",
+        "--release",
+        "--bin",
+        "sknow-rs"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 101,
+      "started_ns": 1790825785451205100,
+      "finished_ns": 1790825790524409800,
+      "elapsed_s": 5.073167900001863,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/abc2963c186943c3249c94f3757df96fa661dd5cfa542e7149861970cf179220.raw",
+        "sha256": "abc2963c186943c3249c94f3757df96fa661dd5cfa542e7149861970cf179220",
+        "bytes": 2893
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-7eb371a95b164fe436c91cc4cb8ed97da90bc06e\\source\\rust\\target",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": true,
+      "target_inside_Knowledge_and_archive": true
+    }
+  ],
+  "directory": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-7eb371a95b164fe436c91cc4cb8ed97da90bc06e",
+  "source": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-7eb371a95b164fe436c91cc4cb8ed97da90bc06e\\source",
+  "site_packages": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-7eb371a95b164fe436c91cc4cb8ed97da90bc06e\\venv\\Lib\\site-packages",
+  "environment": {
+    "PYTHONUTF8": "1",
+    "PYTHONIOENCODING": "utf-8",
+    "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-final-7eb371a95b164fe436c91cc4cb8ed97da90bc06e\\source\\rust\\target"
+  },
+  "exception": {
+    "type": "ValueError",
+    "message": "artifact command failed; STOP, no retry"
+  },
+  "finished_ns": 1790825790525110500
+}

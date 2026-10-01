@@ -152,14 +152,14 @@ def protect():
     for row in moved:
         require(not absolute(row['original_path']).exists(), 'cancelled prep moved back')
         evidence.verify({'path': row['destination'], 'bytes': row['bytes'], 'sha256': row['sha256']})
-    artifacts = load('reports/P3/final-artifacts.json')
+    artifacts = load('reports/P3/final-artifacts-retry1.json')
     verify_artifacts(artifacts)
     perf = performance(evidence)
     save(absolute(PROTECTION), {
         'status': 'PASS', 'source_commit': artifacts['source_commit'],
         'whole_binary_hashes_actual': refs, 'frozen_inputs_unchanged': True,
         'prep_moved_bytes_unchanged': True, 'artifacts_unchanged': True,
-        'artifacts': evidence.binding('reports/P3/final-artifacts.json'),
+        'artifacts': evidence.binding('reports/P3/final-artifacts-retry1.json'),
         'performance': perf, 'no_SQL_or_query': True, 'no_snapshot_rebuild': True,
         'performance_reused': 'YES', 'performance_rerun': 'NO'})
 
@@ -260,7 +260,7 @@ def check_receipt(name, rec, artifacts, evidence):
     require(rec['status'] == 'PASS' and type(rec['exit']) is int and rec['exit'] == 0 and
             rec.get('retries', 0) == 0 and rec.get('head', rec.get('source_commit')) == source,
             'final check status/source differs: ' + name)
-    require(rec.get('artifacts') in (artifacts, evidence.binding('reports/P3/final-artifacts.json')),
+    require(rec.get('artifacts') in (artifacts, evidence.binding('reports/P3/final-artifacts-retry1.json')),
             'final check artifact binding missing/differs: ' + name)
     argv = rec['argv']
     require(isinstance(argv, list) and all(isinstance(a, str) for a in argv), 'invalid check argv')
@@ -288,7 +288,7 @@ def check_receipt(name, rec, artifacts, evidence):
         require(normalized == expected[name], 'not the precise final check: ' + name)
         env = rec['environment']
         target = absolute(env['CARGO_TARGET_DIR'])
-        require(target == absolute('rust/target') or (
+        require(target == absolute('build/p3-final-checks-' + source + '/rust-target') or (
                     target.is_relative_to(absolute(artifacts['directory'])) and
                     target == absolute(artifacts['environment']['CARGO_TARGET_DIR'])),
                 'Cargo check target escaped Knowledge or final artifact archive')
@@ -299,7 +299,7 @@ def check_receipt(name, rec, artifacts, evidence):
 
 def gates(head, evidence):
     old_count = boundaries(head)
-    artifacts = load('reports/P3/final-artifacts.json')
+    artifacts = load('reports/P3/final-artifacts-retry1.json')
     source = artifacts['source_commit']
     require(re.fullmatch('[0-9a-f]{40}', source) is not None, 'full artifact source SHA required')
     require(git('merge-base', source, head).decode().strip() == source, 'artifact source not ancestor')
@@ -312,7 +312,7 @@ def gates(head, evidence):
     protection = load(PROTECTION)
     require(protection['status'] == 'PASS' and protection['source_commit'] == source and
             protection['whole_binary_hashes_actual'] == protected_refs() and
-            protection['artifacts'] == evidence.binding('reports/P3/final-artifacts.json') and
+            protection['artifacts'] == evidence.binding('reports/P3/final-artifacts-retry1.json') and
             protection['performance'] == perf and protection['performance_reused'] == 'YES' and
             protection['performance_rerun'] == 'NO' and
             all(protection[k] is True for k in ('frozen_inputs_unchanged', 'prep_moved_bytes_unchanged',

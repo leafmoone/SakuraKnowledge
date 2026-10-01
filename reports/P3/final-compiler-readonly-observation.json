@@ -1,0 +1,310 @@
+{
+  "status": "FOUND_WITH_HISTORICAL_TOOLCHAIN_DIFFERENCE",
+  "commands": [
+    {
+      "argv": [
+        "rustc",
+        "-vV"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790834581683607200,
+      "finished_ns": 1790834581762292500,
+      "elapsed_s": 0.07868290000624256,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/8b63d892652a4bd91bf0a00adc2f2dd0f2b37f00de60f7b0882236ca60a11810.raw",
+        "sha256": "8b63d892652a4bd91bf0a00adc2f2dd0f2b37f00de60f7b0882236ca60a11810",
+        "bytes": 193
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-compiler-readonly-target",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": false,
+      "target_inside_Knowledge_and_archive": false
+    },
+    {
+      "argv": [
+        "rustup",
+        "show",
+        "active-toolchain"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790834581762949800,
+      "finished_ns": 1790834581797373500,
+      "elapsed_s": 0.03442289999657078,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/17858aca0f8f884712d362403c48820dba61eca9a01305819b17e802ba6f7121.raw",
+        "sha256": "17858aca0f8f884712d362403c48820dba61eca9a01305819b17e802ba6f7121",
+        "bytes": 39
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-compiler-readonly-target",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": false,
+      "target_inside_Knowledge_and_archive": false
+    },
+    {
+      "argv": [
+        "rustup",
+        "target",
+        "list",
+        "--installed"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790834581798458400,
+      "finished_ns": 1790834581851585800,
+      "elapsed_s": 0.05312709999998333,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/3603da2ceee5a37e015787e1640d1bb70f3a35b5a61cbd0b1fe41c2b7dbd92b5.raw",
+        "sha256": "3603da2ceee5a37e015787e1640d1bb70f3a35b5a61cbd0b1fe41c2b7dbd92b5",
+        "bytes": 22
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-compiler-readonly-target",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": false,
+      "target_inside_Knowledge_and_archive": false
+    },
+    {
+      "argv": [
+        "C:\\msys64\\ucrt64\\bin\\gcc.exe",
+        "--version"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790834581852230300,
+      "finished_ns": 1790834581885249500,
+      "elapsed_s": 0.03301859999919543,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/91bf371446c8855e344dd12cfa61b386f9c421c64dfa0dbe4234b26742e549c0.raw",
+        "sha256": "91bf371446c8855e344dd12cfa61b386f9c421c64dfa0dbe4234b26742e549c0",
+        "bytes": 253
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-compiler-readonly-target",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": false,
+      "target_inside_Knowledge_and_archive": false
+    },
+    {
+      "argv": [
+        "C:\\msys64\\ucrt64\\bin\\gcc.exe",
+        "-dumpmachine"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790834581885835800,
+      "finished_ns": 1790834581917606700,
+      "elapsed_s": 0.03177039999718545,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/5a93bd82f1f12e8b275a5cb5df82e8bac02d52c05d53b534913d0bc49ac46b9b.raw",
+        "sha256": "5a93bd82f1f12e8b275a5cb5df82e8bac02d52c05d53b534913d0bc49ac46b9b",
+        "bytes": 20
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-compiler-readonly-target",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": false,
+      "target_inside_Knowledge_and_archive": false
+    },
+    {
+      "argv": [
+        "C:/msys64/ucrt64/bin/g++.exe",
+        "--version"
+      ],
+      "cwd": "D:\\SakuraTool\\SakuraKnowledge",
+      "exit": 0,
+      "started_ns": 1790834581918461800,
+      "finished_ns": 1790834581959838200,
+      "elapsed_s": 0.04137619999528397,
+      "stdout": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/d37e1d6bf894449bc6d02d7736142b49065b955ed6bf27cf8fd18e256fcb4aed.raw",
+        "sha256": "d37e1d6bf894449bc6d02d7736142b49065b955ed6bf27cf8fd18e256fcb4aed",
+        "bytes": 253
+      },
+      "stderr": {
+        "path": "D:/SakuraTool/SakuraKnowledge/reports/P3/final-raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.raw",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "environment": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "CARGO_TARGET_DIR": "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-compiler-readonly-target",
+        "SKNOW_SEARCH_PROFILE_OUT": null
+      },
+      "child_cargo_target_explicit": false,
+      "target_inside_Knowledge_and_archive": false
+    }
+  ],
+  "gcc": {
+    "path": "C:\\msys64\\ucrt64\\bin\\gcc.exe",
+    "bytes": 3306749,
+    "sha256": "f96a3bdb1d3a3967b309d75c7413399391e857b5be4cb17162572ed66f6772a0"
+  },
+  "historical_files": [
+    {
+      "rust_info": {
+        "path": "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\.rustc_info.json",
+        "bytes": 1382,
+        "sha256": "7257e89c29b55d65cdfaeecb1437cf0e23a3a0fba082863df5cf359bebea2c74"
+      },
+      "retained_rustc_info": {
+        "rustc_fingerprint": 12905987778500991819,
+        "outputs": {
+          "7971740275564407648": {
+            "success": true,
+            "status": "",
+            "code": 0,
+            "stdout": "___.exe\nlib___.rlib\n___.dll\n___.dll\nlib___.a\n___.dll\nC:\\Users\\PC\\.rustup\\toolchains\\stable-x86_64-pc-windows-gnu\noff\n___\ndebug_assertions\npanic=\"unwind\"\nproc_macro\ntarget_abi=\"\"\ntarget_arch=\"x86_64\"\ntarget_endian=\"little\"\ntarget_env=\"gnu\"\ntarget_family=\"windows\"\ntarget_feature=\"cmpxchg16b\"\ntarget_feature=\"fxsr\"\ntarget_feature=\"sse\"\ntarget_feature=\"sse2\"\ntarget_feature=\"sse3\"\ntarget_has_atomic=\"128\"\ntarget_has_atomic=\"16\"\ntarget_has_atomic=\"32\"\ntarget_has_atomic=\"64\"\ntarget_has_atomic=\"8\"\ntarget_has_atomic=\"ptr\"\ntarget_has_atomic_primitive_alignment=\"128\"\ntarget_has_atomic_primitive_alignment=\"16\"\ntarget_has_atomic_primitive_alignment=\"32\"\ntarget_has_atomic_primitive_alignment=\"64\"\ntarget_has_atomic_primitive_alignment=\"8\"\ntarget_has_atomic_primitive_alignment=\"ptr\"\ntarget_os=\"windows\"\ntarget_pointer_width=\"64\"\ntarget_vendor=\"pc\"\nwindows\n",
+            "stderr": ""
+          },
+          "16091618510716447011": {
+            "success": true,
+            "status": "",
+            "code": 0,
+            "stdout": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+            "stderr": ""
+          }
+        },
+        "successes": {}
+      }
+    },
+    {
+      "native_artifact": {
+        "path": "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\release\\build\\libsqlite3-sys-f8745b76e6a35ddf\\out\\c877a2978823c39d-sqlite3.o",
+        "bytes": 3148683,
+        "sha256": "2187e631e7804c8b938feafa2bab0d4f6550eb394bfee885b6c7c1d6e4d4bd44"
+      },
+      "compiler_comment_strings": [
+        "GCC: (GNU) 16.2.0"
+      ],
+      "limitation": "Retained object comment is compiler version evidence, not recorded executable path or independent proof this file never changed since build."
+    },
+    {
+      "native_artifact": {
+        "path": "D:\\SakuraTool\\SakuraKnowledge\\rust\\target\\release\\build\\libsqlite3-sys-f8745b76e6a35ddf\\out\\libsqlite3.a",
+        "bytes": 3156296,
+        "sha256": "7d61818bf117b266dbfb18096095b78ce51bd3e38616e44d608916ac8752f390"
+      },
+      "compiler_comment_strings": [
+        "GCC: (GNU) 16.2.0"
+      ],
+      "limitation": "Retained object comment is compiler version evidence, not recorded executable path or independent proof this file never changed since build."
+    },
+    {
+      "rust_info": {
+        "path": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-close-9d7bd507\\source\\rust\\target\\.rustc_info.json",
+        "bytes": 1382,
+        "sha256": "7442786d1d344e8823673626f9bce1086ee1635579dc1852cbba81fde15859b3"
+      },
+      "retained_rustc_info": {
+        "rustc_fingerprint": 12905987778500991819,
+        "outputs": {
+          "16091618510716447011": {
+            "success": true,
+            "status": "",
+            "code": 0,
+            "stdout": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+            "stderr": ""
+          },
+          "7971740275564407648": {
+            "success": true,
+            "status": "",
+            "code": 0,
+            "stdout": "___.exe\nlib___.rlib\n___.dll\n___.dll\nlib___.a\n___.dll\nC:\\Users\\PC\\.rustup\\toolchains\\stable-x86_64-pc-windows-gnu\noff\n___\ndebug_assertions\npanic=\"unwind\"\nproc_macro\ntarget_abi=\"\"\ntarget_arch=\"x86_64\"\ntarget_endian=\"little\"\ntarget_env=\"gnu\"\ntarget_family=\"windows\"\ntarget_feature=\"cmpxchg16b\"\ntarget_feature=\"fxsr\"\ntarget_feature=\"sse\"\ntarget_feature=\"sse2\"\ntarget_feature=\"sse3\"\ntarget_has_atomic=\"128\"\ntarget_has_atomic=\"16\"\ntarget_has_atomic=\"32\"\ntarget_has_atomic=\"64\"\ntarget_has_atomic=\"8\"\ntarget_has_atomic=\"ptr\"\ntarget_has_atomic_primitive_alignment=\"128\"\ntarget_has_atomic_primitive_alignment=\"16\"\ntarget_has_atomic_primitive_alignment=\"32\"\ntarget_has_atomic_primitive_alignment=\"64\"\ntarget_has_atomic_primitive_alignment=\"8\"\ntarget_has_atomic_primitive_alignment=\"ptr\"\ntarget_os=\"windows\"\ntarget_pointer_width=\"64\"\ntarget_vendor=\"pc\"\nwindows\n",
+            "stderr": ""
+          }
+        },
+        "successes": {}
+      }
+    },
+    {
+      "native_artifact": {
+        "path": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-close-9d7bd507\\source\\rust\\target\\release\\build\\libsqlite3-sys-f8745b76e6a35ddf\\out\\c877a2978823c39d-sqlite3.o",
+        "bytes": 3148683,
+        "sha256": "2187e631e7804c8b938feafa2bab0d4f6550eb394bfee885b6c7c1d6e4d4bd44"
+      },
+      "compiler_comment_strings": [
+        "GCC: (GNU) 16.2.0"
+      ],
+      "limitation": "Retained object comment is compiler version evidence, not recorded executable path or independent proof this file never changed since build."
+    },
+    {
+      "native_artifact": {
+        "path": "D:\\SakuraTool\\SakuraKnowledge\\dist\\p3-close-9d7bd507\\source\\rust\\target\\release\\build\\libsqlite3-sys-f8745b76e6a35ddf\\out\\libsqlite3.a",
+        "bytes": 3156296,
+        "sha256": "7d61818bf117b266dbfb18096095b78ce51bd3e38616e44d608916ac8752f390"
+      },
+      "compiler_comment_strings": [
+        "GCC: (GNU) 16.2.0"
+      ],
+      "limitation": "Retained object comment is compiler version evidence, not recorded executable path or independent proof this file never changed since build."
+    }
+  ],
+  "successful_receipts": [
+    "reports/P3/close-artifacts.json",
+    "reports/P3/close-prep-release.json",
+    "reports/P3/close-check-release.json"
+  ],
+  "historical_receipt_limit": "Successful receipts/raw do not record CC/CXX/PATH or GCC version/path. Retained build output and fingerprints CC=null; cannot assert old compiler exact executable path.",
+  "rust_target": "x86_64-pc-windows-gnu; current and retained old rustc 1.98.1 match",
+  "found_gcc_target": "x86_64-w64-mingw32",
+  "historical_gcc_version": "GCC: (GNU) 16.2.0 retained sqlite3 objects",
+  "found_gcc_version": "MSYS2 Rev5 GCC16.1.0; not identical to retained old compiler version",
+  "compatibility": "Architecture/GNU family aligned, compiler version differs; full ABI/CRT/linker/build compatibility NOT_VERIFIED, no compile/link executed",
+  "planned_command_only_environment": {
+    "PATH_prefix": "C:/msys64/ucrt64/bin",
+    "CC": "C:/msys64/ucrt64/bin/gcc.exe",
+    "CXX": "C:/msys64/ucrt64/bin/g++.exe",
+    "CARGO_TARGET_DIR": "A newly authorized Knowledge-isolated artifact directory, never inherited Pool target",
+    "limitation": "Proposal only, not applied or compiler compatibility approved"
+  },
+  "artifact_retry_started": false,
+  "global_environment_modified": false,
+  "install_or_download": false,
+  "Pool_access": false,
+  "original_artifact_FAIL_preserved": "reports/P3/final-artifacts.json"
+}
