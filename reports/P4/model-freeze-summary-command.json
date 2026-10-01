@@ -1,0 +1,26 @@
+{
+  "head": "0ef6992fb7b949ef259da4839b3f5e410943fc95",
+  "working_tree": "?? configs/p4-model-a-contract.json\n?? configs/p4-model-b-contract.json\n?? reports/P4/model-a-download-command.json\n?? reports/P4/model-a-verify-command.json\n?? reports/P4/model-b-download-command.json\n?? reports/P4/model-b-verify-command.json\n?? reports/P4/model-pinned-docs-command.json\n?? reports/P4/model-reviewed-freeze-command.json\n?? uv.lock\n",
+  "argv": [
+    "python",
+    "model/p4-summarize-freeze.py"
+  ],
+  "exit": 0,
+  "elapsed_s": 0.1539065999968443,
+  "status": "PASS",
+  "timeout_policy": {
+    "requested": 0,
+    "effective": null,
+    "disabled": true
+  },
+  "encoding_environment": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "stdout_base64": "eyJzdGF0dXMiOiAiUEFTUyIsICJzdW1tYXJ5IjogInJlcG9ydHMvUDQvbW9kZWwtZnJlZXplLXN1bW1hcnkuanNvbiIsICJtb2RlbHMiOiB7ImEiOiB7InJldmlzaW9uIjogIjYxNDI0MWY2MjJmNTNjNGVlZmY5ODkwYmRjNGYzMWNmZWNjNDE4YjMiLCAiYnl0ZXMiOiA0OTMyOTI4Mjh9LCAiYiI6IHsicmV2aXNpb24iOiAiNTYxN2E5ZjYxYjAyODAwNWE0ODU4ZmRhYzg0NWRiNDA2YWVmYjE4MSIsICJieXRlcyI6IDIyOTMzMzE2MjN9fX0NCg==",
+  "stdout_sha256": "39d26b830df6bb9cd68267915e08f38bda0e5bc7b83e01ea2ff09e21a78ea0cd",
+  "stdout": "{\"status\": \"PASS\", \"summary\": \"reports/P4/model-freeze-summary.json\", \"models\": {\"a\": {\"revision\": \"614241f622f53c4eeff9890bdc4f31cfecc418b3\", \"bytes\": 493292828}, \"b\": {\"revision\": \"5617a9f61b028005a4858fdac845db406aefb181\", \"bytes\": 2293331623}}}\r\n",
+  "stderr_base64": "",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": ""
+}

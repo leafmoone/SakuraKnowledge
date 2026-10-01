@@ -187,6 +187,7 @@ def export(corpus, corpus_manifest, output, tokenizer, inventory, contract, *, r
     snapshot = valid_hash(corpus_manifest["base_snapshot"]["sha256"])
     require(type(corpus_manifest["selected_count"]) is int
             and corpus_manifest["selected_count"] >= 0, "invalid selected_count")
+    require(inventory.get('contract') == contract, 'tokenizer inventory contract mismatch')
     inventory_hash = digest(canonical(inventory))
     output.mkdir(parents=True, exist_ok=False)
     seen, empty = set(), []

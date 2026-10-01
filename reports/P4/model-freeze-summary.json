@@ -1,0 +1,410 @@
+{
+  "schema": "p4-model-freeze-summary-v1",
+  "status": "PASS",
+  "scope": "Asset preparation and byte verification only; dense embeddings contracts reviewed, no inference or benchmarks.",
+  "revision_policy": "Existing CLI has no --revision. Existing resolve/freeze API called with mandatory exact equality to supplied 40-character revisions before freezing. Downloads use immutable plan revisions.",
+  "hash_policy": "All obtained assets have actual byte SHA256; plans retain null upstream SHA256 for git-backed files, never fabricate upstream hashes. file_sha256 hashes raw JSON file bytes; plan_sha256/inventory_sha256 use utility canonical JSON.",
+  "license_policy": "Both official pinned cards and API metadata declare mit. Neither pinned repository inventory contains a standalone license file; none fabricated or downloaded. Not legal approval.",
+  "safety": {
+    "inference_run": false,
+    "weights_deserialized": false,
+    "installs": false,
+    "automatic_retries": false,
+    "b_future_load_requires": "Explicit weights_only=True; never unsafe pickle loading.",
+    "b_scope": "Dense encoder only; sparse_linear.pt and colbert_linear.pt excluded as not required for CLS dense contract."
+  },
+  "documentation_receipt": {
+    "path": "model/p4-pinned-docs-receipt.json",
+    "file_sha256": "9aa39273ecc086f1a345bdb5940b764569f02c8fd4a35e5ecf8cfede3eaeeb06"
+  },
+  "pinned_documentation": [
+    {
+      "model": "a",
+      "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+      "source": "https://huggingface.co/intfloat/multilingual-e5-small/resolve/614241f622f53c4eeff9890bdc4f31cfecc418b3/README.md",
+      "path": "model/intfloat--multilingual-e5-small/614241f622f53c4eeff9890bdc4f31cfecc418b3/README.md",
+      "size": 497538,
+      "sha256": "0038de97aee16258cecbad7ffda4b4febd6953e747a00e0ddbc8e6ed241e9c1c",
+      "git_blob_sha1": "e56327af55e9742caf76bff9ba83b6904cd2003d"
+    },
+    {
+      "model": "a",
+      "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+      "source": "https://huggingface.co/intfloat/multilingual-e5-small/resolve/614241f622f53c4eeff9890bdc4f31cfecc418b3/config.json",
+      "path": "model/intfloat--multilingual-e5-small/614241f622f53c4eeff9890bdc4f31cfecc418b3/config.json",
+      "size": 655,
+      "sha256": "69137736cab8b8903a07fe8afaafdda25aac55415a12a55d1bffa9f581abf959",
+      "git_blob_sha1": "60a2a84020f1d74cc53ea9e8c4e91cf4af6c2b68"
+    },
+    {
+      "model": "a",
+      "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+      "source": "https://huggingface.co/intfloat/multilingual-e5-small/resolve/614241f622f53c4eeff9890bdc4f31cfecc418b3/1_Pooling/config.json",
+      "path": "model/intfloat--multilingual-e5-small/614241f622f53c4eeff9890bdc4f31cfecc418b3/1_Pooling/config.json",
+      "size": 200,
+      "sha256": "987f7a67a38fa564c849bb5d277c52ab9088a84368fc0be31a354125aebb12a0",
+      "git_blob_sha1": "acbd4014202bf4dbc6c03229bcbeef7c4feafb58"
+    },
+    {
+      "model": "a",
+      "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+      "source": "https://huggingface.co/intfloat/multilingual-e5-small/resolve/614241f622f53c4eeff9890bdc4f31cfecc418b3/modules.json",
+      "path": "model/intfloat--multilingual-e5-small/614241f622f53c4eeff9890bdc4f31cfecc418b3/modules.json",
+      "size": 387,
+      "sha256": "c6e29747481e8b5dd2b58401966aeac910de39092f90cda9a704b1545f902b04",
+      "git_blob_sha1": "ac2039abdf6ff023b27c919bb9675cfe378cb10f"
+    },
+    {
+      "model": "a",
+      "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+      "source": "https://huggingface.co/intfloat/multilingual-e5-small/resolve/614241f622f53c4eeff9890bdc4f31cfecc418b3/sentence_bert_config.json",
+      "path": "model/intfloat--multilingual-e5-small/614241f622f53c4eeff9890bdc4f31cfecc418b3/sentence_bert_config.json",
+      "size": 57,
+      "sha256": "948201d8329907aae938fa62f9ceeed53f5694dacc2b87b9f3b78b37ee986529",
+      "git_blob_sha1": "4eca68d85ecd3034cf4174d8a4033a75344ea62d"
+    },
+    {
+      "model": "b",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "source": "https://huggingface.co/BAAI/bge-m3/resolve/5617a9f61b028005a4858fdac845db406aefb181/README.md",
+      "path": "model/BAAI--bge-m3/5617a9f61b028005a4858fdac845db406aefb181/README.md",
+      "size": 15822,
+      "sha256": "0b81ccf9134e5874d620a86e6905062ea999e779c34eb1a7e65eaeb7fe00e450",
+      "git_blob_sha1": "e5a320176edd6ee1cfb256e68ee5ac0004de9447"
+    },
+    {
+      "model": "b",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "source": "https://huggingface.co/BAAI/bge-m3/resolve/5617a9f61b028005a4858fdac845db406aefb181/config.json",
+      "path": "model/BAAI--bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json",
+      "size": 687,
+      "sha256": "26159e7ad065073448460117eb24b7a4572f6f4e78eadff65dc0a11c052449fa",
+      "git_blob_sha1": "e6eda1c72da8f9dc30fdd9b69c73d35af3b7a7ad"
+    },
+    {
+      "model": "b",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "source": "https://huggingface.co/BAAI/bge-m3/resolve/5617a9f61b028005a4858fdac845db406aefb181/1_Pooling/config.json",
+      "path": "model/BAAI--bge-m3/5617a9f61b028005a4858fdac845db406aefb181/1_Pooling/config.json",
+      "size": 191,
+      "sha256": "e54c164a07274f2eb45bb724f54a79d1efcc90c41573887cd9a29aeee0597352",
+      "git_blob_sha1": "9bd85925f325e25246d94c4918dc02ab98f2a1b7"
+    },
+    {
+      "model": "b",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "source": "https://huggingface.co/BAAI/bge-m3/resolve/5617a9f61b028005a4858fdac845db406aefb181/modules.json",
+      "path": "model/BAAI--bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json",
+      "size": 349,
+      "sha256": "84e40c8e006c9b1d6c122e02cba9b02458120b5fb0c87b746c41e0207cf642cf",
+      "git_blob_sha1": "952a9b81c0bfd99800fabf352f69c7ccd46c5e43"
+    },
+    {
+      "model": "b",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "source": "https://huggingface.co/BAAI/bge-m3/resolve/5617a9f61b028005a4858fdac845db406aefb181/sentence_bert_config.json",
+      "path": "model/BAAI--bge-m3/5617a9f61b028005a4858fdac845db406aefb181/sentence_bert_config.json",
+      "size": 54,
+      "sha256": "eb9b44b13c0f52a3b3685c3b1cbdea1ba8b04bea123b98f61610048940776eb1",
+      "git_blob_sha1": "0140ba1eac83a3c9b857d64baba91969d988624b"
+    },
+    {
+      "model": "b",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "source": "https://huggingface.co/BAAI/bge-m3/resolve/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json",
+      "path": "model/BAAI--bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json",
+      "size": 123,
+      "sha256": "1eef72430e7194a1e59680e635aed81ffa083f05668dbc5bb1c56c04c0999c38",
+      "git_blob_sha1": "1fba91c78a6c8e17227058ab6d4d3acb5d8630a9"
+    }
+  ],
+  "models": {
+    "a": {
+      "repository": "intfloat/multilingual-e5-small",
+      "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+      "asset_directory": "model/intfloat--multilingual-e5-small/614241f622f53c4eeff9890bdc4f31cfecc418b3",
+      "contract": {
+        "path": "configs/p4-model-a-contract.json",
+        "file_sha256": "29e240e9aec93cd04d8ca47cff0116bb93c8d35fd523ef02f87f1c67f0bc7b52",
+        "reviewed": {
+          "source": "explicit_config",
+          "review_note": "Reviewed official intfloat/multilingual-e5-small revision 614241f622f53c4eeff9890bdc4f31cfecc418b3. README Usage lines 18318-18354 and FAQ require 384 dimensions, attention-mask mean pooling, L2 normalization, and query: /passage: prefixes including trailing spaces; config.json and sentence_bert_config.json confirm 512 tokens. 1_Pooling/config.json confirms mean; modules.json includes Normalize. Pinned source URLs and actual SHA256 hashes: model/p4-pinned-docs-receipt.json and reports/P4/model-freeze-summary.json. MIT is card metadata, not standalone license-file or legal approval.",
+          "dimension": 384,
+          "max_sequence_tokens": 512,
+          "pooling": "mean",
+          "normalize": true,
+          "query_prefix": "query: ",
+          "passage_prefix": "passage: ",
+          "tokenizer_files": [
+            "tokenizer.json",
+            "tokenizer_config.json",
+            "special_tokens_map.json",
+            "sentencepiece.bpe.model"
+          ]
+        }
+      },
+      "frozen_plan": {
+        "path": "model/p4-model-a-plan.json",
+        "file_sha256": "2ab7ccc0993afc290233dcb99211e51626a02bd13af07ffc29b022880b3509ef",
+        "plan_sha256": "9d917819c5c0f76e23f66886c4f1d92982fe4b9bd7e7c34a92455eca5e011a48",
+        "expected_file_count": 10
+      },
+      "obtained_receipt": {
+        "path": "model/p4-model-a-download.json",
+        "file_sha256": "9a8f5b0111e0c3732b349db4bcc938014d60bb6df2f1cd0ff6488937a7ff00bc",
+        "status": "PASS",
+        "inventory_sha256": "3de31b940c10d1e2a9291151bb6faffa8f8403a9918d5ee318e72b0c9a886bf6",
+        "files": [
+          {
+            "path": "1_Pooling/config.json",
+            "size": 200,
+            "sha256": "987f7a67a38fa564c849bb5d277c52ab9088a84368fc0be31a354125aebb12a0",
+            "git_blob_sha1": "acbd4014202bf4dbc6c03229bcbeef7c4feafb58"
+          },
+          {
+            "path": "README.md",
+            "size": 497538,
+            "sha256": "0038de97aee16258cecbad7ffda4b4febd6953e747a00e0ddbc8e6ed241e9c1c",
+            "git_blob_sha1": "e56327af55e9742caf76bff9ba83b6904cd2003d"
+          },
+          {
+            "path": "config.json",
+            "size": 655,
+            "sha256": "69137736cab8b8903a07fe8afaafdda25aac55415a12a55d1bffa9f581abf959",
+            "git_blob_sha1": "60a2a84020f1d74cc53ea9e8c4e91cf4af6c2b68"
+          },
+          {
+            "path": "model.safetensors",
+            "size": 470641600,
+            "sha256": "1a55775f53449dac10a2bcbc312469fac40b96d53198c407081a831f81c98477",
+            "git_blob_sha1": "1061c451d1eba696c7eff4ba10253eb7092df279"
+          },
+          {
+            "path": "modules.json",
+            "size": 387,
+            "sha256": "c6e29747481e8b5dd2b58401966aeac910de39092f90cda9a704b1545f902b04",
+            "git_blob_sha1": "ac2039abdf6ff023b27c919bb9675cfe378cb10f"
+          },
+          {
+            "path": "sentence_bert_config.json",
+            "size": 57,
+            "sha256": "948201d8329907aae938fa62f9ceeed53f5694dacc2b87b9f3b78b37ee986529",
+            "git_blob_sha1": "4eca68d85ecd3034cf4174d8a4033a75344ea62d"
+          },
+          {
+            "path": "sentencepiece.bpe.model",
+            "size": 5069051,
+            "sha256": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865",
+            "git_blob_sha1": "db9af13bf09fd3028ca32be90d3fb66d5e470399"
+          },
+          {
+            "path": "special_tokens_map.json",
+            "size": 167,
+            "sha256": "d05497f1da52c5e09554c0cd874037a083e1dc1b9cfd48034d1c717f1afc07a7",
+            "git_blob_sha1": "e0b1d18ecd0ae4ff1d47bd297d910c0cf83e504b"
+          },
+          {
+            "path": "tokenizer.json",
+            "size": 17082730,
+            "sha256": "0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39",
+            "git_blob_sha1": "c08c71c380f26cd853e05e382751b80b30bbbc5e"
+          },
+          {
+            "path": "tokenizer_config.json",
+            "size": 443,
+            "sha256": "a1d6bc8734a6f635dc158508bef000f8e2e5a759c7d92f984b2c86e5ff53425b",
+            "git_blob_sha1": "059214673d9d6d2ee319411e2ffec8c024b816d5"
+          }
+        ],
+        "total_bytes": 493292828
+      },
+      "verification": {
+        "path": "model/p4-model-a-verification.json",
+        "file_sha256": "f3bfdac87c8d1b6f0b7a71fa88b140cc61f60e774b603d2982cf7a0760469743",
+        "result": {
+          "schema": "p4-model-verification-v1",
+          "plan_sha256": "9d917819c5c0f76e23f66886c4f1d92982fe4b9bd7e7c34a92455eca5e011a48",
+          "receipt_sha256": "920d821e296e46d16df6fc98e18a2263ddb7a865cd65a9700559852e5ed1d464",
+          "status": "PASS",
+          "errors": []
+        }
+      },
+      "license_metadata": {
+        "source": "https://huggingface.co/api/models/intfloat/multilingual-e5-small/revision/614241f622f53c4eeff9890bdc4f31cfecc418b3",
+        "card_data": {
+          "license": "mit",
+          "license_name": null,
+          "license_link": null
+        },
+        "review_status": "NOT_REVIEWED"
+      },
+      "standalone_license_present": false
+    },
+    "b": {
+      "repository": "BAAI/bge-m3",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "asset_directory": "model/BAAI--bge-m3/5617a9f61b028005a4858fdac845db406aefb181",
+      "contract": {
+        "path": "configs/p4-model-b-contract.json",
+        "file_sha256": "092ef4b732d51722b84299f9f47278f528f01e2f7af01e58a6e781c623873dd2",
+        "reviewed": {
+          "source": "explicit_config",
+          "review_note": "Reviewed official BAAI/bge-m3 revision 5617a9f61b028005a4858fdac845db406aefb181 for dense embeddings only. README Specs gives 1024 dimensions and 8192 tokens; FAQ explicitly removes query instructions and dense example uses unprefixed queries/passages. 1_Pooling/config.json explicitly enables CLS only; modules.json includes Normalize. config.json confirms hidden_size 1024; sentence_bert_config.json confirms max_seq_length 8192 (not config max_position_embeddings 8194). Pinned URLs and actual SHA256 hashes: model/p4-pinned-docs-receipt.json and reports/P4/model-freeze-summary.json. Native weights are pytorch_model.bin; never unsafe pickle loading; any later load must explicitly use weights_only=True. MIT is card metadata, not standalone license-file or legal approval.",
+          "dimension": 1024,
+          "max_sequence_tokens": 8192,
+          "pooling": "cls",
+          "normalize": true,
+          "query_prefix": "",
+          "passage_prefix": "",
+          "tokenizer_files": [
+            "tokenizer.json",
+            "tokenizer_config.json",
+            "special_tokens_map.json",
+            "sentencepiece.bpe.model"
+          ]
+        }
+      },
+      "frozen_plan": {
+        "path": "model/p4-model-b-plan.json",
+        "file_sha256": "a18226dbc276397958ea06ed83c60f0f2c837585a0f2fea8c57ac25c54846b1a",
+        "plan_sha256": "7add01df6058f42924e24b5ded7b6bb415335a68cbd93a30f5a486f36e088f99",
+        "expected_file_count": 11
+      },
+      "obtained_receipt": {
+        "path": "model/p4-model-b-download.json",
+        "file_sha256": "2b97dacb0c79c106c7bd911f636d0f1158b2847c50f2b14e9a3736f5d9edb62e",
+        "status": "PASS",
+        "inventory_sha256": "ba069297a262af48e4effe1384b7543f870f52059a4fc565a28d6836583f85e9",
+        "files": [
+          {
+            "path": "1_Pooling/config.json",
+            "size": 191,
+            "sha256": "e54c164a07274f2eb45bb724f54a79d1efcc90c41573887cd9a29aeee0597352",
+            "git_blob_sha1": "9bd85925f325e25246d94c4918dc02ab98f2a1b7"
+          },
+          {
+            "path": "README.md",
+            "size": 15822,
+            "sha256": "0b81ccf9134e5874d620a86e6905062ea999e779c34eb1a7e65eaeb7fe00e450",
+            "git_blob_sha1": "e5a320176edd6ee1cfb256e68ee5ac0004de9447"
+          },
+          {
+            "path": "config.json",
+            "size": 687,
+            "sha256": "26159e7ad065073448460117eb24b7a4572f6f4e78eadff65dc0a11c052449fa",
+            "git_blob_sha1": "e6eda1c72da8f9dc30fdd9b69c73d35af3b7a7ad"
+          },
+          {
+            "path": "config_sentence_transformers.json",
+            "size": 123,
+            "sha256": "1eef72430e7194a1e59680e635aed81ffa083f05668dbc5bb1c56c04c0999c38",
+            "git_blob_sha1": "1fba91c78a6c8e17227058ab6d4d3acb5d8630a9"
+          },
+          {
+            "path": "modules.json",
+            "size": 349,
+            "sha256": "84e40c8e006c9b1d6c122e02cba9b02458120b5fb0c87b746c41e0207cf642cf",
+            "git_blob_sha1": "952a9b81c0bfd99800fabf352f69c7ccd46c5e43"
+          },
+          {
+            "path": "pytorch_model.bin",
+            "size": 2271145830,
+            "sha256": "b5e0ce3470abf5ef3831aa1bd5553b486803e83251590ab7ff35a117cf6aad38",
+            "git_blob_sha1": "eb880dff93f312627f2a8169847f627a2dacf9e3"
+          },
+          {
+            "path": "sentence_bert_config.json",
+            "size": 54,
+            "sha256": "eb9b44b13c0f52a3b3685c3b1cbdea1ba8b04bea123b98f61610048940776eb1",
+            "git_blob_sha1": "0140ba1eac83a3c9b857d64baba91969d988624b"
+          },
+          {
+            "path": "sentencepiece.bpe.model",
+            "size": 5069051,
+            "sha256": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865",
+            "git_blob_sha1": "db9af13bf09fd3028ca32be90d3fb66d5e470399"
+          },
+          {
+            "path": "special_tokens_map.json",
+            "size": 964,
+            "sha256": "8c785abebea9ae3257b61681b4e6fd8365ceafde980c21970d001e834cf10835",
+            "git_blob_sha1": "b1879d702821e753ffe4245048eee415d54a9385"
+          },
+          {
+            "path": "tokenizer.json",
+            "size": 17098108,
+            "sha256": "21106b6d7dab2952c1d496fb21d5dc9db75c28ed361a05f5020bbba27810dd08",
+            "git_blob_sha1": "846be270dda55af7d53de7b85371d26b0fe30be0"
+          },
+          {
+            "path": "tokenizer_config.json",
+            "size": 444,
+            "sha256": "a62b2b6784f990259fddef5f16388693a8043be4f69179e6a5257eeb3f9abac4",
+            "git_blob_sha1": "dc69ac559dcba2694012009aaa108c614541789a"
+          }
+        ],
+        "total_bytes": 2293331623
+      },
+      "verification": {
+        "path": "model/p4-model-b-verification.json",
+        "file_sha256": "f5a9453001f34352bf7cc8428f8d6be95ddc8859a33c2f523550971e77db6e83",
+        "result": {
+          "schema": "p4-model-verification-v1",
+          "plan_sha256": "7add01df6058f42924e24b5ded7b6bb415335a68cbd93a30f5a486f36e088f99",
+          "receipt_sha256": "7f9de0ea3e831799a7800aa4459140729a26cd90255c3090611b001c72e04e42",
+          "status": "PASS",
+          "errors": []
+        }
+      },
+      "license_metadata": {
+        "source": "https://huggingface.co/api/models/BAAI/bge-m3/revision/5617a9f61b028005a4858fdac845db406aefb181",
+        "card_data": {
+          "license": "mit",
+          "license_name": null,
+          "license_link": null
+        },
+        "review_status": "NOT_REVIEWED"
+      },
+      "standalone_license_present": false
+    }
+  },
+  "command_receipts": [
+    {
+      "path": "reports/P4/model-pinned-docs-command.json",
+      "file_sha256": "734ec6a8d5a921f3ff794bb5461433e3f9dd4c77513deb4df9fecf0d32a03702",
+      "exit": 0,
+      "status": "PASS"
+    },
+    {
+      "path": "reports/P4/model-reviewed-freeze-command.json",
+      "file_sha256": "db81477f5fefe01c5719e9f82395ec794cb5c4db1038df9ad6851bb683cc67a5",
+      "exit": 0,
+      "status": "PASS"
+    },
+    {
+      "path": "reports/P4/model-a-download-command.json",
+      "file_sha256": "022db6fcc8f1eaf7df0b8a98c652c43001c5729a5b012399a55a7a48d2c9ff18",
+      "exit": 0,
+      "status": "PASS"
+    },
+    {
+      "path": "reports/P4/model-b-download-command.json",
+      "file_sha256": "c01049df942dac369869a3b03272de228db382df757190667e9b77ac582f70d0",
+      "exit": 0,
+      "status": "PASS"
+    },
+    {
+      "path": "reports/P4/model-a-verify-command.json",
+      "file_sha256": "f53e1eca11d855d8e1b9c67146499ab6d3ae3ef6c4748ea9b3e8c8b54d2bbf21",
+      "exit": 0,
+      "status": "PASS"
+    },
+    {
+      "path": "reports/P4/model-b-verify-command.json",
+      "file_sha256": "5a7cdfd92e8f13250495f2e43809348e00ead82cb6aa9cbba2d8fd67f5409e2d",
+      "exit": 0,
+      "status": "PASS"
+    }
+  ],
+  "failures": []
+}

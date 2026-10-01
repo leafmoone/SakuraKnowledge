@@ -1,6 +1,7 @@
 """Deterministic offline tests: no model, database or downloaded tokenizer."""
 import hashlib
 import json
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -202,6 +203,7 @@ def fixture_export(tmp_path, docs=None):
     output = tmp_path / "build" / "p4" / "chunks-test"
     inventory = {"tokenizer_json_sha256": "b" * 64, "library": "fake", "library_version": "1"}
     contract = {"passage_prefix": "p:", "query_prefix": "q:", "max_sequence_tokens": 512}
+    inventory['contract'] = dict(contract)
     return corpus, manifest, output, Characters(), inventory, contract
 
 
@@ -221,6 +223,24 @@ def test_export_exclusive_deterministic_empty_reporting(tmp_path):
     second[2] = args[2].with_name("second")
     assert chunks.export(*second, root=tmp_path) == report
     assert (second[2] / "chunks.jsonl").read_bytes() == original
+
+
+def test_export_rejects_contract_mismatch(tmp_path):
+    args = list(fixture_export(tmp_path))
+    args[5] = {**args[5], 'passage_prefix': 'different:'}
+    with pytest.raises(chunks.ChunkError, match='inventory contract mismatch'):
+        chunks.export(*args, root=tmp_path)
+    assert not args[2].exists()
+
+
+def test_export_rejects_redirected_ancestor(tmp_path, monkeypatch):
+    args = fixture_export(tmp_path)
+    original = Path.is_symlink
+    monkeypatch.setattr(Path, 'is_symlink',
+                        lambda path: path == tmp_path / 'build' or original(path))
+    with pytest.raises(chunks.ChunkError, match='symlink forbidden'):
+        chunks.export(*args, root=tmp_path)
+    assert not args[2].exists()
 
 
 def test_export_hash_and_path_guards(tmp_path):
