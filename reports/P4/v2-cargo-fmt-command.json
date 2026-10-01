@@ -1,0 +1,1 @@
+{"command": ["cargo", "fmt", "--manifest-path", "rust/Cargo.toml", "--all", "--", "--check"], "elapsed_seconds": 0.49703820000286214, "environment": {"PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"}, "exit_code": 0, "schema": "p4-command-receipt-v1", "stderr": "", "stderr_base64": "", "stderr_utf8_valid": true, "stdout": "", "stdout_base64": "", "stdout_utf8_valid": true}

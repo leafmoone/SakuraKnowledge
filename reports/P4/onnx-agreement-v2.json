@@ -1,0 +1,4428 @@
+{
+  "schema": "p4-onnx-agreement-v2",
+  "status": "FAIL",
+  "scope": "representation equivalence only",
+  "selection_rerun": false,
+  "performance_qualified": false,
+  "fallback": false,
+  "retries": 0,
+  "queries": [
+    {
+      "case_id": "P4-001",
+      "max_component_error": 3.2782554626464844e-07,
+      "min_cosine": 0.9999999999971383,
+      "max_norm_error": 6.079443322093425e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-002",
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999976709,
+      "max_norm_error": 2.637818949935422e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-003",
+      "max_component_error": 2.7101486921310425e-07,
+      "min_cosine": 0.9999999999967839,
+      "max_norm_error": 2.2047680214853926e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-004",
+      "max_component_error": 2.1606683731079102e-07,
+      "min_cosine": 0.9999999999982809,
+      "max_norm_error": 1.7230025362025003e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-005",
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999976315,
+      "max_norm_error": 5.717474422795021e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-006",
+      "max_component_error": 2.9616057872772217e-07,
+      "min_cosine": 0.9999999999973226,
+      "max_norm_error": 4.9116332889731495e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-007",
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999974323,
+      "max_norm_error": 9.905445841340565e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-008",
+      "max_component_error": 1.6298145055770874e-07,
+      "min_cosine": 0.999999999998816,
+      "max_norm_error": 1.4726737818104851e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-009",
+      "max_component_error": 2.3469328880310059e-07,
+      "min_cosine": 0.999999999997202,
+      "max_norm_error": 2.933959868389735e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-010",
+      "max_component_error": 2.849847078323364e-07,
+      "min_cosine": 0.9999999999967119,
+      "max_norm_error": 3.3585160319482554e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-011",
+      "max_component_error": 2.1979212760925293e-07,
+      "min_cosine": 0.9999999999975573,
+      "max_norm_error": 1.4844027873550658e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-012",
+      "max_component_error": 2.477318048477173e-07,
+      "min_cosine": 0.999999999997386,
+      "max_norm_error": 2.3889796962883736e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-013",
+      "max_component_error": 2.5704503059387207e-07,
+      "min_cosine": 0.9999999999979137,
+      "max_norm_error": 3.542527421407371e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-014",
+      "max_component_error": 2.2724270820617676e-07,
+      "min_cosine": 0.9999999999978322,
+      "max_norm_error": 5.317662659098943e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-015",
+      "max_component_error": 1.9138678908348083e-07,
+      "min_cosine": 0.9999999999985788,
+      "max_norm_error": 1.1666115784514375e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-016",
+      "max_component_error": 2.086162567138672e-07,
+      "min_cosine": 0.9999999999979596,
+      "max_norm_error": 2.5822459170932177e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-017",
+      "max_component_error": 2.0116567611694336e-07,
+      "min_cosine": 0.9999999999983511,
+      "max_norm_error": 3.687810887775811e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-018",
+      "max_component_error": 1.9371509552001953e-07,
+      "min_cosine": 0.9999999999985607,
+      "max_norm_error": 7.16892800678437e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-019",
+      "max_component_error": 2.682209014892578e-07,
+      "min_cosine": 0.999999999998427,
+      "max_norm_error": 6.078247927199243e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-020",
+      "max_component_error": 2.4028122425079346e-07,
+      "min_cosine": 0.9999999999975624,
+      "max_norm_error": 4.5007001348018605e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-021",
+      "max_component_error": 1.955777406692505e-07,
+      "min_cosine": 0.999999999998064,
+      "max_norm_error": 1.8736053064571934e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-022",
+      "max_component_error": 2.6635825634002686e-07,
+      "min_cosine": 0.9999999999972433,
+      "max_norm_error": 3.02314309141849e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-023",
+      "max_component_error": 1.73225998878479e-07,
+      "min_cosine": 0.9999999999985414,
+      "max_norm_error": 2.589996801471983e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-024",
+      "max_component_error": 2.2351741790771484e-07,
+      "min_cosine": 0.9999999999978775,
+      "max_norm_error": 3.1283551726879466e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-025",
+      "max_component_error": 3.725290298461914e-07,
+      "min_cosine": 0.999999999996886,
+      "max_norm_error": 1.5333850134080507e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-026",
+      "max_component_error": 2.8312206268310547e-07,
+      "min_cosine": 0.9999999999984823,
+      "max_norm_error": 5.0579281873908144e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-027",
+      "max_component_error": 1.8533319234848022e-07,
+      "min_cosine": 0.9999999999984479,
+      "max_norm_error": 4.005566922593573e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-028",
+      "max_component_error": 3.334134817123413e-07,
+      "min_cosine": 0.9999999999976217,
+      "max_norm_error": 4.0477028084850986e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-029",
+      "max_component_error": 2.868473529815674e-07,
+      "min_cosine": 0.9999999999975017,
+      "max_norm_error": 1.9153459263065997e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-030",
+      "max_component_error": 2.4586915969848633e-07,
+      "min_cosine": 0.9999999999972295,
+      "max_norm_error": 2.0271909328961613e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-031",
+      "max_component_error": 1.9371509552001953e-07,
+      "min_cosine": 0.9999999999979575,
+      "max_norm_error": 9.505564435574598e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-032",
+      "max_component_error": 2.7008354663848877e-07,
+      "min_cosine": 0.9999999999970277,
+      "max_norm_error": 5.579037285485811e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-033",
+      "max_component_error": 2.3469328880310059e-07,
+      "min_cosine": 0.9999999999977729,
+      "max_norm_error": 1.9314386934254912e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-034",
+      "max_component_error": 2.0489096641540527e-07,
+      "min_cosine": 0.9999999999982665,
+      "max_norm_error": 5.6875117615540205e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-035",
+      "max_component_error": 2.384185791015625e-07,
+      "min_cosine": 0.999999999997626,
+      "max_norm_error": 8.769529202812265e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-036",
+      "max_component_error": 2.9173679649829865e-07,
+      "min_cosine": 0.9999999999973568,
+      "max_norm_error": 2.1344491685226785e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-037",
+      "max_component_error": 1.9371509552001953e-07,
+      "min_cosine": 0.99999999999812,
+      "max_norm_error": 6.601512381188002e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-038",
+      "max_component_error": 2.123415470123291e-07,
+      "min_cosine": 0.9999999999981046,
+      "max_norm_error": 2.865040233945848e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-039",
+      "max_component_error": 2.8312206268310547e-07,
+      "min_cosine": 0.9999999999976787,
+      "max_norm_error": 3.696847343803711e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-040",
+      "max_component_error": 2.1141022443771362e-07,
+      "min_cosine": 0.9999999999982584,
+      "max_norm_error": 2.3212043642750757e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-041",
+      "max_component_error": 2.1606683731079102e-07,
+      "min_cosine": 0.9999999999975496,
+      "max_norm_error": 2.5377272172555365e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-042",
+      "max_component_error": 2.3585744202136993e-07,
+      "min_cosine": 0.9999999999973831,
+      "max_norm_error": 2.7681053016426205e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-043",
+      "max_component_error": 1.9371509552001953e-07,
+      "min_cosine": 0.9999999999979601,
+      "max_norm_error": 1.0955222351505256e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-044",
+      "max_component_error": 2.2351741790771484e-07,
+      "min_cosine": 0.9999999999975768,
+      "max_norm_error": 1.1166078417446101e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-045",
+      "max_component_error": 3.129243850708008e-07,
+      "min_cosine": 0.9999999999978169,
+      "max_norm_error": 1.1707118119375082e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-046",
+      "max_component_error": 2.3702159523963928e-07,
+      "min_cosine": 0.9999999999976816,
+      "max_norm_error": 6.573747242111239e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-047",
+      "max_component_error": 2.1047890186309814e-07,
+      "min_cosine": 0.999999999997603,
+      "max_norm_error": 1.8125887091269277e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-048",
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999977215,
+      "max_norm_error": 1.4718264584878682e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-049",
+      "max_component_error": 3.5762786865234375e-07,
+      "min_cosine": 0.9999999999945111,
+      "max_norm_error": 1.1412427425305793e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-050",
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999980815,
+      "max_norm_error": 5.981163853086002e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-051",
+      "max_component_error": 1.9371509552001953e-07,
+      "min_cosine": 0.999999999998547,
+      "max_norm_error": 2.5924529478693614e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-052",
+      "max_component_error": 2.421438694000244e-07,
+      "min_cosine": 0.9999999999974092,
+      "max_norm_error": 3.715261842618389e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-053",
+      "max_component_error": 2.0675361156463623e-07,
+      "min_cosine": 0.9999999999981082,
+      "max_norm_error": 6.525669515866639e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-054",
+      "max_component_error": 2.3096799850463867e-07,
+      "min_cosine": 0.9999999999978366,
+      "max_norm_error": 5.8265463231954584e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-055",
+      "max_component_error": 2.1141022443771362e-07,
+      "min_cosine": 0.9999999999981402,
+      "max_norm_error": 1.8996058681608474e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-056",
+      "max_component_error": 1.7136335372924805e-07,
+      "min_cosine": 0.9999999999986566,
+      "max_norm_error": 5.864204277727936e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-057",
+      "max_component_error": 2.682209014892578e-07,
+      "min_cosine": 0.9999999999979116,
+      "max_norm_error": 3.754226203245281e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-058",
+      "max_component_error": 1.7508864402770996e-07,
+      "min_cosine": 0.9999999999986725,
+      "max_norm_error": 6.188280810004443e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-059",
+      "max_component_error": 3.2782554626464844e-07,
+      "min_cosine": 0.9999999999969877,
+      "max_norm_error": 6.879404645943055e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-060",
+      "max_component_error": 2.2724270820617676e-07,
+      "min_cosine": 0.9999999999975568,
+      "max_norm_error": 4.698176230277795e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-061",
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999977467,
+      "max_norm_error": 3.5900111394759904e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-062",
+      "max_component_error": 3.129243850708008e-07,
+      "min_cosine": 0.999999999997925,
+      "max_norm_error": 4.420475612221253e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-063",
+      "max_component_error": 2.3096799850463867e-07,
+      "min_cosine": 0.9999999999978795,
+      "max_norm_error": 5.529524564895638e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-064",
+      "max_component_error": 2.551823854446411e-07,
+      "min_cosine": 0.9999999999968678,
+      "max_norm_error": 3.1603614436548355e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-065",
+      "max_component_error": 2.1979212760925293e-07,
+      "min_cosine": 0.9999999999975773,
+      "max_norm_error": 4.1048701993062764e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-066",
+      "max_component_error": 1.6205012798309326e-07,
+      "min_cosine": 0.9999999999986648,
+      "max_norm_error": 1.8043659855138117e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-067",
+      "max_component_error": 2.6263296604156494e-07,
+      "min_cosine": 0.9999999999962244,
+      "max_norm_error": 1.3349815830565603e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-068",
+      "max_component_error": 4.637986421585083e-07,
+      "min_cosine": 0.9999999999894339,
+      "max_norm_error": 3.2875343425331494e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-069",
+      "max_component_error": 2.123415470123291e-07,
+      "min_cosine": 0.9999999999980218,
+      "max_norm_error": 8.612491830817248e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-070",
+      "max_component_error": 2.980232238769531e-07,
+      "min_cosine": 0.9999999999973679,
+      "max_norm_error": 5.081276612806107e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-071",
+      "max_component_error": 2.644956111907959e-07,
+      "min_cosine": 0.9999999999977105,
+      "max_norm_error": 1.1302569979942945e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-072",
+      "max_component_error": 1.909211277961731e-07,
+      "min_cosine": 0.9999999999980522,
+      "max_norm_error": 6.156490139908044e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-073",
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.999999999998174,
+      "max_norm_error": 1.3336460547019868e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-074",
+      "max_component_error": 2.0116567611694336e-07,
+      "min_cosine": 0.9999999999978986,
+      "max_norm_error": 8.000048490330869e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-075",
+      "max_component_error": 2.4586915969848633e-07,
+      "min_cosine": 0.9999999999977759,
+      "max_norm_error": 1.1213893436057276e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-076",
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999974836,
+      "max_norm_error": 1.5653477647425973e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-077",
+      "max_component_error": 2.0302832126617432e-07,
+      "min_cosine": 0.9999999999981712,
+      "max_norm_error": 6.166067134660835e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-078",
+      "max_component_error": 2.5704503059387207e-07,
+      "min_cosine": 0.9999999999979845,
+      "max_norm_error": 1.2792498793601226e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-079",
+      "max_component_error": 2.123415470123291e-07,
+      "min_cosine": 0.9999999999978716,
+      "max_norm_error": 1.685501119785826e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-080",
+      "max_component_error": 2.784654498100281e-07,
+      "min_cosine": 0.9999999999978889,
+      "max_norm_error": 1.1082596185207905e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-081",
+      "max_component_error": 2.2165477275848389e-07,
+      "min_cosine": 0.9999999999978488,
+      "max_norm_error": 7.377615207637689e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-082",
+      "max_component_error": 2.1979212760925293e-07,
+      "min_cosine": 0.9999999999982006,
+      "max_norm_error": 3.658561420483153e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-083",
+      "max_component_error": 2.8312206268310547e-07,
+      "min_cosine": 0.9999999999980898,
+      "max_norm_error": 9.905698217238523e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-084",
+      "max_component_error": 2.775341272354126e-07,
+      "min_cosine": 0.9999999999967074,
+      "max_norm_error": 5.99083178620674e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-085",
+      "max_component_error": 2.086162567138672e-07,
+      "min_cosine": 0.9999999999980771,
+      "max_norm_error": 3.221967072031262e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-086",
+      "max_component_error": 2.2817403078079224e-07,
+      "min_cosine": 0.9999999999974603,
+      "max_norm_error": 1.409844612165756e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-087",
+      "max_component_error": 2.086162567138672e-07,
+      "min_cosine": 0.9999999999977458,
+      "max_norm_error": 2.159118349664979e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-088",
+      "max_component_error": 2.0774314180016518e-07,
+      "min_cosine": 0.9999999999982918,
+      "max_norm_error": 2.797501037488104e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-089",
+      "max_component_error": 2.682209014892578e-07,
+      "min_cosine": 0.9999999999973209,
+      "max_norm_error": 5.3002600419738144e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-090",
+      "max_component_error": 2.421438694000244e-07,
+      "min_cosine": 0.9999999999972853,
+      "max_norm_error": 1.9442878529396523e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-091",
+      "max_component_error": 1.9744038581848145e-07,
+      "min_cosine": 0.9999999999983904,
+      "max_norm_error": 4.233535533249011e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-092",
+      "max_component_error": 2.738088369369507e-07,
+      "min_cosine": 0.9999999999967835,
+      "max_norm_error": 8.706707821382054e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-093",
+      "max_component_error": 1.695007085800171e-07,
+      "min_cosine": 0.9999999999986311,
+      "max_norm_error": 3.6029099881318416e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-094",
+      "max_component_error": 4.172325134277344e-07,
+      "min_cosine": 0.9999999999971214,
+      "max_norm_error": 6.067016489197385e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-095",
+      "max_component_error": 2.5704503059387207e-07,
+      "min_cosine": 0.9999999999975568,
+      "max_norm_error": 5.419674045104017e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-096",
+      "max_component_error": 2.682209014892578e-07,
+      "min_cosine": 0.9999999999976175,
+      "max_norm_error": 3.129738677110083e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-097",
+      "max_component_error": 2.1606683731079102e-07,
+      "min_cosine": 0.9999999999982545,
+      "max_norm_error": 3.4907582380228064e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-098",
+      "max_component_error": 2.3096799850463867e-07,
+      "min_cosine": 0.9999999999979243,
+      "max_norm_error": 1.1462267601736187e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-099",
+      "max_component_error": 3.986060619354248e-07,
+      "min_cosine": 0.9999999999954892,
+      "max_norm_error": 4.1825649499394046e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-100",
+      "max_component_error": 2.1420419216156006e-07,
+      "min_cosine": 0.9999999999982343,
+      "max_norm_error": 1.4545781201746877e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-101",
+      "max_component_error": 2.384185791015625e-07,
+      "min_cosine": 0.9999999999984323,
+      "max_norm_error": 2.2549449962827595e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-102",
+      "max_component_error": 1.8952414393424988e-07,
+      "min_cosine": 0.999999999998334,
+      "max_norm_error": 3.8512938060897284e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-103",
+      "max_component_error": 2.682209014892578e-07,
+      "min_cosine": 0.9999999999981952,
+      "max_norm_error": 1.1570491675882977e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-104",
+      "max_component_error": 1.9185245037078857e-07,
+      "min_cosine": 0.9999999999984521,
+      "max_norm_error": 1.3804631238123477e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-105",
+      "max_component_error": 1.5087425708770752e-07,
+      "min_cosine": 0.9999999999988807,
+      "max_norm_error": 1.0813864315117883e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-106",
+      "max_component_error": 3.2782554626464844e-07,
+      "min_cosine": 0.9999999999985667,
+      "max_norm_error": 3.3181148950678363e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-107",
+      "max_component_error": 2.1606683731079102e-07,
+      "min_cosine": 0.9999999999981146,
+      "max_norm_error": 5.131785647538578e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-108",
+      "max_component_error": 2.4959444999694824e-07,
+      "min_cosine": 0.9999999999982033,
+      "max_norm_error": 2.490403736565838e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-109",
+      "max_component_error": 3.725290298461914e-07,
+      "min_cosine": 0.9999999999977913,
+      "max_norm_error": 1.1247501752187361e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-110",
+      "max_component_error": 2.2351741790771484e-07,
+      "min_cosine": 0.9999999999986079,
+      "max_norm_error": 2.6140375697369933e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-111",
+      "max_component_error": 1.7881393432617188e-07,
+      "min_cosine": 0.9999999999988667,
+      "max_norm_error": 2.4547461885404687e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-112",
+      "max_component_error": 2.4028122425079346e-07,
+      "min_cosine": 0.9999999999981215,
+      "max_norm_error": 3.877713108391134e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-113",
+      "max_component_error": 1.695007085800171e-07,
+      "min_cosine": 0.9999999999984417,
+      "max_norm_error": 8.523503913782093e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-114",
+      "max_component_error": 2.784654498100281e-07,
+      "min_cosine": 0.999999999997311,
+      "max_norm_error": 3.9138700502761026e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-115",
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999981589,
+      "max_norm_error": 1.661666302332776e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-116",
+      "max_component_error": 1.8998980522155762e-07,
+      "min_cosine": 0.9999999999984135,
+      "max_norm_error": 3.7834142441184326e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-117",
+      "max_component_error": 1.9371509552001953e-07,
+      "min_cosine": 0.9999999999984773,
+      "max_norm_error": 1.475700412978398e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-118",
+      "max_component_error": 2.8312206268310547e-07,
+      "min_cosine": 0.9999999999980794,
+      "max_norm_error": 2.134344189164139e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-119",
+      "max_component_error": 1.8812716007232666e-07,
+      "min_cosine": 0.999999999998576,
+      "max_norm_error": 1.2952613892558418e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "case_id": "P4-120",
+      "max_component_error": 2.514570951461792e-07,
+      "min_cosine": 0.9999999999967184,
+      "max_norm_error": 2.1696276175653395e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    }
+  ],
+  "passages": [
+    {
+      "batch_size": 1,
+      "sample_offset": 0,
+      "max_component_error": 2.60770320892334e-07,
+      "min_cosine": 0.9999999999974212,
+      "max_norm_error": 1.1721114168139479e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 1,
+      "max_component_error": 3.948807716369629e-07,
+      "min_cosine": 0.9999999999930425,
+      "max_norm_error": 2.6958784093977783e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 2,
+      "max_component_error": 1.044943928718567e-06,
+      "min_cosine": 0.9999999999368115,
+      "max_norm_error": 3.66224608416843e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 3,
+      "max_component_error": 2.1792948246002197e-07,
+      "min_cosine": 0.9999999999979106,
+      "max_norm_error": 3.461306812280185e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 4,
+      "max_component_error": 2.523884177207947e-07,
+      "min_cosine": 0.9999999999966819,
+      "max_norm_error": 3.124776970508947e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 5,
+      "max_component_error": 1.7136335372924805e-07,
+      "min_cosine": 0.9999999999986824,
+      "max_norm_error": 1.3451130420616408e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 6,
+      "max_component_error": 2.384185791015625e-07,
+      "min_cosine": 0.9999999999972016,
+      "max_norm_error": 4.6286503518899735e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 7,
+      "max_component_error": 5.103647708892822e-07,
+      "min_cosine": 0.9999999999890218,
+      "max_norm_error": 2.191441661469895e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 8,
+      "max_component_error": 1.9744038581848145e-07,
+      "min_cosine": 0.999999999997896,
+      "max_norm_error": 5.9311020206287424e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 9,
+      "max_component_error": 2.3469328880310059e-07,
+      "min_cosine": 0.9999999999979532,
+      "max_norm_error": 2.0834651603962584e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 10,
+      "max_component_error": 2.323649823665619e-07,
+      "min_cosine": 0.9999999999979332,
+      "max_norm_error": 2.4169464407641783e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 11,
+      "max_component_error": 2.2351741790771484e-07,
+      "min_cosine": 0.9999999999981892,
+      "max_norm_error": 4.457441780125748e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 12,
+      "max_component_error": 1.7881393432617188e-07,
+      "min_cosine": 0.9999999999988919,
+      "max_norm_error": 4.0618765573263715e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 13,
+      "max_component_error": 3.203749656677246e-07,
+      "min_cosine": 0.9999999999955986,
+      "max_norm_error": 1.1022534862625832e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 14,
+      "max_component_error": 2.9813963919878006e-07,
+      "min_cosine": 0.9999999999966906,
+      "max_norm_error": 4.170154892513267e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 15,
+      "max_component_error": 1.825392246246338e-07,
+      "min_cosine": 0.9999999999984466,
+      "max_norm_error": 4.333828051983346e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 16,
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999967334,
+      "max_norm_error": 2.983870710515646e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 17,
+      "max_component_error": 9.98377799987793e-07,
+      "min_cosine": 0.9999999999879988,
+      "max_norm_error": 3.870658560334306e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 18,
+      "max_component_error": 2.942979335784912e-07,
+      "min_cosine": 0.9999999999972415,
+      "max_norm_error": 3.298988864308683e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 19,
+      "max_component_error": 1.6763806343078613e-07,
+      "min_cosine": 0.9999999999986302,
+      "max_norm_error": 4.472206316386007e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 20,
+      "max_component_error": 1.955777406692505e-07,
+      "min_cosine": 0.9999999999984612,
+      "max_norm_error": 2.1470760480646334e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 21,
+      "max_component_error": 4.023313522338867e-07,
+      "min_cosine": 0.9999999999933488,
+      "max_norm_error": 2.840161035244648e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 22,
+      "max_component_error": 2.8312206268310547e-07,
+      "min_cosine": 0.9999999999965561,
+      "max_norm_error": 1.4085160637833383e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 23,
+      "max_component_error": 1.4901161193847656e-07,
+      "min_cosine": 0.9999999999987875,
+      "max_norm_error": 2.7116637746349426e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 24,
+      "max_component_error": 2.0675361156463623e-07,
+      "min_cosine": 0.9999999999978486,
+      "max_norm_error": 3.5304112455669667e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 25,
+      "max_component_error": 1.7881393432617188e-07,
+      "min_cosine": 0.9999999999987188,
+      "max_norm_error": 3.427935244548763e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 26,
+      "max_component_error": 2.4028122425079346e-07,
+      "min_cosine": 0.9999999999976266,
+      "max_norm_error": 5.737966635166458e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 27,
+      "max_component_error": 2.0489096641540527e-07,
+      "min_cosine": 0.9999999999977118,
+      "max_norm_error": 3.2248534309609056e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 28,
+      "max_component_error": 2.6263296604156494e-07,
+      "min_cosine": 0.9999999999961569,
+      "max_norm_error": 7.487848074916315e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 29,
+      "max_component_error": 1.755543053150177e-07,
+      "min_cosine": 0.9999999999986913,
+      "max_norm_error": 4.973716671852202e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 30,
+      "max_component_error": 2.4633482098579407e-07,
+      "min_cosine": 0.999999999997478,
+      "max_norm_error": 2.4523043751223383e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 31,
+      "max_component_error": 2.7939677238464355e-07,
+      "min_cosine": 0.9999999999969869,
+      "max_norm_error": 2.2747011607648915e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 32,
+      "max_component_error": 2.6635825634002686e-07,
+      "min_cosine": 0.9999999999975034,
+      "max_norm_error": 1.31355929466892e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 33,
+      "max_component_error": 2.7241185307502747e-07,
+      "min_cosine": 0.9999999999978519,
+      "max_norm_error": 7.604007645767297e-09,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 34,
+      "max_component_error": 2.0302832126617432e-07,
+      "min_cosine": 0.9999999999978946,
+      "max_norm_error": 2.8251351480435005e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 35,
+      "max_component_error": 1.825392246246338e-07,
+      "min_cosine": 0.9999999999984324,
+      "max_norm_error": 2.2238923191864046e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 36,
+      "max_component_error": 2.2351741790771484e-07,
+      "min_cosine": 0.9999999999979984,
+      "max_norm_error": 9.9389603547273e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 37,
+      "max_component_error": 1.6193371266126633e-07,
+      "min_cosine": 0.9999999999986167,
+      "max_norm_error": 6.710949729260562e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 38,
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999977589,
+      "max_norm_error": 8.658885002343908e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 39,
+      "max_component_error": 1.8998980522155762e-07,
+      "min_cosine": 0.9999999999983076,
+      "max_norm_error": 1.9698005004897823e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 40,
+      "max_component_error": 1.9744038581848145e-07,
+      "min_cosine": 0.9999999999982718,
+      "max_norm_error": 1.7888802927856773e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 41,
+      "max_component_error": 2.4586915969848633e-07,
+      "min_cosine": 0.999999999997133,
+      "max_norm_error": 2.8676826691054202e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 42,
+      "max_component_error": 1.9185245037078857e-07,
+      "min_cosine": 0.9999999999983904,
+      "max_norm_error": 1.7165141152908348e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 43,
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999986653,
+      "max_norm_error": 5.681896523279661e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 44,
+      "max_component_error": 2.2351741790771484e-07,
+      "min_cosine": 0.9999999999977232,
+      "max_norm_error": 1.7179849254311819e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 45,
+      "max_component_error": 3.2782554626464844e-07,
+      "min_cosine": 0.9999999999972824,
+      "max_norm_error": 2.467908737369129e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 46,
+      "max_component_error": 2.4028122425079346e-07,
+      "min_cosine": 0.9999999999976366,
+      "max_norm_error": 1.4101564471680206e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 47,
+      "max_component_error": 2.644956111907959e-07,
+      "min_cosine": 0.9999999999977411,
+      "max_norm_error": 1.7886639080977318e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 48,
+      "max_component_error": 3.427267074584961e-07,
+      "min_cosine": 0.9999999999974378,
+      "max_norm_error": 3.9342694380106735e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 49,
+      "max_component_error": 2.2212043404579163e-07,
+      "min_cosine": 0.9999999999977335,
+      "max_norm_error": 2.446760980490126e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 50,
+      "max_component_error": 2.3096799850463867e-07,
+      "min_cosine": 0.9999999999981131,
+      "max_norm_error": 2.1292928109595266e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 51,
+      "max_component_error": 4.023313522338867e-07,
+      "min_cosine": 0.9999999999950079,
+      "max_norm_error": 3.5963007705142047e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 52,
+      "max_component_error": 2.4121254682540894e-07,
+      "min_cosine": 0.9999999999977485,
+      "max_norm_error": 2.2655441944685606e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 53,
+      "max_component_error": 3.3527612686157227e-07,
+      "min_cosine": 0.9999999999955607,
+      "max_norm_error": 3.6526866531438884e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 54,
+      "max_component_error": 3.520399332046509e-07,
+      "min_cosine": 0.999999999995903,
+      "max_norm_error": 2.2114450137777908e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 55,
+      "max_component_error": 2.384185791015625e-07,
+      "min_cosine": 0.9999999999975824,
+      "max_norm_error": 1.1182821824107236e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 56,
+      "max_component_error": 2.2351741790771484e-07,
+      "min_cosine": 0.9999999999980687,
+      "max_norm_error": 4.066351655396261e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 57,
+      "max_component_error": 2.1351297618821263e-07,
+      "min_cosine": 0.9999999999982421,
+      "max_norm_error": 1.3628663309006583e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 58,
+      "max_component_error": 2.4121254682540894e-07,
+      "min_cosine": 0.9999999999978186,
+      "max_norm_error": 4.723836521947078e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 59,
+      "max_component_error": 3.427267074584961e-07,
+      "min_cosine": 0.9999999999978311,
+      "max_norm_error": 2.0157002456056006e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 60,
+      "max_component_error": 1.9371509552001953e-07,
+      "min_cosine": 0.9999999999987056,
+      "max_norm_error": 1.9054681665853224e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 61,
+      "max_component_error": 1.7991987988352776e-07,
+      "min_cosine": 0.9999999999986025,
+      "max_norm_error": 1.5476532966296475e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 62,
+      "max_component_error": 3.129243850708008e-07,
+      "min_cosine": 0.99999999999768,
+      "max_norm_error": 1.4201440923233832e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 63,
+      "max_component_error": 1.5087425708770752e-07,
+      "min_cosine": 0.999999999999067,
+      "max_norm_error": 2.406257297860037e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 64,
+      "max_component_error": 2.980232238769531e-07,
+      "min_cosine": 0.9999999999968632,
+      "max_norm_error": 7.560216541691034e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 65,
+      "max_component_error": 2.1047890186309814e-07,
+      "min_cosine": 0.9999999999980582,
+      "max_norm_error": 3.540972799420672e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 66,
+      "max_component_error": 1.7881393432617188e-07,
+      "min_cosine": 0.9999999999986391,
+      "max_norm_error": 2.563859979876071e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 67,
+      "max_component_error": 2.2351741790771484e-07,
+      "min_cosine": 0.9999999999972016,
+      "max_norm_error": 9.758877961285606e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 68,
+      "max_component_error": 2.980232238769531e-07,
+      "min_cosine": 0.9999999999965572,
+      "max_norm_error": 2.28234885435441e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 69,
+      "max_component_error": 2.980232238769531e-07,
+      "min_cosine": 0.9999999999977843,
+      "max_norm_error": 3.209444696672392e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 70,
+      "max_component_error": 1.862645149230957e-07,
+      "min_cosine": 0.9999999999983947,
+      "max_norm_error": 3.0672215189930796e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 71,
+      "max_component_error": 2.086162567138672e-07,
+      "min_cosine": 0.9999999999980994,
+      "max_norm_error": 2.4490201688820434e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 72,
+      "max_component_error": 1.9371509552001953e-07,
+      "min_cosine": 0.9999999999980529,
+      "max_norm_error": 2.9773658427600935e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 73,
+      "max_component_error": 2.980232238769531e-07,
+      "min_cosine": 0.9999999999980059,
+      "max_norm_error": 1.609984930928121e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 74,
+      "max_component_error": 4.6938657760620117e-07,
+      "min_cosine": 0.9999999999931694,
+      "max_norm_error": 3.04763141389941e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 75,
+      "max_component_error": 1.5273690223693848e-07,
+      "min_cosine": 0.9999999999987261,
+      "max_norm_error": 3.520751501451258e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 76,
+      "max_component_error": 1.564621925354004e-07,
+      "min_cosine": 0.9999999999989333,
+      "max_norm_error": 2.3802646809123473e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 77,
+      "max_component_error": 4.5285560190677643e-07,
+      "min_cosine": 0.999999999994437,
+      "max_norm_error": 1.5771379446860578e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 78,
+      "max_component_error": 2.0489096641540527e-07,
+      "min_cosine": 0.9999999999985891,
+      "max_norm_error": 1.7729310086700423e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 79,
+      "max_component_error": 2.7194619178771973e-07,
+      "min_cosine": 0.9999999999972167,
+      "max_norm_error": 1.219836822663467e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 80,
+      "max_component_error": 3.166496753692627e-07,
+      "min_cosine": 0.9999999999951017,
+      "max_norm_error": 6.089256143759769e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 81,
+      "max_component_error": 2.6868656277656555e-07,
+      "min_cosine": 0.999999999997069,
+      "max_norm_error": 5.452090736657311e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 82,
+      "max_component_error": 2.4028122425079346e-07,
+      "min_cosine": 0.9999999999978417,
+      "max_norm_error": 3.62912624396472e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 83,
+      "max_component_error": 2.086162567138672e-07,
+      "min_cosine": 0.9999999999987107,
+      "max_norm_error": 5.6150900706875007e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 84,
+      "max_component_error": 2.1606683731079102e-07,
+      "min_cosine": 0.9999999999980589,
+      "max_norm_error": 2.0544827039614688e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 85,
+      "max_component_error": 2.0489096641540527e-07,
+      "min_cosine": 0.9999999999986667,
+      "max_norm_error": 3.18548882161096e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 86,
+      "max_component_error": 2.835877239704132e-07,
+      "min_cosine": 0.9999999999974036,
+      "max_norm_error": 1.2346586775180413e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 87,
+      "max_component_error": 2.682209014892578e-07,
+      "min_cosine": 0.9999999999981759,
+      "max_norm_error": 6.276081854217352e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 88,
+      "max_component_error": 1.7852289602160454e-07,
+      "min_cosine": 0.9999999999984988,
+      "max_norm_error": 2.1328390831243382e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 89,
+      "max_component_error": 2.682209014892578e-07,
+      "min_cosine": 0.9999999999979722,
+      "max_norm_error": 9.33287983562181e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 90,
+      "max_component_error": 2.980232238769531e-07,
+      "min_cosine": 0.9999999999966274,
+      "max_norm_error": 3.28612045907839e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 91,
+      "max_component_error": 2.514570951461792e-07,
+      "min_cosine": 0.9999999999974174,
+      "max_norm_error": 4.087149056974937e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 92,
+      "max_component_error": 4.246830940246582e-07,
+      "min_cosine": 0.9999999999954643,
+      "max_norm_error": 1.722989677599429e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 93,
+      "max_component_error": 1.6298145055770874e-07,
+      "min_cosine": 0.999999999998678,
+      "max_norm_error": 2.776509282487183e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 94,
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.9999999999982618,
+      "max_norm_error": 2.952008040235654e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 95,
+      "max_component_error": 2.384185791015625e-07,
+      "min_cosine": 0.9999999999985252,
+      "max_norm_error": 3.279483242746295e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 96,
+      "max_component_error": 3.129243850708008e-07,
+      "min_cosine": 0.9999999999963066,
+      "max_norm_error": 1.11894882692809e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 97,
+      "max_component_error": 1.8998980522155762e-07,
+      "min_cosine": 0.999999999998356,
+      "max_norm_error": 7.465843043785725e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 98,
+      "max_component_error": 3.129243850708008e-07,
+      "min_cosine": 0.9999999999971109,
+      "max_norm_error": 2.9248183475161227e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 99,
+      "max_component_error": 2.7008354663848877e-07,
+      "min_cosine": 0.999999999997275,
+      "max_norm_error": 2.630607288667264e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 100,
+      "max_component_error": 2.980232238769531e-07,
+      "min_cosine": 0.9999999999967801,
+      "max_norm_error": 1.822959513342326e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 101,
+      "max_component_error": 2.1606683731079102e-07,
+      "min_cosine": 0.9999999999987136,
+      "max_norm_error": 7.712244890489828e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 102,
+      "max_component_error": 2.123415470123291e-07,
+      "min_cosine": 0.9999999999980217,
+      "max_norm_error": 1.427702434053657e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 103,
+      "max_component_error": 2.086162567138672e-07,
+      "min_cosine": 0.9999999999977128,
+      "max_norm_error": 1.5440597145310875e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 104,
+      "max_component_error": 3.129243850708008e-07,
+      "min_cosine": 0.9999999999970604,
+      "max_norm_error": 4.6810966825017175e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 105,
+      "max_component_error": 2.60770320892334e-07,
+      "min_cosine": 0.9999999999975825,
+      "max_norm_error": 3.339012333292146e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 106,
+      "max_component_error": 2.1420419216156006e-07,
+      "min_cosine": 0.9999999999978466,
+      "max_norm_error": 2.3513658775620172e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 107,
+      "max_component_error": 1.9371509552001953e-07,
+      "min_cosine": 0.9999999999979405,
+      "max_norm_error": 3.0796750483119695e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 108,
+      "max_component_error": 3.129243850708008e-07,
+      "min_cosine": 0.9999999999993935,
+      "max_norm_error": 2.280440767332692e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 109,
+      "max_component_error": 2.3096799850463867e-07,
+      "min_cosine": 0.999999999998328,
+      "max_norm_error": 4.481722555293999e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 110,
+      "max_component_error": 2.3469328880310059e-07,
+      "min_cosine": 0.9999999999974312,
+      "max_norm_error": 5.465478736255136e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 111,
+      "max_component_error": 1.7927959561347961e-07,
+      "min_cosine": 0.9999999999985525,
+      "max_norm_error": 2.8945785435219307e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 112,
+      "max_component_error": 2.384185791015625e-07,
+      "min_cosine": 0.9999999999971521,
+      "max_norm_error": 2.8091612880309924e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 113,
+      "max_component_error": 2.0116567611694336e-07,
+      "min_cosine": 0.9999999999986144,
+      "max_norm_error": 6.886775993919514e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 114,
+      "max_component_error": 3.725290298461914e-07,
+      "min_cosine": 0.9999999999979162,
+      "max_norm_error": 2.883181263735324e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 115,
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.99999999999747,
+      "max_norm_error": 1.1070072591934377e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 116,
+      "max_component_error": 2.384185791015625e-07,
+      "min_cosine": 0.9999999999977696,
+      "max_norm_error": 8.335270096360148e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 117,
+      "max_component_error": 2.691522240638733e-07,
+      "min_cosine": 0.9999999999967513,
+      "max_norm_error": 4.5096747003370297e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 118,
+      "max_component_error": 1.993030309677124e-07,
+      "min_cosine": 0.9999999999979498,
+      "max_norm_error": 5.3736758709455046e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 119,
+      "max_component_error": 2.1979212760925293e-07,
+      "min_cosine": 0.9999999999975573,
+      "max_norm_error": 4.949008447496794e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 120,
+      "max_component_error": 1.0207295417785645e-06,
+      "min_cosine": 0.9999999999550505,
+      "max_norm_error": 2.7102755650876276e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 121,
+      "max_component_error": 2.682209014892578e-07,
+      "min_cosine": 0.999999999998354,
+      "max_norm_error": 6.381435190272455e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 122,
+      "max_component_error": 3.03611159324646e-07,
+      "min_cosine": 0.999999999996637,
+      "max_norm_error": 2.598420818511471e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 123,
+      "max_component_error": 6.295740604400635e-07,
+      "min_cosine": 0.9999999999841316,
+      "max_norm_error": 6.031175647791542e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 124,
+      "max_component_error": 2.2351741790771484e-07,
+      "min_cosine": 0.9999999999979605,
+      "max_norm_error": 7.05451785876221e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 125,
+      "max_component_error": 2.980232238769531e-07,
+      "min_cosine": 0.999999999997679,
+      "max_norm_error": 1.3544075372351472e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 126,
+      "max_component_error": 2.5331974029541016e-07,
+      "min_cosine": 0.999999999998368,
+      "max_norm_error": 1.9582685251151588e-08,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 1,
+      "sample_offset": 127,
+      "max_component_error": 2.7567148208618164e-07,
+      "min_cosine": 0.9999999999977696,
+      "max_norm_error": 1.3194544812300535e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 0,
+      "max_component_error": 1.044943928718567e-06,
+      "min_cosine": 0.9999999999368115,
+      "max_norm_error": 3.461306812280185e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 8,
+      "max_component_error": 3.203749656677246e-07,
+      "min_cosine": 0.9999999999955986,
+      "max_norm_error": 4.457441780125748e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 16,
+      "max_component_error": 9.98377799987793e-07,
+      "min_cosine": 0.9999999999879988,
+      "max_norm_error": 3.870658560334306e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 24,
+      "max_component_error": 2.7939677238464355e-07,
+      "min_cosine": 0.9999999999961569,
+      "max_norm_error": 4.973716671852202e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 32,
+      "max_component_error": 2.7241185307502747e-07,
+      "min_cosine": 0.9999999999975034,
+      "max_norm_error": 8.658885002343908e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 40,
+      "max_component_error": 3.2782554626464844e-07,
+      "min_cosine": 0.999999999997133,
+      "max_norm_error": 5.681896523279661e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 48,
+      "max_component_error": 4.023313522338867e-07,
+      "min_cosine": 0.9999999999950079,
+      "max_norm_error": 3.9342694380106735e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 56,
+      "max_component_error": 3.427267074584961e-07,
+      "min_cosine": 0.99999999999768,
+      "max_norm_error": 2.406257297860037e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 64,
+      "max_component_error": 2.980232238769531e-07,
+      "min_cosine": 0.9999999999965572,
+      "max_norm_error": 3.540972799420672e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 72,
+      "max_component_error": 4.6938657760620117e-07,
+      "min_cosine": 0.9999999999931694,
+      "max_norm_error": 2.9773658427600935e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 80,
+      "max_component_error": 3.166496753692627e-07,
+      "min_cosine": 0.9999999999951017,
+      "max_norm_error": 5.452090736657311e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 88,
+      "max_component_error": 4.246830940246582e-07,
+      "min_cosine": 0.9999999999954643,
+      "max_norm_error": 4.087149056974937e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 96,
+      "max_component_error": 3.129243850708008e-07,
+      "min_cosine": 0.9999999999963066,
+      "max_norm_error": 7.712244890489828e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 104,
+      "max_component_error": 3.129243850708008e-07,
+      "min_cosine": 0.9999999999970604,
+      "max_norm_error": 4.6810966825017175e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 112,
+      "max_component_error": 3.725290298461914e-07,
+      "min_cosine": 0.9999999999967513,
+      "max_norm_error": 4.949008447496794e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "batch_size": 8,
+      "sample_offset": 120,
+      "max_component_error": 1.0207295417785645e-06,
+      "min_cosine": 0.9999999999550505,
+      "max_norm_error": 6.381435190272455e-07,
+      "gates": {
+        "shape": true,
+        "dtype": true,
+        "finite": true,
+        "max_component_error": true,
+        "min_cosine": true,
+        "max_norm_error": true
+      },
+      "failures": [],
+      "status": "PASS"
+    }
+  ],
+  "ranking": [
+    {
+      "case_id": "P4-001",
+      "status": "PASS",
+      "gates": {
+        "ordered_typed_ids_at_10": true,
+        "ordered_typed_ids_at_100": true,
+        "matching_score_error": true
+      },
+      "max_matching_score_error": 5.662441253662109e-07,
+      "failures": []
+    },
+    {
+      "case_id": "P4-002",
+      "status": "FAIL",
+      "gates": {
+        "ordered_typed_ids_at_10": true,
+        "ordered_typed_ids_at_100": false,
+        "matching_score_error": false
+      },
+      "max_matching_score_error": null,
+      "failures": [
+        "ordered_typed_ids_at_100",
+        "matching_score_error"
+      ]
+    }
+  ],
+  "phase": "ranking",
+  "bindings_sha256": "245147d9e9216b6c5b49d52d08d7d3122b5c6ea5b86ed099d66d7aecf1472345",
+  "input_validations": {
+    "before": "PASS",
+    "after": "PASS"
+  },
+  "runtime": {
+    "onnxruntime": "1.24.1",
+    "numpy": "2.4.6",
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "threads": 8,
+    "interop_threads": 8,
+    "optimization": "ORT_ENABLE_ALL"
+  },
+  "active": {
+    "case_id": "P4-002"
+  },
+  "error": "ValueError: ranking agreement gates failed"
+}

@@ -1,6 +1,20 @@
 # Stage Status (SakuraKnowledge)
 
-## Current P4 — IN_PROGRESS / AUTHORIZED_TRUSTED_TEXT_CONTINUATION
+## Current P4 — IN_PROGRESS / AUTHORIZED_BENCHMARK_V2_CONTINUATION
+
+- External review of ffff13b: CHANGES_REQUIRED, pilot evidence VALID;
+  benchmark-v1 ceiling defect confirmed. V1 FAIL/NONE receipts remain preserved.
+- User authorizes model-independent capped Recall10 selection contract v2 and
+  read-only recompute of frozen results. No new gold, embedding build, selection
+  retrieval, or RRF retuning. Quality PASS is required before BGE-M3 CPU tests;
+  V2 recompute PASS: A FAIL/B quality PASS; native CPU qualification FAIL
+  at fresh P4-075 timeout after120 reused successes and74 fresh successes.
+- Separately authorized new query reference PASS (not historical evidence).
+  Single FP32 ONNX export PASS, numerical query/passage agreement PASS;
+  predeclared top100 ordered identity agreement FAIL at P4-002. No retuning,
+  re-export, or final model selection. ONNX performance/ANN/Rust/FULL NOT_RUN.
+  See reports/P4/V2_STOP_REPORT.md for explicit NOT_READY gate evidence.
+- Historical continuation record follows; its STOP remains valid for v1.
 
 - P1/P2/P3: **CLOSED_AND_MERGED**, per explicit user authorization.
 - P4 base: `269e34eeeac920c29f2d684cfe37c93a95c73057`. Initial fetch verified
