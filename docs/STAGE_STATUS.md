@@ -1,6 +1,18 @@
 # Stage Status (SakuraKnowledge)
 
-## Current P4 — IN_PROGRESS / AUTHORIZED_BENCHMARK_V2_CONTINUATION
+## Current P4 — IN_PROGRESS / ONNX_V3_WAITING_REVIEW
+
+- V3 validates the existing FP32 ONNX artifact only: no export, native reference
+  regeneration, passage rebuild, gold/RRF change or model reselection.
+- V3 numerical query120/passages128 (batches1/8) PASS; all120 cases have
+  set overlap1.0 at10/20/100. Ordered equality119/120 at10,111/120 at100 remains
+  diagnostic. Benchmark-v2 and subset metric-regression gates PASS.
+- Receipt: reports/P4/onnx-quality-v3-retry1.json. Initial pre-inference
+  contract-byte failure remains in onnx-quality-v3.json; CRLF storage corrected
+  without changing contract semantics. Resident CPU has NOT_STARTED.
+- User requests this v3 submission be fixed and pushed for review before CPU.
+  CPU harness code exists but is unexecuted; ANN/Rust/FULL remain NOT_RUN.
+- Historical v2 records follow; their FAIL results remain unchanged.
 
 - External review of ffff13b: CHANGES_REQUIRED, pilot evidence VALID;
   benchmark-v1 ceiling defect confirmed. V1 FAIL/NONE receipts remain preserved.
