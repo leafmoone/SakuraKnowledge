@@ -1008,8 +1008,15 @@ def load_reviewed_receipt(path, *, expected_sha256, capture_path, expected_captu
             type(capture.get('exit')) is int and capture['exit'] == 0 and
             capture.get('timeout') is False and type(capture.get('retries')) is int and capture['retries'] == 0,
             'successful reviewed capture required')
-    require(capture.get('receipt') == {'path': str(path), 'sha256': expected_sha256},
+    output_ref = capture.get('receipt')
+    require(isinstance(output_ref, dict) and set(output_ref) in
+            ({'path', 'sha256'}, {'path', 'sha256', 'bytes'}) and
+            output_ref.get('path') == str(path) and output_ref.get('sha256') == expected_sha256,
             'capture must bind reviewed output receipt')
+    if 'bytes' in output_ref:
+        require(type(output_ref['bytes']) is int and output_ref['bytes'] >= 0 and
+                output_ref['bytes'] == contained(path, root).stat().st_size,
+                'reviewed output receipt byte size mismatch')
     for stream in ('stdout', 'stderr'):
         ref = capture.get(stream, {})
         file = contained(ref.get('path', ''), root)

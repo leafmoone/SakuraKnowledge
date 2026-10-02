@@ -593,6 +593,44 @@ def test_selected_projection_never_streams_or_recounts(tmp_path, monkeypatch):
                                  max_document_text_bytes=full.DOCUMENT_CAP_BYTES)
 
 
+@pytest.mark.parametrize('receipt_kind', ['count', 'disk'])
+@pytest.mark.parametrize('variant', ['two_fields', 'with_bytes', 'wrong_bytes', 'bool_bytes',
+                                    'negative_bytes', 'unknown', 'missing', 'wrong_path', 'wrong_sha', 'tamper'])
+def test_reviewed_output_reference_exact_schemas(tmp_path, receipt_kind, variant):
+    path = tmp_path / f'{receipt_kind}.json'
+    path.write_text(json.dumps({'fixed_code_sha': 'a' * 40}), encoding='utf-8')
+    for name in ('stdout', 'stderr'):
+        (tmp_path / name).write_bytes(b'')
+    ref = {'path': path.name, 'sha256': full.exact.sha(path)}
+    if variant in ('with_bytes', 'wrong_bytes', 'bool_bytes', 'negative_bytes'):
+        ref['bytes'] = {'with_bytes': path.stat().st_size, 'wrong_bytes': path.stat().st_size + 1,
+                        'bool_bytes': True, 'negative_bytes': -1}[variant]
+    if variant == 'unknown':
+        ref['extra'] = 'not permitted'
+    if variant == 'missing':
+        del ref['sha256']
+    if variant == 'wrong_path':
+        ref['path'] = 'other.json'
+    if variant == 'wrong_sha':
+        ref['sha256'] = 'b' * 64
+    capture = {'argv': ['python', receipt_kind], 'cwd': str(tmp_path.resolve()), 'exit': 0,
+               'timeout': False, 'retries': 0, 'receipt': ref,
+               **{name: {'path': name, 'bytes': 0, 'sha256': full.exact.sha(tmp_path / name)}
+                  for name in ('stdout', 'stderr')}}
+    cap = tmp_path / 'capture.json'
+    cap.write_text(json.dumps(capture), encoding='utf-8')
+    review = {'expected_sha256': full.exact.sha(path), 'capture_path': cap.name,
+              'expected_capture_sha256': full.exact.sha(cap), 'expected_argv': capture['argv'],
+              'fixed_head': 'a' * 40, 'root': tmp_path}
+    if variant == 'tamper':
+        cap.write_text('{}', encoding='utf-8')
+    if variant in ('two_fields', 'with_bytes'):
+        assert full.load_reviewed_receipt(path.name, **review)['fixed_code_sha'] == 'a' * 40
+    else:
+        with pytest.raises(ValueError):
+            full.load_reviewed_receipt(path.name, **review)
+
+
 def test_reviewed_capture_requires_external_hash_and_actual_streams(tmp_path):
     receipt = {'fixed_code_sha': 'a' * 40}
     out = tmp_path / 'stdout.raw'
