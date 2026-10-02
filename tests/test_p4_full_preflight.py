@@ -381,6 +381,140 @@ def test_inventory_complete_hash_and_path_escape(tmp_path):
         full.verify_bindings({'asset': {**spec, 'sha256': 'b' * 64}}, {'asset'}, tmp_path)
 
 
+@pytest.mark.parametrize('change', ['atime', 'mtime', 'size', 'ino', 'dev', 'hash', 'sidecars', 'dual'])
+def test_snapshot_observations_always_hash_and_preserve_failures(tmp_path, monkeypatch, change):
+    path = tmp_path / 'snapshot'
+    path.write_bytes(b'x')
+    monkeypatch.setattr(full, 'validate_contract', lambda *args: None)
+    monkeypatch.setattr(full, 'contained', lambda *args: path)
+    monkeypatch.setattr(full, 'SNAPSHOT', {'path': 'snapshot', 'size': 1, 'sha256': 'a' * 64})
+    stat = {'st_size': 1, 'st_mtime_ns': 2, 'st_dev': 3, 'st_ino': 4, 'st_atime_ns': 5}
+    real_stat = Path.stat
+    def fake_stat(self, *args, **kwargs):
+        return SimpleNamespace(**stat) if self == path else real_stat(self, *args, **kwargs)
+    monkeypatch.setattr(Path, 'stat', fake_stat)
+    hashes = []
+    monkeypatch.setattr(full.corpus, 'sha256_file', lambda *args: hashes.append(1) or (
+        'b' * 64 if change == 'hash' and len(hashes) == 2 else 'a' * 64))
+    sidecars = {}
+    monkeypatch.setattr(full.corpus, 'sidecars', lambda *args: dict(sidecars))
+    @contextmanager
+    def reader(*args):
+        yield None
+    monkeypatch.setattr(full, 'readonly', reader)
+    monkeypatch.setattr(full, 'scalar', lambda *args: 'false')
+    report = {}
+    def execute():
+        with full.validate_snapshot({}, tmp_path, report):
+            if change in ('atime', 'mtime', 'size', 'ino', 'dev'):
+                stat[{'atime': 'st_atime_ns', 'mtime': 'st_mtime_ns', 'size': 'st_size',
+                      'ino': 'st_ino', 'dev': 'st_dev'}[change]] += 1
+            if change in ('sidecars', 'dual'):
+                sidecars['-wal'] = {'size': 0}
+            if change == 'dual':
+                raise TypeError('original projection error')
+    if change == 'atime':
+        execute()
+        assert all(report['snapshot_observations']['checks'].values())
+    else:
+        with pytest.raises(ValueError, match='snapshot changed'):
+            execute()
+        assert report['guard_error'] and report['status'] == 'FAIL'
+    assert len(hashes) == 2
+    if change == 'dual':
+        assert 'original projection error' in report['original_error']
+
+
+def test_sqlite_row_documents_and_lookup_actual_join_plan(monkeypatch):
+    with closing(sqlite3.connect(':memory:')) as conn:
+        conn.row_factory = sqlite3.Row
+        conn.executescript('''
+            CREATE TABLE build_meta(key TEXT,value TEXT);
+            INSERT INTO build_meta VALUES('index_episodes','false');
+            CREATE TABLE sources(source_id TEXT,metadata TEXT);
+            INSERT INTO sources VALUES('source','{"source_family":"bangumi"}');
+            CREATE TABLE entries(id INTEGER PRIMARY KEY,kind TEXT,namespace TEXT,value TEXT,conflicted INTEGER);
+            INSERT INTO entries VALUES(1,'subject','bangumi.subject','1',0);
+            CREATE TABLE documents(id INTEGER PRIMARY KEY,entry_id INTEGER,title TEXT,original TEXT,
+                language TEXT,status TEXT,source_id TEXT,evidence_id TEXT,search_text TEXT);
+            INSERT INTO documents VALUES(1,1,'','short','ja','source_backed','source','evidence','short');
+            CREATE TABLE entry_evidence(entry_id INTEGER,status TEXT);
+            INSERT INTO entry_evidence VALUES(1,'source_backed');
+            CREATE VIRTUAL TABLE search_fts USING fts5(document_id UNINDEXED,entry_id UNINDEXED,text);
+            INSERT INTO search_fts(rowid,document_id,entry_id,text) VALUES(73,1,1,'short');
+        ''')
+        monkeypatch.setattr(full.corpus, 'family', lambda *args: 'bangumi')
+        rows = list(full.documents(conn))
+        assert rows[0]['fts_rowid'] == 73 and rows[0]['entry_key']['namespace'] == 'bangumi.subject'
+        ref = {'document_id': 1, 'fts_rowid': 73, 'document_text_sha256': hashlib.sha256(
+            full.chunks.document_text(rows[0]).encode('utf-8')).hexdigest()}
+        assert full.lookup_document(conn, ref)['document_id'] == 1
+        sql = f'''SELECT {full.corpus.FIELDS} FROM search_fts f
+            CROSS JOIN documents d ON d.id=f.document_id CROSS JOIN entries e ON e.id=d.entry_id
+            WHERE f.rowid=? AND d.id=? AND f.entry_id=e.id AND f.text=d.search_text AND {full.corpus.TRUST}'''
+        plan = conn.execute('EXPLAIN QUERY PLAN ' + sql, (73, 1)).fetchall()
+        assert any('VIRTUAL TABLE INDEX' in row[3] and '=' in row[3] for row in plan)
+
+
+@pytest.mark.parametrize('stream_fail,close_fail,cleanup_fail', [
+    (False, False, False), (True, True, False), (True, False, True),
+    (True, True, True), (False, True, True)])
+def test_audit_independent_finalizers_preserve_all_errors(tmp_path, monkeypatch,
+                                                        stream_fail, close_fail, cleanup_fail):
+    real_connect = sqlite3.connect
+    real_directory = full.tempfile.TemporaryDirectory
+    calls = []
+    class Connection:
+        def __init__(self, *args, **kwargs):
+            self.connection = real_connect(*args, **kwargs)
+        def __getattr__(self, name):
+            return getattr(self.connection, name)
+        def close(self):
+            calls.append('close')
+            self.connection.close()
+            if close_fail:
+                raise OSError('injected close failure')
+    class Directory:
+        def __init__(self, *args, **kwargs):
+            self.directory = real_directory(*args, **kwargs)
+            self.name = self.directory.name
+        def cleanup(self):
+            calls.append('cleanup')
+            self.directory.cleanup()
+            if cleanup_fail:
+                raise OSError('injected cleanup failure')
+    monkeypatch.setattr(full.sqlite3, 'connect', Connection)
+    monkeypatch.setattr(full.tempfile, 'TemporaryDirectory', Directory)
+    audit = {}
+    def execute():
+        with full.chunk_audit(tmp_path, full.AUDIT_CAP_BYTES, 1024, audit):
+            if stream_fail:
+                raise TypeError('original stream failure')
+    if stream_fail or close_fail or cleanup_fail:
+        with pytest.raises((TypeError, ValueError)) as failure:
+            execute()
+        assert failure.value.audit is audit
+    else:
+        execute()
+    assert calls == ['close', 'cleanup'] and audit['audit_started'] and audit['cleanup_attempted']
+    assert audit['connection_closed'] is (not close_fail)
+    assert audit['cleanup_status'] == ('NOT_VERIFIED' if close_fail or cleanup_fail else 'VERIFIED')
+    assert ('close_error' in audit) is close_fail and ('cleanup_error' in audit) is cleanup_fail
+    if stream_fail:
+        assert 'original stream failure' in audit['original_error']
+
+
+def test_failed_stream_audit_metadata_is_immediate(tmp_path):
+    def stream():
+        raise TypeError('stream projection failure')
+        yield
+    with pytest.raises(TypeError) as failure:
+        full.count_documents(stream(), CharacterTokenizer(), 'a' * 64, root=tmp_path)
+    audit = failure.value.audit
+    assert audit['audit_started'] and audit['temporary_removed'] and audit['cleanup_status'] == 'VERIFIED'
+    assert not Path(audit['temporary_directory']).exists()
+
+
 def test_historical_raw_job_and_filtered_source_are_separate(tmp_path, monkeypatch):
     name = 'configs/p4-rust-pilot-v1.json'
     path = tmp_path / name

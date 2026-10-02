@@ -173,22 +173,66 @@ def readonly(path):
 
 
 @contextmanager
-def validate_snapshot(config, root=ROOT):
+def validate_snapshot(config, root=ROOT, report=None):
     validate_contract(config)
+    report = {} if report is None else report
+
+    def observe(path, label, observations):
+        observed = observations.setdefault(label, {})
+        errors = []
+        try:
+            stat = path.stat()
+            observed.update(identity={'size': stat.st_size, 'mtime_ns': stat.st_mtime_ns,
+                                      'dev': stat.st_dev, 'ino': stat.st_ino}, atime_ns=stat.st_atime_ns)
+        except (OSError, ValueError) as error:
+            observed['stat_error'] = repr(error)
+            errors.append(error)
+            report.setdefault('observation_errors', []).append(repr(error))
+        try:
+            observed['sidecars'] = corpus.sidecars(path)
+        except (OSError, ValueError) as error:
+            observed['sidecars_error'] = repr(error)
+            errors.append(error)
+            report.setdefault('observation_errors', []).append(repr(error))
+        try:
+            observed['sha256'] = corpus.sha256_file(path)
+        except (OSError, ValueError) as error:
+            observed['hash_error'] = repr(error)
+            errors.append(error)
+            report.setdefault('observation_errors', []).append(repr(error))
+        if errors:
+            raise errors[0]
+        return observed
+
     with product_guard(root):
         path = contained(SNAPSHOT['path'], root)
-        before = path.stat()
-        sidecars = corpus.sidecars(path)
-        require(before.st_size == SNAPSHOT['size'] and
-                corpus.sha256_file(path) == SNAPSHOT['sha256'], 'snapshot binding mismatch')
+        observations = report.setdefault('snapshot_observations', {})
         try:
+            observe(path, 'before', observations)
+            require(observations['before']['identity']['size'] == SNAPSHOT['size'] and
+                    observations['before']['sha256'] == SNAPSHOT['sha256'], 'snapshot binding mismatch')
             with readonly(path) as conn:
                 require(scalar(conn, "SELECT value FROM build_meta WHERE key='index_episodes'")
                         == 'false', 'index_episodes policy must be false')
                 yield conn
+        except Exception as error:
+            report.setdefault('original_error', getattr(error, 'audit', {}).get('original_error', repr(error)))
+            if hasattr(error, 'audit'):
+                report['audit'] = error.audit
+            error.phase_receipt = report
+            raise
         finally:
-            require(path.stat() == before and corpus.sidecars(path) == sidecars and
-                    corpus.sha256_file(path) == SNAPSHOT['sha256'], 'snapshot changed')
+            try:
+                observe(path, 'after', observations)
+                before, after = observations['before'], observations['after']
+                observations['checks'] = {'stable_identity': after['identity'] == before['identity'],
+                    'sidecars': after['sidecars'] == before['sidecars'],
+                    'whole_hash': after['sha256'] == before['sha256'] == SNAPSHOT['sha256']}
+                require(all(observations['checks'].values()), 'snapshot changed')
+            except Exception as error:
+                report.update(status='FAIL', count_complete=False, guard_error=repr(error))
+                error.phase_receipt = report
+                raise
 
 
 def check_components(path):
@@ -321,7 +365,9 @@ def documents(conn):
     previous = None
     with closing(conn.execute(sql)) as cursor:
         for row in cursor:
-            doc = {**corpus.project(row[:-1], sources), 'fts_rowid': row[-1]}
+            values = dict(row)
+            rowid = values.pop('fts_rowid')
+            doc = {**corpus.project(values, sources), 'fts_rowid': rowid}
             did = doc['document_id']
             require(type(did) is int and (previous is None or did > previous),
                     'duplicate or unordered document ID')
@@ -392,7 +438,8 @@ def chunk_audit(root, max_audit_bytes, batch_size, metadata):
     directory = tempfile.TemporaryDirectory(prefix='chunk-ids-', dir=parent)
     path = Path(directory.name) / 'audit.sqlite'
     conn = None
-    metadata.update(temporary_created=True, temporary_directory=directory.name)
+    metadata.update(temporary_created=True, temporary_directory=directory.name, audit_started=True,
+                    count_complete=False, cleanup_status='NOT_VERIFIED')
     try:
         conn = sqlite3.connect(path)
         for sql in ('PRAGMA cache_size=-16384', 'PRAGMA temp_store=FILE',
@@ -421,18 +468,53 @@ def chunk_audit(root, max_audit_bytes, batch_size, metadata):
         check()
         yield conn, check
     except sqlite3.IntegrityError as error:
-        raise ValueError('global duplicate chunk ID') from error
+        failure = ValueError('global duplicate chunk ID')
+        failure.audit = metadata
+        raise failure from error
     except sqlite3.Error as error:
         if getattr(error, 'sqlite_errorcode', None) == sqlite3.SQLITE_FULL or \
                 'database or disk is full' in str(error).lower():
             raise AuditDiskBlocked('BLOCKED_AUDIT_DISK: SQLITE_FULL', metadata) from error
+        error.audit = metadata
+        raise
+    except Exception as error:
+        error.audit = metadata
         raise
     finally:
-        if conn is not None:
-            conn.close()
-        directory.cleanup()
-        metadata['temporary_removed'] = not Path(directory.name).exists()
-        require(metadata['temporary_removed'], 'audit temporary directory cleanup failed')
+        import sys
+
+        original = sys.exc_info()[1]
+        if original is not None:
+            original.audit = metadata
+            metadata.setdefault('original_error', repr(original))
+        errors = []
+        metadata.update(connection_close_attempted=conn is not None, connection_closed=False,
+                        cleanup_attempted=False, cleanup_status='NOT_VERIFIED')
+        try:
+            if conn is not None:
+                conn.close()
+                metadata['connection_closed'] = True
+        except Exception as error:  # noqa: BLE001 -- every close failure must allow independent cleanup
+            metadata['close_error'] = repr(error)
+            errors.append(error)
+        try:
+            metadata['cleanup_attempted'] = True
+            directory.cleanup()
+            metadata['temporary_removed'] = not Path(directory.name).exists()
+            require(metadata['temporary_removed'], 'audit temporary directory cleanup failed')
+        except Exception as error:  # noqa: BLE001 -- retain arbitrary finalizer failures alongside original
+            metadata['cleanup_error'] = repr(error)
+            errors.append(error)
+        if not errors and (conn is None or metadata['connection_closed']) and metadata['temporary_removed']:
+            metadata['cleanup_status'] = 'VERIFIED'
+        if errors:
+            if original is not None:
+                # Re-raise the pending original unchanged; finally diagnostics share its audit object.
+                metadata['finalization_failed'] = True
+            else:
+                failure = ValueError('audit finalization failed: ' + '; '.join(repr(error) for error in errors))
+                failure.audit = metadata
+                raise failure from errors[0]
 
 
 def count_documents(stream, tokenizer, inventory_sha, *, root=ROOT,
@@ -507,6 +589,7 @@ def count_documents(stream, tokenizer, inventory_sha, *, root=ROOT,
                 digest.update(chunks.canonical({**row, 'position': position}) + b'\n')
                 position += 1
         flush()
+    audit['count_complete'] = True
     require(position > 0, 'empty census')
     require(pilot_ids is None or (len(sample_refs) == 512 and len(full_only_refs) == 512),
             'BLOCKED_RESOURCE: bounded smoke references insufficient; no fallback scan')
@@ -1006,7 +1089,10 @@ def phase_guard(config, fixed_head, root, report):
         try:
             yield before
         except Exception as error:
-            report.update(status='FAIL', original_error=repr(error), count_complete=False)
+            report.setdefault('original_error', getattr(error, 'audit', {}).get('original_error', repr(error)))
+            if hasattr(error, 'audit'):
+                report['audit'] = error.audit
+            report.update(status='FAIL', count_complete=False)
             error.phase_receipt = report
             raise
         finally:
@@ -1050,7 +1136,8 @@ def count_preflight(config, *, authorized, fixed_head, root=ROOT,
     report = {'schema': 'p4-full-reviewed-count-v2', 'status': 'FAIL',
               'fixed_code_sha': fixed_head, 'count_complete': False, 'attempts': 0,
               'snapshot': config['snapshot'], 'canonical_config_sha256': exact.sha(CONFIG),
-              'builder_authorized': False, 'implementation_origin': IMPLEMENTATION}
+              'builder_authorized': False, 'implementation_origin': IMPLEMENTATION,
+              'audit': {'audit_started': False, 'status': 'NOT_RUN', 'cleanup_status': 'NOT_VERIFIED'}}
     require(re.fullmatch('[0-9a-f]{40}', fixed_head or '') is not None, 'fixed HEAD required')
     positive_integer(max_document_text_bytes, 'max_document_text_bytes')
     positive_integer(audit_batch_size, 'audit_batch_size')
@@ -1061,7 +1148,7 @@ def count_preflight(config, *, authorized, fixed_head, root=ROOT,
     with phase_guard(config, fixed_head, root, report) as verified:
         ids, _, _, _, _ = pilot_inputs(verified)
         raw, _ = exact.frozen_tokenizers(contained(verified['model']['asset_directory']))
-        with validate_snapshot(config, root) as conn:
+        with validate_snapshot(config, root, report) as conn:
             report['count'] = census_and_chunk_count(conn, raw,
                 verified['manifest']['tokenizer_inventory_sha256'], config, root=root,
                 max_audit_bytes=max_audit_bytes, audit_batch_size=audit_batch_size,
