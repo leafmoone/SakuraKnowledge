@@ -1,0 +1,103 @@
+{
+  "schema": "p4-evidence-redaction-manifest-v1",
+  "policy": {
+    "environment_whitelist": [
+      "CARGO_TARGET_DIR",
+      "CC",
+      "CC_x86_64_pc_windows_gnu",
+      "CXX",
+      "CXX_x86_64_pc_windows_gnu",
+      "DLLTOOL",
+      "DLLTOOL_x86_64_pc_windows_gnu",
+      "HF_HUB_OFFLINE",
+      "PATH",
+      "PYTHONIOENCODING",
+      "PYTHONUTF8",
+      "TRANSFORMERS_OFFLINE"
+    ],
+    "other_environment_values": "REDACTED",
+    "known_secret_values": "recursive replacement in every string including embedded argv text; scan serialized JSON for literal and JSON-escaped values",
+    "originals": "local-only immutable; derivatives not hash-equivalent",
+    "scan_limitation": "known-secret-value scan is not proof against unknown secrets"
+  },
+  "entries": [
+    {
+      "original_path": "reports/P4/clean-room-diagnostics/fixed-matrix-ccc80fd-r3-receipt.json",
+      "original_bytes": 815860,
+      "original_sha256": "dc4ad93426e19cbe7226f6b5933438d93e88b5e0d4f6de6ae396562f4bdd085e",
+      "redactions": {
+        "env_values": 0,
+        "string_occurrences": 0
+      },
+      "derivative_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/sanitized/fixed-matrix-ccc80fd-r3-receipt.sanitized.json",
+      "derivative_bytes": 837372,
+      "derivative_sha256": "5c090441fd61917377d55a3e2002f71d40055b46554d3a4d26d064ff9aead810",
+      "known_secret_value_hits": 0
+    },
+    {
+      "original_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/inventory-formal6.capture.json",
+      "original_bytes": 146044,
+      "original_sha256": "7db02e4998b00865da7f6d69c2faf6843b12cee6f277dbbe919ce07e04235d82",
+      "redactions": {
+        "env_values": 55,
+        "string_occurrences": 0
+      },
+      "derivative_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/sanitized/inventory-formal6.capture.sanitized.json",
+      "derivative_bytes": 175812,
+      "derivative_sha256": "5407261e1aacd2b09364de99d1cc813864b7a15199683a4afb295a6622e4e307",
+      "known_secret_value_hits": 0
+    },
+    {
+      "original_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/count-formal7.capture.json",
+      "original_bytes": 140449,
+      "original_sha256": "980193b96ee6c0e3744ed9f8413faf9dc3e10bf37acec09fe044581bf6a58a68",
+      "redactions": {
+        "env_values": 55,
+        "string_occurrences": 0
+      },
+      "derivative_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/sanitized/count-formal7.capture.sanitized.json",
+      "derivative_bytes": 170391,
+      "derivative_sha256": "eb40dbd84707f0420798be5924995ac7ae1df62dafc8c5cd11bb7da3f204686e",
+      "known_secret_value_hits": 0
+    },
+    {
+      "original_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/disk-formal3.capture.json",
+      "original_bytes": 182519,
+      "original_sha256": "a087934cede3aca1fc13dccba25c5763316afc3918a7e718893c5534d0ae96fe",
+      "redactions": {
+        "env_values": 55,
+        "string_occurrences": 0
+      },
+      "derivative_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/sanitized/disk-formal3.capture.sanitized.json",
+      "derivative_bytes": 222084,
+      "derivative_sha256": "22e4f26a7ee6f0114f9eb159c378216fd15f213f0c5d8ce476d9ce2c979e33ef",
+      "known_secret_value_hits": 0
+    },
+    {
+      "original_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/smoke-formal2.capture.json",
+      "original_bytes": 106095,
+      "original_sha256": "a2afc907e1cc3264b374d6babe1fd04b4babd0ccf9eba2e46beae40beeec5015",
+      "redactions": {
+        "env_values": 55,
+        "string_occurrences": 0
+      },
+      "derivative_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/sanitized/smoke-formal2.capture.sanitized.json",
+      "derivative_bytes": 125651,
+      "derivative_sha256": "8c6990873f9afa0e2ab739f167e854519e7e9d790cc1fd234e7f6fdff2188bd3",
+      "known_secret_value_hits": 0
+    },
+    {
+      "original_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/formal-pilot-legacy2-receipt.json",
+      "original_bytes": 130672,
+      "original_sha256": "030a6420526156dc6457ab25f99d4a51d075ebed504677008143667e8419e9d7",
+      "redactions": {
+        "env_values": 330,
+        "string_occurrences": 0
+      },
+      "derivative_path": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/sanitized/formal-pilot-legacy2-receipt.sanitized.json",
+      "derivative_bytes": 151335,
+      "derivative_sha256": "f121e66dc5b1ec514c82a0326e32ec2ae72bcb01cf74d7c96ba4c5b3610ebd40",
+      "known_secret_value_hits": 0
+    }
+  ]
+}

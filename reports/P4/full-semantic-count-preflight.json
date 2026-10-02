@@ -1,0 +1,41 @@
+{
+  "schema": "p4-full-clean-room-recovery-summary-v1",
+  "status": "WAITING_REVIEW",
+  "producer_commit": "ccc80fd8d2d700654a9003cc70e3785628275f99",
+  "evidence_commit_binding": "Git commit containing this report; exact submission SHA recorded externally in handoff",
+  "implementation_origin": "clean-room new implementation; original source was lost and not recovered",
+  "historical_loss_test_result": {"errors": 30, "failures": 3, "authority": "root incident statement; not current test results"},
+  "FULL_SEMANTIC_BUILD_ATTEMPTS": 0,
+  "FULL_SEMANTIC_PACK": "NOT_RUN",
+  "FULL_PRODUCT_ARTIFACTS_CREATED": false,
+  "builder_authorized": false,
+  "base_directory": "reports/P4/fixed-ccc80fd8d2d700654a9003cc70e3785628275f99/",
+  "receipts": {
+    "matrix": {"path": "reports/P4/clean-room-diagnostics/fixed-matrix-ccc80fd-r3-receipt.json", "bytes": 815860, "sha256": "dc4ad93426e19cbe7226f6b5933438d93e88b5e0d4f6de6ae396562f4bdd085e", "status": "COMPLETE_WITH_SKIPS", "command_exit_zero_count": 12, "symlink_skips_NOT_RUN": 21},
+    "inventory": {"file": "inventory-formal6.json", "bytes": 187852, "sha256": "c42cfc6fab355d02a7142fa0e29d98e41ff2bca9c45358442b13bf34a769a718", "capture_sha256": "7db02e4998b00865da7f6d69c2faf6843b12cee6f277dbbe919ce07e04235d82", "status": "PASS"},
+    "count": {"file": "count-formal7.json", "bytes": 392412, "sha256": "305d71f47a8038ef9dc57b078b393902e5a1113e6d5414938a057d7f5e83731c", "capture_sha256": "980193b96ee6c0e3744ed9f8413faf9dc3e10bf37acec09fe044581bf6a58a68", "status": "COUNT_COMPLETE"},
+    "disk": {"file": "disk-formal3.json", "bytes": 2041445, "sha256": "fd93727fce073ff9afdc301689e04fe904076a296dc90c78933e4c02f6276b0c", "capture_sha256": "a087934cede3aca1fc13dccba25c5763316afc3918a7e718893c5534d0ae96fe", "status": "DISK_PASS"},
+    "smoke": {"file": "smoke-formal2.json", "bytes": 150807, "sha256": "13b8869242eeb526a36ab11777382a42c68c5276b5e7405d44e923b23ce51b0f", "capture_sha256": "a2afc907e1cc3264b374d6babe1fd04b4babd0ccf9eba2e46beae40beeec5015", "status": "PASS_EXTERNAL_RUN_REVIEW", "native_status": "READY_FOR_BUILD_REVIEW"},
+    "pilot": {"file": "pilot-formal2.json", "bytes": 92598, "sha256": "5b929c467cc21f40b8567192876d94e0575ddf86a24c0fc1b880b474e0067898", "status": "PASS_PENDING_EXTERNAL_REVIEW"},
+    "legacy": {"file": "legacy-formal2.json", "bytes": 173389, "sha256": "442e2132c6725901039b495ecb28ffcd557eba148c2585bc15a38642dbb485e3", "status": "PASS_PENDING_EXTERNAL_REVIEW"},
+    "formal_dispatch": {"file": "formal-pilot-legacy2-receipt.json", "bytes": 130672, "sha256": "030a6420526156dc6457ab25f99d4a51d075ebed504677008143667e8419e9d7", "status": "PASS"}
+  },
+  "count": {"documents": 1295638, "chunks": 1366520, "tokens": 147849991, "max_chunk_tokens": 384, "empty_documents": 0, "duplicate_documents": 0, "duplicate_chunk_ids": 0, "paragraph_splits": 15411, "audit_peak_bytes": 113798888, "audit_cap_bytes": 1073741824, "audit_cleanup": "VERIFIED"},
+  "disk": {"required_bytes": 64156962688, "observed_free_bytes": 384525631488, "future_resource_guarantee": false},
+  "pilot": {"warmups_passed": 2, "formal_passed": 120, "failed": 0, "not_run": 0, "retries": 0, "overlap_at_10_20_100": 1.0, "quality_failures": [], "wall_p95_ms": 334.93409998482093, "resident_p95_ms": 324.8028},
+  "legacy": {"baseline_anchor": "c417655e149b7dce64d0bab376076f2a2f7c7320", "P2_passed": 151, "whole_values": 135, "error_contracts": 16, "gold_passed": 55, "resolved": 39, "nonresolved": 16, "wrong_resolved": 0, "timeout_count": 0, "evidence_manifest_entries_verified": 622, "evidence_manifest_sha256": "c1f1c52dcf99a42ac9639a3561e0b2692823a096379afd40f90c0e0da9cddd4d"},
+  "limitations": [
+    "Top-level count audit remains stale NOT_RUN/NOT_VERIFIED; actual audit evidence is count.audit. External per-run review does not fix general validator missing checks.",
+    "21 matrix symlink skips are NOT_RUN, not PASS; Windows privilege limitation.",
+    "Smoke inner snapshot observations are not retained and no outer snapshot observations were recorded for smoke.",
+    "Smoke GPU duration and peak memory are NOT_RECORDED; pilot optional memory NOT_AVAILABLE.",
+    "Mapping 25 percent uplift is an estimate, not a strict upper bound.",
+    "Smoke footprint field is narrower than the disk referenced-asset accounting; neither is entire Python/venv footprint.",
+    "New venv ORT DLL identity differs from approved system DLL; no substitution of pack runtime.",
+    "Helpers may execute Git during failure finalization.",
+    "Full source-fact human review and Pi/Pool integration are not established by these runs.",
+    "Complete environment captures contain credential-like variables and must not be staged or published as-is. Raw local originals remain preserved."
+  ],
+  "historical_evidence": "Retain original incident, preserve directory, inventory/count/disk/probe/matrix failures, smoke1 wrapper failure and formal build1 exit101. Old producer receipts are not migrated or consumed as current acceptance.",
+  "publication": "Selected evidence and explicitly redacted derivatives are proposed for publication; originals and referenced build/raw evidence not in the named submission remain local-only. Exact evidence commit is recorded externally in handoff, distinct from producer commit; normal push and remote SHA verification required before formal review."
+}
