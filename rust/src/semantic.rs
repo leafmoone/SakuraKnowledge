@@ -1323,6 +1323,164 @@ mod tests {
         v
     }
     #[test]
+    fn builder_synthetic_reader_interop() {
+        // Env input is private to tests; production authority stays immutable.
+        let Some(root) = std::env::var_os("SKNOW_P4_BUILD_INTEROP_DIR") else {
+            // Normal matrix exercises shared manifest validation independently.
+            validate_manifest(&full_manifest()).unwrap();
+            return;
+        };
+        let root = PathBuf::from(root);
+        let builder: Value = serde_json::from_slice(
+            &std::fs::read(root.join("builder-runtime-manifest.json")).unwrap(),
+        )
+        .unwrap();
+        let expected: Value =
+            serde_json::from_slice(&std::fs::read(root.join("interop-expected.json")).unwrap())
+                .unwrap();
+        let mut v = builder.clone();
+        let frozen = full_manifest();
+        for name in ["canonical_contract", "declarative_contract"] {
+            v[name] = frozen[name].clone();
+        }
+        v["contract"] = full_contract(row_count(&builder).unwrap()).unwrap();
+        for name in ["identity", "size", "sha256"] {
+            v["snapshot"][name] = frozen["snapshot"][name].clone();
+        }
+        for name in ["size", "sha256"] {
+            v["artifacts"]["ort_dll"][name] = frozen["artifacts"]["ort_dll"][name].clone();
+        }
+        validate_manifest(&v).unwrap();
+        let mut missing = v.clone();
+        missing.as_object_mut().unwrap().remove("pack_version");
+        assert!(validate_manifest(&missing).is_err());
+        for field in ["schema", "lexical_metadata", "lexical"] {
+            let mut mixed = v.clone();
+            match field {
+                "schema" => mixed["schema"] = json!("p4-rust-semantic-pack-v1"),
+                "lexical_metadata" => mixed[field] = json!({}),
+                _ => mixed["artifacts"][field] = v["artifacts"]["corpus"].clone(),
+            }
+            assert!(validate_manifest(&mixed).is_err());
+        }
+        let pack = root.join("synthetic");
+        let mapping = full_artifact(
+            &root,
+            &pack,
+            "mapping",
+            &builder["artifacts"]["mapping"],
+            None,
+        )
+        .unwrap();
+        let before = std::fs::read(&mapping).unwrap();
+        let c = readonly(&mapping).unwrap();
+        assert!(c.execute("DELETE FROM chunks", []).is_err());
+        let n = row_count(&v).unwrap();
+        validate_mapping(&c, n).unwrap();
+        let rows = expected["metadata"].as_array().unwrap();
+        assert_eq!(rows.len(), n);
+        let keys: Vec<u64> = (0..n as u64).collect();
+        let distances = vec![0.0; n];
+        for (position, row) in rows.iter().enumerate() {
+            let raw: String = c
+                .query_row(
+                    "SELECT metadata FROM chunks WHERE position=?",
+                    [position as u64],
+                    |r| r.get(0),
+                )
+                .unwrap();
+            assert_eq!(serde_json::from_str::<Value>(&raw).unwrap(), *row);
+            let mut selected = keys.clone();
+            selected.rotate_left(position);
+            let hits = dense_hits_for(&c, &selected, &distances, n, Mode::Full).unwrap();
+            let first = &hits[0];
+            assert_eq!(
+                EntryKey::parse(&first["entry"]).unwrap(),
+                EntryKey::parse(&row["entry_key"]).unwrap()
+            );
+            for name in ["document_id", "chunk_id"] {
+                assert_eq!(text(first, name).unwrap(), field_string(row, name).unwrap());
+            }
+            for name in ["source_id", "evidence_id"] {
+                assert_eq!(first[name], row[name]);
+            }
+        }
+        let corpus_path = full_artifact(
+            &root,
+            &pack,
+            "corpus",
+            &builder["artifacts"]["corpus"],
+            None,
+        )
+        .unwrap();
+        let bytes = std::fs::read(corpus_path).unwrap();
+        assert_eq!(builder["artifacts"]["corpus"]["sha256"], sha256(&bytes));
+        // Fixture-only JSONL join: production binds corpus, has no corpus parser.
+        let docs: Vec<Value> = std::str::from_utf8(&bytes)
+            .unwrap()
+            .lines()
+            .map(|s| serde_json::from_str(s).unwrap())
+            .collect();
+        assert_eq!(json!(docs), expected["documents"]);
+        for row in rows {
+            let doc = docs
+                .iter()
+                .find(|d| d["document_id"] == row["document_id"])
+                .unwrap();
+            for name in ["entry_key", "entry_id", "source_id", "evidence_id"] {
+                assert_eq!(row[name], doc[name]);
+            }
+        }
+        for sql in [
+            "UPDATE chunks SET metadata='{}' WHERE position=0",
+            "DELETE FROM chunks WHERE position=0",
+        ] {
+            let corrupt = root.join("rust-corrupt-mapping.sqlite");
+            std::fs::copy(&mapping, &corrupt).unwrap();
+            {
+                let writable = Connection::open(&corrupt).unwrap();
+                writable.execute(sql, []).unwrap();
+            }
+            {
+                let bad = readonly(&corrupt).unwrap();
+                assert!(
+                    validate_mapping(&bad, n).is_err()
+                        || dense_hits_for(&bad, &keys, &distances, n, Mode::Full).is_err()
+                );
+            }
+            std::fs::remove_file(corrupt).unwrap();
+        }
+        for field in ["source_id", "document_id"] {
+            let corrupt = root.join("rust-corrupt-mapping.sqlite");
+            std::fs::copy(&mapping, &corrupt).unwrap();
+            let mut invalid = rows[0].clone();
+            invalid[field] = json!("wrong-fixture-provenance");
+            {
+                let writable = Connection::open(&corrupt).unwrap();
+                writable
+                    .execute(
+                        "UPDATE chunks SET metadata=? WHERE position=0",
+                        [invalid.to_string()],
+                    )
+                    .unwrap();
+            }
+            {
+                let bad = readonly(&corrupt).unwrap();
+                // Nonempty wrong provenance is readable, but fixture corpus closure
+                // MUST fail: the runtime reader does not authenticate these joins.
+                let hits = dense_hits_for(&bad, &keys, &distances, n, Mode::Full).unwrap();
+                assert_ne!(hits[0][field], rows[0][field]);
+                assert!(!docs
+                    .iter()
+                    .any(|doc| doc["document_id"] == invalid["document_id"]
+                        && doc["source_id"] == invalid["source_id"]));
+            }
+            std::fs::remove_file(corrupt).unwrap();
+        }
+        drop(c);
+        assert_eq!(std::fs::read(mapping).unwrap(), before);
+    }
+    #[test]
     fn full_paths_controlled_assets_receipt_exception_and_aliases() {
         let temp = std::env::temp_dir().join(format!("sknow-full-path-{}", std::process::id()));
         let repo = temp.join("ROOT");

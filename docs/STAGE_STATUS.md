@@ -394,3 +394,83 @@ Its claims and failed receipts are retained as historical context, not current a
 - Windows, gnu toolchain rustc/cargo 1.98.1, GCC 16.2.0 (w64devkit).
 - Python 3.14.5, SQLite 3.50.4 (FTS5 yes; **dbstat no**).
 - Machine: see `reports/P2/p2-perf-20bf5b3.json` `host`.
+
+## FULL executor implementation revision — WAITING_REVIEW
+
+- Prior narrative above is restored verbatim from HEAD; this executor section is
+  appended only. Implementation permission is not execution authorization.
+- Scope: tools/p4_full_build.py, tests/test_p4_full_build.py and executor docs.
+  No helper/config/Rust/public API changes, installation, formal run or commit.
+  FULL attempts remain 0; actual pack and native GPU/USearch remain NOT_RUN.
+- Mapping uses source_id/evidence_id/text_sha256 and document_id/typedkey indexes.
+  Bounded whole saved-matrix finite/norm scan and independent pinned CPU FP32
+  LocalEncoder sample parity precede deferred ANN initialization. Actual reference
+  identity is receipted; it is not labeled an ONNX reference.
+- Activation guards exit before reservation; work/finalization guard exits precede
+  manifest publication and terminal receipt. Activation errors attach attempt0 FAIL
+  reports. No late outer guard can publish a false completion.
+- Distinct sorted runtime_required inventory includes snapshot and canonical bytes;
+  FULL_SEMANTIC_PACK_SHA256 aliases the canonical inventory digest. Receipt self
+  bytes are excluded explicitly; top-level receipt binding and tempstate are recorded.
+- ANN build seconds and byte/SHA binding are recorded. Optional memory/acceleration
+  telemetry and supported reset/close cleanup are best effort, never blockers.
+- Synthetic CLI invokes the actual FULL validator with explicit fixture authorities.
+  Targeted pytest43PASS, owned RuffPASS; earlier regression41PASS/2FAIL was a fixture
+  mismatch retained as historical evidence, not relabeled PASS.
+
+### Final executor matrix / submission pending
+
+- Latest reported executor tests: 78 passed. Final controller matrix: 12 commands,
+  all exit0; full pytest1639 passed,21 skipped,67 subtests passed. Earlier counts
+  above remain historical. No tests were rerun for this docs-only correction.
+- Cargo/pytest targets remain repository-contained and process-local isolated;
+  skipped cases remain NOT_RUN, not native GPU/USearch qualification.
+- Authorization has exactly12 keys, including preflight_producer_sha (ccc80fd),
+  preflight_evidence_sha (51346b2), and reviewed_source_bindings for count/disk/smoke.
+  Historical reviewed provenance is separate from independently fixed executor SHA.
+- Terminal snapshot CHANGED/HASH_FAILED or receipt persistence failure is FAIL;
+  initial error type/message and failed phase remain preserved.
+- docs/p4-full-semantic-v1.md retains all139 original baseline lines with an appended
+  executor section. Prior no-builder wording is a historical preflight-stage boundary
+  superseded for code implementation only; FULL remains unauthorized.
+- Fixed-source submission/review remains pending. FULL attempts0,actual pack NOT_RUN;
+
+### Final-review corrections — final6 pending, history retained
+
+- Old matrix3 is supplanted after reviewer runtime `pack_version`, durable receipt
+  fsync/publication and cancellation bugs. Historical results are not relabeled.
+  Running matrix5 was invalidated by source changes; final6 is pending, not PASS.
+  Reported base91 plus six additions is **91 + 6 = 97 expected**, not actual final97.
+- Generated packs carry `pack_version=p4-full-semantic-v1`. Receipt staging fsync
+  precedes exclusive hard-link publication with no overwrite. Directory durability
+  is explicitly **NOT_GUARANTEED**. Every `BaseException`, including `GeneratorExit`
+  and custom subclasses, preserves original reraising and finally accounting;
+  secondary errors remain in the error registry with best-effort stderr accounting.
+- Root approved fifth file `rust/src/semantic.rs` for `cfg(test)` only. Actual Python
+  synthetic mapping/corpus products are exported to shared Rust `validate_mapping`,
+  `dense_hits_for`, `full_artifact` and `validate_manifest`. Manifest coverage uses a
+  TEST-authority derivative, not production FULL authority; JSONL joins are
+  fixture-only, not a production corpus parser. Three actual direct-binary consumer
+  version checks pass expected gates: generated version reaches subsequent FULL
+  artifact-size rejection; missing/empty reject `missing/nontext pack_version`.
+- Exact authorization fields: `schema`, `operation`, `fixed_code_sha`,
+  `preflight_producer_sha`, `preflight_evidence_sha`, `reviewed_source_bindings`,
+  `output`, `max_attempts`, `count_review`, `disk_review`, `smoke_review`,
+  `executor_bindings`. Executor bindings retain four original owned files:
+  `tools/p4_full_build.py`, `tests/test_p4_full_build.py`, `docs/p4-full-semantic-v1.md`,
+  `docs/STAGE_STATUS.md`. Existing authenticated Rust inventory/source guards cover
+  Rust test source, not a fifth executor key; fixed-source review must cover it.
+- Native ORT/GPU and 21,718,736,896-byte FULL snapshot/pack opening **NOT_RUN**;
+  FULL attempts **0**, actual pack **NOT_RUN**. Docs-only append; final6/review pending.
+
+### Authorization closure correction (finalmatrix7 pending)
+
+Earlier four-key executor binding claims are superseded: exactly five owned paths
+include `rust/src/semantic.rs` alongside executor/tests/two docs. Each binds reviewed
+raw SHA256 and fixed-HEAD Git bytes. Historical producer/evidence/receipt identities
+are not migrated. Only the pinned appended `cfg(test)` reader-interop block may differ
+from producer Rust; stripping that exact block restores all producer bytes.
+Block SHA256: `8a5306d202fe4a7ee87a14d5cf05407a7b28ed18951ecf5a55c18566af876a78`.
+Actual isolated temporary-Git tests cover valid closure and four rejection cases.
+Finalmatrix6 is superseded by this correction; finalmatrix7 and review are pending.
+No real-repository commit or formal count/disk/GPU/FULL execution; attempts0.
