@@ -1,5 +1,40 @@
 # P4 FULL semantic clean-room preflight contract (implementation draft)
 
+## Reviewed split execution (not yet formally executed)
+
+The tracked interfaces are `count_preflight`, `disk_preflight`, and
+`smoke_preflight`. `preflight` performs one new count and stops at
+`WAITING_COUNT_REVIEW`; it never automatically resumes a receipt or initializes
+GPU. Direct count derives necessary resource reservations from the trusted
+1,295,638-document lower bound and authenticated pilot mapping/ANN observations,
+not a guessed caller staging budget. Disk uses reviewed actual chunk N and
+measured mapping pages to derive minima. Insufficient disk or resource caps block.
+
+The one count stream retains 512 hash-ranked document references and the first
+512 FULL-only chunk references excluding the approved 50,000 pilot documents.
+Later phases only look up those IDs, validate text/token/boundary digests, and
+repeat the bounded projection; they do not search a second FULL stream. Sample
+shortage blocks without fallback scan, truncation, skipped census, or retry.
+
+Each resume requires root-reviewed `expected_sha256`, separate
+`expected_capture_sha256`, and exact `expected_argv`. The capture binds actual
+exit, cwd, zero retries, stdout/stderr bytes and hashes, and the output receipt.
+These externally reviewed digests and fixed-code execution logs are the trust
+source: a receipt's own JSON hash or count stream digest does not independently
+prove execution or reconstruct every chunk. Partial or changed code/config,
+snapshot/tokenizer/chunker/inventory bindings cannot resume. Count and capture
+must be published create-new by the authorized caller; do not overwrite prior
+attempts. Exceptions retain failure receipts; finally guards remain fatal.
+
+Disk PASS is reviewed and fresh free space is checked immediately before encoder
+creation and after smoke. GPU, 128 approved pilot vectors, and 512 FULL-only chunk
+smokes require explicit separate authorization. No phase authorizes FULL build.
+
+The legacy regression CLI now requires explicit runtime SHA, run-id and a new
+contained target. Its historical baseline anchor remains immutable; runtime
+source and captured actual binary build provenance are independent bindings.
+151/55 expected records and comparison policy remain unchanged.
+
 implementation_origin: `clean_room_reimplementation_after_untracked_source_loss`
 recovered_original_source: **false**
 reference_sources: committed Rust pilot `471829644b32eecc10aa30d9d3b71979500a3117`,

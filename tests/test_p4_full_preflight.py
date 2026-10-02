@@ -4,7 +4,7 @@ import json
 import os
 import sqlite3
 import subprocess
-from contextlib import closing
+from contextlib import closing, contextmanager
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -49,7 +49,7 @@ class CharacterTokenizer:
 
 
 def document(did, text='x' * 900):
-    return {'document_id': did, 'entry_id': did, 'entry_key': {
+    return {'document_id': did, 'fts_rowid': did, 'entry_id': did, 'entry_key': {
         'kind': 'subject', 'namespace': 'bangumi.subject', 'value': str(did)},
         'source_family': 'bangumi', 'source_id': 'source', 'evidence_id': 'evidence',
         'title': '', 'original': text}
@@ -381,6 +381,213 @@ def test_inventory_complete_hash_and_path_escape(tmp_path):
         full.verify_bindings({'asset': {**spec, 'sha256': 'b' * 64}}, {'asset'}, tmp_path)
 
 
+def test_fts_reference_is_rowid_constrained_not_unindexed_scan():
+    with closing(sqlite3.connect(':memory:')) as conn:
+        conn.execute('CREATE VIRTUAL TABLE search_fts USING fts5(document_id UNINDEXED,entry_id UNINDEXED,text)')
+        conn.execute('INSERT INTO search_fts(rowid,document_id,entry_id,text) VALUES(73,5,9,?)', ('bound',))
+        plan = conn.execute('EXPLAIN QUERY PLAN SELECT document_id,entry_id,text FROM search_fts WHERE rowid=?',
+                            (73,)).fetchall()
+        assert any('VIRTUAL TABLE INDEX' in row[3] and '= ' not in row[3] and '=' in row[3] for row in plan)
+        assert conn.execute('SELECT document_id,entry_id,text FROM search_fts WHERE rowid=?', (73,)).fetchone() == (5, 9, 'bound')
+    with pytest.raises(ValueError, match='FTS rowid required'):
+        full.lookup_document(None, {'document_id': 5})
+
+
+def test_count_retains_two_bounded_samples_in_single_stream(tmp_path):
+    pilot_ids = set(range(-49999, 1))
+    seen = []
+
+    def stream():
+        for did in range(1, 514):
+            seen.append(did)
+            yield document(did, 'short')
+
+    result = full.count_documents(stream(), CharacterTokenizer(), 'a' * 64,
+                                 root=tmp_path, pilot_document_ids=pilot_ids)
+    assert result['documents'] == 513 and len(seen) == 513
+    assert len(result['sample_documents']) == len(result['full_only_chunk_references']) == 512
+    assert result['count_complete'] and result['audit']['temporary_removed']
+
+
+def test_selected_projection_never_streams_or_recounts(tmp_path, monkeypatch):
+    docs = {i: document(i, 'short') for i in range(1, 513)}
+    result = full.count_documents(iter(docs.values()), CharacterTokenizer(), 'a' * 64,
+        root=tmp_path, pilot_document_ids=set(range(-49999, 1)))
+    monkeypatch.setattr(full, 'lookup_document', lambda conn, ref: copy.deepcopy(docs[ref['document_id']]))
+    monkeypatch.setattr(full, 'documents', lambda *args: pytest.fail('second FULL stream'))
+    monkeypatch.setattr(full, 'count_documents', lambda *args: pytest.fail('second count'))
+    sample, only = full.selected_projection(None, CharacterTokenizer(), 'a' * 64, result,
+                                           max_document_text_bytes=full.DOCUMENT_CAP_BYTES)
+    assert len(sample) == len(only) == 512
+    assert [row['position'] for row in sample] == list(range(512))
+    result['full_only_chunk_references'][0]['chunk_sha256'] = '0' * 64
+    with pytest.raises(ValueError, match='changed'):
+        full.selected_projection(None, CharacterTokenizer(), 'a' * 64, result,
+                                 max_document_text_bytes=full.DOCUMENT_CAP_BYTES)
+
+
+def test_reviewed_capture_requires_external_hash_and_actual_streams(tmp_path):
+    receipt = {'fixed_code_sha': 'a' * 40}
+    out = tmp_path / 'stdout.raw'
+    err = tmp_path / 'stderr.raw'
+    out.write_bytes(b'actual output')
+    err.write_bytes(b'')
+    path = tmp_path / 'receipt.json'
+    path.write_text(json.dumps(receipt), encoding='utf-8')
+    capture = {'argv': ['python', 'reviewed-count'], 'cwd': str(tmp_path.resolve()),
+               'exit': 0, 'timeout': False, 'retries': 0,
+               'receipt': {'path': 'receipt.json', 'sha256': full.exact.sha(path)},
+               'stdout': {'path': 'stdout.raw', 'bytes': out.stat().st_size, 'sha256': full.exact.sha(out)},
+               'stderr': {'path': 'stderr.raw', 'bytes': 0, 'sha256': full.exact.sha(err)}}
+    cap = tmp_path / 'capture.json'
+    cap.write_text(json.dumps(capture), encoding='utf-8')
+    review = {'expected_sha256': full.exact.sha(path), 'capture_path': 'capture.json',
+              'expected_capture_sha256': full.exact.sha(cap), 'expected_argv': capture['argv'],
+              'fixed_head': 'a' * 40, 'root': tmp_path}
+    assert full.load_reviewed_receipt('receipt.json', **review) == receipt
+    out.write_bytes(b'tampered')
+    with pytest.raises(ValueError, match='capture changed'):
+        full.load_reviewed_receipt('receipt.json', **review)
+    review['expected_sha256'] = '0' * 64
+    with pytest.raises(ValueError, match='bytes changed'):
+        full.load_reviewed_receipt('receipt.json', **review)
+
+
+def test_convenience_stops_at_count_review(monkeypatch):
+    monkeypatch.setattr(full, 'count_preflight', lambda *args, **kwargs: {
+        'status': 'COUNT_COMPLETE', 'STOP_STATE': 'WAITING_COUNT_REVIEW'})
+    monkeypatch.setattr(full, 'disk_preflight', lambda *args: pytest.fail('unreviewed disk'))
+    monkeypatch.setattr(full.exact, 'LocalEncoder', lambda *args: pytest.fail('unreviewed GPU'))
+    assert full.preflight(contract(), authorized=True, fixed_head='a' * 40)['STOP_STATE'] == 'WAITING_COUNT_REVIEW'
+
+
+def test_real_count_shape_validates_and_tampered_samples_fail(tmp_path):
+    count = full.count_documents((document(i, 'short') for i in range(1, 513)),
+        CharacterTokenizer(), 'a' * 64, root=tmp_path,
+        pilot_document_ids=set(range(-49999, 1)))
+    # Synthetic census size aliases only: preserve the producer's actual stats/schema.
+    count.update(documents=1295638, strata=full.STRATA, actual_chunks=1295638,
+                 FULL_DOCUMENT_COUNT=1295638, FULL_EXACT_CHUNK_COUNT=1295638, attempts=0,
+                 EMPTY_DOCUMENTS=0, DUPLICATE_DOCUMENTS=0, DUPLICATE_CHUNK_IDS=0,
+                 MAX_CHUNK_TOKENS=count['max_chunk_tokens'],
+                 chunk_token_count=1295638, canonical_token_count=1295638)
+    receipt = {'schema': 'p4-full-reviewed-count-v2', 'status': 'COUNT_COMPLETE',
+               'count_complete': True, 'fixed_code_sha': 'a' * 40, 'attempts': 0,
+               'source_inventory_sha256': 'source', 'inventory_sha256': 'inventory',
+               'canonical_config_sha256': full.exact.sha(full.CONFIG),
+               'snapshot': contract()['snapshot'], 'count': count}
+    assert full.validate_count_receipt(receipt, contract(), fixed_head='a' * 40,
+        source_binding='source', inventory_binding='inventory') is count
+    count['sample_documents'][1] = count['sample_documents'][0]
+    with pytest.raises(ValueError, match='unique ordered sample'):
+        full.validate_count_receipt(receipt, contract(), fixed_head='a' * 40,
+            source_binding='source', inventory_binding='inventory')
+
+
+def test_partial_count_receipt_cannot_resume():
+    with pytest.raises(ValueError, match='complete reviewed count'):
+        full.validate_count_receipt({'schema': 'p4-full-reviewed-count-v2', 'status': 'BLOCKED_AUDIT_DISK'},
+            contract(), fixed_head='a' * 40, source_binding='source', inventory_binding='inventory')
+
+
+def test_split_smoke_success_uses_reviewed_samples_not_count(monkeypatch, tmp_path):
+    sample = [{'position': 0, 'document_id': 1, 'chunk_index': 0, 'chunk_id': 'a' * 64,
+               'canonical_token_start': 0, 'canonical_token_end': 1, 'token_ids': [1]}]
+    only = [{'document_id': i, 'chunk_id': str(i)} for i in range(1, 513)]
+    verified = {'inventory_sha256': 'inventory', 'manifest': {'tokenizer_inventory_sha256': 'a' * 64},
+                'model': {'asset_directory': 'assets'}, 'contract': {'max_sequence_tokens': 512,
+                    'query_prefix': '', 'passage_prefix': ''}, 'job': {'threads': 8, 'batch_size': 32}, 'bindings': {'assets/model.onnx': {'size': 100}},
+                'pilot_smoke_binding': {'selected_rows': 128},
+                'pack': {'artifacts': {'ort_dll': {'size': 10}}}}
+    @contextmanager
+    def guard(config, head, root, report):
+        report['source_inventory_sha256'] = 'source'
+        yield verified
+    @contextmanager
+    def snapshot(*args):
+        yield None
+    monkeypatch.setattr(full, 'phase_guard', guard)
+    monkeypatch.setattr(full, 'validate_snapshot', snapshot)
+    monkeypatch.setattr(full, 'reviewed_count', lambda *args: ({}, {'max_document_text_bytes': 1024, 'sample_documents': list(range(512))}))
+    disk = {'schema': 'p4-full-reviewed-disk-v1', 'status': 'DISK_PASS', 'inventory_sha256': 'inventory',
+            'source_inventory_sha256': 'source', 'count_receipt_sha256': 'count',
+            'count_capture_sha256': 'capture', 'disk': {}, 'sample': sample, 'full_only': only,
+            'sample_sha256': full.exact.canonical_hash(sample), 'full_only_sha256': full.exact.canonical_hash(only)}
+    monkeypatch.setattr(full, 'load_reviewed_receipt', lambda **kwargs: disk)
+    checks = []
+    monkeypatch.setattr(full, 'disk_capacity', lambda *args: checks.append('disk') or {'status': 'PASS'})
+    monkeypatch.setattr(full, 'pilot_inputs', lambda *args: (set(), [], [], 1, {}))
+    monkeypatch.setattr(full, 'contained', lambda *args: tmp_path)
+    monkeypatch.setattr(full.exact, 'frozen_tokenizers', lambda *args: (CharacterTokenizer(), None))
+    monkeypatch.setattr(full, 'selected_projection', lambda *args, **kwargs: (sample, only))
+    cuda = SimpleNamespace(device_count=lambda: 1, get_device_name=lambda _: 'synthetic', current_device=lambda: 0)
+    def encoder(*args):
+        assert checks[-1] == 'disk'
+        return SimpleNamespace(contract=verified['contract'], torch=SimpleNamespace(cuda=cuda, __version__='synthetic', version=SimpleNamespace(cuda='synthetic')),
+                               info={'actual_device': 'cuda:0'})
+    monkeypatch.setattr(full.exact, 'LocalEncoder', encoder)
+    monkeypatch.setattr(full, 'embedding_smoke', lambda *args: {'status': 'PASS'})
+    monkeypatch.setattr(full, 'count_documents', lambda *args: pytest.fail('second FULL count'))
+    monkeypatch.setattr(full, 'documents', lambda *args: pytest.fail('second FULL scan'))
+    result = full.smoke_preflight(contract(), authorized=True, fixed_head='a' * 40,
+        count_review={'expected_sha256': 'count', 'expected_capture_sha256': 'capture'},
+        disk_review={'expected_sha256': 'disk'}, root=tmp_path)
+    assert result['status'] == 'READY_FOR_BUILD_REVIEW' and result['STOP_STATE'] == 'WAITING_REVIEW'
+    assert len(checks) == 3 and not result['builder_authorized']
+    assert result['pilot_smoke_binding']['selected_rows'] == 128
+    assert result['smoke_chunks_sha256'] == result['repeated_smoke_chunks_sha256']
+    assert result['smoke_token_ids_sha256'] == result['repeated_smoke_token_ids_sha256']
+    assert result['additional_asset_copy_bytes'] == 0 and result['referenced_asset_bytes'] == 100
+    assert result['encoder']['torch_version'] == 'synthetic'
+
+
+def test_split_smoke_disk_failure_stops_before_encoder(monkeypatch, tmp_path):
+    @contextmanager
+    def guard(config, head, root, report):
+        report['source_inventory_sha256'] = 'source'
+        yield {'inventory_sha256': 'inventory'}
+
+    monkeypatch.setattr(full, 'phase_guard', guard)
+    monkeypatch.setattr(full, 'reviewed_count', lambda *args: ({}, {}))
+    disk = {'schema': 'p4-full-reviewed-disk-v1', 'status': 'DISK_PASS',
+            'inventory_sha256': 'inventory', 'source_inventory_sha256': 'source',
+            'count_receipt_sha256': 'count', 'count_capture_sha256': 'capture', 'disk': {}}
+    monkeypatch.setattr(full, 'load_reviewed_receipt', lambda **kwargs: disk)
+    monkeypatch.setattr(full, 'disk_capacity', lambda *args: {'status': 'BLOCKED_DISK'})
+    monkeypatch.setattr(full.exact, 'LocalEncoder', lambda *args: pytest.fail('GPU before disk PASS'))
+    monkeypatch.setattr(full, 'documents', lambda *args: pytest.fail('extra FULL scan'))
+    report = full.smoke_preflight(contract(), authorized=True, fixed_head='a' * 40,
+        count_review={'expected_sha256': 'count', 'expected_capture_sha256': 'capture'},
+        disk_review={}, root=tmp_path)
+    assert report['status'] == 'BLOCKED_DISK' and not report['count_complete']
+
+
+def test_phase_guard_failure_keeps_original_error(monkeypatch, canonical_root):
+    root, config = canonical_root, contract()
+    monkeypatch.setattr(full, 'ROOT', root.resolve())
+    @contextmanager
+    def source(*args):
+        yield
+    monkeypatch.setattr(full, 'source_guard', source)
+    calls = iter([{'inventory_sha256': 'first', 'bindings': {}}, {'bindings': {'changed': True}}])
+    monkeypatch.setattr(full, 'inventory', lambda: next(calls))
+    report = {}
+    with (pytest.raises(ValueError, match='inventory changed') as failure,
+          full.phase_guard(config, 'a' * 40, root, report)):
+        raise ValueError('original count failure')
+    assert 'original count failure' in report['original_error']
+    assert 'inventory changed' in report['guard_error']
+    assert failure.value.phase_receipt['status'] == 'FAIL'
+
+
+def test_split_root_fails_closed_before_assets(tmp_path, monkeypatch):
+    monkeypatch.setattr(full, 'inventory', lambda: pytest.fail('wrong ROOT inventory'))
+    for phase, extra in [(full.count_preflight, {}), (full.disk_preflight, {'count_review': {}}),
+                         (full.smoke_preflight, {'count_review': {}, 'disk_review': {}})]:
+        with pytest.raises(ValueError, match='real preflight repository root'):
+            phase(contract(), authorized=True, fixed_head='a' * 40, root=tmp_path, **extra)
+
+
 def test_orchestration_not_run_does_not_load(monkeypatch, canonical_root):
     def forbidden(*args, **kwargs):
         pytest.fail('real inventory/count/model/git operation was invoked')
@@ -408,7 +615,7 @@ def test_staging_invalid_before_expensive_work(monkeypatch, canonical_root):
 
     monkeypatch.setattr(full, 'inventory', forbidden)
     monkeypatch.setattr(full, 'source_inventory', forbidden)
-    for invalid in ({}, None, {**staging(), 'vectors': 0}, {**staging(), 'mapping': True}):
+    for invalid in ({}, {**staging(), 'vectors': 0}, {**staging(), 'mapping': True}):
         with pytest.raises(ValueError, match='staging'):
             full.preflight(contract(), authorized=True, fixed_head='a' * 40,
                            staging=invalid, root=canonical_root)

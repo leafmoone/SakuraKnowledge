@@ -280,19 +280,38 @@ def preliminary_model(job):
     return model
 
 
+def lookup_document(conn, reference):
+    """Bounded ID lookup, using exactly the FULL census eligibility relation."""
+    require(type(reference.get('fts_rowid')) is int and reference['fts_rowid'] > 0,
+            'reviewed FTS rowid required; old receipts cannot resume')
+    sql = f'''SELECT {corpus.FIELDS} FROM search_fts f
+        CROSS JOIN documents d ON d.id=f.document_id
+        CROSS JOIN entries e ON e.id=d.entry_id
+        WHERE f.rowid=? AND d.id=? AND f.entry_id=e.id AND f.text=d.search_text AND {corpus.TRUST}'''
+    with closing(conn.execute('SELECT source_id,metadata FROM sources ORDER BY source_id')) as cur:
+        sources = {row[0]: json.loads(row[1]) for row in cur}
+    with closing(conn.execute(sql, (reference['fts_rowid'], reference['document_id']))) as cur:
+        rows = cur.fetchmany(2)
+    require(len(rows) == 1, 'selected document missing/ambiguous')
+    doc = corpus.project(rows[0], sources)
+    require(hashlib.sha256(chunks.document_text(doc).encode('utf-8')).hexdigest() ==
+            reference['document_text_sha256'], 'selected document text changed')
+    return doc
+
+
 def documents(conn):
     require(scalar(conn, "SELECT value FROM build_meta WHERE key='index_episodes'") == 'false',
             'index_episodes policy must be false')
     with closing(conn.execute('SELECT source_id,metadata FROM sources ORDER BY source_id')) as cur:
         sources = {row[0]: json.loads(row[1]) for row in cur}
-    sql = f'''SELECT {corpus.FIELDS} FROM documents d
-        JOIN entries e ON e.id=d.entry_id WHERE {corpus.TRUST}
-        AND EXISTS (SELECT 1 FROM search_fts f WHERE f.document_id=d.id
-                    AND f.entry_id=e.id AND f.text=d.search_text) ORDER BY d.id'''
+    sql = f'''SELECT {corpus.FIELDS},f.rowid AS fts_rowid FROM search_fts f
+        CROSS JOIN documents d ON d.id=f.document_id
+        CROSS JOIN entries e ON e.id=d.entry_id
+        WHERE f.entry_id=e.id AND f.text=d.search_text AND {corpus.TRUST} ORDER BY d.id'''
     previous = None
     with closing(conn.execute(sql)) as cursor:
         for row in cursor:
-            doc = corpus.project(row, sources)
+            doc = {**corpus.project(row[:-1], sources), 'fts_rowid': row[-1]}
             did = doc['document_id']
             require(type(did) is int and (previous is None or did > previous),
                     'duplicate or unordered document ID')
@@ -408,13 +427,16 @@ def chunk_audit(root, max_audit_bytes, batch_size, metadata):
 
 def count_documents(stream, tokenizer, inventory_sha, *, root=ROOT,
                     max_audit_bytes=AUDIT_CAP_BYTES, audit_batch_size=AUDIT_BATCH_SIZE,
-                    max_document_text_bytes=DOCUMENT_CAP_BYTES):
-    """Exact disk-backed global uniqueness; never an assumed token/chunk bound."""
+                    max_document_text_bytes=DOCUMENT_CAP_BYTES, pilot_document_ids=None):
+    """Exact disk-backed count; retain bounded references during this single stream."""
     positive_integer(max_document_text_bytes, 'max_document_text_bytes')
     counts, totals = Counter(), Counter()
     digest = hashlib.sha256()
     previous, position, maximum, document_peak = None, 0, 0, 0
     audit, batch = {}, []
+    sample_heap, sample_refs, full_only_refs = [], {}, []
+    pilot_ids = None if pilot_document_ids is None else set(pilot_document_ids)
+    require(pilot_ids is None or len(pilot_ids) == 50000, 'complete pilot document exclusion required')
     with product_guard(root), chunk_audit(root, max_audit_bytes, audit_batch_size, audit) as (db, check):
         def flush():
             if batch:
@@ -440,6 +462,14 @@ def count_documents(stream, tokenizer, inventory_sha, *, root=ROOT,
                     (doc['source_family'], doc['entry_key']['kind']) == expected[namespace],
                     'unexpected eligible stratum')
             counts[namespace] += 1
+            if pilot_ids is not None:
+                score = corpus.rank(doc, 'p4-full-preflight-512-v1')
+                corpus.retain(sample_heap, 512, score, did)
+                retained = {-item[1] for item in sample_heap}
+                sample_refs = {key: value for key, value in sample_refs.items() if key in retained}
+                if did in retained:
+                    sample_refs[did] = {'document_id': did, 'fts_rowid': doc['fts_rowid'], 'rank': str(score),
+                        'document_text_sha256': hashlib.sha256(chunks.document_text(doc).encode('utf-8')).hexdigest()}
             stats = {}
             rows = project(doc, tokenizer, inventory_sha, stats,
                            max_document_text_bytes=max_document_text_bytes)
@@ -458,11 +488,22 @@ def count_documents(stream, tokenizer, inventory_sha, *, root=ROOT,
                     flush()
                 require(0 < row['token_count'] <= 384, 'chunk token budget')
                 maximum = max(maximum, row['token_count'])
+                if pilot_ids is not None and did not in pilot_ids and len(full_only_refs) < 512:
+                    full_only_refs.append({'document_id': did, 'fts_rowid': doc['fts_rowid'], 'chunk_index': index,
+                        'chunk_id': row['chunk_id'], 'chunk_sha256': exact.canonical_hash(row),
+                        'token_ids_sha256': exact.canonical_hash(list(
+                            tokenizer.encode(row['text'], add_special_tokens=False).ids)),
+                        'document_text_sha256': hashlib.sha256(chunks.document_text(doc).encode('utf-8')).hexdigest()})
                 digest.update(chunks.canonical({**row, 'position': position}) + b'\n')
                 position += 1
         flush()
     require(position > 0, 'empty census')
-    return {'documents': sum(counts.values()), 'strata': dict(counts),
+    require(pilot_ids is None or (len(sample_refs) == 512 and len(full_only_refs) == 512),
+            'BLOCKED_RESOURCE: bounded smoke references insufficient; no fallback scan')
+    return {'sample_documents': sorted(sample_refs.values(), key=lambda ref: ref['document_id']),
+            'full_only_chunk_references': full_only_refs,
+            'pilot_document_ids_sha256': None if pilot_ids is None else exact.canonical_hash(sorted(pilot_ids)),
+            'documents': sum(counts.values()), 'strata': dict(counts),
             'actual_chunks': position, **dict(totals), 'max_chunk_tokens': maximum,
             'duplicate_document_count': 0, 'duplicate_chunk_identity_count': 0,
             'chunk_id_collision_policy': 'Exact SQLite UNIQUE(chunk_id) WITHOUT ROWID',
@@ -529,10 +570,10 @@ def measure_mapping_sample(sample, tokenizer):
                      'metadata BLOB NOT NULL, token_ids BLOB NOT NULL, text TEXT NOT NULL)').close()
         conn.execute('CREATE INDEX audit_document ON audit_mapping(document_id)').close()
         conn.executemany('INSERT INTO audit_mapping VALUES (?,?,?,?,?,?,?)',
-                         [(i, row['chunk_id'], row['document_id'], row['chunk_index'],
+                         ((i, row['chunk_id'], row['document_id'], row['chunk_index'],
                            chunks.canonical(row), chunks.canonical(list(
                                tokenizer.encode(row['text'], add_special_tokens=False).ids)), row['text'])
-                          for i, row in enumerate(sample)]).close()
+                          for i, row in enumerate(sample))).close()
         pages, page_size = scalar(conn, 'PRAGMA page_count'), scalar(conn, 'PRAGMA page_size')
     serialized_bytes = sum(len(chunks.canonical(row)) for row in sample)
     return {'rows': len(sample), 'page_count': pages, 'page_size': page_size,
@@ -549,7 +590,8 @@ def initial_stage_gate(staging, root, max_audit_bytes):
     This never substitutes for exact-count, measured-header or expanded-schema gates.
     No model inventory, tokenizer load or FULL scan occurs here.
     """
-    validate_staging(staging)
+    if staging is not None:
+        validate_staging(staging)
     positive_integer(max_audit_bytes, 'max_audit_bytes')
     n = DECLARATIONS['corpus']['documents']
     raw = n * 4096 + 1  # Strictly positive header lower bound; actual header checked later.
@@ -561,6 +603,8 @@ def initial_stage_gate(staging, root, max_audit_bytes):
     mapping = math.ceil(n * mapping_size / 52664 * 1.25)
     minimums = {'vectors': raw, 'ann_construction': 2 * ann, 'mapping': mapping,
                 'final_ann': ann, 'receipts': 1024 ** 2}
+    if staging is None:
+        staging = minimums
     for name, minimum in minimums.items():
         require(staging[name] >= minimum, f'initial staging {name} below necessary minimum {minimum}')
     peak = raw + ann + mapping + sum(staging.values()) + max_audit_bytes
@@ -592,6 +636,8 @@ def disk_budget(actual_chunks, pilot_mapping, schema_sample_bytes_per_chunk, *,
                                             schema_sample_bytes_per_chunk * 1.25))
     minimums = {'vectors': raw, 'ann_construction': 2 * ann, 'mapping': mapping,
                 'final_ann': ann, 'receipts': 1024 ** 2 + report_bytes}
+    if staging is None:
+        staging = minimums
     for name, minimum in minimums.items():
         require(staging[name] >= minimum, f'staging {name} below derived minimum {minimum}')
     temporary = sum(staging.values()) + max_audit_bytes
@@ -794,6 +840,353 @@ def source_guard(fixed_head, root, report):
         require(source_inventory(fixed_head, root) == before, 'fixed source changed during preflight')
 
 
+def load_reviewed_receipt(path, *, expected_sha256, capture_path, expected_capture_sha256,
+                          expected_argv, fixed_head, root=ROOT):
+    """External reviewer hashes authenticate execution records, not JSON self-claims.
+
+    These expected digests and argv must come from root's independent review. A
+    streaming digest describes the execution; it does not reconstruct all chunks.
+    """
+    def bound_json(name, digest):
+        chunks.valid_hash(digest)
+        file = contained(name, root)
+        data = file.read_bytes()
+        require(hashlib.sha256(data).hexdigest() == digest, 'reviewed receipt bytes changed')
+
+        def unique(items):
+            result = {}
+            for key, value in items:
+                require(key not in result, 'duplicate receipt JSON key')
+                result[key] = value
+            return result
+
+        value = json.loads(data, object_pairs_hook=unique,
+                           parse_constant=lambda value: (_ for _ in ()).throw(
+                               ValueError('nonfinite receipt JSON')))
+        require(isinstance(value, dict), 'receipt object required')
+        return value
+
+    receipt = bound_json(path, expected_sha256)
+    capture = bound_json(capture_path, expected_capture_sha256)
+    require(capture.get('argv') == expected_argv and isinstance(expected_argv, list) and
+            expected_argv and all(isinstance(arg, str) for arg in expected_argv), 'reviewed capture argv mismatch')
+    require(capture.get('cwd') == str(Path(root).resolve()) and
+            type(capture.get('exit')) is int and capture['exit'] == 0 and
+            capture.get('timeout') is False and type(capture.get('retries')) is int and capture['retries'] == 0,
+            'successful reviewed capture required')
+    require(capture.get('receipt') == {'path': str(path), 'sha256': expected_sha256},
+            'capture must bind reviewed output receipt')
+    for stream in ('stdout', 'stderr'):
+        ref = capture.get(stream, {})
+        file = contained(ref.get('path', ''), root)
+        require(type(ref.get('bytes')) is int and ref['bytes'] >= 0 and
+                file.stat().st_size == ref['bytes'] and exact.sha(file) == ref.get('sha256'),
+                'reviewed raw capture changed')
+    require(receipt.get('fixed_code_sha') == fixed_head, 'reviewed receipt code SHA mismatch')
+    return receipt
+
+
+def validate_count_receipt(receipt, config, *, fixed_head, source_binding, inventory_binding):
+    """Validate complete count semantics after external receipt/capture authentication."""
+    validate_contract(config)
+    require(receipt.get('schema') == 'p4-full-reviewed-count-v2' and
+            receipt.get('status') == 'COUNT_COMPLETE' and receipt.get('count_complete') is True,
+            'complete reviewed count required; partial cannot resume')
+    require(receipt.get('fixed_code_sha') == fixed_head and
+            receipt.get('source_inventory_sha256') == source_binding and
+            receipt.get('inventory_sha256') == inventory_binding and
+            receipt.get('canonical_config_sha256') == exact.sha(CONFIG) and
+            receipt.get('snapshot') == config['snapshot'], 'count input bindings mismatch')
+    count = receipt.get('count', {})
+    require(count.get('count_complete') is True and count.get('FULL_DOCUMENT_COUNT') == 1295638 and
+            count.get('documents') == 1295638 and count.get('strata') == STRATA and
+            type(count.get('actual_chunks')) is int and count['actual_chunks'] >= 1295638 and
+            count.get('FULL_EXACT_CHUNK_COUNT') == count['actual_chunks'], 'count census/count mismatch')
+    for key in ('EMPTY_DOCUMENTS', 'DUPLICATE_DOCUMENTS', 'DUPLICATE_CHUNK_IDS'):
+        require(type(count.get(key)) is int and count[key] == 0, 'count empty/duplicate failure')
+    require(type(count.get('MAX_CHUNK_TOKENS')) is int and 0 < count['MAX_CHUNK_TOKENS'] <= 384 and
+            count.get('max_chunk_tokens') == count['MAX_CHUNK_TOKENS'] and
+            count.get('attempts') == 0 and receipt.get('attempts') == 0 and
+            count.get('audit', {}).get('temporary_removed') is True, 'count policy/cleanup failure')
+    require(len(count.get('sample_documents', [])) == 512 and
+            len(count.get('full_only_chunk_references', [])) == 512,
+            'bounded sample references required')
+    chunks.valid_hash(count.get('streaming_sha256'))
+    chunks.valid_hash(count.get('pilot_document_ids_sha256'))
+    for key in ('empty_token_document_count', 'duplicate_document_count', 'duplicate_chunk_identity_count'):
+        require(type(count.get(key)) is int and count[key] == 0, 'underlying count failure')
+    for key in ('chunk_token_count', 'canonical_token_count'):
+        require(type(count.get(key)) is int and count[key] >= count['documents'], 'invalid token statistics')
+    positive_integer(count.get('max_document_text_bytes'), 'document cap')
+    audit = count['audit']
+    positive_integer(audit.get('batch_size'), 'audit batch')
+    require(audit['batch_size'] <= 1024, 'invalid audit batch')
+    positive_integer(audit.get('audit_cap_bytes'), 'audit cap')
+    require(type(audit.get('audit_peak_bytes')) is int and
+            0 <= audit['audit_peak_bytes'] <= audit['audit_cap_bytes'], 'invalid audit peak')
+    refs = count['sample_documents']
+    dids = [ref.get('document_id') for ref in refs]
+    require(all(type(did) is int and did > 0 for did in dids) and
+            dids == sorted(set(dids)), 'unique ordered sample document IDs required')
+    for ref in refs + count['full_only_chunk_references']:
+        require(type(ref.get('fts_rowid')) is int and ref['fts_rowid'] > 0, 'reviewed FTS rowid required')
+    for ref in refs:
+        require(isinstance(ref.get('rank'), str) and ref['rank'].isdigit(), 'invalid sample rank')
+        chunks.valid_hash(ref.get('document_text_sha256'))
+    only = count['full_only_chunk_references']
+    pairs = [(ref.get('document_id'), ref.get('chunk_index')) for ref in only]
+    require(all(type(did) is int and did > 0 and type(index) is int and index >= 0
+                for did, index in pairs) and pairs == sorted(set(pairs)), 'unique ordered chunk references required')
+    require(len({ref.get('chunk_id') for ref in only}) == 512, 'unique chunk identities required')
+    for ref in only:
+        for key in ('chunk_id', 'chunk_sha256', 'token_ids_sha256', 'document_text_sha256'):
+            chunks.valid_hash(ref.get(key))
+    return count
+
+
+@contextmanager
+def phase_guard(config, fixed_head, root, report):
+    """Recheck source/config/inventory even on failure; guard failure is fatal."""
+    require(Path(root).resolve() == ROOT, 'real preflight repository root required')
+    with product_guard(root), config_guard(config, root), source_guard(fixed_head, root, report):
+        before = inventory()
+        report.update(inventory_sha256=before['inventory_sha256'],
+                      inventory_bindings=before['bindings'])
+        try:
+            yield before
+        except Exception as error:
+            report.update(status='FAIL', original_error=repr(error), count_complete=False)
+            error.phase_receipt = report
+            raise
+        finally:
+            try:
+                require(inventory()['bindings'] == before['bindings'], 'phase inventory changed')
+            except Exception as guard_error:
+                report.update(status='FAIL', guard_error=repr(guard_error), count_complete=False)
+                guard_error.phase_receipt = report
+                raise
+
+
+def phase_failure_capture(function):
+    """Return BLOCKED evidence only after finally guards; preserve all other errors."""
+    def execute(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except (ValueError, AuditDiskBlocked) as error:
+            report = getattr(error, 'phase_receipt', {'status': 'FAIL', 'count_complete': False,
+                'attempts': 0, 'builder_authorized': False})
+            report.setdefault('original_error', repr(error))
+            if report.get('guard_error'):
+                raise
+            if isinstance(error, AuditDiskBlocked):
+                report.update(status=error.status, audit=error.audit, count_complete=False)
+                return report
+            for status in ('BLOCKED_RESOURCE', 'BLOCKED_DISK'):
+                if str(error).startswith(status + ':'):
+                    report.update(status=status, count_complete=False, blocked_reason=str(error))
+                    return report
+            error.phase_receipt = report
+            raise
+    return execute
+
+
+@phase_failure_capture
+def count_preflight(config, *, authorized, fixed_head, root=ROOT,
+                    max_audit_bytes=AUDIT_CAP_BYTES, audit_batch_size=AUDIT_BATCH_SIZE,
+                    max_document_text_bytes=DOCUMENT_CAP_BYTES):
+    """One FULL count; returns evidence for external capture/review, never GPU."""
+    require(authorized is True, 'explicit count authorization required')
+    report = {'schema': 'p4-full-reviewed-count-v2', 'status': 'FAIL',
+              'fixed_code_sha': fixed_head, 'count_complete': False, 'attempts': 0,
+              'snapshot': config['snapshot'], 'canonical_config_sha256': exact.sha(CONFIG),
+              'builder_authorized': False, 'implementation_origin': IMPLEMENTATION}
+    require(re.fullmatch('[0-9a-f]{40}', fixed_head or '') is not None, 'fixed HEAD required')
+    positive_integer(max_document_text_bytes, 'max_document_text_bytes')
+    positive_integer(audit_batch_size, 'audit_batch_size')
+    require(audit_batch_size <= 1024, 'audit batch exceeds 1024')
+    audit_capacity(root, max_audit_bytes)
+    require(Path(root).resolve() == ROOT, 'real preflight repository root required')
+    report['initial_stage_gate'] = initial_stage_gate(None, root, max_audit_bytes)
+    with phase_guard(config, fixed_head, root, report) as verified:
+        ids, _, _, _, _ = pilot_inputs(verified)
+        raw, _ = exact.frozen_tokenizers(contained(verified['model']['asset_directory']))
+        with validate_snapshot(config, root) as conn:
+            report['count'] = census_and_chunk_count(conn, raw,
+                verified['manifest']['tokenizer_inventory_sha256'], config, root=root,
+                max_audit_bytes=max_audit_bytes, audit_batch_size=audit_batch_size,
+                max_document_text_bytes=max_document_text_bytes, pilot_document_ids=ids)
+        report.update(status='COUNT_COMPLETE', count_complete=True,
+                      STOP_STATE='WAITING_COUNT_REVIEW', tokenizer_inventory_sha256=
+                      verified['manifest']['tokenizer_inventory_sha256'])
+    return report
+
+
+def selected_projection(conn, raw, inventory_sha, count, *, max_document_text_bytes):
+    """Only bounded ID lookups; no documents() stream or recount."""
+    projected, full_only = [], []
+    selected_bytes = 0
+    for ref in count['sample_documents']:
+        doc = lookup_document(conn, ref)
+        require(str(corpus.rank(doc, 'p4-full-preflight-512-v1')) == ref['rank'], 'sample rank changed')
+        first = project(doc, raw, inventory_sha, max_document_text_bytes=max_document_text_bytes)
+        second = project(doc, raw, inventory_sha, max_document_text_bytes=max_document_text_bytes)
+        require(first == second and first, 'selected chunker nondeterministic')
+        for row in first:
+            tokens = list(raw.encode(row['text'], add_special_tokens=False).ids)
+            require(tokens == list(raw.encode(row['text'], add_special_tokens=False).ids) and
+                    len(tokens) == row['token_count'], 'selected token IDs nondeterministic')
+            projected.append({**row, 'token_ids': tokens, 'position': len(projected)})
+            selected_bytes += len(chunks.canonical(projected[-1]))
+            require(selected_bytes <= 64 * 1024**2,
+                    'BLOCKED_RESOURCE: selected projection exceeds bounded receipt allocation')
+    for ref in count['full_only_chunk_references']:
+        doc = lookup_document(conn, ref)
+        rows = project(doc, raw, inventory_sha, max_document_text_bytes=max_document_text_bytes)
+        require(0 <= ref['chunk_index'] < len(rows), 'selected chunk missing')
+        row = rows[ref['chunk_index']]
+        require(row['chunk_id'] == ref['chunk_id'] and exact.canonical_hash(row) == ref['chunk_sha256'] and
+                exact.canonical_hash(list(raw.encode(row['text'], add_special_tokens=False).ids)) ==
+                ref['token_ids_sha256'], 'selected FULL-only chunk changed')
+        selected_bytes += len(chunks.canonical(row))
+        require(selected_bytes <= 64 * 1024**2, 'BLOCKED_RESOURCE: selected samples exceed receipt cap')
+        full_only.append(row)
+    require(len(full_only) == 512, '512 FULL-only chunks required')
+    return projected, full_only
+
+
+def reviewed_count(config, fixed_head, verified, report, review, root):
+    receipt = load_reviewed_receipt(fixed_head=fixed_head, root=root, **review)
+    count = validate_count_receipt(receipt, config, fixed_head=fixed_head,
+        source_binding=report['source_inventory_sha256'], inventory_binding=verified['inventory_sha256'])
+    pilot_ids, _, _, _, _ = pilot_inputs(verified)
+    require(count['pilot_document_ids_sha256'] == exact.canonical_hash(sorted(pilot_ids)) and
+            all(ref['document_id'] not in pilot_ids for ref in count['full_only_chunk_references']),
+            'reviewed count pilot exclusion mismatch')
+    require(receipt.get('tokenizer_inventory_sha256') ==
+            verified['manifest']['tokenizer_inventory_sha256'], 'count tokenizer binding mismatch')
+    return receipt, count
+
+
+@phase_failure_capture
+def disk_preflight(config, *, authorized, fixed_head, count_review, root=ROOT):
+    """Derive minima from reviewed actual N; no user-guessed staging and no GPU."""
+    require(authorized is True, 'explicit disk authorization required')
+    report = {'schema': 'p4-full-reviewed-disk-v1', 'status': 'FAIL', 'fixed_code_sha': fixed_head,
+              'attempts': 0, 'builder_authorized': False}
+    with phase_guard(config, fixed_head, root, report) as verified:
+        receipt, count = reviewed_count(config, fixed_head, verified, report, count_review, root)
+        ids, _, _, header, schema = pilot_inputs(verified)
+        require(count['pilot_document_ids_sha256'] == exact.canonical_hash(sorted(ids)), 'pilot exclusion changed')
+        raw, _ = exact.frozen_tokenizers(contained(verified['model']['asset_directory']))
+        with validate_snapshot(config, root) as conn:
+            sample, full_only = selected_projection(conn, raw,
+                verified['manifest']['tokenizer_inventory_sha256'], count,
+                max_document_text_bytes=count['max_document_text_bytes'])
+        require(schema and all(schema <= set(row) for row in sample), 'mapping schema projection')
+        measurement = measure_mapping_sample(sample, raw)
+        n = count['actual_chunks']
+        ann = math.ceil(n * (223537008 / 52664) * 1.1)
+        mapping = contained(pilot.ann.INPUTS['mapping'])
+        staging = {'vectors': n * 4096 + header, 'ann_construction': 2 * ann,
+                   'mapping': math.ceil(n * max(mapping.stat().st_size / 52664 * 1.25,
+                                               measurement['bytes_per_chunk'] * 1.25)),
+                   'final_ann': ann, 'receipts': 1024**2 + 2 * len(chunks.canonical(
+                       {'sample': sample, 'full_only': full_only, 'count': receipt}))}
+        budget = disk_budget(n, mapping, measurement['bytes_per_chunk'], raw_header_bytes=header,
+            staging=staging, max_audit_bytes=count['audit']['audit_cap_bytes'],
+            report_bytes=len(chunks.canonical({'sample': sample, 'full_only': full_only, 'count': receipt})))
+        report.update(disk=disk_capacity(budget, root), sample=sample, full_only=full_only,
+                      count_receipt_sha256=count_review['expected_sha256'],
+                      count_capture_sha256=count_review['expected_capture_sha256'],
+                      sample_sha256=exact.canonical_hash(sample), full_only_sha256=exact.canonical_hash(full_only),
+                      mapping_sample_measurement=measurement)
+        report['status'] = 'DISK_PASS' if report['disk']['status'] == 'PASS' else 'BLOCKED_DISK'
+    return report
+
+
+@phase_failure_capture
+def smoke_preflight(config, *, authorized, fixed_head, count_review, disk_review, root=ROOT):
+    """Reviewed disk before GPU; consume bounded samples without FULL recount."""
+    require(authorized is True, 'explicit smoke authorization required')
+    report = {'schema': 'p4-full-phase12-preflight-v1', 'status': 'FAIL', 'fixed_code_sha': fixed_head,
+              'attempts': 0, 'builder_authorized': False, 'full_output_created': False,
+              'full_mapping_created': False, 'full_vectors_created': False, 'full_ann_created': False}
+    with phase_guard(config, fixed_head, root, report) as verified:
+        _, count = reviewed_count(config, fixed_head, verified, report, count_review, root)
+        disk = load_reviewed_receipt(fixed_head=fixed_head, root=root, **disk_review)
+        require(disk.get('schema') == 'p4-full-reviewed-disk-v1' and disk.get('status') == 'DISK_PASS' and
+                disk.get('inventory_sha256') == verified['inventory_sha256'] and
+                disk.get('source_inventory_sha256') == report['source_inventory_sha256'] and
+                disk.get('count_receipt_sha256') == count_review['expected_sha256'] and
+                disk.get('count_capture_sha256') == count_review['expected_capture_sha256'],
+                'reviewed matching disk PASS required before GPU')
+        require(disk_capacity(disk['disk'], root)['status'] == 'PASS', 'BLOCKED_DISK: before GPU')
+        sample, full_only = disk['sample'], disk['full_only']
+        require(exact.canonical_hash(sample) == disk['sample_sha256'] and
+                exact.canonical_hash(full_only) == disk['full_only_sha256'] and len(full_only) == 512,
+                'reviewed bounded samples changed')
+        ids, texts, vectors, _, _ = pilot_inputs(verified)
+        require(all(row['document_id'] not in ids for row in full_only), 'FULL-only pilot overlap')
+        raw, _ = exact.frozen_tokenizers(contained(verified['model']['asset_directory']))
+        with validate_snapshot(config, root) as conn:
+            current, current_only = selected_projection(conn, raw,
+                verified['manifest']['tokenizer_inventory_sha256'], count,
+                max_document_text_bytes=count['max_document_text_bytes'])
+            require(current == sample and current_only == full_only, 'reviewed sample projection changed')
+            require(disk_capacity(disk['disk'], root)['status'] == 'PASS', 'BLOCKED_DISK: before GPU')
+            require(verified['contract']['max_sequence_tokens'] == 512 and
+                    verified['contract']['query_prefix'] == verified['contract']['passage_prefix'] == '',
+                    'actual encoder sequence/prefix contract')
+            encoder = exact.LocalEncoder(verified['model'], verified['contract'], 'cuda', verified['job']['threads'])
+            require(encoder.contract == verified['contract'], 'actual LocalEncoder contract mismatch')
+            require(encoder.torch.cuda.device_count() > 0 and encoder.info['actual_device'].startswith('cuda'),
+                    'actual GPU required')
+            batch_size = verified['job']['batch_size']
+            positive_integer(batch_size, 'encoder batch size')
+
+            def encode(values):
+                import numpy as np
+
+                return np.concatenate([encoder.encode(values[start:start + batch_size])[0]
+                                       for start in range(0, len(values), batch_size)])
+
+            report['embedding'] = embedding_smoke(texts, vectors, full_only, encode)
+            report.update(pilot_smoke_binding=verified['pilot_smoke_binding'],
+                pilot_document_count=len(ids), pilot_document_ids_sha256=exact.canonical_hash(sorted(ids)),
+                smoke_document_count=len(count['sample_documents']),
+                smoke_chunks_sha256=exact.canonical_hash(sample),
+                repeated_smoke_chunks_sha256=exact.canonical_hash(current),
+                smoke_order='document_id,chunk_index ascending',
+                smoke_token_ids_sha256=exact.canonical_hash([row['token_ids'] for row in sample]),
+                repeated_smoke_token_ids_sha256=exact.canonical_hash([row['token_ids'] for row in current]),
+                smoke_token_ids_count=sum(len(row['token_ids']) for row in sample),
+                smoke_boundary_ids_sha256=exact.canonical_hash([
+                    {key: row[key] for key in ('chunk_id', 'document_id', 'chunk_index',
+                     'canonical_token_start', 'canonical_token_end', 'position')} for row in sample]),
+                full_only_chunk_ids=[row['chunk_id'] for row in full_only],
+                full_only_chunks_sha256=exact.canonical_hash(full_only),
+                full_only_document_ids=sorted({row['document_id'] for row in full_only}),
+                model_tokenizer_ONNX_inventory=verified['bindings'],
+                referenced_asset_bytes=sum(ref['size'] for ref in verified['bindings'].values()),
+                additional_asset_copy_bytes=0, DLL_binding=verified['pack']['artifacts']['ort_dll'],
+                model_runtime_accounting='Authenticated existing bytes referenced; no copies created')
+            model_directory = contained(verified['model']['asset_directory'])
+            report['EST_MODEL_RUNTIME_BYTES'] = sum(ref['size'] for name, ref in verified['bindings'].items()
+                if Path(ROOT / name).resolve().is_relative_to(model_directory) or
+                name.endswith(('.onnx', '.onnx_data', '.dll', '.data')))
+            report['encoder'] = {**encoder.info, 'gpu_count': encoder.torch.cuda.device_count(),
+                'gpu_name': encoder.torch.cuda.get_device_name(encoder.torch.cuda.current_device()),
+                'batch_size': batch_size, 'class': 'tools.p4_exact_pilot.LocalEncoder',
+                'max_sequence_tokens': 512, 'query_prefix': '', 'passage_prefix': '',
+                'torch_version': str(encoder.torch.__version__),
+                'cuda_version': str(encoder.torch.version.cuda)}
+        require(disk_capacity(disk['disk'], root)['status'] == 'PASS', 'BLOCKED_DISK: final free space')
+        report.update(status='READY_FOR_BUILD_REVIEW', STOP_STATE='WAITING_REVIEW', gates='PASS',
+                      count_receipt_sha256=count_review['expected_sha256'],
+                      disk_receipt_sha256=disk_review['expected_sha256'])
+    return report
+
+
 def embedding_smoke(pilot_texts, pilot_vectors, full_only_chunks, encode):
     import numpy as np
 
@@ -809,8 +1202,14 @@ def embedding_smoke(pilot_texts, pilot_vectors, full_only_chunks, encode):
     error = float(np.max(np.abs(old - new)))
     cos = np.sum(old * new, axis=1) / (np.linalg.norm(old, axis=1) * np.linalg.norm(new, axis=1))
     require(error <= 1e-4 and float(np.min(cos)) >= .99999, 'pilot embedding parity failed')
+    observations = {}
+    for label, values in (('approved_pilot', old), ('actual_pilot', new), ('actual_full_only', full)):
+        observations[label] = {'shape': list(values.shape), 'dtype': str(values.dtype),
+            'finite_all': bool(np.isfinite(values).all()),
+            'maximum_l2_norm_error': float(np.max(np.abs(np.linalg.norm(values, axis=1) - 1))),
+            'array_sha256': hashlib.sha256(values.tobytes(order='C')).hexdigest()}
     return {'pilot_rows': 128, 'full_only_rows': 512, 'maximum_absolute_error': error,
-            'minimum_cosine': float(np.min(cos))}
+            'minimum_cosine': float(np.min(cos)), 'observations': observations}
 
 
 def pilot_inputs(verified):
@@ -845,6 +1244,11 @@ def pilot_inputs(verified):
         'vector_reference': verified['bindings'][pilot.ann.INPUTS['vectors']],
         'chunk_reference': verified['bindings'][job['chunks']],
         'selected_chunks_sha256': exact.canonical_hash(selected),
+        'selected_passages_sha256': exact.canonical_hash(texts),
+        'selected_vectors_sha256': hashlib.sha256(vectors.tobytes(order='C')).hexdigest(),
+        'vector_header': {'version': list(version), 'shape': list(shape),
+                          'fortran_order': fortran, 'dtype': str(dtype), 'bytes': header},
+        'selected_rows': 128,
         'selected_chunk_ids': [row['chunk_id'] for row in selected],
         'order': 'approved first 128 positions ascending',
     }
@@ -854,7 +1258,17 @@ def pilot_inputs(verified):
 def preflight(config, *, authorized=False, fixed_head='NOT_FIXED_YET', staging=None, root=ROOT,
               max_audit_bytes=AUDIT_CAP_BYTES, audit_batch_size=AUDIT_BATCH_SIZE,
               max_document_text_bytes=DOCUMENT_CAP_BYTES):
-    """Reviewed preflight only: no builder entry, product, attempt or authorization."""
+    """Convenience stops after a newly executed count; no automatic receipt trust/GPU."""
+    if authorized is True and fixed_head != 'NOT_FIXED_YET':
+        require(re.fullmatch('[0-9a-f]{40}', fixed_head or '') is not None, 'fixed HEAD required')
+        if staging is not None:
+            validate_staging(staging)
+            # Legacy caller budgets can only block an impossible run, never authorize GPU.
+            with product_guard(root), config_guard(config, root), source_guard(fixed_head, root, {}):
+                initial_stage_gate(staging, root, max_audit_bytes)
+        return count_preflight(config, authorized=True, fixed_head=fixed_head, root=root,
+            max_audit_bytes=max_audit_bytes, audit_batch_size=audit_batch_size,
+            max_document_text_bytes=max_document_text_bytes)
     report = {'schema': 'p4-full-phase12-preflight-v1', 'status': 'NOT_RUN',
               'implementation_origin': IMPLEMENTATION, 'recovered_original_source': False,
               'reference_sources': REFERENCE_SOURCES,
@@ -871,118 +1285,4 @@ def preflight(config, *, authorized=False, fixed_head='NOT_FIXED_YET', staging=N
         require(type(authorized) is bool, 'explicit authorization bool required')
         if not authorized or fixed_head == 'NOT_FIXED_YET':
             return report
-        require(re.fullmatch('[0-9a-f]{40}', fixed_head or '') is not None, 'fixed HEAD required')
-        require(Path(root).resolve() == ROOT, 'real preflight repository root required')
-        validate_staging(staging)
-        positive_integer(max_document_text_bytes, 'max_document_text_bytes')
-        positive_integer(audit_batch_size, 'audit_batch_size')
-        require(audit_batch_size <= 1024, 'audit batch exceeds 1024')
-        with source_guard(fixed_head, root, report):
-            def operation(function, *args, **kwargs):
-                with product_guard(root):
-                    return function(*args, **kwargs)
-
-            try:
-                audit_capacity(root, max_audit_bytes)
-                report['initial_stage_gate'] = operation(initial_stage_gate, staging, root, max_audit_bytes)
-                verified = operation(inventory)
-                report.update(inventory_verified=True, inventory_sha256=verified['inventory_sha256'])
-                ids, texts, vectors, header, schema = operation(pilot_inputs, verified)
-                raw, _ = operation(exact.frozen_tokenizers, contained(verified['model']['asset_directory']))
-                with validate_snapshot(config, root) as conn:
-                    count = operation(census_and_chunk_count, conn, raw,
-                                      verified['manifest']['tokenizer_inventory_sha256'], config,
-                                      root=root, max_audit_bytes=max_audit_bytes,
-                                      audit_batch_size=audit_batch_size,
-                                      max_document_text_bytes=max_document_text_bytes)
-                    sample, full_only = operation(deterministic_smoke, conn, raw,
-                                                 verified['manifest']['tokenizer_inventory_sha256'], ids,
-                                                 max_document_text_bytes=max_document_text_bytes)
-            except AuditDiskBlocked as error:
-                report.update(status=error.status, count_complete=False, audit=error.audit,
-                              blocked_reason=str(error))
-                return report
-            except ValueError as error:
-                if str(error).startswith('BLOCKED_RESOURCE:'):
-                    report.update(status='BLOCKED_RESOURCE', count_complete=False,
-                                  blocked_reason=str(error), census_reduced=False,
-                                  documents_skipped=0, text_truncated=False)
-                    return report
-                raise
-            report.update(snapshot_bound=True, phase9=count, count_complete=True,
-                          pilot_document_count=len(ids),
-                          pilot_document_ids_sha256=exact.canonical_hash(sorted(ids)),
-                          smoke_document_count=512, smoke_chunks_sha256=exact.canonical_hash(sample),
-                          smoke_token_ids_sha256=exact.canonical_hash([row['token_ids'] for row in sample]),
-                          smoke_token_ids_count=sum(len(row['token_ids']) for row in sample),
-                          smoke_boundary_ids_sha256=exact.canonical_hash([
-                              {key: row[key] for key in ('chunk_id', 'document_id', 'chunk_index',
-                                                        'canonical_token_start', 'canonical_token_end',
-                                                        'position')} for row in sample]),
-                          pilot_smoke_binding=verified['pilot_smoke_binding'],
-                          full_only_document_ids=sorted({row['document_id'] for row in full_only}))
-            require(schema and all(schema <= set(row) for row in sample), 'mapping schema projection')
-            measurement = operation(measure_mapping_sample, sample, raw)
-            report['mapping_sample_measurement'] = measurement
-            report['referenced_asset_bytes'] = sum(r['size'] for r in verified['bindings'].values())
-            report['additional_asset_copy_bytes'] = 0
-            report['model_tokenizer_ONNX_inventory'] = verified['bindings']
-            report['ANN_contract'] = DECLARATIONS['ann']
-            report['DLL_binding'] = verified['pack']['artifacts']['ort_dll']
-            budget = operation(disk_budget, count['actual_chunks'],
-                               contained(pilot.ann.INPUTS['mapping']), measurement['bytes_per_chunk'],
-                               raw_header_bytes=header, staging=staging, max_audit_bytes=max_audit_bytes,
-                               report_bytes=len(chunks.canonical(report)))
-            report['disk'] = operation(disk_capacity, budget, root)
-            report['disk']['actual_audit_peak_bytes'] = count['audit']['audit_peak_bytes']
-            model_directory = contained(verified['model']['asset_directory'])
-            model_runtime_names = {name for name in verified['bindings'] if
-                                   (Path(ROOT / name).resolve().is_relative_to(model_directory) or
-                                    name.endswith(('.onnx', '.onnx_data', '.dll', '.data')))}
-            report['disk']['EST_MODEL_RUNTIME_BYTES'] = sum(
-                verified['bindings'][name]['size'] for name in model_runtime_names)
-            report['disk']['model_runtime_accounting'] = 'Referenced existing bytes; additional copies zero'
-            if report['disk']['status'] != 'PASS':
-                report['status'] = 'BLOCKED_DISK'
-                return report
-            require(verified['contract']['max_sequence_tokens'] == 512 and
-                    verified['contract']['query_prefix'] == verified['contract']['passage_prefix'] == '',
-                    'actual encoder sequence/prefix contract')
-            encoder = operation(exact.LocalEncoder, verified['model'], verified['contract'],
-                                'cuda', verified['job']['threads'])
-            require(encoder.contract == verified['contract'], 'actual LocalEncoder contract mismatch')
-            batch_size = verified['job']['batch_size']
-            positive_integer(batch_size, 'encoder batch size')
-
-            def encode(values):
-                import numpy as np
-
-                batches = []
-                for start in range(0, len(values), batch_size):
-                    result, _ = operation(encoder.encode, values[start:start + batch_size])
-                    batches.append(result)
-                return np.concatenate(batches)
-
-            report['embedding'] = operation(embedding_smoke, texts, vectors, full_only, encode)
-            torch = encoder.torch
-            require(torch.cuda.device_count() > 0 and encoder.info['actual_device'].startswith('cuda'),
-                    'actual GPU required')
-            report['encoder'] = {**encoder.info, 'class': 'tools.p4_exact_pilot.LocalEncoder',
-                                 'max_sequence_tokens': 512, 'passage_prefix': '', 'query_prefix': '',
-                                 'batch_size': batch_size, 'gpu_count': torch.cuda.device_count(),
-                                 'gpu_name': torch.cuda.get_device_name(torch.cuda.current_device())}
-            after = operation(inventory)
-            require(after['bindings'] == verified['bindings'], 'inventory changed during preflight')
-            report.update(status='READY_FOR_BUILD_REVIEW', STOP_STATE='WAITING_REVIEW', gates='PASS')
-            report['phase18_receipt'] = {key: report[key] for key in
-                                         ('HEAD', 'origin_dev', 'remote_dev', 'fixed_code_sha',
-                                          'source_inventory_sha256')}
-            # Recheck the actual final receipt, not just its earlier partial representation.
-            final_budget = operation(disk_budget, count['actual_chunks'],
-                                     contained(pilot.ann.INPUTS['mapping']), measurement['bytes_per_chunk'],
-                                     raw_header_bytes=header, staging=staging,
-                                     max_audit_bytes=max_audit_bytes,
-                                     report_bytes=len(chunks.canonical(report)))
-            require(report['disk']['free_bytes'] >= final_budget['required_free_bytes'],
-                    'final receipt disk budget exceeded')
-            return report
+        raise ValueError('invalid authorization state')

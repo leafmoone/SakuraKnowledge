@@ -4,6 +4,22 @@ Implementation: `clean_room_reimplementation_after_untracked_source_loss`.
 `recovered_original_source=false`. This is new source, not recovery of the lost drafts.
 Baseline clean dev HEAD: `471829644b32eecc10aa30d9d3b71979500a3117`.
 
+## Split revision evidence boundary
+
+`9066ce6a7f579087c2a4e4f42f639e0070aa0710` is a retained historical
+implementation commit, not a guarantee that all formal runners were configurable.
+The subsequent six-file revision separates reviewed count/disk/smoke and runtime
+legacy provenance. It requires a new ordinary implementation commit and push;
+all fixed-stage evidence must bind that new SHA. v8 preparation is not a substitute.
+No count, GPU smoke, formal pilot, P2/P3 qualification, or FULL build was executed
+while implementing this revision. Synthetic tests are preparation only.
+
+Early parent development runs reported two failures with 160 passes and a later
+Ruff C408 failure; their local stdout/stderr files and complete argv/environment
+were **NOT_RECORDED**. Do not reconstruct those missing logs as original evidence.
+Later named `split-targeted-*` captures preserve their own actual output, including
+failures, independently. No implementation readiness follows from a partial run.
+
 ## Authority and references
 
 Approved FULL requirements are the P4_FULL_CLEAN_ROOM_PREFLIGHT_RECOVERY instruction:

@@ -1,8 +1,10 @@
-"""One-shot default Rust regression against the frozen approved P4 corpus."""
+"""One-shot comparison with the frozen approved baseline (not historical oracle recovery)."""
 import argparse
 import json
 import os
+import re
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -10,44 +12,109 @@ import p4_approved_baseline as approved
 import p4_legacy_baseline as legacy
 
 ROOT = approved.ROOT
-FIXED = 'c417655e149b7dce64d0bab376076f2a2f7c7320'
-LOCAL = ROOT / 'build/p4-rust-legacy-regression-v1'
-TARGET = ROOT / 'build/p4-rust-default-target'
-REPORT = ROOT / 'reports/P4/rust-legacy-regression-v1.json'
+sys.path.insert(0, str(ROOT))
+from tools import p4_full_preflight as fullpreflight
+
+BASELINE_ANCHOR = 'c417655e149b7dce64d0bab376076f2a2f7c7320'
 
 
-def store(data):
-    ref = legacy.binding(data)
-    path = LOCAL / (ref['sha256'] + '.raw')
-    if not path.exists():
-        path.write_bytes(data)
-    elif path.read_bytes() != data:
-        raise ValueError('raw collision')
-    return {'path': path.relative_to(ROOT).as_posix(), **ref}
+class RunContext:
+    """Explicit one-shot paths, environment, command evidence and dependencies."""
 
+    def __init__(self, runtime_sha, run_id, target_dir, knowledge, *, root=ROOT,
+                 runner=subprocess.run, source_inventory=fullpreflight.source_inventory):
+        if not isinstance(runtime_sha, str) or not re.fullmatch('[0-9a-f]{40}', runtime_sha):
+            raise ValueError('explicit runtime SHA required')
+        if not isinstance(run_id, str) or not re.fullmatch('[A-Za-z0-9][A-Za-z0-9_-]{0,63}', run_id):
+            raise ValueError('safe explicit run ID required')
+        self.root = fullpreflight.controlled_path(root, root)
+        self.runtime_sha, self.run_id = runtime_sha, run_id
+        expected = self.root / f'build/p4-fixed-{runtime_sha}-legacy-{run_id}'
+        self.target = fullpreflight.controlled_path(target_dir, self.root, strict=False)
+        if self.target != expected:
+            raise ValueError('target must be the run-specific legacy build root')
+        self.report_path = fullpreflight.controlled_path(
+            f'reports/P4/fixed-{runtime_sha}/legacy-{run_id}.json', self.root, strict=False)
+        self.knowledge = fullpreflight.controlled_path(knowledge, self.root)
+        if self.knowledge != self.root / approved.DB.relative_to(ROOT):
+            raise ValueError('approved Knowledge snapshot required')
+        self.local = self.target / 'evidence'
+        self.runner, self.source_inventory = runner, source_inventory
+        self.index = 0
+        self.env = approved.environment()
+        self.env.update(CARGO_TARGET_DIR=str(self.target), DLLTOOL='C:/msys64/ucrt64/bin/dlltool.exe',
+                        DLLTOOL_x86_64_pc_windows_gnu='C:/msys64/ucrt64/bin/dlltool.exe')
+        # Caller build flags/wrappers must not alter the default release artifact.
+        for key in list(self.env):
+            if key.startswith(('CARGO_', 'RUST', 'SKNOW_')) and key != 'CARGO_TARGET_DIR':
+                self.env.pop(key)
 
-def capture(argv, env, deadline=30):
-    start = time.perf_counter()
-    rec = {'argv': argv, 'cwd': str(ROOT), 'deadline_s': deadline,
-           'attempted': 1, 'retries': 0, 'timeout': False}
-    try:
-        proc = subprocess.run(argv, cwd=ROOT, env=env, capture_output=True,
-                              timeout=deadline, check=False)
-        out, err, code = proc.stdout, proc.stderr, proc.returncode
-    except subprocess.TimeoutExpired as exc:
-        out, err, code = exc.stdout or b'', exc.stderr or b'', None
-        rec['timeout'] = True
-    except OSError as exc:
-        out, err, code = b'', b'', None
-        rec['exception'] = str(exc)
-    rec.update(exit=code, elapsed_s=time.perf_counter() - start,
-               stdout=store(out), stderr=store(err))
-    approved.save(LOCAL / f'command-{capture.index:04d}.json', rec)
-    capture.index += 1
-    return rec, out, err
+    def reserve(self):
+        for path in (self.target, self.report_path):
+            fullpreflight.check_components(path)
+            if os.path.lexists(path):
+                raise FileExistsError('one-shot output/target already exists; no retry')
+        self.report_path.parent.mkdir(parents=True, exist_ok=True)
+        # Reserve the output too: a failed/partial run is never reusable.
+        with self.report_path.open('x', encoding='utf-8'):
+            pass
+        self.target.mkdir()
+        self.local.mkdir()
 
+    def store(self, data):
+        ref = legacy.binding(data)
+        path = self.local / (ref['sha256'] + '.raw')
+        fullpreflight.check_components(path)
+        if not path.exists():
+            path.write_bytes(data)
+        elif path.read_bytes() != data:
+            raise ValueError('raw collision')
+        return {'path': path.relative_to(self.root).as_posix(), **ref}
 
-capture.index = 0
+    def capture(self, argv, deadline=30):
+        start = time.perf_counter()
+        rec = {'argv': argv, 'cwd': str(self.root), 'deadline_s': deadline,
+               'attempted': 1, 'retries': 0, 'timeout': False, 'started_unix_s': time.time()}
+        try:
+            proc = self.runner(argv, cwd=self.root, env=self.env, capture_output=True,
+                               timeout=deadline, check=False)
+            out, err, code = proc.stdout, proc.stderr, proc.returncode
+        except subprocess.TimeoutExpired as exc:
+            out, err, code = exc.stdout or b'', exc.stderr or b'', None
+            rec['timeout'] = True
+        except OSError as exc:
+            out, err, code = b'', str(exc).encode('utf-8'), None
+            rec['exception'] = str(exc)
+        rec.update(exit=code, elapsed_s=time.perf_counter() - start, ended_unix_s=time.time(),
+                   stdout=self.store(out), stderr=self.store(err),
+                   stderr_utf8=err.decode('utf-8', errors='replace'))
+        approved.save(self.local / f'command-{self.index:04d}.json', rec)
+        self.index += 1
+        return rec, out, err
+
+    def run(self, argv, deadline=30):
+        rec, out, _err = self.capture(argv, deadline)
+        if rec['exit'] != 0 or rec['timeout'] or rec.get('exception'):
+            raise ValueError('command failed; STOP: ' + repr(argv))
+        return out
+
+    def check_source(self):
+        return self.source_inventory(self.runtime_sha, self.root)
+
+    def build(self, source):
+        argv = ['cargo', 'build', '--manifest-path', str(self.root / 'rust/Cargo.toml'),
+                '--locked', '--release', '--bin', 'sknow-rs']
+        rec, _out, _err = self.capture(argv, 1200)
+        provenance = {'source_sha': self.runtime_sha, 'source_inventory': source,
+                      'argv': argv, 'process': rec, 'default_features': True}
+        approved.save(self.local / 'build.json', provenance)
+        if rec['exit'] != 0 or rec['timeout'] or rec.get('exception'):
+            raise ValueError('build failed; STOP')
+        binary = fullpreflight.controlled_path(
+            self.target / ('release/sknow-rs.exe' if os.name == 'nt' else 'release/sknow-rs'), self.root)
+        provenance['binary'] = {'path': binary.relative_to(self.root).as_posix(),
+                                **approved.file_binding(binary)}
+        return binary, provenance
 
 
 def canonical(value):
@@ -69,7 +136,7 @@ def load_baseline(run):
     for name in ('continuation-approved-baseline.json', 'legacy-baseline-freeze.json'):
         relative = 'reports/P4/' + name
         raw = (ROOT / relative).read_bytes()
-        if run(['git', 'show', FIXED + ':' + relative]) != raw:
+        if run(['git', 'show', BASELINE_ANCHOR + ':' + relative]) != raw:
             raise ValueError('tracked anchor differs: ' + relative)
         anchors[name] = legacy.strict_json(raw)
     baseline = anchors['continuation-approved-baseline.json']
@@ -120,68 +187,46 @@ def load_baseline(run):
     return baseline, result
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--execute', required=True, action='store_true')
-    parser.parse_args()
-    if LOCAL.exists() or REPORT.exists() or TARGET.exists():
-        raise FileExistsError('one-shot output/target already exists; no retry')
-    LOCAL.mkdir()
-    env = approved.environment()
-    env['CARGO_TARGET_DIR'] = str(TARGET.resolve())
-    report = {'schema': 'p4-rust-legacy-regression-v1', 'status': 'NOT_RUN',
-              'baseline_identity': approved.IDENTITY, 'runtime_sha': FIXED,
+def execute(context):
+    context.reserve()
+    env = context.env
+    report = {'schema': 'p4-rust-legacy-regression-v1', 'status': 'FAIL',
+              'baseline_identity': approved.IDENTITY, 'baseline_anchor': BASELINE_ANCHOR,
+              'provenance': approved.PROVENANCE, 'runtime_sha': context.runtime_sha,
+              'run_id': context.run_id, 'knowledge': str(context.knowledge),
               'retries': 0, 'timeout_count': 0, 'wrong_resolved': 0,
               'pool': False, 'external_preservation': False, 'counts': {},
-              'environment': {k: env[k] for k in ('PATH', 'CC', 'CXX', 'CARGO_TARGET_DIR',
-                               'CC_x86_64_pc_windows_gnu', 'CXX_x86_64_pc_windows_gnu')},
+              'environment': {k: env[k] for k in ('PATH', 'CC', 'CXX', 'DLLTOOL', 'CARGO_TARGET_DIR',
+                               'CC_x86_64_pc_windows_gnu', 'CXX_x86_64_pc_windows_gnu',
+                               'DLLTOOL_x86_64_pc_windows_gnu')},
               'helper': approved.file_binding(Path(__file__))}
-    approved.save(LOCAL / 'reservation.json', report)
-
-    def run(argv, deadline=30):
-        rec, out, _err = capture(argv, env, deadline)
-        report['timeout_count'] += int(rec['timeout'])
-        if rec['exit'] != 0 or rec['timeout'] or rec.get('exception'):
-            raise ValueError('command failed: ' + repr(argv))
-        return out
-
-    def source_check():
-        if run(['git', 'rev-parse', 'HEAD']).decode().strip() != FIXED:
-            raise ValueError('HEAD differs from fixed runtime')
-        for argv in (['git', 'diff', '--exit-code', FIXED, '--', 'src', 'rust'],
-                     ['git', 'ls-files', '--others', '--exclude-standard', '--', 'src', 'rust']):
-            if run(argv):
-                raise ValueError('production source differs')
-
-    before = sides = None
+    approved.save(context.local / 'reservation.json', report)
+    before = sides = source = None
     try:
-        source_check()
-        baseline, cases = load_baseline(run)
+        source = context.check_source()
+        report['source_before'] = source
+        baseline, cases = load_baseline(context.run)
         report['baseline_report'] = approved.file_binding(approved.REPORT)
         report['baseline_corpus_manifest'] = baseline['baseline_corpus_manifest']
-        before, sides = approved.file_binding(approved.DB), approved.sidecars()
+        before, sides = approved.file_binding(context.knowledge), approved.sidecars()
         report['snapshot_before'], report['sidecars_before'] = before, sides
         if before != baseline['snapshot_after'] or before['sha256'] != approved.DB_HASH:
             raise ValueError('snapshot differs')
-        run(['C:/msys64/ucrt64/bin/gcc.exe', '--version'])
-        run(['C:/msys64/ucrt64/bin/g++.exe', '--version'])
-        run(['python', '-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_p4_rust_legacy_regression.py'])
-        run(['cargo', 'build', '--manifest-path', str(ROOT / 'rust/Cargo.toml'),
-             '--locked', '--release', '--bin', 'sknow-rs'], 1200)
-        binary = TARGET / ('release/sknow-rs.exe' if os.name == 'nt' else 'release/sknow-rs')
-        report['binary'] = {'path': binary.relative_to(ROOT).as_posix(), **approved.file_binding(binary)}
-        source_check()
-        report['status'] = 'FAIL'
+        context.run(['C:/msys64/ucrt64/bin/gcc.exe', '--version'])
+        context.run(['C:/msys64/ucrt64/bin/g++.exe', '--version'])
+        context.run(['C:/msys64/ucrt64/bin/dlltool.exe', '--version'])
+        binary, report['build'] = context.build(source)
+        if context.check_source() != source:
+            raise ValueError('source changed during build')
         for suite, row, entry, expected in cases:
             counts = report['counts'].setdefault(suite, {'executed': 0, 'passed': 0,
                 'whole_values': 0, 'error_contracts': 0, 'source_assertions': 0,
                 'resolved': 0, 'nonresolved': 0, 'wrong_resolved': 0})
             argv = [str(binary), *entry['process']['argv'][1:]]
-            rec, out, err = capture(argv, env, 15)
+            rec, out, err = context.capture(argv, 15)
             value, problems = compare(suite, row, rec, out, err, expected)
             counts['executed'] += 1
             counts['passed'] += int(not problems)
-            report['timeout_count'] += int(rec['timeout'])
             error = suite == 'P2' and row['original_case']['mode'] in ('error', 'cli', 'runtime_error')
             counts['error_contracts' if error else 'whole_values'] += 1
             if suite == 'gold':
@@ -192,33 +237,59 @@ def main():
                 wrong = resolved and (want['status'] != 'resolved' or value.get('tag_key') != want.get('tag_key'))
                 counts['wrong_resolved'] += int(wrong)
                 report['wrong_resolved'] += int(wrong)
-            approved.save(LOCAL / (suite + '-' + row['case_id'] + '.json'),
+            approved.save(context.local / (suite + '-' + row['case_id'] + '.json'),
                           {'suite': suite, 'case_id': row['case_id'], 'process': rec,
                            'problems': problems, 'actual_json': value, 'passed': not problems})
             if problems:
                 raise ValueError('mismatch; STOP: ' + suite + '/' + row['case_id'] + ': ' + repr(problems))
         p2, gold = report['counts']['P2'], report['counts']['gold']
         if (p2['passed'], p2['whole_values'], p2['error_contracts'], gold['passed'],
-                gold['resolved'], gold['nonresolved'], report['wrong_resolved'], report['timeout_count']) != (151, 135, 16, 55, 39, 16, 0, 0):
+                gold['resolved'], gold['nonresolved'], report['wrong_resolved']) != (151, 135, 16, 55, 39, 16, 0):
             raise ValueError('required final counts differ')
-        source_check()
         report['status'] = 'PASS'
     except Exception as exc:  # noqa: BLE001 - Preserve evidence; never retry.
         report['failure'] = {'type': type(exc).__name__, 'message': str(exc)}
     finally:
-        if before is not None:
-            report['snapshot_after'], report['sidecars_after'] = approved.file_binding(approved.DB), approved.sidecars()
-            if report['snapshot_after'] != before or report['sidecars_after'] != sides:
-                report['status'] = 'FAIL'
-                report['snapshot_mutated'] = True
-        approved.save(LOCAL / 'corpus-manifest.json',
-                      {p.name: approved.file_binding(p) for p in sorted(LOCAL.iterdir()) if p.is_file()})
-        report['local_evidence'] = {'path': (LOCAL / 'corpus-manifest.json').relative_to(ROOT).as_posix(),
-                                    **approved.file_binding(LOCAL / 'corpus-manifest.json')}
-        report['commands_preserved'] = capture.index
-        approved.save(REPORT, report)
+        try:
+            report['source_after'] = context.check_source()
+            if source is None or report['source_after'] != source:
+                raise ValueError('fixed source changed')
+            if before is not None:
+                report['snapshot_after'], report['sidecars_after'] = approved.file_binding(context.knowledge), approved.sidecars()
+                if report['snapshot_after'] != before or report['sidecars_after'] != sides:
+                    raise ValueError('snapshot mutated')
+        except Exception as exc:  # noqa: BLE001 - End checks must fail closed.
+            report['status'] = 'FAIL'
+            report['end_failure'] = {'type': type(exc).__name__, 'message': str(exc)}
+        commands = [legacy.strict_json(p.read_bytes()) for p in sorted(context.local.glob('command-*.json'))]
+        report['timeout_count'] = sum(int(rec['timeout']) for rec in commands)
+        if report['timeout_count']:
+            report['status'] = 'FAIL'
+        approved.save(context.local / 'corpus-manifest.json',
+                      {p.name: approved.file_binding(p) for p in sorted(context.local.iterdir()) if p.is_file()})
+        report['local_evidence'] = {'path': (context.local / 'corpus-manifest.json').relative_to(context.root).as_posix(),
+                                    **approved.file_binding(context.local / 'corpus-manifest.json')}
+        report['commands_preserved'] = context.index
+        fullpreflight.check_components(context.report_path)
+        # Only the empty reservation made by this context may be filled.
+        if context.report_path.read_bytes() != b'':
+            raise FileExistsError('reserved output changed')
+        with context.report_path.open('r+', encoding='utf-8', newline='\n') as stream:
+            json.dump(report, stream, ensure_ascii=True, indent=2, allow_nan=False)
+            stream.write('\n')
         print(json.dumps(report, indent=2))
     return 0 if report['status'] == 'PASS' else 1
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--execute', required=True, action='store_true')
+    parser.add_argument('--runtime-sha', required=True)
+    parser.add_argument('--run-id', required=True)
+    parser.add_argument('--target-dir', required=True)
+    parser.add_argument('--knowledge', type=Path, default=approved.DB)
+    args = parser.parse_args()
+    return execute(RunContext(args.runtime_sha, args.run_id, args.target_dir, args.knowledge))
 
 
 if __name__ == '__main__':
