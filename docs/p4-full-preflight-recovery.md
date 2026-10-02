@@ -4,6 +4,23 @@ Implementation: `clean_room_reimplementation_after_untracked_source_loss`.
 `recovered_original_source=false`. This is new source, not recovery of the lost drafts.
 Baseline clean dev HEAD: `471829644b32eecc10aa30d9d3b71979500a3117`.
 
+## Historical source/asset byte boundary
+
+The retained b5 inventory-formal2 run failed (exit 1) at the Rust pilot job pin.
+Its P3 before/after whole-file hashes matched; inventory did not complete. That
+failure is not converted to PASS. The source Git blob was LF (53ee8132…), while
+historical approved execution bound CRLF raw job bytes (614bc6e6…). No checkout,
+upstream config, or old receipt is normalized or replaced.
+
+The revised verifier independently binds filtered Git source OID/blob SHA and
+raw execution bytes. Raw authority is taken only from separately exact-pinned
+historical PASS receipts: Rust pilot receipt 1f3efa3d… and model-B tokenizer parity
+receipt 5fef965b… (job raw 6e4e975e…, unchanged). Unknown job authority blocks;
+current checkout hashes are never substituted as approval. Historical job code
+anchors are not the current runtime implementation SHA. This revision needs a
+new ordinary implementation commit and all new fixed gates; no inventory rerun
+or count/GPU authorization follows from development tests.
+
 ## Split revision evidence boundary
 
 `9066ce6a7f579087c2a4e4f42f639e0070aa0710` is a retained historical

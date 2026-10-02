@@ -381,6 +381,39 @@ def test_inventory_complete_hash_and_path_escape(tmp_path):
         full.verify_bindings({'asset': {**spec, 'sha256': 'b' * 64}}, {'asset'}, tmp_path)
 
 
+def test_historical_raw_job_and_filtered_source_are_separate(tmp_path, monkeypatch):
+    name = 'configs/p4-rust-pilot-v1.json'
+    path = tmp_path / name
+    path.parent.mkdir()
+    lf = b'{\n"code_sha":"historical-not-runtime"\n}\n'
+    raw = lf.replace(b'\n', b'\r\n')
+    path.write_bytes(lf)
+    def git(*args):
+        subprocess.run(['git', *args], cwd=tmp_path, check=True, capture_output=True)
+    git('init')
+    git('config', 'core.autocrlf', 'true')
+    git('add', name)
+    git('-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-m', 'fixture')
+    path.write_bytes(raw)
+    receipt = tmp_path / 'receipt.json'
+    receipt.write_text(json.dumps({'status': 'PASS', 'job_sha256': hashlib.sha256(raw).hexdigest()}), encoding='utf-8')
+    monkeypatch.setattr(full, 'PINNED_JOBS', {name: hashlib.sha256(lf).hexdigest()})
+    monkeypatch.setattr(full, 'HISTORICAL_RUST_JOB_RECEIPT', {'path': 'receipt.json',
+        'sha256': full.exact.sha(receipt), 'job_sha256': hashlib.sha256(raw).hexdigest()})
+    monkeypatch.setattr(full, 'HISTORICAL_MODEL_B_JOB_RECEIPT', full.HISTORICAL_RUST_JOB_RECEIPT)
+    binding = full.historical_job_bindings(tmp_path)[name]
+    assert binding['source_blob_sha256'] != binding['raw_sha256']
+    assert binding['source_blob_oid'] == binding['checkout_filtered_oid']
+    # LF still filters to the same Git source, but is not approved raw execution bytes.
+    path.write_bytes(lf)
+    with pytest.raises(ValueError, match='SHA256 mismatch'):
+        full.historical_job_bindings(tmp_path)
+    path.write_bytes(raw)
+    receipt.write_text('{}', encoding='utf-8')
+    with pytest.raises(ValueError, match='SHA256 mismatch'):
+        full.historical_job_bindings(tmp_path)
+
+
 def test_fts_reference_is_rowid_constrained_not_unindexed_scan():
     with closing(sqlite3.connect(':memory:')) as conn:
         conn.execute('CREATE VIRTUAL TABLE search_fts USING fts5(document_id UNINDEXED,entry_id UNINDEXED,text)')

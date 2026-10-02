@@ -1,5 +1,15 @@
 # P4 FULL semantic clean-room preflight contract (implementation draft)
 
+## Source and historical execution bytes
+
+Git filtered source OID and blob SHA are separate from asset raw-byte pins.
+Historical job raw SHA must be supplied by an independently exact-pinned PASS
+receipt, not arbitrary mutable JSON or a normalized checkout. The Rust pilot
+receipt authorizes 614bc6e6… CRLF job bytes; its LF Git source remains 53ee8132….
+The model-B job retains 6e4e975e… with historical tokenizer parity receipt proof.
+Any unknown raw authority or tampered receipt blocks. These historical anchors
+never replace the fixed current runtime/source SHA guard.
+
 ## Reviewed split execution (not yet formally executed)
 
 The tracked interfaces are `count_preflight`, `disk_preflight`, and

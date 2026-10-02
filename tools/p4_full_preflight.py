@@ -73,6 +73,16 @@ PINNED_JOBS = {
     'configs/p4-pilot-job-b.json':
         '6e4e975e9a0e068156e841069535a7db935a8db233034c1e870191050e98f18f',
 }
+HISTORICAL_RUST_JOB_RECEIPT = {
+    'path': 'reports/P4/rust-semantic-pilot-v1.json',
+    'sha256': '1f3efa3deddacd0493cdac325fc95e2a86d737bc39617bc534a6811f6f70f58f',
+    'job_sha256': '614bc6e64641a8ee718e30760d3acb4a03e7a8672d91224726446bf0eb38baf0',
+}
+HISTORICAL_MODEL_B_JOB_RECEIPT = {
+    'path': 'reports/P4/continuation-tokenizer-parity-b.json',
+    'sha256': '5fef965b6e25eea82a83b267bda30862e88ca3328e1cba1b5cd8cda7ded7cf65',
+    'job_sha256': '6e4e975e9a0e068156e841069535a7db935a8db233034c1e870191050e98f18f',
+}
 STAGING_KEYS = {'vectors', 'ann_construction', 'mapping', 'final_ann', 'receipts'}
 
 
@@ -689,9 +699,50 @@ def encoder_contract(model, contract):
     return {**contract, 'max_sequence_tokens': 512}
 
 
+def historical_job_bindings(root=ROOT):
+    """Source blobs and approved execution bytes are independent trust boundaries.
+
+    Never normalize an asset into satisfying a pin. The Rust job's raw digest
+    comes from a separately immutable historical execution receipt, not Git EOL.
+    Other raw pins remain unchanged: missing historical authority is not repaired
+    by substituting current checkout bytes.
+    """
+    authority = HISTORICAL_RUST_JOB_RECEIPT
+    model_b = HISTORICAL_MODEL_B_JOB_RECEIPT
+    model_receipt_path = contained(model_b['path'], root)
+    exact.bound(model_receipt_path, model_b['sha256'])
+    model_receipt = exact.load(model_receipt_path)
+    require(model_receipt.get('status') == 'PASS' and model_receipt.get('job_sha256') == model_b['job_sha256'],
+            'historical model B job receipt binding mismatch')
+    receipt_path = contained(authority['path'], root)
+    exact.bound(receipt_path, authority['sha256'])
+    receipt = exact.load(receipt_path)
+    require(receipt.get('status') == 'PASS' and receipt.get('job_sha256') == authority['job_sha256'],
+            'historical job receipt binding mismatch')
+    records = {}
+    for name, source_digest in PINNED_JOBS.items():
+        path = contained(name, root)
+        blob = subprocess.check_output(['git', 'show', f'HEAD:{name}'], cwd=root)
+        require(hashlib.sha256(blob).hexdigest() == source_digest, 'historical job source blob mismatch')
+        filtered_oid = subprocess.check_output(['git', 'hash-object', f'--path={name}', name],
+                                               cwd=root, text=True).strip()
+        tree_oid = subprocess.check_output(['git', 'rev-parse', f'HEAD:{name}'],
+                                          cwd=root, text=True).strip()
+        require(filtered_oid == tree_oid, 'historical job filtered source mismatch')
+        raw_authority = {'configs/p4-rust-pilot-v1.json': authority,
+                         'configs/p4-pilot-job-b.json': model_b}.get(name)
+        require(raw_authority is not None, 'BLOCKED: historical raw job authority missing')
+        raw_digest = raw_authority['job_sha256']
+        exact.bound(path, raw_digest)
+        records[name] = {'source_blob_sha256': source_digest, 'source_blob_oid': tree_oid,
+            'checkout_filtered_oid': filtered_oid, 'raw_sha256': raw_digest,
+            'raw_size': path.stat().st_size,
+            'raw_authority': raw_authority}
+    return records
+
+
 def inventory():
-    for name, digest in PINNED_JOBS.items():
-        exact.bound(contained(name), digest)
+    historical = historical_job_bindings()
     frozen = exact.load(contained('configs/p4-rust-pilot-v1.json'))['frozen_sha256']
     pack_path = contained(pilot.PACK)
     exact.bound(pack_path, frozen[pilot.PACK])
@@ -745,7 +796,7 @@ def inventory():
         records[name] = {'size': path.stat().st_size, 'sha256': exact.sha(path)}
         if name in frozen:
             require(records[name]['sha256'] == frozen[name], 'pinned inventory mismatch')
-    return {'bindings': records, 'model': model, 'contract': contract,
+    return {'bindings': records, 'historical_job_bindings': historical, 'model': model, 'contract': contract,
             'manifest': manifest, 'job': job, 'pack': pack,
             'inventory_sha256': exact.canonical_hash(records)}
 
