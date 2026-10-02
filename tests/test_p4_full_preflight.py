@@ -1183,3 +1183,178 @@ def test_external_exception_is_kind_path_size_hash_specific(tmp_path, monkeypatc
                 full.record_path({**record, field: value}, tmp_path, kind='ort_dll')
     finally:
         external.unlink()
+
+
+@pytest.fixture(params=['count-formal6', 'disk-formal2'])
+def captured_shape(tmp_path, request):
+    # Sanitized static copies of the 5382 capture envelopes. No real reports,
+    # environment, corpus, inventory, or producer execution is used by tests.
+    kind = request.param
+    head = 'a' * 40
+    observation = {'identity': {'size': 1, 'mtime_ns': 1, 'dev': 1, 'ino': 1},
+                   'atime_ns': 1, 'sidecars': {}, 'sha256': 'b' * 64}
+    snapshots = {'before': observation, 'after': copy.deepcopy(observation),
+                 'checks': {'stable_identity': True, 'sidecars': True, 'whole_hash': True}}
+    source = {'HEAD': head, 'origin_dev': head, 'remote_dev': head,
+              'source_inventory_sha256': 'b' * 64, 'source_inventory': {}}
+    receipt = {**source, 'attempts': 0, 'builder_authorized': False,
+               'count_complete': kind == 'count-formal6', 'fixed_code_sha': head,
+               'dirt_policy': 'Unrelated dirt allowed; related source must match fixed blobs',
+               'inventory_bindings': {}, 'inventory_sha256': 'b' * 64,
+               'schema': 'p4-full-reviewed-count-v2' if kind == 'count-formal6'
+               else 'p4-full-reviewed-disk-v1',
+               'status': 'COUNT_COMPLETE' if kind == 'count-formal6' else 'FAIL'}
+    if kind == 'count-formal6':
+        receipt.update(STOP_STATE='WAITING_COUNT_REVIEW',
+                       audit={'audit_started': False, 'cleanup_status': 'NOT_VERIFIED',
+                              'status': 'NOT_RUN'},
+                       canonical_config_sha256='b' * 64,
+                       count={'schema': 'p4-full-phase9-count-v1', 'documents': 1,
+                              'actual_chunks': 1, 'count_complete': True,
+                              'sample_documents': [], 'full_only_chunk_references': [],
+                              'audit': {'audit_started': True, 'cleanup_status': 'VERIFIED',
+                                        'connection_closed': True, 'temporary_removed': True,
+                                        'audit_peak_bytes': 1, 'audit_cap_bytes': 1024}},
+                       implementation_origin=full.IMPLEMENTATION,
+                       initial_stage_gate={'existing_assets_accounting': 'Referenced, not copied'},
+                       snapshot={'path': 'snapshot', 'size': 1, 'sha256': 'b' * 64},
+                       snapshot_observations=snapshots, tokenizer_inventory_sha256='b' * 64)
+    else:
+        receipt['original_error'] = "ValueError('successful reviewed capture required')"
+    path = tmp_path / f'{kind}.json'
+    path.write_text(json.dumps(receipt), encoding='utf-8')
+    streams = {}
+    for name, data in [('stdout', b'fixture output\n'), ('stderr', b'')]:
+        file = tmp_path / f'{kind}.{name}.raw'
+        file.write_bytes(data)
+        streams[name] = {'path': file.name, 'bytes': len(data), 'sha256': full.exact.sha(file)}
+    # Same executable/-c/multiline-source list shape; never execute this argv.
+    argv = ['C:/Fixture/Python/python.exe', '-c',
+            'import json\nfrom tools import p4_full_preflight as p\n# sanitized fixture\n']
+    capture = {'schema': f'{kind}-capture-v1', 'argv': argv,
+               'cwd': tmp_path.resolve().as_posix(),
+               'environment': {'PYTHONUTF8': '1', 'PYTHONIOENCODING': 'utf-8',
+                               'CARGO_TARGET_DIR': 'D:\\Fixture\\rust-target'},
+               'duration_s': 1, 'exit': 0 if kind == 'count-formal6' else 1,
+               'timeout': False, 'retries': 0,
+               'receipt': {'path': path.name, 'sha256': full.exact.sha(path),
+                           'bytes': path.stat().st_size}, **streams,
+               'asset_bindings_verified': True, 'audit_evidence_source': 'nested count.audit',
+               'finalization_from': 'fixture', 'historical_job_bindings': {},
+               'phase_state': {}, 'source_before': source, 'source_after': source,
+               'status': receipt['status'], 'top_audit_stale_limitation': 'Use nested audit',
+               'validator_limitation': 'Loader authentication only; not phase validation'}
+    if kind == 'count-formal6':
+        capture.update(nested_audit_checks={'temporary_removed': True},
+                       temporary_absent_now=True)
+    else:
+        capture.update(child_receipt_status='FAIL', count_review={
+            'path': 'count-formal6.json', 'expected_sha256': 'b' * 64,
+            'capture_path': 'count-formal6.capture.json',
+            'expected_capture_sha256': 'b' * 64, 'expected_argv': argv},
+            count_temporary_absent_now=True, external_nested_audit_checks={},
+            mapping_estimate_limitation='Not a formal future bound',
+            model_runtime_accounting={'additional_asset_copy_bytes': 0},
+            snapshot_capture_source='fixture', snapshot_observations=snapshots)
+    cap = tmp_path / f'{kind}.capture.json'
+    review = {'expected_sha256': full.exact.sha(path), 'capture_path': cap.name,
+              'expected_argv': copy.deepcopy(argv), 'fixed_head': head, 'root': tmp_path}
+
+    def save():
+        cap.write_text(json.dumps(capture), encoding='utf-8')
+        review['expected_capture_sha256'] = full.exact.sha(cap)
+
+    save()
+    return SimpleNamespace(root=tmp_path, kind=kind, receipt=receipt, path=path,
+                           capture=capture, cap=cap, review=review, save=save)
+
+
+def test_captured_shape_original_exit(captured_shape):
+    fixture = captured_shape
+    if fixture.kind == 'disk-formal2':
+        with pytest.raises(ValueError, match='successful reviewed capture required'):
+            full.load_reviewed_receipt(fixture.path.name, **fixture.review)
+    else:
+        assert full.load_reviewed_receipt(fixture.path.name, **fixture.review) == fixture.receipt
+
+
+@pytest.mark.parametrize('slash', ['forward', 'native', 'backslash'])
+def test_captured_shape_cwd_slashes_fixture_modified_disk_exit0(captured_shape, slash):
+    fixture = captured_shape
+    if slash == 'backslash' and os.name != 'nt':
+        pytest.skip('Backslash is not a path separator on this platform')
+    cwd = str(fixture.root.resolve())
+    fixture.capture['cwd'] = cwd.replace('\\', '/') if slash == 'forward' else (
+        cwd.replace('/', '\\') if slash == 'backslash' else cwd)
+    # Hypothetical future successful execution envelope, NOT real disk2 PASS.
+    fixture.capture['exit'] = 0
+    fixture.save()
+    assert full.load_reviewed_receipt(fixture.path.name, **fixture.review) == fixture.receipt
+
+
+@pytest.mark.parametrize('change', [None, True, 1, [], {}, 'subdir', 'escape', 'missing'])
+def test_captured_shape_cwd_rejects(captured_shape, change):
+    fixture = captured_shape
+    (fixture.root / 'subdir').mkdir()
+    cwd = {'subdir': str(fixture.root / 'subdir'), 'escape': str(fixture.root.parent),
+           'missing': str(fixture.root / 'absent')}.get(change, change) if isinstance(change, str) else change
+    fixture.capture.update(cwd=cwd, exit=0)
+    fixture.save()
+    with pytest.raises((ValueError, FileNotFoundError)):
+        full.load_reviewed_receipt(fixture.path.name, **fixture.review)
+
+
+def test_captured_shape_cwd_link_walk(captured_shape):
+    fixture = captured_shape
+    link = fixture.root / 'alias'
+    try:
+        link.symlink_to(fixture.root, target_is_directory=True)
+    except (OSError, NotImplementedError) as error:
+        pytest.skip(f'Directory symlink capability unavailable: {error}')
+    try:
+        for cwd in (str(link), str(link / '..' / fixture.root.name)):
+            fixture.capture.update(cwd=cwd, exit=0)
+            fixture.save()
+            with pytest.raises(ValueError, match='symlink/reparse/junction'):
+                full.load_reviewed_receipt(fixture.path.name, **fixture.review)
+    finally:
+        link.unlink()
+
+
+@pytest.mark.parametrize('change', ['outer_sha', 'argv', 'raw', 'exit', 'timeout', 'retries', 'producer_sha'])
+def test_captured_shape_authentication_stays_strict(captured_shape, change):
+    fixture = captured_shape
+    fixture.capture['exit'] = 0
+    fixture.save()
+    if change == 'outer_sha':
+        fixture.review['expected_capture_sha256'] = '0' * 64
+    elif change == 'argv':
+        fixture.review['expected_argv'] = ['different']
+    elif change == 'raw':
+        (fixture.root / fixture.capture['stdout']['path']).write_bytes(b'tampered')
+    elif change == 'producer_sha':
+        fixture.review['fixed_head'] = 'c' * 40
+    else:
+        fixture.capture[change] = {'exit': 1, 'timeout': True, 'retries': 1}[change]
+        fixture.save()
+    with pytest.raises(ValueError):
+        full.load_reviewed_receipt(fixture.path.name, **fixture.review)
+
+
+def test_captured_shape_cwd_junction(captured_shape):
+    if os.name != 'nt':
+        pytest.skip('Windows junction capability requires Windows')
+    fixture = captured_shape
+    link = fixture.root / 'junction'
+    result = subprocess.run(['cmd', '/c', 'mklink', '/J', str(link), str(fixture.root)],
+                            capture_output=True, check=False)
+    if result.returncode:
+        pytest.skip(f'Junction capability unavailable: {result.stdout!r} {result.stderr!r}')
+    try:
+        for cwd in (str(link), str(link / '..' / fixture.root.name)):
+            fixture.capture.update(cwd=cwd, exit=0)
+            fixture.save()
+            with pytest.raises(ValueError, match='symlink/reparse/junction'):
+                full.load_reviewed_receipt(fixture.path.name, **fixture.review)
+    finally:
+        link.rmdir()

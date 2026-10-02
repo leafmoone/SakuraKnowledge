@@ -1004,8 +1004,10 @@ def load_reviewed_receipt(path, *, expected_sha256, capture_path, expected_captu
     capture = bound_json(capture_path, expected_capture_sha256)
     require(capture.get('argv') == expected_argv and isinstance(expected_argv, list) and
             expected_argv and all(isinstance(arg, str) for arg in expected_argv), 'reviewed capture argv mismatch')
-    require(capture.get('cwd') == str(Path(root).resolve()) and
-            type(capture.get('exit')) is int and capture['exit'] == 0 and
+    require(type(capture.get('cwd')) is str, 'reviewed capture cwd must be a string')
+    require(controlled_path(capture['cwd'], root, strict=True) == Path(root).resolve(strict=True),
+            'reviewed capture cwd mismatch')
+    require(type(capture.get('exit')) is int and capture['exit'] == 0 and
             capture.get('timeout') is False and type(capture.get('retries')) is int and capture['retries'] == 0,
             'successful reviewed capture required')
     output_ref = capture.get('receipt')
