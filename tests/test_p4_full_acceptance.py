@@ -395,13 +395,13 @@ def test_external_guard_rechecks_authority(fixture_pack, external_dll, monkeypat
         monkeypatch.setattr(acceptance, '_approved_dll_path', lambda: pack / 'ort_dll')
 
 
-def test_mutable_pilot_job_cannot_grant_authority(fixture_pack):
-    root, _, _, _, _, _ = fixture_pack
-    job = root / 'configs' / 'p4-rust-pilot-v1.json'
+def test_mutable_pilot_job_cannot_grant_authority(historical_dll_authority):
+    _, job, _, _, _, _ = historical_dll_authority
     job.write_text('{"manifest":"invented.json"}', encoding='utf-8')
     with pytest.raises(ValueError, match='BLOCKED') as error:
         acceptance._approved_dll_path()
-    assert 'unapproved pilot configuration' in str(error.value.__cause__)
+    assert error.value.__cause__ is not None
+    assert 'mismatch' in str(error.value.__cause__)
 
 
 @pytest.mark.parametrize('target', ['parent', 'traversed_parent'])
@@ -450,3 +450,110 @@ def test_truncated_pin_still_requires_snapshot_closure(response_fixture, fault):
         pin['match'] = 'invented'
     with pytest.raises(ValueError):
         acceptance.validate_response(response, snapshot_conn=conn)
+
+
+@pytest.fixture
+def historical_dll_authority(tmp_path, monkeypatch):
+    root = tmp_path / 'repo'
+    root.mkdir()
+    monkeypatch.setattr(acceptance, 'ROOT', root)
+    monkeypatch.setenv('GIT_CONFIG_NOSYSTEM', '1')
+    monkeypatch.setenv('GIT_CONFIG_GLOBAL', os.devnull)
+
+    def git(*args):
+        return subprocess.check_output(['git', '-c', 'core.autocrlf=false',
+            '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid',
+            '-c', 'commit.gpgsign=false', *args], cwd=root)
+
+    git('init')
+    (root / '.gitattributes').write_text('*.json text eol=lf\n', encoding='utf8')
+    dll = tmp_path / 'external.dll'
+    dll.write_bytes(b'fixture external ORT bytes')
+    monkeypatch.setattr(acceptance.pilot, 'DLL_SIZE', dll.stat().st_size)
+    monkeypatch.setattr(acceptance.pilot, 'DLL_SHA', full.exact.sha(dll))
+    pack = root / acceptance.pilot.PACK
+    pack.parent.mkdir(parents=True)
+    pack.write_text(json.dumps({'artifacts': {'ort_dll': binding(dll, str(dll))}}), encoding='utf8')
+    names = ['configs/p4-rust-pilot-v1.json', 'configs/p4-pilot-job-b.json']
+    jobs = {}
+    for name in names:
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        data = json.dumps({'manifest': acceptance.pilot.PACK,
+                          'frozen_sha256': {acceptance.pilot.PACK: full.exact.sha(pack)}}, indent=2) + '\n'
+        path.write_bytes(data.encode('utf8'))
+        jobs[name] = path
+    git('add', '.')
+    git('commit', '-m', 'authorized authority fixture')
+    sources = {name: hashlib.sha256(git('show', 'HEAD:' + name)).hexdigest() for name in names}
+    authorities = []
+    for i, name in enumerate(names):
+        jobs[name].write_bytes(jobs[name].read_bytes().replace(b'\n', b'\r\n'))
+        digest = full.exact.sha(jobs[name])
+        receipt = root / f'receipt{i}.json'
+        receipt.write_text(json.dumps({'status': 'PASS', 'job_sha256': digest}), encoding='utf8')
+        authorities.append({'path': receipt.name, 'sha256': full.exact.sha(receipt), 'job_sha256': digest})
+        assert digest != sources[name]
+    monkeypatch.setattr(full, 'PINNED_JOBS', sources)
+    monkeypatch.setattr(full, 'HISTORICAL_RUST_JOB_RECEIPT', authorities[0])
+    monkeypatch.setattr(full, 'HISTORICAL_MODEL_B_JOB_RECEIPT', authorities[1])
+    return root, jobs[names[0]], pack, dll, authorities[0], git
+
+
+@pytest.mark.parametrize('fault', ['valid', 'raw_wrong', 'source_wrong', 'receipt_bytes',
+                                  'receipt_status', 'receipt_job', 'pack_hash', 'dll_size', 'dll_hash'])
+def test_source_raw_authority_domains_real_git(historical_dll_authority, monkeypatch, fault):
+    root, job, pack, dll, authority, git = historical_dll_authority
+    if fault == 'raw_wrong':
+        job.write_bytes(job.read_bytes().replace(b'\r\n', b'\n'))
+    elif fault == 'source_wrong':
+        job.write_bytes(job.read_bytes() + b' \r\n')
+        git('add', '.')
+        git('commit', '-m', 'unauthorized fixture source')
+        job.write_bytes(job.read_bytes()[:-3])  # Correct historical raw, wrong HEAD source.
+    elif fault == 'receipt_bytes':
+        (root / authority['path']).write_bytes(b'{}')
+    elif fault in ('receipt_status', 'receipt_job'):
+        path = root / authority['path']
+        value = json.loads(path.read_bytes())
+        value['status' if fault == 'receipt_status' else 'job_sha256'] = 'FAIL' if fault == 'receipt_status' else '0' * 64
+        path.write_text(json.dumps(value), encoding='utf8')
+        authority['sha256'] = full.exact.sha(path)  # Independently pinned fixture bytes still require semantic PASS.
+    elif fault == 'pack_hash':
+        pack.write_bytes(pack.read_bytes() + b' ')
+    elif fault == 'dll_size':
+        dll.write_bytes(b'x')
+    elif fault == 'dll_hash':
+        dll.write_bytes(b'x' * dll.stat().st_size)
+    if fault == 'valid':
+        historical = full.historical_job_bindings(root=root)
+        assert historical['configs/p4-rust-pilot-v1.json']['source_blob_sha256'] != authority['job_sha256']
+        assert acceptance._approved_dll_path() == dll.resolve()
+    else:
+        with pytest.raises(ValueError, match='approved external ORT DLL binding unavailable'):
+            acceptance._approved_dll_path()
+
+
+@pytest.mark.parametrize('fault', ['valid', 'path', 'size', 'hash'])
+def test_activation_real_authority_inventory_parity(historical_dll_authority, monkeypatch, fault):
+    from tools import p4_full_build as build
+    root, _, _, dll, _, _ = historical_dll_authority
+    monkeypatch.setattr(build, 'ROOT', root)
+    record = binding(dll, str(dll))
+    if fault == 'path':
+        other = dll.with_name('wrong-location.dll')
+        other.write_bytes(dll.read_bytes())
+        record['path'] = str(other)
+    elif fault == 'size':
+        record['size'] += 1
+    elif fault == 'hash':
+        record['sha256'] = '0' * 64
+    verified = {'pack': {'artifacts': {'ort_dll': record}}}
+    if fault == 'valid':
+        assert build.validate_activation_dll(verified) == acceptance._approved_dll_path()
+        # Work inventory uses the identical authority primitive, without loading ORT.
+        with acceptance._inventory_guard([(dll, record, 'ort_dll')]):
+            pass
+    else:
+        with pytest.raises(ValueError, match='activation external ORT DLL'):
+            build.validate_activation_dll(verified)

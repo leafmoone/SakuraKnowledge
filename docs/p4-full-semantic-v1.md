@@ -356,3 +356,40 @@ test or production changes reject. Real temporary-Git fixture tests cover a lega
 five-file closure and missing Rust, altered production, unapproved harness, and
 uncommitted/fixed-Git mismatch. Finalmatrix6 is superseded; finalmatrix7 is pending.
 No formal count/disk/GPU/FULL execution is authorized; attempts remain0.
+
+## Attempt1 harness authority-domain remediation (no retry)
+
+Historical implementation-stage attempts0 statements above are superseded by the
+single authorized attempt recorded in `d5c7c1b0bc900af1f547c544e8fd95309e1a9395`.
+Attempt1 is FAIL_HARNESS_AUTHORITY_DOMAIN_MISMATCH, consumed1, reservation phase,
+all completed counts0, snapshot-after UNCHANGED. Original output, persistent lock,
+authorization and receipts remain unchanged; no second attempt is authorized.
+
+The defect compared raw CRLF job bytes to the Git source SHA. These are distinct:
+source `53ee8132288252713b5ccdcd36acfa6f4aee455e95e552eafca0676a91e0cf14`, historical
+raw execution `614bc6e64641a8ee718e30760d3acb4a03e7a8672d91224726446bf0eb38baf0`.
+Acceptance now calls the existing `historical_job_bindings(root=ROOT)` lazily,
+which authenticates HEAD source bytes, filtered checkout identity, historical
+receipt exact bytes/PASS/job raw SHA, and raw job bytes independently. Then the
+job binds frozen pack bytes, which bind approved DLL path/size/SHA and actual file.
+Activation calls the same external authority primitive used by work inventory,
+before reservation, and compares resolved DLL path and actual size/SHA with the
+verified inventory. No normalized job bytes, changed pins or generic path exception.
+
+Repair/future authorization requires exactly seven executor bindings: original
+five (`tools/p4_full_build.py`, `tests/test_p4_full_build.py`, this document,
+`docs/STAGE_STATUS.md`, `rust/src/semantic.rs`) plus `tools/p4_full_acceptance.py`
+and `tests/test_p4_full_acceptance.py`. All require reviewed raw SHA/fixed Git blob.
+Original attempt1 authorization retains its five keys and is not reusable.
+Shared acceptance production changes are only accepted for independently pinned
+old producer Git SHA `21583b2b2a38afee54bddccbdbbbbdf7f369dff23cc2946495d62d602e721c8c`
+and exact repaired Git SHA `1210800f6e56f8ff91f07fbcb5577ff5720f085bfba35341bba6ee88b90e42a0`.
+These pin only removal of the wrong-domain import/comparison, shared historical
+binding resolution, and actual DLL verification; any additional code rejects.
+Historical preflight receipts/producer identities are never migrated.
+
+Synthetic real-Git LF/CRLF authority tests cover source/raw mismatches, receipt
+bytes/status/job, pack hash, actual DLL size/hash, inventory path mismatch, and
+activation rejection before reservation. No FULL projection, embeddings or ANN
+execution forms part of this remediation. Full pack remains NOT_CREATED;
+runtime qualification and quality acceptance remain NOT_RUN. STOP=WAITING_REVIEW.

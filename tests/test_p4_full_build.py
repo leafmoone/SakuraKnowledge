@@ -572,6 +572,7 @@ def activation(fixture, monkeypatch):
     monkeypatch.setattr(full, 'contained', lambda path: Path(path) if Path(path).is_absolute() else root / path)
     monkeypatch.setattr(full, 'inventory', lambda: verified)
     monkeypatch.setattr(build, 'reviewed_preflight', reviewed)
+    monkeypatch.setattr(build, 'validate_activation_dll', lambda verified: None)
     monkeypatch.setattr(full, 'disk_capacity', lambda disk: {'status': 'PASS'})
     import torch
     monkeypatch.setattr(torch.cuda, 'is_available', lambda: True)
@@ -742,7 +743,8 @@ def test_lock_io_failure_consumes_attempt_without_mkdir(tmp_path, monkeypatch, f
 def test_authorization_exact_fields_policy_and_source_closure(tmp_path, monkeypatch, fault):
     head = 'b' * 40
     names = ('tools/p4_full_build.py', 'tests/test_p4_full_build.py',
-             'docs/p4-full-semantic-v1.md', 'docs/STAGE_STATUS.md', 'rust/src/semantic.rs')
+             'docs/p4-full-semantic-v1.md', 'docs/STAGE_STATUS.md', 'rust/src/semantic.rs',
+             'tools/p4_full_acceptance.py', 'tests/test_p4_full_acceptance.py')
     bindings = {}
     for name in names:
         path = tmp_path / name
@@ -782,7 +784,7 @@ def test_authorization_exact_fields_policy_and_source_closure(tmp_path, monkeypa
     digest = full.exact.sha(path)
     if fault == 'valid':
         assert build.authorize('auth.json', digest, fixed_head=head, root=tmp_path) == value
-        assert len(git_calls) == 10
+        assert len(git_calls) == 14
         assert all(command[2].startswith(head + ':') for command in git_calls if command[1] == 'rev-parse')
     else:
         message = ('exact future authorization fields' if fault in ('extra', 'missing') else
@@ -1126,7 +1128,8 @@ def test_actual_builder_products_rust_reader_interop(fixture, monkeypatch):
 
 
 @pytest.mark.parametrize('fault', ['valid', 'missing_rust', 'production_changed',
-                                  'unapproved_test', 'wrong_fixed_rust'])
+                                  'unapproved_test', 'wrong_fixed_rust', 'missing_acceptance_test',
+                                  'test_raw', 'test_fixed', 'legal_test_change', 'other_shared_test'])
 def test_rust_source_authorization_actual_git(tmp_path, monkeypatch, fault):
     env = os.environ.copy()
     env.update(GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL=os.devnull)
@@ -1180,6 +1183,10 @@ def test_rust_source_authorization_actual_git(tmp_path, monkeypatch, fault):
     elif fault == 'unapproved_test':
         shown = shown.replace(b'// Env input is private to tests;', b'// Unapproved test edit;')
     rust.write_bytes(shown)
+    if fault == 'legal_test_change':
+        (tmp_path / 'tests/test_p4_full_acceptance.py').write_bytes(b'approved new tests\n')
+    elif fault == 'other_shared_test':
+        (tmp_path / 'tests/test_p4_full_preflight.py').write_bytes(b'unauthorized shared test\n')
     git('add', '.')
     git('commit', '-m', 'authorized current fixture')
     head = git('rev-parse', 'HEAD').decode().strip()
@@ -1189,6 +1196,13 @@ def test_rust_source_authorization_actual_git(tmp_path, monkeypatch, fault):
     bindings = {name: full.exact.sha(tmp_path / name) for name in build.EXECUTOR_PATHS}
     if fault == 'missing_rust':
         del bindings['rust/src/semantic.rs']
+    elif fault == 'missing_acceptance_test':
+        del bindings['tests/test_p4_full_acceptance.py']
+    elif fault == 'test_raw':
+        bindings['tests/test_p4_full_acceptance.py'] = '0' * 64
+    elif fault == 'test_fixed':
+        (tmp_path / 'tests/test_p4_full_acceptance.py').write_bytes(b'uncommitted test\n')
+        bindings['tests/test_p4_full_acceptance.py'] = full.exact.sha(tmp_path / 'tests/test_p4_full_acceptance.py')
     auth = {'schema': build.AUTH_SCHEMA, 'operation': 'execute_full', 'fixed_code_sha': head,
             'preflight_producer_sha': producer, 'preflight_evidence_sha': producer,
             'reviewed_source_bindings': dict.fromkeys(('count', 'disk', 'smoke'), source_sha),
@@ -1206,15 +1220,68 @@ def test_rust_source_authorization_actual_git(tmp_path, monkeypatch, fault):
         for receipt in receipts.values():
             build.authenticate_preflight_source(receipt, producer, source_sha, current, tmp_path, auth=auth)
 
-    if fault == 'valid':
+    if fault in ('valid', 'legal_test_change'):
         authenticate()
-        assert len(bindings) == 5
+        assert len(bindings) == 7
     else:
         message = {'missing_rust': 'executor source closure',
                    'production_changed': 'shared preflight Rust implementation changed',
                    'unapproved_test': 'unapproved Rust test harness',
-                   'wrong_fixed_rust': 'executor does not match fixed Git source'}[fault]
+                   'wrong_fixed_rust': 'executor does not match fixed Git source',
+                   'missing_acceptance_test': 'executor source closure',
+                   'test_raw': 'executor source changed',
+                   'test_fixed': 'executor does not match fixed Git source',
+                   'other_shared_test': 'shared preflight implementation changed'}[fault]
         with pytest.raises(ValueError, match=message):
             authenticate()
     assert receipts == original_receipts
     assert not (tmp_path / build.OUTPUT).exists()
+
+
+def test_activation_authority_failure_never_reserves(activation, monkeypatch):
+    report = build.new_report()
+    def forbidden(*args, **kwargs):
+        pytest.fail('reservation/work must not start after authority failure')
+    monkeypatch.setattr(build, 'reserve', forbidden)
+    monkeypatch.setattr(build, 'lifecycle', forbidden)
+    monkeypatch.setattr(acceptance, '_approved_dll_path', lambda: (_ for _ in ()).throw(ValueError('authority failure')))
+    monkeypatch.setattr(build, 'validate_activation_dll', lambda verified: acceptance._approved_dll_path())
+    with pytest.raises(ValueError, match='authority failure'):
+        build._execute({}, {}, 'b' * 40, report, 'unused-auth', 'a' * 64)
+    assert report['attempts'] == 0
+
+
+@pytest.mark.parametrize('fault', ['valid', 'producer', 'added_code', 'raw_binding', 'fixed_binding'])
+def test_acceptance_repair_review_closure_actual_git(tmp_path, monkeypatch, fault):
+    repository = Path(__file__).resolve().parents[1]
+    name = 'tools/p4_full_acceptance.py'
+    old = subprocess.check_output(['git', 'show', 'ccc80fd8d2d700654a9003cc70e3785628275f99:' + name], cwd=repository)
+    new = (repository / name).read_bytes().replace(b'\r\n', b'\n')
+    path = tmp_path / name
+    path.parent.mkdir(parents=True)
+    path.write_bytes(new + (b'\nraise RuntimeError("unapproved production code")\n' if fault == 'added_code' else b''))
+    monkeypatch.setenv('GIT_CONFIG_NOSYSTEM', '1')
+    monkeypatch.setenv('GIT_CONFIG_GLOBAL', os.devnull)
+    def git(*args):
+        return subprocess.check_output(['git', '-c', 'core.autocrlf=false', '-c', 'commit.gpgsign=false',
+            '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', *args], cwd=tmp_path)
+    git('init')
+    git('add', '--', name)
+    git('commit', '-m', 'authorized review fixture')
+    head = git('rev-parse', 'HEAD').decode().strip()
+    blob = git('rev-parse', 'HEAD:' + name).decode().strip()
+    bindings = dict.fromkeys(build.EXECUTOR_PATHS, 'a' * 64)
+    bindings[name] = full.exact.sha(path)
+    if fault == 'producer':
+        old += b'\nraise RuntimeError("wrong producer")\n'
+    elif fault == 'raw_binding':
+        bindings[name] = '0' * 64
+    elif fault == 'fixed_binding':
+        path.write_bytes(new + b'\n# uncommitted\n')
+        bindings[name] = full.exact.sha(path)
+    auth = {'fixed_code_sha': head, 'executor_bindings': bindings}
+    if fault == 'valid':
+        build.authenticate_acceptance_repair(old, {'git_blob': blob}, tmp_path, auth)
+    else:
+        with pytest.raises(ValueError):
+            build.authenticate_acceptance_repair(old, {'git_blob': blob}, tmp_path, auth)

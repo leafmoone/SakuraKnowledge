@@ -24,7 +24,8 @@ PRODUCTS = ('chunks.sqlite', 'corpus.jsonl', 'vectors.npy', 'vectors.usearch',
             'sample.json', 'manifest.json', 'execution-receipt.json')
 TRANSIENTS = ('chunks.sqlite-journal', 'chunks.sqlite-wal', 'chunks.sqlite-shm')
 EXECUTOR_PATHS = {'tools/p4_full_build.py', 'tests/test_p4_full_build.py',
-                  'docs/p4-full-semantic-v1.md', 'docs/STAGE_STATUS.md', 'rust/src/semantic.rs'}
+                  'docs/p4-full-semantic-v1.md', 'docs/STAGE_STATUS.md', 'rust/src/semantic.rs',
+                  'tools/p4_full_acceptance.py', 'tests/test_p4_full_acceptance.py'}
 APPROVED_RUST_HARNESS_SHA256 = '8a5306d202fe4a7ee87a14d5cf05407a7b28ed18951ecf5a55c18566af876a78'
 
 
@@ -89,6 +90,25 @@ def authorize(path, expected_sha256, *, fixed_head, root):
     return value
 
 
+def authenticate_acceptance_repair(producer_bytes, record, root, auth):
+    # Exact reviewed before/after Git bytes pin the three approved edit regions.
+    name = 'tools/p4_full_acceptance.py'
+    require(hashlib.sha256(producer_bytes).hexdigest() ==
+            '21583b2b2a38afee54bddccbdbbbbdf7f369dff23cc2946495d62d602e721c8c',
+            'unapproved acceptance repair producer')
+    require(isinstance(auth, dict) and set(auth.get('executor_bindings', {})) == EXECUTOR_PATHS,
+            'executor source closure required')
+    require(full.exact.sha(full.contained(name, root)) == auth['executor_bindings'][name],
+            'acceptance repair checkout mismatch')
+    current = subprocess.check_output(['git', 'hash-object', '--path=' + name, name], cwd=root, text=True).strip()
+    fixed = subprocess.check_output(['git', 'rev-parse', auth['fixed_code_sha'] + ':' + name], cwd=root, text=True).strip()
+    require(current == fixed == record['git_blob'], 'acceptance repair fixed source mismatch')
+    shown = subprocess.check_output(['git', 'show', fixed], cwd=root)
+    require(hashlib.sha256(shown).hexdigest() ==
+            '1210800f6e56f8ff91f07fbcb5577ff5720f085bfba35341bba6ee88b90e42a0',
+            'unapproved acceptance repair diff')
+
+
 def authenticate_rust_harness(producer_bytes, record, root, auth):
     name = 'rust/src/semantic.rs'
     require(isinstance(auth, dict) and isinstance(auth.get('executor_bindings'), dict) and
@@ -144,7 +164,9 @@ def authenticate_preflight_source(receipt, producer, expected, current, root, *,
         require(type(record['checkout_size']) is int and record['checkout_size'] >= 0,
                 'historical checkout size mismatch')
         require(name in current, 'shared preflight implementation changed')
-        if name == 'rust/src/semantic.rs' and current[name]['git_blob'] != blob:
+        if name == 'tools/p4_full_acceptance.py' and current[name]['git_blob'] != blob:
+            authenticate_acceptance_repair(shown, current[name], root, auth)
+        elif name == 'rust/src/semantic.rs' and current[name]['git_blob'] != blob:
             authenticate_rust_harness(shown, current[name], root, auth)
         else:
             require(name in EXECUTOR_PATHS or current[name]['git_blob'] == blob,
@@ -655,6 +677,20 @@ def lifecycle(output, report, work, *, snapshot=None, finalize=lambda: None):
     return report
 
 
+def validate_activation_dll(verified):
+    record = verified['pack']['artifacts']['ort_dll']
+    path = acceptance._approved_dll_path()
+    expected = Path(record['path'])
+    if not expected.is_absolute():
+        expected = ROOT / full.pilot.PACK
+        expected = expected.parent / record['path']
+    require(path == expected.resolve(strict=True), 'activation external ORT DLL path mismatch')
+    require((record['size'], record['sha256']) == (full.pilot.DLL_SIZE, full.pilot.DLL_SHA),
+            'activation external ORT DLL binding mismatch')
+    acceptance._verify_file(path, record)
+    return path
+
+
 def _execute(auth, config, fixed_head, report, authorization, authorization_sha):
     output = ROOT / OUTPUT
     full.assert_no_product(ROOT)
@@ -663,6 +699,7 @@ def _execute(auth, config, fixed_head, report, authorization, authorization_sha)
     # Activation guards must EXIT before claiming the sole attempt.
     with full.config_guard(config), full.source_guard(fixed_head, ROOT, report):
         verified = full.inventory()
+        validate_activation_dll(verified)
         count, disk, smoke = reviewed_preflight(auth, config, verified, report, ROOT)
         for receipt in (disk, smoke):
             require(receipt.get('inventory_sha256') == verified['inventory_sha256'] and

@@ -15,7 +15,6 @@ from tools import p4_rust_pilot as pilot
 from tools.p4_full_preflight import (
     CONFIG,
     IMPLEMENTATION,
-    PINNED_JOBS,
     ROOT,
     require,
     validate_contract,
@@ -68,11 +67,14 @@ def _binding(record):
 def _approved_dll_path():
     """Only the existing pack authenticated by the pinned pilot job grants authority."""
     try:
+        # Lazy import: preflight imports acceptance, and fixture ROOT is explicit.
+        from tools.p4_full_preflight import historical_job_bindings
         job_name = 'configs/p4-rust-pilot-v1.json'
+        authority = historical_job_bindings(root=ROOT)[job_name]
         job_path = _controlled_path(Path(ROOT) / job_name, ROOT)
         job_bytes = job_path.read_bytes()
-        require(hashlib.sha256(job_bytes).hexdigest() == PINNED_JOBS[job_name],
-                'unapproved pilot configuration')
+        require(hashlib.sha256(job_bytes).hexdigest() == authority['raw_sha256'],
+                'unapproved pilot execution bytes')
         job = json.loads(job_bytes)
         require(job['manifest'] == pilot.PACK, 'unapproved pilot pack path')
         pack_path = _controlled_path(Path(ROOT) / pilot.PACK, ROOT)
@@ -88,6 +90,7 @@ def _approved_dll_path():
         resolved = path.resolve(strict=True)
         _no_links(resolved)
         require(resolved.is_file(), 'approved ORT DLL missing')
+        _verify_file(resolved, record)
         return resolved
     except (OSError, ValueError, KeyError, TypeError) as exc:
         raise ValueError('BLOCKED: approved external ORT DLL binding unavailable') from exc

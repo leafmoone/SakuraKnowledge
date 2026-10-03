@@ -474,3 +474,22 @@ Block SHA256: `8a5306d202fe4a7ee87a14d5cf05407a7b28ed18951ecf5a55c18566af876a78`
 Actual isolated temporary-Git tests cover valid closure and four rejection cases.
 Finalmatrix6 is superseded by this correction; finalmatrix7 and review are pending.
 No real-repository commit or formal count/disk/GPU/FULL execution; attempts0.
+
+### Attempt1 harness remediation — no retry
+
+Attempt1 evidence commit `d5c7c1b0bc900af1f547c544e8fd95309e1a9395` records exit1,
+FAIL_HARNESS_AUTHORITY_DOMAIN_MISMATCH: raw execution job CRLF digest was compared
+to Git source LF digest inside external ORT authority lookup after reservation.
+Historical attempt1 remains consumed1, all completed0, snapshot UNCHANGED. Output,
+lock, authorization and original receipts are preserved; no attempt2 authorized.
+Acceptance now reuses explicit-root historical_job_bindings (source/raw/receipt
+independent closure), then frozen pack and actual pinned DLL checks. Activation
+invokes the same work authority primitive before reservation, including verified
+inventory path/size/SHA parity. Frozen constants/config and old evidence unchanged.
+Repair-only future executor closure is exactly7 paths: original5 plus acceptance
+source and acceptance tests, all raw SHA/fixed Git authenticated. Acceptance repair
+old/new Git SHA pins restrict approved production edits; no blanket shared-code
+exemption. Original attempt1 five-key authorization is not changed or reused.
+Synthetic real-Git/failure-first regression and fixed Python/Rust matrices required;
+real-source resources are only read-only hashed for authority checks, not FULL build.
+FULL attempts1, FULL pack NOT_CREATED, runtime/quality NOT_RUN. WAITING_REVIEW.
