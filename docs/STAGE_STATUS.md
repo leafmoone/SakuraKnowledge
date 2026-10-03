@@ -493,3 +493,29 @@ exemption. Original attempt1 five-key authorization is not changed or reused.
 Synthetic real-Git/failure-first regression and fixed Python/Rust matrices required;
 real-source resources are only read-only hashed for authority checks, not FULL build.
 FULL attempts1, FULL pack NOT_CREATED, runtime/quality NOT_RUN. WAITING_REVIEW.
+
+### Explicit Attempt2 envelope — implementation/read-only readiness only
+
+Retry1 is a new exact authorization schema, explicit attempt_number2/max_total2,
+not a modification of canonical build.max_attempts1 or historical five-key auth.
+It pins original Attempt1 result/implementation and five real raw byte bindings;
+requires FAIL/reservation/attempts1/fourcompleted0/UNCHANGED and no old manifest.
+Old output/lock/evidence are never changed. New output/lock locations are exclusively
+`build/p4-full-semantic-v1-retry1` and its sibling `.attempt2.lock`.
+All fourteen activation gates execute before reservation; history-aware absence
+guard replaces the old no-product guard only on retry, leaving old guard intact.
+Exact seven reviewed source paths remain required. No runtime/digest algorithm
+changes: new manifest field is only build_provenance. Independent attempt_reserved
+accounting avoids publishing retry evidence on pre-reservation failure (total1);
+post-reservation failure/success totals2, preserving partials and refusing attempt3.
+
+Implementation commit is fixed before the single real read-only readiness probe.
+Probe binds that implementation SHA, not the later evidence/submission commit SHA;
+future execution authorization must still bind the then-current HEAD. Separate
+ordinary readiness evidence commit avoids self-referential SHA/amending. Probe
+checks old history, authority/DLL/inventory, full snapshot hash, fresh disk and GPU
+presence without full count/projection/embedding/ANN or new authorization/output/lock.
+Failures stay FAIL/NOT_RUN as observed. Synthetic failure-first tests and full
+Python/default/semantic Rust matrix are implementation checks, not FULL execution.
+Formal attempts remain1, second attempt NOT_STARTED/NOT_AUTHORIZED, FULL pack
+NOT_CREATED, runtime/quality NOT_RUN, main unchanged; STOP WAITING_REVIEW.

@@ -1285,3 +1285,259 @@ def test_acceptance_repair_review_closure_actual_git(tmp_path, monkeypatch, faul
     else:
         with pytest.raises(ValueError):
             build.authenticate_acceptance_repair(old, {'git_blob': blob}, tmp_path, auth)
+
+
+@pytest.fixture
+def retry_history(tmp_path, monkeypatch):
+    monkeypatch.setattr(build, 'ROOT', tmp_path)
+    # Fixture authorities are separate from production pins; all bytes are really read.
+    output = tmp_path / build.OUTPUT
+    output.mkdir(parents=True)
+    report = build.new_report()
+    report.update(attempts=1, phase='reservation', snapshot_after_hash_status='UNCHANGED')
+    values = {'execution_receipt': (build.OUTPUT + '/execution-receipt.json', report),
+              'authorization': ('build/old-auth.json', {'schema': build.AUTH_SCHEMA}),
+              'command_receipt': ('reports/command.json', {'exit_code': 1}),
+              'handoff': ('reports/handoff.json', {'status': 'FAIL'}),
+              'attempt1_lock': (build.OUTPUT + '.attempt1.lock', {'attempt': 1})}
+    pins = {}
+    for key, (name, value) in values.items():
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        build.save_new(path, value)
+        pins[key] = {'path': name, 'size': path.stat().st_size, 'sha256': full.exact.sha(path)}
+    monkeypatch.setattr(build, 'ATTEMPT1_BINDINGS', pins, raising=False)
+    return tmp_path, pins
+
+
+@pytest.mark.parametrize('fault', ['valid', 'old_output_missing', 'old_lock_missing',
+    'execution_receipt', 'authorization', 'command_receipt', 'handoff', 'manifest',
+    'new_output', 'new_lock', 'status', 'attempts', 'phase', 'documents', 'chunks',
+    'embeddings', 'ann', 'snapshot'])
+def test_retry_history_failure_first_real_bytes(retry_history, fault):
+    root, pins = retry_history
+    if fault == 'old_output_missing':
+        (root / pins['execution_receipt']['path']).unlink()
+        (root / build.OUTPUT).rmdir()
+    elif fault == 'old_lock_missing':
+        (root / pins['attempt1_lock']['path']).unlink()
+    elif fault in pins:
+        with (root / pins[fault]['path']).open('ab') as f:
+            f.write(b' ')
+    elif fault == 'manifest':
+        (root / build.OUTPUT / 'manifest.json').write_bytes(b'{}')
+    elif fault == 'new_output':
+        (root / build.RETRY_OUTPUT).mkdir()
+    elif fault == 'new_lock':
+        build.attempt_lock(root / build.RETRY_OUTPUT, 2).write_bytes(b'occupied')
+    elif fault != 'valid':
+        path = root / pins['execution_receipt']['path']
+        value = build.read_json(path)
+        key = {'documents': 'completed_documents', 'chunks': 'completed_chunks',
+               'embeddings': 'completed_embeddings', 'ann': 'completed_ann',
+               'snapshot': 'snapshot_after_hash_status'}.get(fault, fault)
+        value[key] = {'status': 'PASS', 'phase': 'projection', 'snapshot': 'CHANGED'}.get(fault, 2)
+        path.write_bytes(full.chunks.canonical(value))
+        pins['execution_receipt'].update(size=path.stat().st_size, sha256=full.exact.sha(path))
+    before = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
+    if fault == 'valid':
+        result = build.validate_retry_history_and_no_retry_product(root=root)
+        assert result['attempt1_lock'] == pins['attempt1_lock']
+    else:
+        with pytest.raises((ValueError, FileNotFoundError)):
+            build.validate_retry_history_and_no_retry_product(root=root)
+    assert {p: p.read_bytes() for p in root.rglob('*') if p.is_file()} == before
+
+
+def retry_policy():
+    return {'schema': build.RETRY_SCHEMA, 'operation': 'execute_full_retry', 'fixed_code_sha': 'b' * 40,
+        'attempt_number': 2, 'max_total_attempts': 2, 'retry_of': build.attempt1_history_binding(),
+        'failure_class': build.FAILURE_CLASS, 'preflight_producer_sha': 'a' * 40,
+        'preflight_evidence_sha': 'c' * 40, 'reviewed_source_bindings': dict.fromkeys(('count', 'disk', 'smoke'), 'd' * 64),
+        'output': build.RETRY_OUTPUT, 'previous_output': build.OUTPUT, 'count_review': {},
+        'disk_review': {}, 'smoke_review': {}, 'executor_bindings': {}}
+
+
+@pytest.mark.parametrize('fault', ['valid', 'failure_class', 'attempt_number', 'max_total_attempts',
+    'output', 'old_output', 'previous_output', 'retry_of', 'extra', 'missing', 'boolean_attempt',
+    'boolean_history_count', 'operation'])
+def test_retry_exact_policy(retry_history, fault):
+    value = retry_policy()
+    if fault == 'old_output':
+        value['output'] = build.OUTPUT
+    elif fault == 'boolean_attempt':
+        value['attempt_number'] = True
+    elif fault == 'boolean_history_count':
+        value['retry_of']['completed_documents'] = False
+    elif fault == 'extra':
+        value['unknown'] = 1
+    elif fault == 'missing':
+        del value['max_total_attempts']
+    elif fault != 'valid':
+        value[fault] = 3 if fault in ('attempt_number', 'max_total_attempts') else 'wrong'
+    if fault == 'valid':
+        build.validate_retry_policy(value, 'b' * 40)
+    else:
+        with pytest.raises(ValueError):
+            build.validate_retry_policy(value, 'b' * 40)
+
+
+def retry_report():
+    report = build.new_report()
+    report.update(attempts=1, attempt_reserved=False, attempt_number=2,
+        retry_of=build.attempt1_history_binding(), fixed_code_sha='b' * 40,
+        authorization_sha256='c' * 64, BUILD_POLICY_EXCEPTION=build.POLICY_EXCEPTION)
+    return report
+
+
+@pytest.mark.parametrize('fault', ['success', 'work_fail', 'already_reserved', 'attempt3'])
+def test_retry_lifecycle_total_and_old_bytes(retry_history, fault):
+    root, pins = retry_history
+    before = {key: (root / ref['path']).read_bytes() for key, ref in pins.items()}
+    report = retry_report()
+    output = root / build.RETRY_OUTPUT
+    def work():
+        build.save_new(output / 'partial.json', {'synthetic': True})
+        if fault == 'work_fail':
+            raise RuntimeError('synthetic work failed')
+        return {'inventory_sha256': 'a' * 64, 'FULL_SEMANTIC_PACK_SHA256': 'a' * 64}
+    if fault == 'already_reserved':
+        build.attempt_lock(output, 2).write_bytes(b'occupied')
+    if fault in ('work_fail', 'already_reserved', 'attempt3'):
+        with pytest.raises((RuntimeError, ValueError)):
+            build.lifecycle(output, report, work, attempt_number=3 if fault == 'attempt3' else 2)
+    else:
+        build.lifecycle(output, report, work, attempt_number=2)
+    assert {key: (root / ref['path']).read_bytes() for key, ref in pins.items()} == before
+    if fault in ('success', 'work_fail'):
+        lock = build.read_json(build.attempt_lock(output, 2))
+        assert lock['attempt'] == 2 and lock['retry_of'] == build.attempt1_history_binding()
+        assert lock['fixed_code_sha'] == 'b' * 40 and lock['authorization_sha256'] == 'c' * 64
+        receipt = build.read_json(output / 'execution-receipt.json')
+        assert receipt['attempts'] == receipt['attempt_number'] == 2
+        assert (output / 'partial.json').exists()
+        assert receipt['retained_partial'] == (fault == 'work_fail')
+        if fault == 'success':
+            value = build.read_json(output / 'manifest.json')
+            assert value['build_provenance'] == build.retry_build_provenance(report)
+            assert value['FULL_SEMANTIC_PACK_SHA256'] == value['inventory_sha256'] == 'a' * 64
+    else:
+        assert report['attempts'] == 1 and not report['retained_partial']
+        assert not output.exists()
+        assert not output.with_name(output.name + '.execution-receipt.json').exists()
+    assert not output.with_name(output.name + '.attempt3.lock').exists()
+
+
+@pytest.mark.parametrize('fault', ['dll', 'snapshot', 'disk', 'gpu'])
+def test_retry_activation_failure_before_claim(activation, monkeypatch, fault):
+    root = build.ROOT
+    config, _, _ = activation
+    original_auth = build.authorize(None)
+    auth = {**original_auth, 'schema': build.RETRY_SCHEMA, 'output': build.RETRY_OUTPUT}
+    original_reviewed = build.reviewed_preflight
+    monkeypatch.setattr(build, 'reviewed_preflight',
+        lambda a, c, v, r, rt: original_reviewed(original_auth, c, v, r, rt))
+    # Existing activation fixture supplies independently synthetic preflight/inputs.
+    monkeypatch.setattr(build, 'authenticate_executor_bindings', lambda *a, **k: None)
+    monkeypatch.setattr(full, 'historical_job_bindings', lambda **k: {})
+    if fault == 'dll':
+        monkeypatch.setattr(build, 'validate_activation_dll', lambda v: (_ for _ in ()).throw(ValueError('DLL failure')))
+    elif fault == 'disk':
+        monkeypatch.setattr(full, 'disk_capacity', lambda v: {'status': 'FAIL'})
+    elif fault == 'snapshot':
+        config['snapshot']['sha256'] = '0' * 64
+    else:
+        import torch
+        monkeypatch.setattr(torch.cuda, 'is_available', lambda: False)
+    monkeypatch.setattr(build, 'reserve', lambda *a, **k: pytest.fail('must not reserve2'))
+    report = retry_report()
+    match = {'dll': 'DLL failure', 'snapshot': 'snapshot size/SHA mismatch',
+             'disk': 'BLOCKED_DISK', 'gpu': 'GPU unavailable'}[fault]
+    with pytest.raises(ValueError, match=match):
+        build._execute(auth, config, 'b' * 40, report, 'unused', 'c' * 64)
+    assert report['attempts'] == 1 and not report['attempt_reserved']
+    assert not (root / build.RETRY_OUTPUT).exists()
+    assert not build.attempt_lock(root / build.RETRY_OUTPUT, 2).exists()
+
+
+@pytest.mark.parametrize('fault', ['history', 'after_hash', 'after_stat', 'cancel', 'after_cancel'])
+def test_readiness_failures_are_structured_and_no_work(retry_history, monkeypatch, fault):
+    root, pins = retry_history
+    monkeypatch.setattr(build, 'verify_fixed_current_dev', lambda *a: None)
+    original_sha = full.exact.sha
+    original_stat = Path.stat
+    calls = {}
+    target = root / pins['authorization']['path']
+    def sha(path):
+        calls[path] = calls.get(path, 0) + 1
+        if path == target and calls[path] > 1 and fault in ('after_hash', 'after_cancel'):
+            if fault == 'after_cancel':
+                raise KeyboardInterrupt('after cancellation')
+            raise OSError('after hash failed')
+        return original_sha(path)
+    def stat(path, *a, **k):
+        if path == target and calls.get(target, 0) >= 1 and fault == 'after_stat':
+            raise OSError('after stat failed')
+        return original_stat(path, *a, **k)
+    monkeypatch.setattr(full.exact, 'sha', sha)
+    monkeypatch.setattr(Path, 'stat', stat)
+    def history(**kwargs):
+        if fault == 'cancel':
+            raise KeyboardInterrupt('probe cancelled')
+        raise ValueError('history rejected')
+    monkeypatch.setattr(build, 'validate_retry_history_and_no_retry_product', history)
+    monkeypatch.setattr(build, 'reserve', lambda *a, **k: pytest.fail('readiness never reserves'))
+    monkeypatch.setattr(full, 'inventory', lambda: pytest.fail('early failure cannot reach inventory'))
+    if fault in ('cancel', 'after_cancel'):
+        with pytest.raises(KeyboardInterrupt) as error:
+            build.attempt2_readiness(fixed_head='b' * 40)
+        report = error.value.readiness_receipt
+    else:
+        report = build.attempt2_readiness(fixed_head='b' * 40)
+    assert report['status'] == report['ATTEMPT1_HISTORY'] == 'FAIL'
+    assert report['AUTHORITY_PARITY'] == report['SNAPSHOT'] == report['DISK'] == report['GPU'] == 'NOT_RUN'
+    assert report['error']['message'] in ('history rejected', 'probe cancelled')
+    if fault.startswith('after_'):
+        assert report['after_errors'] and report['ATTEMPT1_PRESERVED'] == 'NO'
+    assert report['SECOND_ATTEMPT_STARTED'] == 'NO'
+    assert not (root / build.RETRY_OUTPUT).exists()
+
+
+@pytest.mark.parametrize('fault', ['valid', 'raw', 'fixed', 'extra_binding', 'missing_binding', 'wrong_hash', 'old_schema'])
+def test_retry_authorization_actual_git(retry_history, monkeypatch, fault):
+    root, _ = retry_history
+    monkeypatch.setenv('GIT_CONFIG_NOSYSTEM', '1')
+    monkeypatch.setenv('GIT_CONFIG_GLOBAL', os.devnull)
+    def git(*args):
+        return subprocess.check_output(['git', '-c', 'core.autocrlf=false', '-c', 'commit.gpgsign=false',
+            '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', *args], cwd=root)
+    git('init')
+    for name in build.EXECUTOR_PATHS:
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b'fixture source\n')
+    git('add', '--', *sorted(build.EXECUTOR_PATHS))
+    git('commit', '-m', 'retry implementation fixture')
+    head = git('rev-parse', 'HEAD').decode().strip()
+    value = retry_policy()
+    value['fixed_code_sha'] = head
+    value['executor_bindings'] = {n: full.exact.sha(root / n) for n in build.EXECUTOR_PATHS}
+    if fault == 'raw':
+        value['executor_bindings']['tools/p4_full_build.py'] = '0' * 64
+    elif fault == 'fixed':
+        (root / 'tools/p4_full_build.py').write_bytes(b'uncommitted code\n')
+        value['executor_bindings']['tools/p4_full_build.py'] = full.exact.sha(root / 'tools/p4_full_build.py')
+    elif fault == 'extra_binding':
+        value['executor_bindings']['unknown.py'] = '0' * 64
+    elif fault == 'missing_binding':
+        del value['executor_bindings']['tests/test_p4_full_acceptance.py']
+    elif fault == 'old_schema':
+        value['schema'] = build.AUTH_SCHEMA
+    path = root / 'fixture-retry-auth.json'
+    build.save_new(path, value)
+    digest = '0' * 64 if fault == 'wrong_hash' else full.exact.sha(path)
+    if fault == 'valid':
+        assert build.authorize_retry(path.name, digest, fixed_head=head, root=root) == value
+    else:
+        with pytest.raises(ValueError):
+            build.authorize_retry(path.name, digest, fixed_head=head, root=root)

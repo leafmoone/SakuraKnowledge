@@ -393,3 +393,71 @@ bytes/status/job, pack hash, actual DLL size/hash, inventory path mismatch, and
 activation rejection before reservation. No FULL projection, embeddings or ANN
 execution forms part of this remediation. Full pack remains NOT_CREATED;
 runtime qualification and quality acceptance remain NOT_RUN. STOP=WAITING_REVIEW.
+
+## Explicit Attempt2/retry1 envelope (implementation only)
+
+This section implements a future, separately authorized policy exception, not an
+execution authorization. Historical Attempt1 is consumed1, FAIL/reservation,
+all completed0 and snapshot UNCHANGED. It is never deleted, moved, rewritten or
+reused as an output. Canonical configuration retains `build.max_attempts=1`.
+Old `p4-full-build-authorization-v1` field/operation/output/max_attempts semantics
+and `full.assert_no_product` remain intact. They do not authorize retry.
+
+New `p4-full-build-retry-authorization-v1` requires exactly these sixteen keys:
+`schema`, `operation`, `fixed_code_sha`, `attempt_number`, `max_total_attempts`,
+`retry_of`, `failure_class`, `preflight_producer_sha`, `preflight_evidence_sha`,
+`reviewed_source_bindings`, `output`, `previous_output`, `count_review`,
+`disk_review`, `smoke_review`, `executor_bindings`.
+Operation is `execute_full_retry`, attempt_number and max_total_attempts are both
+integer2, failure_class is `HARNESS_AUTHORITY_DOMAIN_MISMATCH`, previous_output is
+`build/p4-full-semantic-v1`, output is exclusively
+`build/p4-full-semantic-v1-retry1`. New lock is exclusively
+`build/p4-full-semantic-v1-retry1.attempt2.lock`. No Attempt3 is representable.
+
+`retry_of` is an exact object containing result_sha `d5c7c1b0bc900af1f547c544e8fd95309e1a9395`,
+implementation_sha `3eeda16b4f1c99b01430979819e5c079243d1f08`, and five `{path,size,sha256}`
+bindings (`authorization`, `attempt1_lock`, `execution_receipt`, `command_receipt`,
+`handoff`) pinned by `ATTEMPT1_BINDINGS` in the reviewed executor. It also contains
+integer0 `completed_documents`, `completed_chunks`, `completed_embeddings`,
+`completed_ann` and `snapshot_after_hash_status: UNCHANGED`.
+Those independent pins include raw Windows bytes, not normalized JSON. Actual
+old files are size/hash-checked, receipt FAIL/attempts1/reservation/four0/UNCHANGED
+is parsed, and old output must contain exactly execution-receipt.json, no manifest.
+`validate_retry_history_and_no_retry_product` requires that complete history and
+absence of the new output/lock; it never weakens the old no-product guard.
+
+Activation order, entirely before reserve2: (1) current fixed HEAD and origin/dev;
+(2) independently hashed retry envelope; (3) Attempt1 history; (4) canonical
+contract; (5) source closure, same exact seven paths plus strict source_guard;
+(6) current inventory; (7) historical source/raw authority; (8) shared activation
+DLL validation; (9) reviewed count/disk/smoke evidence; (10) fresh disk capacity;
+(11) full snapshot size/SHA; (12) available GPU; (13) new output absent;
+(14) new attempt2 lock absent. All final input guards and source/authorization
+closure are rechecked before publication. No count/projection is rerun at activation.
+
+The new lock records attempt2, retry_of, fixed_code_sha, authorization_sha256.
+Cumulative `attempts` starts at historical1; separate `attempt_reserved=False`
+controls terminal publication/retained_partial. Only successful exclusive lock
+creation consumes2. Before-claim failures retain total1 and create no retry receipt,
+output or lock. After-claim failures retain total2, lock and partial state. Success
+also reports2. Retry receipts include
+`BUILD_POLICY_EXCEPTION: EXPLICIT_ATTEMPT2_AFTER_VERIFIED_HARNESS_DEFECT`.
+Manifest adds only `build_provenance` (attempt_number2, prior_attempt_resultFAIL,
+prior_failure_class, retry_authorization_sha256, attempt1_execution_receipt_sha256,
+attempt1_result_sha). Runtime contract and inventory/FULL pack digest algorithm
+are unchanged; provenance is not a new runtime identity.
+
+Implementation is committed normally first, then one real read-only readiness
+probe uses that fixed implementation HEAD and verified origin/dev. It reads all
+old bindings, historical job authorities, approved DLL, full inventory, full
+snapshot SHA, fresh disk and GPU presence, never reserve/project/embed/ANN.
+Its small receipt is a separate ordinary evidence commit, not an amended or
+self-referential implementation SHA. Probe coverage is the implementation HEAD,
+not the later evidence/submission HEAD. Any future authorization must pin the
+then-current execution HEAD; source_guard HEAD equality is never waived.
+Probe failures remain FAIL with later gates NOT_RUN; after-read errors and
+cancellation preserve structured evidence (cancellation propagates).
+
+No real retry authorization/output/lock is created by this implementation task.
+Formal FULL attempts remain1, second attempt NOT_STARTED/NOT_AUTHORIZED, FULL pack
+NOT_CREATED, runtime/quality NOT_RUN; stop WAITING_REVIEW even if readiness PASS.
