@@ -1012,6 +1012,360 @@ def attempt2_readiness(*, fixed_head):
     return report
 
 
+def validate_partial_vectors(path, *, rows=1366520, dimension=1024):
+    import numpy as np
+    vectors = np.load(path, mmap_mode='r', allow_pickle=False)
+    try:
+        require(vectors.shape == (rows, dimension) and vectors.dtype == np.float32,
+                'partial vector shape/dtype mismatch')
+        max_error = 0.0
+        for start in range(0, rows, 1024):
+            batch = vectors[start:start + 1024]
+            require(np.isfinite(batch).all(), 'partial nonfinite vectors')
+            error = float(np.max(np.abs(np.linalg.norm(batch, axis=1) - 1)))
+            require(error <= 1e-5, 'partial vector normalization failed')
+            max_error = max(max_error, error)
+        return {'ROWS': rows, 'DIM': dimension, 'DTYPE': 'float32', 'FINITE': 'PASS',
+                'NORMALIZATION': 'PASS', 'max_norm_error': max_error, 'sha256': full.exact.sha(path)}
+    finally:
+        close_memmap(vectors)
+
+
+def partial_parity_metrics(actual, expected, actual_tokens, expected_tokens):
+    import numpy as np
+    require(actual.shape == expected.shape and actual_tokens == expected_tokens,
+            'partial sample shape/token mismatch')
+    require(np.isfinite(actual).all() and np.isfinite(expected).all(), 'partial sample nonfinite')
+    norms = np.linalg.norm(actual, axis=1)
+    expected_norms = np.linalg.norm(expected, axis=1)
+    require(np.all(expected_norms > 0) and np.all(norms > 0), 'partial sample zero norms')
+    metrics = {'max_component_error': float(np.max(np.abs(actual - expected))),
+               'minimum_cosine': float(np.min(np.sum(actual * expected, axis=1) / (norms * expected_norms))),
+               'max_norm_error': float(max(np.max(np.abs(norms - 1)), np.max(np.abs(expected_norms - 1))))}
+    require(metrics['max_component_error'] <= 1e-4 and metrics['minimum_cosine'] >= .99999 and
+            metrics['max_norm_error'] <= 1e-5, 'partial CPU sample parity failed')
+    return metrics
+
+
+def partial_cpu_worker(request):
+    """Fresh interpreter only: pinned CPU LocalEncoder initialized before parallel work."""
+    import numpy as np
+    require(request['schema'] == 'p4-partial-cpu-request-v1', 'CPU request schema')
+    require(full.exact.sha(Path(__file__)) == request['source_sha256'], 'CPU worker source changed')
+    require(full.exact.sha(full.CONFIG) == request['config_sha256'], 'CPU worker config changed')
+    verified = full.inventory()
+    require(verified['inventory_sha256'] == request['inventory_sha256'] and
+            verified['manifest']['tokenizer_inventory_sha256'] == request['tokenizer_inventory_sha256'],
+            'CPU worker model/tokenizer inventory changed')
+    require(verified['job']['threads'] == 8, 'CPU worker threads must be8')
+    encoder = full.exact.LocalEncoder(verified['model'], verified['contract'], 'cpu', 8)
+    require(encoder.info['actual_dtype'] == 'torch.float32' and encoder.info['actual_device'] == 'cpu' and
+            encoder.info['threads'] == encoder.info['interop_threads'] == 8, 'CPU worker actual config mismatch')
+    output = full.contained(RETRY_OUTPUT, ROOT)
+    for name, ref in request['products'].items():
+        path = output / name
+        require(path.stat().st_size == ref['bytes'] and full.exact.sha(path) == ref['sha256'],
+                'CPU worker partial product changed')
+    positions = request['positions']
+    require(len(positions) == len(set(positions)) == 1200 and positions == sorted(positions), 'CPU sample positions')
+    metrics = {'max_component_error': 0.0, 'minimum_cosine': 1.0, 'max_norm_error': 0.0}
+    vectors = np.load(output / 'vectors.npy', mmap_mode='r', allow_pickle=False)
+    try:
+        with full.readonly(output / 'chunks.sqlite') as db:
+            db.execute('PRAGMA query_only=ON')
+            require(select_sample(db, len(vectors))['positions'] == positions, 'CPU deterministic sample mismatch')
+            for start in range(0, 1200, 8):
+                selected = positions[start:start + 8]
+                rows = [json.loads(db.execute('SELECT row_json FROM projection WHERE position=?', (p,)).fetchone()[0])
+                        for p in selected]
+                expected, tokens = encoder.encode([row['text'] for row in rows])
+                values = partial_parity_metrics(np.asarray(vectors[selected]), expected,
+                    [row['inference_token_count'] for row in rows], tokens)
+                metrics['max_component_error'] = max(metrics['max_component_error'], values['max_component_error'])
+                metrics['minimum_cosine'] = min(metrics['minimum_cosine'], values['minimum_cosine'])
+                metrics['max_norm_error'] = max(metrics['max_norm_error'], values['max_norm_error'])
+    finally:
+        close_memmap(vectors)
+    return {'schema': 'p4-partial-cpu-response-v1', 'status': 'PASS',
+            'request_sha256': full.exact.canonical_hash(request), 'positions': positions,
+            'sample_count': 1200, 'metrics': metrics, 'encoder': encoder.info,
+            'process_id': os.getpid(), 'process': 'FRESH_PYTHON_CPU_WORKER'}
+
+
+def run_partial_cpu_worker(request):
+    import sys
+    command = [sys.executable, '-X', 'utf8', '-c',
+        'import json,sys; from tools import p4_full_build as b; print(json.dumps(b.partial_cpu_worker(json.load(sys.stdin)),sort_keys=True))']
+    env = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1')
+    child = subprocess.run(command, input=full.chunks.canonical(request), cwd=ROOT, env=env, capture_output=True, check=False)
+    require(child.returncode == 0, 'fresh CPU worker failed: ' + child.stderr.decode('utf8', errors='replace'))
+    response = json.loads(child.stdout.decode('utf8'))
+    require(response['status'] == 'PASS' and response['request_sha256'] == full.exact.canonical_hash(request) and
+            response['positions'] == request['positions'] and response['sample_count'] == 1200 and
+            response['process_id'] != os.getpid(), 'CPU response authority/coverage mismatch')
+    info = response['encoder']
+    require(info['actual_device'] == 'cpu' and info['actual_dtype'] == 'torch.float32' and
+            info['threads'] == info['interop_threads'] == 8, 'CPU response actual thread/device mismatch')
+    metrics = response['metrics']
+    require(metrics['max_component_error'] <= 1e-4 and metrics['minimum_cosine'] >= .99999 and
+            metrics['max_norm_error'] <= 1e-5, 'CPU response parity failed')
+    response['request'] = request
+    response['command'] = command
+    response['command_exit'] = child.returncode
+    response['stderr_sha256'] = hashlib.sha256(child.stderr).hexdigest()
+    return response
+
+
+PARTIAL_PRODUCTS = {'chunks.sqlite': (3675488256, '67471db26e04420a905e0726d4582531e2270eb2d3ed528b79b0e3f8fcfcbe2c'),
+    'corpus.jsonl': (1316930137, '6097c0c93eb75f624d549ff062d37b70cc0dbb069fae812194ba7f2a8acf301f'),
+    'sample.json': (16747, '2f61ba6325ff6ec6984e49299b9b86caf6daef2f3b7858f6ed9e45a72611b7ad'),
+    'vectors.npy': (5597266048, 'b81cdaf057a41c8882f52cfbe322adcc0f93c88103e2f141bf9cd942724ec78a')}
+ATTEMPT2_HISTORY = {
+    'build/p4-full-build-attempt2-authorization-6755d33d.json': 'b375582035fa4902cf9fd5114e228d5c3813e12913ed8f86a6b97456f4a466c3',
+    'build/p4-full-semantic-v1-retry1.attempt2.lock': '849cd1c52bd9844f3cbf0c904d4612af4af717854164834daac1030c8f5284fb',
+    'build/p4-full-semantic-v1-retry1/execution-receipt.json': '7d9f8ffa5cebc2ddb162f970a000b3b5948d23b521d938e008a334e00ece57c4',
+    'reports/P4/full-semantic-attempt2-command.json': '79f8b8ad6552395417b134738cb3cee98dc8140adaadd2a53af2ebd89e5ffe48',
+    'reports/P4/full-semantic-attempt2-handoff.json': '51fbe167df48db8a0fbb0964a0c396386a4b63a7455997086a1b46e220f7e660'}
+CONTINUATION_SCHEMA = 'p4-attempt2-partial-continuation-authorization-v1'
+
+
+def validate_partial_preservation(*, root, new_absent=True):
+    validate_retry_history_and_no_retry_product(root=root, check_new=False)
+    for name, digest in ATTEMPT2_HISTORY.items():
+        require(full.exact.sha(full.contained(name, root)) == digest, 'Attempt2 history changed')
+    output = full.contained(RETRY_OUTPUT, root)
+    receipt = read_json(output / 'execution-receipt.json')
+    require(receipt['status'] == 'FAIL' and receipt['phase'] == 'sample_reference_parity' and
+            receipt['attempts'] == receipt['attempt_number'] == 2 and receipt['attempt_reserved'] is True and
+            receipt['completed_documents'] == 1295638 and receipt['completed_chunks'] ==
+            receipt['completed_embeddings'] == 1366520 and receipt['completed_ann'] == 0 and
+            receipt['snapshot_after_hash_status'] == 'UNCHANGED', 'Attempt2 partial state mismatch')
+    for name, (size, digest) in PARTIAL_PRODUCTS.items():
+        path = full.controlled_path(output / name, root)
+        require(path.stat().st_size == size and full.exact.sha(path) == digest, 'partial product changed: ' + name)
+    require(not any((output / name).exists() for name in TRANSIENTS), 'unsafe SQLite transients')
+    if new_absent:
+        for name in ('vectors.usearch', 'manifest.json', 'continuation-receipt.json',
+                     'continuation-receipt.json.staging'):
+            require(not (output / name).exists(), 'continuation product already exists; no overwrite')
+    return output
+
+
+CPU_SOURCE_BINDING_SHA = 'b4c0185718eda9dfe982638ab567b395c7867ee3f5a9e4833826954691b50b8a'
+
+
+def validate_cpu_qualification_source(root):
+    import ast
+    path = full.contained('reports/P4/attempt2-partial-cpu-source-binding.json', root)
+    require(full.exact.sha(path) == CPU_SOURCE_BINDING_SHA, 'independent CPU source evidence changed')
+    evidence = read_json(path)
+    original = evidence['qualification_source_reconstructed_utf8'].encode('utf8')
+    require(hashlib.sha256(original).hexdigest() == evidence['qualification_source_raw_sha256'] and
+            len(original) == evidence['qualification_source_bytes'] and
+            evidence['request']['source_sha256'] == evidence['qualification_source_raw_sha256'] and
+            full.exact.canonical_hash(evidence['request']) == evidence['original_response']['request_sha256'],
+            'historical CPU source/request mismatch')
+    source = (Path(root) / 'tools/p4_full_build.py').read_text('utf8')
+    nodes = {n.name: n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef)}
+    for name, record in evidence['worker_regions'].items():
+        node = nodes[name]
+        region = '\n'.join(source.splitlines()[node.lineno - 1:node.end_lineno]) + '\n'
+        require(hashlib.sha256(region.encode()).hexdigest() == record['sha256'], 'CPU worker/helper changed')
+    for name, digest in evidence['transitive_source_bindings'].items():
+        require(full.exact.sha(full.contained(name, root)) == digest, 'CPU transitive source changed')
+    transitive_path = full.contained('reports/P4/attempt2-partial-cpu-transitive-binding.json', root)
+    require(full.exact.sha(transitive_path) ==
+            '97a3642145628cb11f044185370d1f9beb4e1272ffdfe42189e89c0e5f8f120e',
+            'independent transitive evidence changed')
+    transitive = read_json(transitive_path)
+    for name, record in transitive['bindings'].items():
+        path = full.contained(name, root)
+        require(full.exact.sha(path) == record['raw_sha256'], 'CPU transitive source changed')
+        shown = subprocess.check_output(['git', 'show', transitive['historical_commit'] + ':' + name], cwd=root)
+        require(hashlib.sha256(shown).hexdigest() == record['historical_git_source_sha256'] and
+                path.read_bytes().replace(b'\r\n', b'\n') == shown, 'CPU historical transitive source mismatch')
+    return evidence
+
+
+def authorize_continuation(path, digest, *, fixed_head, root):
+    require(path is not None and digest is not None, 'separate explicit continuation authorization required')
+    full.chunks.valid_hash(digest)
+    require(full.exact.sha(full.contained(path, root)) == digest, 'continuation authorization hash mismatch')
+    value = read_json(full.contained(path, root))
+    require(set(value) == {'schema', 'operation', 'fixed_code_sha', 'output', 'qualification',
+        'executor_bindings', 'preflight_producer_sha', 'preflight_evidence_sha', 'reviewed_source_bindings',
+        'count_review', 'disk_review', 'smoke_review'}, 'exact continuation authorization fields')
+    require(value['schema'] == CONTINUATION_SCHEMA and value['operation'] == 'continue_attempt2_partial' and
+            value['fixed_code_sha'] == fixed_head and value['output'] == RETRY_OUTPUT,
+            'continuation authorization policy mismatch')
+    authenticate_executor_bindings(value, fixed_head=fixed_head, root=root)
+    ref = value['qualification']
+    require(set(ref) == {'path', 'sha256'} and ref['path'] == 'reports/P4/attempt2-partial-qualification.json',
+            'qualification receipt path mismatch')
+    require(full.exact.sha(full.contained(ref['path'], root)) == ref['sha256'], 'qualification hash mismatch')
+    qualification = read_json(full.contained(ref['path'], root))
+    evidence = validate_cpu_qualification_source(root)
+    require(qualification['cpu_source_binding_sha256'] == CPU_SOURCE_BINDING_SHA and
+            qualification['qualification_source_raw_sha256'] == evidence['qualification_source_raw_sha256'],
+            'qualification historical CPU source mismatch')
+    require(qualification['status'] == 'QUALIFIED' and qualification['mapping'] == 'QUALIFIED' and
+            qualification['embeddings'] == 'QUALIFIED' and qualification['sample_parity'] == 'PASS' and
+            qualification['attempt2_result_sha'] == '33601978374d241827c7b698475f3c33f8273b0d' and
+            qualification['history'] == ATTEMPT2_HISTORY and
+            qualification['products'] == {n: {'bytes': s, 'sha256': h} for n, (s, h) in PARTIAL_PRODUCTS.items()},
+            'qualification authority mismatch')
+    return value
+
+
+def continue_partial(*, authorization=None, expected_authorization_sha256=None, fixed_head='NOT_FIXED_YET'):
+    """Future separately authorized ANN-only continuation; never reserve/encode/replace old FAIL."""
+    import numpy as np
+    report = {'schema': 'p4-attempt2-continuation-receipt-v1', 'status': 'FAIL', 'attempts': 2,
+              'formal_build_attempts_total': 2, 'attempt3_created': False, 'completed_ann': 0,
+              'fixed_code_sha': fixed_head, 'phase': 'activation', 'continuation_claimed': False}
+    output = ROOT / RETRY_OUTPUT
+    claimed = False
+    original_error = None
+    try:
+        verify_fixed_current_dev(fixed_head, ROOT)
+        auth = authorize_continuation(authorization, expected_authorization_sha256, fixed_head=fixed_head, root=ROOT)
+        validate_partial_preservation(root=ROOT)
+        config = read_json(full.CONFIG)
+        full.validate_contract(config)
+        with full.config_guard(config), full.source_guard(fixed_head, ROOT, report):
+            verified = full.inventory()
+            validate_activation_dll(verified)
+            count, disk, _ = reviewed_preflight(auth, config, verified, report, ROOT)
+            require(count['actual_chunks'] == 1366520, 'continuation count mismatch')
+            require(full.disk_capacity(disk['disk'])['status'] == 'PASS', 'continuation disk blocked')
+            snapshot = full.contained(config['snapshot']['path'], ROOT)
+            snapshot_before = binding(snapshot, ROOT)
+            require(all(snapshot_before[k] == config['snapshot'][k] for k in ('path', 'size', 'sha256')),
+                    'continuation snapshot mismatch')
+            validate_partial_preservation(root=ROOT)
+            # An exclusive continuation receipt is the one-shot claim, never a new build lock/attempt.
+            receipt_path = output / 'continuation-receipt.json'
+            with receipt_path.open('xb') as file:
+                claimed = True
+                report['continuation_claimed'] = True
+                file.write(full.chunks.canonical(report) + b'\n')
+                file.flush()
+                os.fsync(file.fileno())
+            vectors = np.load(output / 'vectors.npy', mmap_mode='r', allow_pickle=False)
+            index = reopened = None
+            try:
+                report['phase'] = 'ann_construction'
+                started = time.perf_counter()
+                index = index_factory(config['declarative_contract'])
+                for start in range(0, 1366520, 8):
+                    require(full.disk_capacity(disk['disk'])['status'] == 'PASS', 'continuation disk blocked')
+                    rows = vectors[start:start + 8]
+                    index.add(np.arange(start, start + len(rows), dtype=np.uint64), rows,
+                              threads=config['declarative_contract']['runtime']['intra_threads'], copy=True)
+                    report['completed_ann'] = start + len(rows)
+                verify_keys(index, 1366520)
+                # Exclusive reservation prevents native save from overwriting a foreign index.
+                with (output / 'vectors.usearch').open('xb'):
+                    pass
+                index.save(str(output / 'vectors.usearch'))
+                report['ann_build_seconds'] = time.perf_counter() - started
+                report['phase'] = 'ann_readonly_reload'
+                reopened = index_factory(config['declarative_contract'])
+                reopened.view(str(output / 'vectors.usearch'))
+                verify_keys(reopened, 1366520)
+                value = manifest(config, verified, output, 1366520)
+                value['build_provenance'] = {'formal_build_attempts_total': 2, 'attempt2_original_result': 'FAIL',
+                    'attempt2_failure_phase': 'sample_reference_parity',
+                    'attempt2_failure_class': 'CPU_REFERENCE_ENCODER_PROCESS_GLOBAL_THREAD_INIT',
+                    'partial_embedding_reused': True, 'partial_vectors_sha256': PARTIAL_PRODUCTS['vectors.npy'][1],
+                    'partial_mapping_sha256': PARTIAL_PRODUCTS['chunks.sqlite'][1],
+                    'continuation_implementation_sha': fixed_head}
+                value['inventory_exclusions']['execution-receipt.json'] = 'immutable_original_attempt2_FAIL_history'
+                value['inventory_exclusions']['continuation-receipt.json'] = 'terminal_continuation_binding_externally'
+                acceptance.validate_full_manifest(value, config, pack_root=output)
+                validate_partial_preservation(root=ROOT, new_absent=False)
+                authorize_continuation(authorization, expected_authorization_sha256, fixed_head=fixed_head, root=ROOT)
+                require(binding(snapshot, ROOT) == snapshot_before, 'continuation snapshot changed')
+                save_new(output / 'manifest.json', value)
+                report.update(status='RECOVERED_FROM_QUALIFIED_ATTEMPT2_PARTIAL', phase='complete',
+                              manifest_sha256=full.exact.sha(output / 'manifest.json'))
+            finally:
+                close_index(reopened)
+                close_index(index)
+                close_memmap(vectors)
+    except BaseException as error:
+        report.update(status='FAIL', error_type=type(error).__name__, error_message=str(error))
+        error.continuation_receipt = report
+        original_error = error
+        raise
+    finally:
+        if claimed:
+            try:
+                report['snapshot_after'] = binding(snapshot, ROOT)
+                report['snapshot_after_hash_status'] = 'UNCHANGED' if report['snapshot_after'] == snapshot_before else 'CHANGED'
+                if report['snapshot_after_hash_status'] != 'UNCHANGED':
+                    raise ValueError('continuation terminal snapshot changed')
+            except BaseException as error:  # noqa: BLE001 - retain secondary evidence and propagate cancellation below
+                report.update(status='FAIL', terminal_error=repr(error))
+                report.setdefault('snapshot_after_hash_status', 'HASH_FAILED')
+                report.setdefault('finalization_errors', []).append(repr(error))
+                if original_error is None:
+                    original_error = error
+            # Stage/fsync before atomically replacing only our owned FAIL claim.
+            # Any stage durability failure leaves on-disk FAIL, never unflushed success.
+            try:
+                publish_continuation_receipt(receipt_path, report)
+            except BaseException as error:  # noqa: BLE001 - preserve original/cancellation and fail-closed claim
+                report.update(status='FAIL', terminal_error=repr(error))
+                report.setdefault('finalization_errors', []).append(repr(error))
+                if original_error is None:
+                    original_error = error
+            if original_error is not None:
+                original_error.continuation_receipt = report
+                raise original_error
+    return report
+
+
+def publish_continuation_receipt(receipt_path, report):
+    # Explicit narrow exception: one exclusive same-directory temporary receipt.
+    # A hard interruption may retain it; the existing claim blocks another run.
+    stage = receipt_path.with_name(receipt_path.name + '.staging')
+    owned = False
+    first_error = None
+    try:
+        with stage.open('xb') as file:
+            owned = True
+            file.write(full.chunks.canonical(report) + b'\n')
+            file.flush()
+            os.fsync(file.fileno())
+        try:
+            os.replace(stage, receipt_path)
+            owned = False  # Replacement consumed the temporary; no post-success cleanup call.
+        except BaseException as original:
+            # Replacement may finish before cancellation is delivered. Fail closed
+            # in our claim; retain scrub failures as secondary to original error.
+            failure = dict(report, status='FAIL', publication_error='replacement interrupted',
+                           publication_durability='NOT_GUARANTEED under hard process termination')
+            try:
+                with receipt_path.open('wb') as file:
+                    file.write(full.chunks.canonical(failure) + b'\n')
+                    file.flush()
+            except BaseException as scrub_error:  # noqa: BLE001 - preserve first cancellation
+                original.publication_scrub_error = repr(scrub_error)
+            raise
+    except BaseException as error:
+        first_error = error
+        raise
+    finally:
+        if owned:
+            try:
+                stage.unlink(missing_ok=True)
+            except BaseException as cleanup_error:  # Preserve first failure/cancellation.
+                if first_error is None:
+                    raise
+                first_error.publication_cleanup_error = repr(cleanup_error)
+
+
 def synthetic_run(root):
     """Synthetic authorities, real FULL validator; never actual FULL acceptance."""
     import copy
@@ -1115,13 +1469,16 @@ def synthetic_run(root):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     modes = parser.add_mutually_exclusive_group(required=True)
-    for mode in ('validate', 'dry-run', 'synthetic', 'execute-full', 'execute-full-retry'):
+    for mode in ('validate', 'dry-run', 'synthetic', 'execute-full', 'execute-full-retry', 'continue-attempt2-partial'):
         modes.add_argument('--' + mode, action='store_true')
     parser.add_argument('--authorization')
     parser.add_argument('--expected-authorization-sha256')
     parser.add_argument('--fixed-head', default='NOT_FIXED_YET')
     args = parser.parse_args()
-    if args.execute_full_retry:
+    if args.continue_attempt2_partial:
+        result = continue_partial(authorization=args.authorization,
+            expected_authorization_sha256=args.expected_authorization_sha256, fixed_head=args.fixed_head)
+    elif args.execute_full_retry:
         result = execute_retry(authorization=args.authorization,
             expected_authorization_sha256=args.expected_authorization_sha256, fixed_head=args.fixed_head)
     elif args.execute_full:

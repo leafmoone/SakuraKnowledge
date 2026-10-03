@@ -519,3 +519,26 @@ Failures stay FAIL/NOT_RUN as observed. Synthetic failure-first tests and full
 Python/default/semantic Rust matrix are implementation checks, not FULL execution.
 Formal attempts remain1, second attempt NOT_STARTED/NOT_AUTHORIZED, FULL pack
 NOT_CREATED, runtime/quality NOT_RUN, main unchanged; STOP WAITING_REVIEW.
+
+### Attempt2 partial qualification and future continuation implementation
+
+Historical attempt2 result3360197 is permanent FAIL/sample_reference_parity after
+GPU embeddings finished. Read-only inventory/integrity/production mapping closure,
+canonical deterministic sample, full1366520x1024float32 finite/L2 check and fresh
+CPU1200 parity all actually PASS. Worker uses pinned CPUFP32/thread8 in a new process,
+not a swallowed second-set-thread error. Four products remain byte-identical.
+Metrics component4.461035132408142e-06 mincos0.9999998807907104 norm1.7881393432617188e-07.
+
+Historical qualification source is explicitly RECONSTRUCTED and request-bound to
+preserved worker response, not an original source/stdin capture or final-source run.
+Independent region and16tools historical/current binding receipts restrict reuse;
+transitive tampering rejects. Qualification evidence is distinct from continuation
+success, final FULL pack, runtime qualification or quality acceptance.
+Future separate authorization enables only ANN/reload/key audit/new manifest, never
+reserve/embedding/newattemptlock. Original FAIL receipt and four products are immutable.
+Independent owned continuation receipt claim, fsynced publication and first-error/
+cancellation accounting preserve fail-closed semantics. Explicit user narrow exception
+allows exactly one same-directory exclusive receipt staging, cleaning only own temporary
+on catchable completion; hard interruptions and directory durability are limitations.
+Full Python/Rust matrix required on final fixed implementation; no real continuation,
+ANN or manifest executed here. Formal attempts2, Attempt3NO, STOP WAITING_REVIEW.

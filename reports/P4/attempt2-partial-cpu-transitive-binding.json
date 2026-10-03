@@ -1,0 +1,72 @@
+{
+  "bindings": {
+    "tools/p4_ann_v1.py": {
+      "historical_git_source_sha256": "c61b49c37e170e1917145c356c4a57827a2938c0e7ff6148b13408885ccb438c",
+      "raw_sha256": "8ccdfb1b9f73c7d3ffd11de9ba97c42a552be1605a5676d30d2c2fe163249534"
+    },
+    "tools/p4_chunks.py": {
+      "historical_git_source_sha256": "2d0237683988d2a234f5cbd680c37970433f7fa4ca520bc663992190cd2a5cd2",
+      "raw_sha256": "43583a4b51d6610d96ec0bad8a5ef01f6db30191e9a5d777d595a5f5e6565f6e"
+    },
+    "tools/p4_corpus.py": {
+      "historical_git_source_sha256": "7333a05389bb59b58f6ac8e4c12f60abd500939ce8a4c6c6f8bb699b55860f01",
+      "raw_sha256": "5abbd4c4202e88252ae4a58ac360cd7eed024356384b4d4419bafdd5958774e0"
+    },
+    "tools/p4_cpu_representation.py": {
+      "historical_git_source_sha256": "81a7de3e468de96abd5d28c5ae3347bf39d51c842342bf648aa1316cfd223b05",
+      "raw_sha256": "388430c180305faac00106f1e20c945fec3d540a3c2416fc5c5c51c5a97d2aba"
+    },
+    "tools/p4_exact_pilot.py": {
+      "historical_git_source_sha256": "48ae718aaef8e1e453f1f6ba1c211d2b636e23659e458034983fe2f5d3c54a92",
+      "raw_sha256": "f17c7c4ed335939fd96c1559ee25a9d4ace0e8845ebae02bddf0709f7a247756"
+    },
+    "tools/p4_full_acceptance.py": {
+      "historical_git_source_sha256": "1210800f6e56f8ff91f07fbcb5577ff5720f085bfba35341bba6ee88b90e42a0",
+      "raw_sha256": "b81bc8fa8abfd7b4d43267c5718e6d106d2452f8836c7f4bf53688446dfc5efa"
+    },
+    "tools/p4_full_preflight.py": {
+      "historical_git_source_sha256": "0eec07a6139cf5c7b012f8432f0be977db57938ac24f7a73563a0d1aaeead31f",
+      "raw_sha256": "5e880bd39f2da93c58f98e67d64194afbab9b54e65ff6ead3b186a55bb958e4f"
+    },
+    "tools/p4_onnx_agreement.py": {
+      "historical_git_source_sha256": "401b3413128fb6a9194d8178cdb62b306718c10c862e0174826842a0151498e8",
+      "raw_sha256": "b6ce8d2074e88d6e6783020636d338e928adae5457f47e3b480cbdc796fad29a"
+    },
+    "tools/p4_onnx_cpu_v3.py": {
+      "historical_git_source_sha256": "6a606a1a41f4646b14b929682045cadbc324741e0051dad08eada00c5f932796",
+      "raw_sha256": "4f84ea446d0fe7d9cd567964d4a752c05b2fcf495c6ab95dbdb0686a0a6bf593"
+    },
+    "tools/p4_onnx_export.py": {
+      "historical_git_source_sha256": "571a78cee3b0afce19bfd902dd3f46b3287131d7514aa772a5f0bf4582178a19",
+      "raw_sha256": "03fdef55daab96831dbfa18531984ef1c47a8b17eb1768a967dce2b85297e0d6"
+    },
+    "tools/p4_onnx_quality_v3.py": {
+      "historical_git_source_sha256": "071a73efbb06e72fc9a2748735890ff80a8e41d3ef3823f407faa336aab58cbd",
+      "raw_sha256": "2676d6e04ee74df1e97220c9f1174ba354325bae1e22773ee24123eee51f3b73"
+    },
+    "tools/p4_pilot_score.py": {
+      "historical_git_source_sha256": "ef011a607fb3c109ba6459138257a04b681587ccc279a04eedffa8db4f82542b",
+      "raw_sha256": "b16651377e9c4e846decc5bb7612b031912491cc5c7de9a40fc0ec4bccb6fc17"
+    },
+    "tools/p4_query_reference.py": {
+      "historical_git_source_sha256": "efae25bfa875d3cc351f9a026ab9b710333736bfde3e6e91903c85367b2c6463",
+      "raw_sha256": "f8e316ddb044ff895f83658b4802eb1564091874092ee1f63d814eb71e6a7ec1"
+    },
+    "tools/p4_retrieval_metrics.py": {
+      "historical_git_source_sha256": "551153b26d53d2ff98f6f0b7506c7cf0d4ce43f33a2d097177a50fec6f7aefaf",
+      "raw_sha256": "1af82429798e8e9efcf8b6c56ecab13dec0f008cfd4278605117fd553e31a4fe"
+    },
+    "tools/p4_rust_pilot.py": {
+      "historical_git_source_sha256": "c8768703f8556bb5ce3ce1a5f723c8647bdc2e5ae42cbe88fdab331509aeaebd",
+      "raw_sha256": "e202bba9863f639d98c437f896c8277a85bba9e9fe26f067292b9d84b3963ade"
+    },
+    "tools/p4_selection_v2.py": {
+      "historical_git_source_sha256": "26ab0d7562da4f7337ee8f937da8c4486c0ece4fa3ce403561f836469c3a5966",
+      "raw_sha256": "73cbd2c4b647c5af075b1547f6ba80265a5d9fbe81e6f816cd18cb38cba5b362"
+    }
+  },
+  "dynamic_loading_observation": "exact_pilot contains no dynamic import; ann/export use importlib.metadata package version queries only; tools dependencies recursively included",
+  "evidence_boundary": "historical Git source and current filtered checkout equality; no separate runtime full-source capture. Files remained unchanged by sole editor during qualification.",
+  "historical_commit": "33601978374d241827c7b698475f3c33f8273b0d",
+  "schema": "p4-partial-cpu-transitive-binding-v1"
+}

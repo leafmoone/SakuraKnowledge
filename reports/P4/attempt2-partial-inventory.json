@@ -1,0 +1,40 @@
+{
+  "ANN_CREATED": "NO",
+  "ATTEMPT3_CREATED": "NO",
+  "FORMAL_BUILD_ATTEMPTS_TOTAL": 2,
+  "MANIFEST_CREATED": "NO",
+  "attempt2_result_sha": "33601978374d241827c7b698475f3c33f8273b0d",
+  "files": {
+    "attempt2_lock": {
+      "bytes": 31588,
+      "path": "build/p4-full-semantic-v1-retry1.attempt2.lock",
+      "sha256": "849cd1c52bd9844f3cbf0c904d4612af4af717854164834daac1030c8f5284fb"
+    },
+    "chunks.sqlite": {
+      "bytes": 3675488256,
+      "path": "build/p4-full-semantic-v1-retry1/chunks.sqlite",
+      "sha256": "67471db26e04420a905e0726d4582531e2270eb2d3ed528b79b0e3f8fcfcbe2c"
+    },
+    "corpus.jsonl": {
+      "bytes": 1316930137,
+      "path": "build/p4-full-semantic-v1-retry1/corpus.jsonl",
+      "sha256": "6097c0c93eb75f624d549ff062d37b70cc0dbb069fae812194ba7f2a8acf301f"
+    },
+    "execution-receipt.json": {
+      "bytes": 108705,
+      "path": "build/p4-full-semantic-v1-retry1/execution-receipt.json",
+      "sha256": "7d9f8ffa5cebc2ddb162f970a000b3b5948d23b521d938e008a334e00ece57c4"
+    },
+    "sample.json": {
+      "bytes": 16747,
+      "path": "build/p4-full-semantic-v1-retry1/sample.json",
+      "sha256": "2f61ba6325ff6ec6984e49299b9b86caf6daef2f3b7858f6ed9e45a72611b7ad"
+    },
+    "vectors.npy": {
+      "bytes": 5597266048,
+      "path": "build/p4-full-semantic-v1-retry1/vectors.npy",
+      "sha256": "b81cdaf057a41c8882f52cfbe322adcc0f93c88103e2f141bf9cd942724ec78a"
+    }
+  },
+  "schema": "p4-attempt2-partial-inventory-v1"
+}

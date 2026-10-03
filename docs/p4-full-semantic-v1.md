@@ -461,3 +461,76 @@ cancellation preserve structured evidence (cancellation propagates).
 No real retry authorization/output/lock is created by this implementation task.
 Formal FULL attempts remain1, second attempt NOT_STARTED/NOT_AUTHORIZED, FULL pack
 NOT_CREATED, runtime/quality NOT_RUN; stop WAITING_REVIEW even if readiness PASS.
+
+## Qualified Attempt2 partial salvage — no continuation execution
+
+Attempt2 result `33601978374d241827c7b698475f3c33f8273b0d` is permanently FAIL at
+sample_reference_parity: second LocalEncoder in the same process attempted to
+reset process-global Torch interop threads. Documents1295638/chunks1366520 and
+embeddings1366520 completed, ANN0. Both historical locks/receipts remain immutable.
+Formal build attempts total2; no Attempt3, GPU recomputation, ANN or manifest in
+this qualification task. Canonical FP32/chunk/ANN/runtime policy is unchanged.
+
+Read-only independent inventory pins mapping/corpus/sample/vectors plus failed
+execution and attempt2 lock bytes. Production verify_mapping under mode=ro and
+query_only verifies integrity, all positions, corpus canonical bytes, tokenizer
+projection closure, document census/strata/streaming SHA against approved count.
+Its full.project calls are verification only, never writing/rebuilding products.
+Deterministic sample regenerated semantics and exact canonical bytes match.
+All1366520x1024 float32 vectors are mmap-read in batches, finite and L2 error<=1e-5;
+not a sampling claim. Vector bytes5597266048 remain SHA
+`b81cdaf057a41c8882f52cfbe322adcc0f93c88103e2f141bf9cd942724ec78a`.
+
+Fresh CPU worker uses the same pinned model/tokenizer/CLS/L2/FP32 and8threads,
+initializes LocalEncoder once in a fresh interpreter before encoding, and reads
+only deterministic1200 sampled positions. It validates request source/config/model
+inventory/product bindings, exact positions/token counts and actual CPU FP32/thread
+configuration. Parent requires exit0, independent process ID, request SHA equality,
+coverage and metrics; no catch-and-ignore global-thread RuntimeError. Real metrics:
+maxcomponent4.461035132408142e-06, mincos0.9999998807907104,
+maxnorm1.7881393432617188e-07. Limits remain1e-4/.99999/1e-5.
+
+`attempt2-partial-cpu-source-binding.json` is RECONSTRUCTED, not an original runtime
+source/stdin capture: exact Git3360197 baseline plus recorded helper insertion
+recreates raw source73298bytes SHA750b002981a7f7d32fab7f96c07bce1da2712c2925ceefbd25ebe92be2761157.
+Its reconstructed request SHA621e54c15acc3ded13b8789665711efcd2b7f68a4d9afbdcff5603b3bc31943a
+matches the preserved actual worker response. This proves matching recorded bindings,
+not recovery of an original file. The original tool event python_77ab1e2b records
+exit0/mappingPASS/vectorPASS/parity metrics. No original standalone command capture
+exists. Fixed worker/parity/sample/reader regions and an independently pinned
+16-tools transitive historical-Git/current-raw receipt are compared with final
+source. No dynamic module loading found (importlib.metadata version queries only).
+Final implementation differs from qualification whole-source SHA; this is explicit,
+not a claim that the final whole source was executed for qualification.
+
+Future `--continue-attempt2-partial` fails closed without separately hashed exact
+`p4-attempt2-partial-continuation-authorization-v1` envelope. It authenticates current
+fixed source closure, qualification receipt/source evidence, both histories and all
+four product bytes, snapshot/inventory/DLL/disk and reviewed count evidence.
+No reserve/new lock/encoder is called; attempts stay2. Existing ANN/manifest/new
+continuation receipt reject before writes. Exclusive continuation receipt FAIL
+claim prevents automatic rerun. Only ANN/index/read-only reload/key audit and new
+manifest are eligible under future authorization. Reused products are never written.
+New build_provenance preserves original FAIL, failure phase/class,
+partial_embedding_reused, qualified vector/mapping SHAs and implementation SHA.
+Success is RECOVERED_FROM_QUALIFIED_ATTEMPT2_PARTIAL, never rewriting original FAIL.
+Original execution-receipt exclusion denotes immutable history; continuation receipt
+is independently terminal-bound outside pack inventory, leaving runtime digest rules
+unchanged. Publication stages/fsyncs before atomic replacement of owned FAIL claim;
+staging durability failure leaves original FAIL and propagates first error/cancel.
+ANN failures retain partial index and original products; no auto continuation/Attempt3.
+
+Qualification is not a finished FULL pack or runtime/quality acceptance. This task
+stops WAITING_REVIEW with ANN_CREATED=NO, MANIFEST_CREATED=NO,
+CONTINUATION_EXECUTED=NO, FORMAL_BUILD_ATTEMPTS_TOTAL=2.
+
+Explicitly approved narrow future publication exception: one same-directory
+exclusive `continuation-receipt.json.staging` is allowed only to write/flush/fsync
+before atomic publication of the owned continuation receipt. Normal/catchable
+failures remove only that owned temporary file. A pre-existing stage is never
+removed and blocks activation; hard interruptions may leave stage/claim evidence
+and prohibit automatic re-execution. No other staging paths are introduced.
+Replacement-side-effect cancellation scrubs owned exposed success to FAIL and
+propagates cancellation/first error; secondary errors remain explicit. Hard process
+termination, scrub/storage failures and directory durability are not guaranteed.
+Terminal snapshot CHANGED raises an error, never a normal success/exit0.

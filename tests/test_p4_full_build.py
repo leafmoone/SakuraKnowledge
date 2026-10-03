@@ -1349,6 +1349,336 @@ def test_retry_history_failure_first_real_bytes(retry_history, fault):
     assert {p: p.read_bytes() for p in root.rglob('*') if p.is_file()} == before
 
 
+@pytest.mark.parametrize('fault', ['valid', 'nan', 'norm', 'shape', 'dtype'])
+def test_salvage_whole_vector_gate(tmp_path, fault):
+    value = np.zeros((8, 4), dtype=np.float32)
+    value[:, 0] = 1
+    if fault == 'nan':
+        value[7, 1] = np.nan
+    elif fault == 'norm':
+        value[7, 0] = 2
+    elif fault == 'shape':
+        value = value[:, :3]
+    elif fault == 'dtype':
+        value = value.astype(np.float64)
+    path = tmp_path / 'vectors.npy'
+    np.save(path, value)
+    if fault == 'valid':
+        assert build.validate_partial_vectors(path, rows=8, dimension=4)['FINITE'] == 'PASS'
+    else:
+        with pytest.raises(ValueError):
+            build.validate_partial_vectors(path, rows=8, dimension=4)
+
+
+@pytest.mark.parametrize('fault', ['valid', 'tokens', 'component', 'cosine', 'norm', 'nan'])
+def test_salvage_cpu_parity_thresholds(fault):
+    actual = np.zeros((8, 4), dtype=np.float32)
+    actual[:, 0] = 1
+    expected = actual.copy()
+    tokens = [2] * 8
+    if fault == 'tokens':
+        tokens[-1] = 3
+    elif fault == 'component':
+        expected[-1, 1] = .0002
+    elif fault == 'cosine':
+        expected[-1] = [-1, 0, 0, 0]
+    elif fault == 'norm':
+        expected[-1, 0] = 1.00002
+    elif fault == 'nan':
+        expected[-1, 1] = np.nan
+    if fault == 'valid':
+        assert build.partial_parity_metrics(actual, expected, [2] * 8, tokens)['minimum_cosine'] == 1
+    else:
+        with pytest.raises(ValueError):
+            build.partial_parity_metrics(actual, expected, [2] * 8, tokens)
+
+
+@pytest.mark.parametrize('fault', ['valid', 'size', 'sha', 'mapping', 'sample', 'existing_ann', 'existing_manifest', 'receipt'])
+def test_salvage_preservation_actual_bytes(retry_history, monkeypatch, fault):
+    root, _ = retry_history
+    output = root / build.RETRY_OUTPUT
+    output.mkdir()
+    receipt = retry_report()
+    receipt.update(status='FAIL', phase='sample_reference_parity', attempts=2, attempt_reserved=True,
+        completed_documents=1295638, completed_chunks=1366520, completed_embeddings=1366520,
+        completed_ann=0, snapshot_after_hash_status='UNCHANGED')
+    build.save_new(output / 'execution-receipt.json', receipt)
+    history = {build.RETRY_OUTPUT + '/execution-receipt.json': full.exact.sha(output / 'execution-receipt.json')}
+    products = {}
+    for name in build.PARTIAL_PRODUCTS:
+        path = output / name
+        path.write_bytes(b'fixture product ' + name.encode())
+        products[name] = (path.stat().st_size, full.exact.sha(path))
+    monkeypatch.setattr(build, 'ATTEMPT2_HISTORY', history)
+    monkeypatch.setattr(build, 'PARTIAL_PRODUCTS', products)
+    if fault in ('size', 'sha', 'mapping', 'sample'):
+        name = {'mapping': 'chunks.sqlite', 'sample': 'sample.json'}.get(fault, 'vectors.npy')
+        path = output / name
+        path.write_bytes(b'x' * path.stat().st_size if fault == 'sha' else path.read_bytes() + b'x')
+    elif fault == 'existing_ann':
+        (output / 'vectors.usearch').write_bytes(b'foreign')
+    elif fault == 'existing_manifest':
+        (output / 'manifest.json').write_bytes(b'foreign')
+    elif fault == 'receipt':
+        (output / 'execution-receipt.json').write_bytes(b'{}')
+    before = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
+    if fault == 'valid':
+        assert build.validate_partial_preservation(root=root) == output
+    else:
+        with pytest.raises(ValueError):
+            build.validate_partial_preservation(root=root)
+    assert before == {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
+
+
+def test_continuation_no_authorization_fail_closed(tmp_path, monkeypatch):
+    monkeypatch.setattr(build, 'ROOT', tmp_path)
+    monkeypatch.setattr(build, 'verify_fixed_current_dev', lambda *a: None)
+    monkeypatch.setattr(build, 'reserve', lambda *a, **k: pytest.fail('continuation cannot reserve'))
+    monkeypatch.setattr(full.exact, 'LocalEncoder', lambda *a, **k: pytest.fail('continuation cannot encode'))
+    with pytest.raises(ValueError, match='separate explicit') as error:
+        build.continue_partial(fixed_head='a' * 40)
+    assert error.value.continuation_receipt['attempts'] == 2
+    assert error.value.continuation_receipt['attempt3_created'] is False
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize('fault', ['exit', 'request', 'positions', 'threads', 'metrics'])
+def test_cpu_parent_rejects_untrusted_response(monkeypatch, fault):
+    request = {'positions': list(range(1200))}
+    response = {'status': 'PASS', 'request_sha256': full.exact.canonical_hash(request),
+        'positions': request['positions'], 'sample_count': 1200, 'process_id': os.getpid() + 1,
+        'encoder': {'actual_device': 'cpu', 'actual_dtype': 'torch.float32', 'threads': 8, 'interop_threads': 8},
+        'metrics': {'max_component_error': 0.0, 'minimum_cosine': 1.0, 'max_norm_error': 0.0}}
+    if fault == 'request':
+        response['request_sha256'] = '0' * 64
+    elif fault == 'positions':
+        response['positions'] = [0] * 1200
+    elif fault == 'threads':
+        response['encoder']['interop_threads'] = 1
+    elif fault == 'metrics':
+        response['metrics']['max_component_error'] = 1
+    monkeypatch.setattr(subprocess, 'run', lambda *a, **k: SimpleNamespace(returncode=1 if fault == 'exit' else 0,
+        stdout=json.dumps(response).encode(), stderr=b'worker failed' if fault == 'exit' else b''))
+    with pytest.raises(ValueError):
+        build.run_partial_cpu_worker(request)
+
+
+@pytest.mark.parametrize('fault', ['ann_failure', 'receipt_write', 'receipt_flush', 'receipt_fsync', 'snapshot_cancel', 'snapshot_changed'])
+def test_continuation_synthetic_claim_preserves_old_products(activation, monkeypatch, fault):
+    _config, snapshot, _ = activation
+    root = build.ROOT
+    output = root / build.RETRY_OUTPUT
+    output.mkdir(parents=True)
+    original = {'execution-receipt.json': b'immutable FAIL', 'chunks.sqlite': b'mapping',
+                'corpus.jsonl': b'corpus', 'sample.json': b'sample', 'vectors.npy': b'vectors'}
+    for name, value in original.items():
+        (output / name).write_bytes(value)
+    auth = build.authorize(None)
+    reviewed = build.reviewed_preflight
+    monkeypatch.setattr(build, 'reviewed_preflight', lambda a,c,v,r,rt: (dict(reviewed(a,c,v,r,rt)[0], actual_chunks=1366520),
+        *reviewed(a,c,v,r,rt)[1:]))
+    monkeypatch.setattr(full, 'contained', lambda path, *a: Path(path) if Path(path).is_absolute() else root / path)
+    monkeypatch.setattr(build, 'verify_fixed_current_dev', lambda *a: None)
+    monkeypatch.setattr(build, 'authorize_continuation', lambda *a, **k: auth)
+    monkeypatch.setattr(build, 'validate_partial_preservation', lambda **k: output)
+    monkeypatch.setattr(build, 'reserve', lambda *a, **k: pytest.fail('no new build reservation'))
+    monkeypatch.setattr(full.exact, 'LocalEncoder', lambda *a, **k: pytest.fail('no embeddings'))
+    monkeypatch.setattr(np, 'load', lambda *a, **k: np.zeros((0, 1024), dtype=np.float32))
+    monkeypatch.setattr(build, 'close_memmap', lambda v: None)
+    monkeypatch.setattr(build, 'index_factory', lambda d: (_ for _ in ()).throw(RuntimeError('synthetic ANN failure')))
+    if fault.startswith('receipt_'):
+        monkeypatch.setattr(build, 'save_new', lambda *a, **k: (_ for _ in ()).throw(OSError(fault)))
+    elif fault in ('snapshot_cancel', 'snapshot_changed'):
+        original_binding = build.binding
+        calls = 0
+        def binding(path, directory):
+            nonlocal calls
+            if path == snapshot:
+                calls += 1
+                if calls > 1:
+                    if fault == 'snapshot_cancel':
+                        raise KeyboardInterrupt('terminal snapshot cancel')
+                    return {**original_binding(path, directory), 'sha256': '0' * 64}
+            return original_binding(path, directory)
+        monkeypatch.setattr(build, 'binding', binding)
+    # ANN fails immediately; injected secondary terminal failures must not mask first.
+    with pytest.raises(RuntimeError, match='synthetic ANN failure') as error:
+        build.continue_partial(fixed_head='a' * 40)
+    receipt = json.loads((output / 'continuation-receipt.json').read_bytes())
+    assert receipt['status'] == 'FAIL' and receipt['attempts'] == 2
+    assert receipt['continuation_claimed'] is True and receipt['attempt3_created'] is False
+    assert error.value.continuation_receipt['attempts'] == 2
+    assert all((output / name).read_bytes() == value for name, value in original.items())
+    assert not (output / 'manifest.json').exists() and not (output / 'vectors.usearch').exists()
+    assert not output.with_name(output.name + '.attempt3.lock').exists()
+
+
+@pytest.mark.parametrize('fault', ['valid', 'worker', 'helper', 'import', 'chunks_import', 'ann_import',
+    'export_import', 'request', 'response', 'historical_source'])
+def test_cpu_qualification_source_tamper(tmp_path, monkeypatch, fault):
+    repository = Path(__file__).resolve().parents[1]
+    evidence_path = 'reports/P4/attempt2-partial-cpu-source-binding.json'
+    evidence = json.loads((repository / evidence_path).read_bytes())
+    transitive_name = 'reports/P4/attempt2-partial-cpu-transitive-binding.json'
+    transitive = json.loads((repository / transitive_name).read_bytes())
+    for name in [evidence_path, transitive_name, 'tools/p4_full_build.py', *transitive['bindings']]:
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((repository / name).read_bytes())
+    if fault in ('worker', 'helper'):
+        path = tmp_path / 'tools/p4_full_build.py'
+        source = path.read_text('utf8')
+        needle = 'def partial_cpu_worker(request):' if fault == 'worker' else 'def partial_parity_metrics(actual, expected, actual_tokens, expected_tokens):'
+        path.write_text(source.replace(needle, needle + '\n    raise RuntimeError("unapproved code")'), encoding='utf8')
+    elif fault in ('import', 'chunks_import', 'ann_import', 'export_import'):
+        path = tmp_path / {'import': 'tools/p4_exact_pilot.py', 'chunks_import': 'tools/p4_chunks.py',
+            'ann_import': 'tools/p4_ann_v1.py', 'export_import': 'tools/p4_onnx_export.py'}[fault]
+        path.write_bytes(path.read_bytes() + b'\nraise RuntimeError("unapproved import")\n')
+    elif fault in ('request', 'response', 'historical_source'):
+        if fault == 'request':
+            evidence['request']['source_sha256'] = '0' * 64
+        elif fault == 'response':
+            evidence['original_response']['request_sha256'] = '0' * 64
+        else:
+            evidence['qualification_source_reconstructed_utf8'] += '\nraise RuntimeError("tamper")\n'
+        path = tmp_path / evidence_path
+        path.write_text(json.dumps(evidence), encoding='utf8')
+    original_check_output = subprocess.check_output
+    monkeypatch.setattr(subprocess, 'check_output', lambda args, **kw: original_check_output(args, cwd=repository)
+        if args[:2] == ['git', 'show'] else original_check_output(args, **kw))
+    if fault == 'valid':
+        assert build.validate_cpu_qualification_source(tmp_path)['request_sha256'] == evidence['request_sha256']
+    else:
+        with pytest.raises(ValueError):
+            build.validate_cpu_qualification_source(tmp_path)
+
+
+@pytest.mark.parametrize('fault', ['write', 'flush', 'fsync'])
+def test_continuation_success_publication_durability_fail_closed(tmp_path, monkeypatch, fault):
+    target = tmp_path / 'continuation-receipt.json'
+    build.save_new(target, {'status': 'FAIL', 'attempts': 2})
+    original_open = Path.open
+    class File:
+        def __init__(self, stream):
+            self.stream = stream
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            self.stream.close()
+        def write(self, value):
+            if fault == 'write':
+                raise OSError('write failed')
+            return self.stream.write(value)
+        def flush(self):
+            if fault == 'flush':
+                raise OSError('flush failed')
+            self.stream.flush()
+        def fileno(self):
+            return self.stream.fileno()
+    def open_file(path, *args, **kwargs):
+        stream = original_open(path, *args, **kwargs)
+        return File(stream) if path.name.endswith('.staging') else stream
+    monkeypatch.setattr(Path, 'open', open_file)
+    if fault == 'fsync':
+        monkeypatch.setattr(os, 'fsync', lambda fd: (_ for _ in ()).throw(OSError('fsync failed')))
+    with pytest.raises(OSError):
+        build.publish_continuation_receipt(target, {'status': 'RECOVERED_FROM_QUALIFIED_ATTEMPT2_PARTIAL'})
+    assert json.loads(target.read_bytes())['status'] == 'FAIL'
+
+
+def test_continuation_replace_side_effect_cancel_scrubs_success(tmp_path, monkeypatch):
+    target = tmp_path / 'continuation-receipt.json'
+    build.save_new(target, {'status': 'FAIL', 'attempts': 2})
+    replace = os.replace
+    def interrupted(source, destination):
+        replace(source, destination)
+        raise KeyboardInterrupt('after replacement')
+    monkeypatch.setattr(os, 'replace', interrupted)
+    with pytest.raises(KeyboardInterrupt):
+        build.publish_continuation_receipt(target, {'status': 'RECOVERED_FROM_QUALIFIED_ATTEMPT2_PARTIAL'})
+    assert json.loads(target.read_bytes())['status'] == 'FAIL'
+    assert not target.with_name(target.name + '.staging').exists()
+
+
+@pytest.mark.parametrize('cancel', [False, True])
+def test_continuation_publication_cleanup_secondary(tmp_path, monkeypatch, cancel):
+    target = tmp_path / 'continuation-receipt.json'
+    build.save_new(target, {'status': 'FAIL'})
+    if cancel:
+        monkeypatch.setattr(os, 'replace', lambda *a: (_ for _ in ()).throw(KeyboardInterrupt('first cancel')))
+    else:
+        monkeypatch.setattr(os, 'fsync', lambda *a: (_ for _ in ()).throw(OSError('first fsync')))
+    monkeypatch.setattr(Path, 'unlink', lambda *a, **k: (_ for _ in ()).throw(PermissionError('cleanup secondary')))
+    with pytest.raises(KeyboardInterrupt if cancel else OSError) as error:
+        build.publish_continuation_receipt(target, {'status': 'RECOVERED_FROM_QUALIFIED_ATTEMPT2_PARTIAL'})
+    assert 'cleanup secondary' in error.value.publication_cleanup_error
+    assert json.loads(target.read_bytes())['status'] == 'FAIL'
+
+
+def test_continuation_success_publication_no_post_replace_cleanup(tmp_path, monkeypatch):
+    target = tmp_path / 'continuation-receipt.json'
+    build.save_new(target, {'status': 'FAIL'})
+    monkeypatch.setattr(Path, 'unlink', lambda *a, **k: pytest.fail('no post-replace cleanup'))
+    build.publish_continuation_receipt(target, {'status': 'RECOVERED_FROM_QUALIFIED_ATTEMPT2_PARTIAL'})
+    assert json.loads(target.read_bytes())['status'] == 'RECOVERED_FROM_QUALIFIED_ATTEMPT2_PARTIAL'
+
+
+def test_continuation_success_work_terminal_snapshot_changed(activation, monkeypatch):
+    _config, snapshot, _ = activation
+    root = build.ROOT
+    output = root / build.RETRY_OUTPUT
+    output.mkdir(parents=True)
+    old = {'execution-receipt.json': b'original FAIL', 'chunks.sqlite': b'mapping',
+           'corpus.jsonl': b'corpus', 'sample.json': b'sample', 'vectors.npy': b'vectors'}
+    for name, value in old.items():
+        (output / name).write_bytes(value)
+    auth = build.authorize(None)
+    reviewed = build.reviewed_preflight
+    monkeypatch.setattr(build, 'reviewed_preflight', lambda a,c,v,r,rt: (dict(reviewed(a,c,v,r,rt)[0], actual_chunks=1366520),
+        *reviewed(a,c,v,r,rt)[1:]))
+    monkeypatch.setattr(full, 'contained', lambda path, *a: Path(path) if Path(path).is_absolute() else root / path)
+    monkeypatch.setattr(build, 'verify_fixed_current_dev', lambda *a: None)
+    monkeypatch.setattr(build, 'authorize_continuation', lambda *a, **k: auth)
+    monkeypatch.setattr(build, 'validate_partial_preservation', lambda **k: output)
+    monkeypatch.setattr(build, 'reserve', lambda *a, **k: pytest.fail('no reservation'))
+    monkeypatch.setattr(full.exact, 'LocalEncoder', lambda *a, **k: pytest.fail('no encoding'))
+    # Empty batch views avoid work; every index/manifest operation is synthetic.
+    monkeypatch.setattr(np, 'load', lambda *a, **k: np.zeros((0, 1024), dtype=np.float32))
+    monkeypatch.setattr(build, 'close_memmap', lambda v: None)
+    monkeypatch.setattr(full, 'disk_capacity', lambda *a: {'status': 'PASS'})
+    class Index:
+        def add(self, *a, **k):
+            pass
+        def save(self, path):
+            Path(path).write_bytes(b'synthetic ANN only')
+        def view(self, *a):
+            pass
+    monkeypatch.setattr(build, 'index_factory', lambda *a: Index())
+    monkeypatch.setattr(build, 'close_index', lambda *a: None)
+    monkeypatch.setattr(build, 'verify_keys', lambda *a: None)
+    monkeypatch.setattr(build, 'manifest', lambda *a: {'inventory_exclusions': {}})
+    monkeypatch.setattr(build.acceptance, 'validate_full_manifest', lambda *a, **k: None)
+    original_binding = build.binding
+    calls = 0
+    def binding(path, directory):
+        nonlocal calls
+        result = original_binding(path, directory)
+        if path == snapshot:
+            calls += 1
+            if calls == 3:  # Before and pre-publication equal; terminal alone changes.
+                result = dict(result, sha256='0' * 64)
+        return result
+    monkeypatch.setattr(build, 'binding', binding)
+    with pytest.raises(ValueError, match='terminal snapshot changed') as error:
+        build.continue_partial(fixed_head='a' * 40)
+    report = error.value.continuation_receipt
+    assert report['status'] == 'FAIL' and report['snapshot_after_hash_status'] == 'CHANGED'
+    receipt = json.loads((output / 'continuation-receipt.json').read_bytes())
+    assert receipt['status'] == 'FAIL' and receipt['snapshot_after_hash_status'] == 'CHANGED'
+    assert (output / 'manifest.json').exists()  # Retained partial work, not a success claim.
+    assert all((output / name).read_bytes() == value for name, value in old.items())
+
+
 def retry_policy():
     return {'schema': build.RETRY_SCHEMA, 'operation': 'execute_full_retry', 'fixed_code_sha': 'b' * 40,
         'attempt_number': 2, 'max_total_attempts': 2, 'retry_of': build.attempt1_history_binding(),
