@@ -127,7 +127,7 @@ def finish_driver(driver, report):
         process.stdout.close()
 
 
-def evaluate(*, binary, output, results, existing_pack=False, verified_session=None):
+def evaluate(*, binary, output, results, existing_pack=False, verified_session=None, diagnostic_case=None):
     """Create-new candidate and result directory. Return retained report on failure."""
     candidate = build.full.controlled_path(ROOT / output, ROOT, strict=False)
     destination = build.full.controlled_path(ROOT / results, ROOT, strict=False)
@@ -176,7 +176,13 @@ def evaluate(*, binary, output, results, existing_pack=False, verified_session=N
                                       startup_wall_ms=(time.perf_counter() - start) * 1000)
                         require(opened['event'] == 'opened' and opened['retries'] == 0 and
                                 isinstance(opened['open_timings_ms'], dict), 'resident startup mismatch')
-                        for phase, rows in (('warmups', cases[:2]), ('formal', cases)):
+                        phases = (('warmups', cases[:2]), ('formal', cases))
+                        if diagnostic_case is not None:
+                            selected = [c for c in cases if c['case_id'] == diagnostic_case]
+                            require(len(selected) == 1, 'unknown diagnostic case')
+                            report['diagnostic'] = [{'case_id': diagnostic_case, 'status': 'NOT_RUN'}]
+                            phases = (('diagnostic', selected),)
+                        for phase, rows in phases:
                             if phase == 'formal':
                                 require(all(row['status'] == 'PASS' for row in report['warmups']),
                                         'warmup failure prevents formal quality evaluation')
@@ -205,17 +211,21 @@ def evaluate(*, binary, output, results, existing_pack=False, verified_session=N
                                             isinstance(exc, (TimeoutError, OSError, RustFailure)) or
                                             'EOF/oversize JSONL response' in str(exc)):
                                         raise
-                        if all(r['status'] == 'PASS' for r in report['formal']):
+                        if diagnostic_case is None and all(r['status'] == 'PASS' for r in report['formal']):
                             aggregates = {n: metrics.aggregate_cases(v) for n, v in scored.items()}
                             report['aggregates'] = {n: {s: asdict(v) for s, v in a.items()}
                                                     for n, a in aggregates.items()}
                             report['quality_gate'] = quality_gate(aggregates['lexical'], aggregates['final'])
+                            report['total_quality'] = report['quality_gate']['status']
                     finally:
                         if driver is not None:
                             closing, driver = driver, None
-                            finish_driver(closing, report)
+                            try:
+                                finish_driver(closing, report)
+                            except Exception as cleanup:  # noqa: BLE001 - preserve original work failure
+                                report['failures'].append(f'driver cleanup: {cleanup}')
             report['status'] = ('PASS' if not report['failures'] and
-                                report.get('quality_gate', {}).get('status') == 'PASS' else 'FAIL')
+                                (diagnostic_case is not None or report.get('quality_gate', {}).get('status') == 'PASS') else 'FAIL')
     except Exception as exc:  # noqa: BLE001 - retain the complete failed run
         report['failures'].append(str(exc))
     finally:
@@ -241,12 +251,13 @@ def require_success_response(response):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--diagnostic-case', help='run one separate frozen diagnostic, not formal quality')
     parser.add_argument('--binary', required=True)
     parser.add_argument('--output', required=True, help='new candidate directory')
     parser.add_argument('--results', required=True, help='disjoint new results directory')
     parser.add_argument('--existing-pack', action='store_true', help='revalidate an existing immutable candidate rather than republish')
     args = parser.parse_args(argv)
-    report = evaluate(binary=args.binary, output=args.output, results=args.results, existing_pack=args.existing_pack)
+    report = evaluate(binary=args.binary, output=args.output, results=args.results, existing_pack=args.existing_pack, diagnostic_case=args.diagnostic_case)
     print(build.full.chunks.canonical(report).decode('utf8'))
     return 0 if report['status'] == 'PASS' else 1
 

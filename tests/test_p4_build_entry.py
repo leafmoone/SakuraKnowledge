@@ -11,6 +11,84 @@ from tools import p4_full_build as build
 from tools import p4_full_preflight as full
 
 
+def test_prepare_cleanup_keeps_primary_error_and_unrelated_stage(tmp_path, monkeypatch):
+    import shutil
+    root = tmp_path
+    source = root / 'source'
+    source.mkdir()
+    (source / 'manifest.json').write_text(json.dumps({'pack_version': 'p4-full-existing-assets-v1',
+        'snapshot': {'path': '../snapshot'}, 'artifacts': {}}))
+    (root / 'snapshot').write_bytes(b'snapshot')
+    (root / 'contract').write_text(json.dumps({'snapshot': {'path': 'snapshot'}}))
+    monkeypatch.setattr(build, 'ROOT', root)
+    monkeypatch.setattr(full, 'FULL_CONTRACT', root / 'contract')
+    monkeypatch.setattr(acceptance, 'validate_full_manifest', lambda *a, **k: 1)
+    class Session:
+        def guard(self, records):
+            return nullcontext()
+    def fail(*args):
+        raise RuntimeError('primary prepare failure')
+    monkeypatch.setattr(build, 'prepare_membership', fail)
+    monkeypatch.setattr(shutil, 'rmtree', lambda *a: (_ for _ in ()).throw(OSError('cleanup failure')))
+    other = root / 'output.staging-unrelated'
+    other.mkdir()
+    with pytest.raises(RuntimeError, match='primary prepare failure') as caught:
+        build.prepare_lexical(existing_pack='source', output='output', session=Session())
+    assert any('cleanup failure' in note for note in caught.value.__notes__)
+    assert other.is_dir() and not (root / 'output').exists()
+
+
+def test_prepared_rebase_preserves_only_authorized_external_dll(tmp_path, monkeypatch):
+    import ntpath
+    dll = tmp_path / 'ort.dll'
+    dll.write_bytes(b'dll')
+    # Any attempt to relativize the external DLL reproduces Windows cross-drive failure.
+    def cross_drive(*args):
+        return ntpath.relpath('C:/ort.dll', 'D:/pack')
+    monkeypatch.setattr(build.os.path, 'relpath', cross_drive)
+    record = {'path': str(dll), 'size': 3, 'sha256': 'a' * 64}
+    build.rebase_prepared_binding(record, tmp_path, tmp_path / 'pack', external_dll=True)
+    assert record['path'] == str(dll.resolve())
+    with pytest.raises(ValueError, match='unknown external'):
+        build.rebase_prepared_binding(dict(record), tmp_path, tmp_path / 'pack')
+
+
+def test_explicit_membership_keeps_independent_fts_rows_and_strict_metadata(tmp_path):
+    source = tmp_path / 'snapshot.sqlite'
+    with sqlite3.connect(source) as c:
+        c.executescript("CREATE TABLE entries(id INTEGER PRIMARY KEY,kind TEXT,conflicted INTEGER);"
+                       "CREATE TABLE documents(id INTEGER PRIMARY KEY,entry_id INTEGER,status TEXT,search_text TEXT);"
+                       "CREATE TABLE entry_evidence(entry_id INTEGER,status TEXT);"
+                       "CREATE VIRTUAL TABLE search_fts USING fts5(text,document_id UNINDEXED,entry_id UNINDEXED);"
+                       "INSERT INTO entries VALUES(1,'subject',0),(2,'episode',0),(3,'subject',1);"
+                       "INSERT INTO documents VALUES(20,1,'source_backed','alpha'),(21,2,'source_backed','alpha'),(22,3,'source_backed','alpha');"
+                       "INSERT INTO entry_evidence VALUES(1,'source_backed'),(2,'source_backed'),(3,'source_backed');"
+                       "INSERT INTO search_fts(rowid,text,document_id,entry_id) VALUES(500,'alpha',20,1),(501,'alpha',20,1),(502,'wrong',20,1),(503,'alpha',20,2),(504,'alpha',21,2),(505,'alpha',22,3);")
+    spec = build.binding(source, tmp_path)
+    output = tmp_path / 'lexical-membership.sqlite'
+    declaration, elapsed = build.prepare_membership(source, output, spec)
+    manifest = {'snapshot': spec, 'lexical_membership': declaration}
+    assert declaration['rows'] == 2 and elapsed > 0
+    assert acceptance.validate_prepared_membership(output, manifest) == 2
+    from contextlib import closing
+    with closing(sqlite3.connect(output)) as c:
+        assert c.execute('SELECT * FROM members ORDER BY fts_rowid').fetchall() == [(500,1,20),(501,1,20)]
+    with pytest.raises(ValueError, match='destination exists'):
+        build.prepare_membership(source, output, spec)
+    bad = copy.deepcopy(manifest)
+    bad['lexical_membership']['rows'] = 3
+    with pytest.raises(ValueError, match='metadata mismatch'):
+        acceptance.validate_prepared_membership(output,bad)
+    moved = tmp_path / 'moved-members.sqlite'
+    output.rename(moved)
+    moved.rename(output)
+    from contextlib import closing
+    with closing(sqlite3.connect(output)) as c, c:
+        c.execute("UPDATE members SET entry_id='not-an-integer' WHERE fts_rowid=500")
+    with pytest.raises(ValueError, match='rows mismatch'):
+        acceptance.validate_prepared_membership(output,manifest)
+
+
 def test_execute_connects_real_builder_and_manifest(tmp_path, monkeypatch):
     snapshot = tmp_path / 'snapshot.sqlite'
     snapshot.write_bytes(b'fixture')

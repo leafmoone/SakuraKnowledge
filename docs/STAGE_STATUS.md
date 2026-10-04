@@ -1,6 +1,125 @@
 # Current stage status
 
-## Current round: PARTIAL / BLOCKED_FULL_BM25_DEADLINE
+## Current round: PARTIAL / RUNTIME_PASS / QUALITY_FAIL
+
+Baseline `5c8526e8444e8bf7c6f1742998733180621b6555`; ordinary `dev` delivery only.
+Explicit prepared membership and rank-cursor BM25 now run the unchanged FULL
+workload under its existing five-second deadline. **FULL acceptance failed the
+frozen semantic quality gate.** No gold, formula, corpus, ANN, embedding, source
+trust, or deadline was changed to obtain a pass.
+
+### Prepared asset and exact retrieval semantics
+
+`tools/p4_full_build.py --prepare-lexical --existing-pack <pack> --output <new-pack>`
+builds a rebuildable SQLite membership artifact only during explicit prepare.
+Normal Rust open checks and loads it; missing, mismatched, corrupt or legacy
+unprepared packs require explicit prepare, never a startup/query fallback scan.
+Each valid original FTS row is stored as integer `(fts_rowid, entry_id, document_id)`;
+original joins, text equality and trust qualify membership. Distinct valid FTS
+rows for the same document remain separate. Metadata/schema/integrity, unique
+rowid, integer IDs, actual row count, rule version and snapshot size/SHA binding
+are checked independently. The new pack references unchanged immutable assets
+and is published via exclusively owned staging with no overwrite.
+
+Rank SQL is `SELECT rowid,rank FROM search_fts WHERE search_fts MATCH ?1 AND
+rank MATCH 'bm25()' ORDER BY rank`. Original MATCH/OR/tokenization/corpus/BM25
+weights remain. Actual FTS rowid membership filters the cursor; bounded document
+row top-100 preserves original kind/namespace/value/document_id ties. All equal
+100th-score rows are traversed until strictly worse/end, with no fixed oversample,
+filtered LIMIT, or premature entry deduplication. Only selected top-100 rows get
+original strict source/evidence output validation. Ineligible and discarded
+low-priority boundary rows cannot introduce new output errors; erroneous selected
+rows still fail. SQL and loops share the unchanged overall deadline. Read-only
+real-snapshot EXPLAIN returned `SCAN search_fts VIRTUAL TABLE INDEX 32:rM3` without
+a temp sorting B-tree. Fixture equality checks complete original JSON output,
+including `chunk_id: null`, displaced rowids, duplicate valid rows, wrong-row
+membership, hundreds of boundary ties and selected/discarded source errors.
+
+### Real execution, failures and publication
+
+New candidate: `build/p4-prepared-lexical-5c8526e-v1/manifest.json`, 28,074 bytes,
+SHA256 `f3e04c68a1ec424706881d5a854ca8f86a8ef8698684b83082dd5dc65803f9fe`.
+Membership: `lexical-membership.sqlite`, 20,799,488 bytes, 1,295,638 FTS rows,
+SHA256 `e4fe2806e3aead3df4098803ed633e8eced87f2cda42ad733b0b60678bc7773a`.
+Snapshot remains 21,718,736,896 bytes, SHA256
+`61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9`.
+Executed release binary `build/p4-usearch-native-fix/rust-target/release/semantic_pilot.exe`:
+19,407,056 bytes, SHA256
+`9a808c80868db4a943a0003cef94570ef5d822ebc1a6b4e83770f225f356ba3e`.
+
+Execution was serialized, with verified UTF-8 environment and retained stderr.
+First prepare failed before FTS scan at cross-drive ORT DLL relativization;
+fix preserves only the already authorized absolute DLL binding. Second prepare
+completed/committed the derived asset, then Windows publication failed because
+SQLite contexts did not close handles; cleanup also failed and masked the first
+error. Fixed explicit connection closing and preserving primary exceptions with
+cleanup notes. Its owned failed staging remains at
+`build/p4-prepared-lexical-5c8526e-v1.staging-ln_7b1zb/`.
+With explicit authorization, recovery checked actual schema/integrity/meta/count
+and content SHA, copied only that known completed derived asset and small manifest
+into new exclusive staging, then published and validated the new candidate.
+Evidence: `build/p4-prepared-lexical-5c8526e-diagnostic-v3/recovery.json`.
+This was **explicit recovery, not a fresh successful prepare**. Current prepare
+scan time is **NOT_RECORDED**; do not substitute prior-round scan timing. Asset
+hash/guard elapsed time is also NOT_RECORDED; fresh-process guards were necessary
+after failures, while the final diagnostic/formal process shared one session.
+Original candidate and failed directories remain. Diagnostic v1/v2 did not query;
+v3 engine open failed a second legacy seven-role closed-set check before query.
+Its stderr retains `FULL artifact closed set mismatch`; this is not P4-003 query
+failure. The formal validation entry now has a prepared-role fixture.
+
+### Independent diagnostic and frozen formal results
+
+Actual command used existing `evaluate(...existing_pack=True, verified_session=session,
+diagnostic_case='P4-003')`, then only on diagnostic PASS
+`evaluate(...existing_pack=True, verified_session=session)` in the same process.
+New evidence directories:
+- `build/p4-prepared-lexical-5c8526e-diagnostic-v4/`: independent P4-003 PASS,
+  startup wall 2,654.4294 ms/internal 2,319.0394 ms/membership load 261.6206 ms;
+  query wall 1,419.9333 ms/internal total 1,412.2051 ms;
+  ANN index search 29.7632 ms, dense mapping 14.7675 ms,
+  BM25 1,218.9774 ms, pins 2.8573 ms, fusion/evidence 70.7941 ms.
+  Cursor rows 101, eligible rows 100, extra boundary ties 0. Cursor read count
+  includes the first strictly worse row used to terminate.
+- `build/p4-prepared-lexical-5c8526e-evaluation-v1/`: two warmups PASS;
+  **120/120 formal runtime/source/typed-identity PASS**, zero timeout/nonzero child
+  exits, child exit 0. Parent command exit **1** because quality gate is FAIL.
+  Startup wall 2,423.4557 ms/internal 2,394.9019 ms; membership load 259.7551 ms.
+  Formal wall min/median/nearest-rank p95/max:
+  156.7592 / 466.0806 / 961.2627 / 1,265.9187 ms.
+
+| Frozen subset/metric | Lexical baseline | Final | Gate target | Result |
+| --- | ---: | ---: | ---: | --- |
+| lexical (30), Recall@10 | .8 | 1 | .7666666667 | PASS |
+| lexical, MRR@10 | .6481481481 | .9777777778 | .6181481481 | PASS |
+| lexical, nDCG@10 | .6862202839 | .9833333333 | .6562202839 | PASS |
+| semantic (40), Recall@10 | .95 | .925 | 1 | **FAIL** |
+| semantic, MRR@10 | .8660714286 | .8475 | .8660714286 | **FAIL** |
+| semantic, nDCG@10 | .8862850007 | .8666623719 | .8862850007 | **FAIL** |
+| crosslingual (30), Recall@10 | .0666666667 | .6 | .1666666667 | PASS |
+| crosslingual, MRR@10 | .0666666667 | .3203571429 | .0666666667 | PASS |
+| crosslingual, nDCG@10 | .0666666667 | .3882281914 | .0666666667 | PASS |
+
+Overall identity-promotion errors 0/120 and negative identity-promotion errors
+0/10; negative-query nonempty return ratio 1.0 does **not** mean negative quality
+success. The saved raw report's `total_quality: NOT_RUN` is an accounting bug:
+its actual `quality_gate.status: FAIL` and all gates were computed. Raw evidence
+is preserved unchanged; runner is corrected for future output. Exact-dense FULL
+oracle/overlap remains independently **NOT_RUN**, as does RSS measurement. Memory
+payload/allocation are not measured RSS: FTS 31,095,312/50,331,648 bytes; deduplicated
+entry/document membership 20,730,208/20,730,208 bytes. No repeat formal run, quality
+parameter tuning, full Python suite, legacy 206 rerun, or ANN probe was performed.
+
+### Directed checks
+
+Rust semantic tests: 32 library + 2 dependency-probe + 1 main PASS; release build
+PASS. Directed Python checks: **119 passed, 4 skipped in 7.45s** (Windows symlink
+privilege skips), Ruff `src tests tools` PASS and `git diff --check` PASS, exit 0.
+Additional Windows rename-after-prepare/validate fixture confirms derived handles
+close; cleanup failure fixture preserves the primary error and unrelated staging.
+No integration or full human source-fact review is claimed.
+
+## Previous round: PARTIAL / BLOCKED_FULL_BM25_DEADLINE
 
 Baseline `37318ebeb6812a1df1a4a1adeeafbc891854207a`, current `dev`.
 The newly authorized engine-lifetime FULL membership index removed repeated pin

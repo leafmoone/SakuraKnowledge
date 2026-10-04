@@ -7,6 +7,7 @@ import math
 import os
 import sqlite3
 import subprocess
+import sys
 import tempfile
 import time
 from collections import Counter
@@ -914,16 +915,116 @@ def existing_assets(*, output, session=None):
             session.close()
 
 
+def prepare_membership(snapshot, destination, spec):
+    """Explicit rebuildable FTS-row membership; input snapshot is readonly."""
+    import sqlite3
+    from contextlib import closing
+    start = time.perf_counter()
+    sql = ("SELECT f.rowid,e.id,d.id FROM search_fts f CROSS JOIN documents d ON d.id=f.document_id "
+           "CROSS JOIN entries e ON e.id=d.entry_id WHERE f.entry_id=e.id AND f.text=d.search_text "
+           "AND e.conflicted=0 AND d.status IN ('source_backed','generated_from_evidence') "
+           "AND e.kind!='episode' AND EXISTS(SELECT 1 FROM entry_evidence v "
+           "WHERE v.entry_id=e.id AND v.status='source_backed')")
+    require(not destination.exists(), 'membership destination exists')
+    with full.readonly(snapshot) as source, closing(sqlite3.connect(destination)) as target, target:
+        target.executescript('CREATE TABLE meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);'
+                             'CREATE TABLE members(fts_rowid INTEGER PRIMARY KEY,entry_id INTEGER NOT NULL,document_id INTEGER NOT NULL);')
+        rows = 0
+        for row in source.execute(sql):
+            require(all(type(x) is int for x in row), 'membership integer IDs required')
+            target.execute('INSERT INTO members VALUES(?,?,?)', row)
+            rows += 1
+        require(rows > 0, 'empty FULL membership')
+        declaration = {'version': 'p4-full-membership-v1', 'snapshot_sha256': spec['sha256'],
+                       'snapshot_size': spec['size'], 'rows': rows}
+        target.executemany('INSERT INTO meta VALUES(?,?)',
+                           [(key, str(value)) for key, value in declaration.items()])
+    return declaration, (time.perf_counter() - start) * 1000
+
+
+def rebase_prepared_binding(record, source, target, *, external_dll=False):
+    raw = Path(record['path'])
+    if raw.is_absolute():
+        require(external_dll, 'unknown external prepared asset')
+        record['path'] = str(raw.resolve(strict=True))
+    else:
+        resolved = (source / raw).resolve(strict=True)
+        record['path'] = Path(os.path.relpath(resolved, target)).as_posix()
+
+
+def prepare_lexical(*, existing_pack, output, session=None):
+    """Publish a new pack; never prepare during normal engine open/query."""
+    import copy
+    import shutil
+    start = time.perf_counter()
+    source = full.controlled_path(ROOT / existing_pack, ROOT)
+    manifest = read_json(source / 'manifest.json')
+    require(manifest['pack_version'] == 'p4-full-existing-assets-v1', 'existing-assets source pack required')
+    target = full.controlled_path(ROOT / output, ROOT, strict=False)
+    require(not target.exists(), 'prepared output exists')
+    target.parent.mkdir(parents=True, exist_ok=True)
+    owned = session is None
+    session = session or acceptance.AcceptanceSession()
+    stage = None
+    try:
+        acceptance.validate_full_manifest(manifest, read_json(full.FULL_CONTRACT), pack_root=source, session=session)
+        stage = Path(tempfile.mkdtemp(prefix=target.name + '.staging-', dir=target.parent))
+        value = copy.deepcopy(manifest)
+        value['pack_version'] = 'p4-full-prepared-lexical-v1'
+        rebase_prepared_binding(value['snapshot'], source, target)
+        for role, records in value['artifacts'].items():
+            for record in records if role == 'external_data' else [records]:
+                rebase_prepared_binding(record, source, target, external_dll=role == 'ort_dll')
+        spec = read_json(full.FULL_CONTRACT)['snapshot']
+        with session.guard([(full.contained(spec['path'], ROOT), spec, 'snapshot')]):
+            declaration, scan_ms = prepare_membership(full.contained(spec['path'], ROOT), stage / 'lexical-membership.sqlite', spec)
+            value['lexical_membership'] = declaration
+            value['artifacts']['lexical_membership'] = binding(stage / 'lexical-membership.sqlite', stage)
+            save_new(stage / 'manifest.json', value)
+            acceptance.validate_prepared_membership(stage / 'lexical-membership.sqlite', value)
+            dll = acceptance.approved_full_dll()
+            staged_records = acceptance._verify_inventory(
+                value['artifacts'], stage, expected_dll=(dll['size'], dll['sha256']), prepared=True)
+            acceptance._verify_existing_roles(staged_records)
+            require(not target.exists(), 'prepared output exists')
+            stage.rename(target)
+            stage = None
+            acceptance.validate_full_manifest(value, read_json(full.FULL_CONTRACT), pack_root=target, session=session)
+        return {'manifest': value, 'prepare_ms': scan_ms, 'total_ms': (time.perf_counter() - start) * 1000}
+    finally:
+        primary = sys.exception()
+        if stage is not None:
+            try:
+                shutil.rmtree(stage)
+            except Exception as cleanup:
+                if primary is None:
+                    raise
+                primary.add_note(f'owned staging cleanup failed: {cleanup}')
+        if owned:
+            try:
+                session.close()
+            except Exception as cleanup:
+                if primary is None:
+                    raise
+                primary.add_note(f'acceptance session cleanup failed: {cleanup}')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', help='readiness receipt destination (default: stdout)')
     parser.add_argument('--execute', action='store_true', help='run the supported ordinary builder lifecycle')
     parser.add_argument('--synthetic', action='store_true', help='run the supported synthetic lifecycle')
     parser.add_argument('--existing-assets', action='store_true', help='validate and reference existing FULL assets without rebuilding')
+    parser.add_argument('--prepare-lexical', action='store_true')
+    parser.add_argument('--existing-pack')
     args = parser.parse_args()
-    if sum((args.execute, args.synthetic, args.existing_assets)) > 1:
+    if sum((args.execute, args.synthetic, args.existing_assets, args.prepare_lexical)) > 1:
         parser.error('execution modes are mutually exclusive')
-    if args.existing_assets:
+    if args.prepare_lexical:
+        if not (args.output and args.existing_pack):
+            parser.error('--prepare-lexical requires --existing-pack and new --output')
+        result = prepare_lexical(existing_pack=args.existing_pack, output=args.output)
+    elif args.existing_assets:
         if not args.output:
             parser.error('--existing-assets requires a new --output directory')
         result = existing_assets(output=args.output)

@@ -231,6 +231,8 @@ def _verify_existing_roles(records):
     exported = json.loads(export.read_bytes())['files']
     for path, record, role in records:
         resolved = _artifact_path(path, role, record)
+        if role == 'lexical_membership':
+            continue
         if role in ('index', 'mapping', 'corpus'):
             expected = assets['existing_full_assets'][role]
             expected_path = ROOT / expected['path']
@@ -253,9 +255,9 @@ def _verify_existing_roles(records):
                 'existing product role binding mismatch')
 
 
-def _verify_inventory(artifacts, pack_root, *, expected_dll):
+def _verify_inventory(artifacts, pack_root, *, expected_dll, prepared=False):
     """Bindings are relative to the pack, but containment authority is Knowledge ROOT."""
-    require(isinstance(artifacts, dict) and set(artifacts) == ARTIFACTS,
+    require(isinstance(artifacts, dict) and set(artifacts) == (ARTIFACTS | {'lexical_membership'} if prepared else ARTIFACTS),
             'exact FULL artifact inventory required (no sidecar)')
     external = artifacts['external_data']
     require(isinstance(external, list) and external, 'nonempty external_data required')
@@ -264,11 +266,13 @@ def _verify_inventory(artifacts, pack_root, *, expected_dll):
     require(root.resolve(strict=True).is_relative_to(Path(ROOT).resolve(strict=True)) and
             root.is_dir(), 'controlled pack root required')
     records, seen = [], set()
-    inventory = [(key, artifacts[key]) for key in sorted(ARTIFACTS - {'external_data'})]
+    inventory = [(key, artifacts[key]) for key in sorted(set(artifacts) - {'external_data'})]
     inventory.extend(('external_data', binding) for binding in external)
     for kind, binding in inventory:
         _binding(binding)
         name = Path(binding['path'])
+        if kind == 'lexical_membership':
+            require(name.as_posix() == 'lexical-membership.sqlite', 'local prepared membership required')
         require(not name.is_absolute() or kind == 'ort_dll', 'inventory path escape')
         path = _artifact_path(root / name, kind, binding)
         require(path not in seen, 'duplicate inventory path')
@@ -305,13 +309,48 @@ def validate_full_manifest(manifest, contract, *, pack_root, session=None):
     require('lexical_metadata' not in manifest and 'full_declaration' not in manifest,
             'FULL pilot sidecar/metadata forbidden')
     approved_dll = approved_full_dll()
+    prepared = manifest.get('pack_version') == 'p4-full-prepared-lexical-v1'
     records = _verify_inventory(manifest.get('artifacts'), pack_root,
-                                expected_dll=(approved_dll['size'], approved_dll['sha256']))
-    if manifest.get('pack_version') == 'p4-full-existing-assets-v1':
+                                expected_dll=(approved_dll['size'], approved_dll['sha256']), prepared=prepared)
+    if manifest.get('pack_version') in ('p4-full-existing-assets-v1', 'p4-full-prepared-lexical-v1'):
         _verify_existing_roles(records)
     with _inventory_guard([(canonical, canonical_binding, 'canonical'),
                            (snapshot, spec, 'snapshot'), *records], session):
+        if prepared:
+            validate_prepared_membership(Path(pack_root) / 'lexical-membership.sqlite', manifest)
         return rows
+
+
+def validate_prepared_membership(path, manifest):
+    import sqlite3
+    from contextlib import closing
+    declaration = manifest.get('lexical_membership', {})
+    snapshot = manifest['snapshot']
+    require(set(declaration) == {'version', 'snapshot_sha256', 'snapshot_size', 'rows'} and
+            declaration['version'] == 'p4-full-membership-v1' and
+            declaration['snapshot_sha256'] == snapshot['sha256'] and
+            declaration['snapshot_size'] == snapshot['size'] and
+            type(declaration['rows']) is int and declaration['rows'] > 0,
+            'membership metadata mismatch: run explicit prepare-lexical')
+    with closing(sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True)) as conn:
+        require(conn.execute('PRAGMA integrity_check').fetchall() == [('ok',)],
+                'membership corrupt: run explicit prepare-lexical')
+        tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()
+        require(tables == [('members',), ('meta',)], 'membership schema mismatch')
+        expected = {'version': declaration['version'], 'snapshot_sha256': snapshot['sha256'],
+                    'snapshot_size': str(snapshot['size']), 'rows': str(declaration['rows'])}
+        require(conn.execute('PRAGMA table_info(meta)').fetchall() ==
+                [(0, 'key', 'TEXT', 0, None, 1), (1, 'value', 'TEXT', 1, None, 0)],
+                'membership meta schema mismatch')
+        metadata = conn.execute('SELECT key,value FROM meta').fetchall()
+        require(len(metadata) == 4 and dict(metadata) == expected, 'membership metadata mismatch')
+        require(conn.execute('PRAGMA table_info(members)').fetchall() ==
+                [(0, 'fts_rowid', 'INTEGER', 0, None, 1), (1, 'entry_id', 'INTEGER', 1, None, 0),
+                 (2, 'document_id', 'INTEGER', 1, None, 0)], 'membership schema mismatch')
+        count, bad = conn.execute("SELECT count(*),coalesce(sum(typeof(fts_rowid)!='integer' OR "
+                                 "typeof(entry_id)!='integer' OR typeof(document_id)!='integer'),0) FROM members").fetchone()
+        require(count == declaration['rows'] and bad == 0, 'membership rows mismatch')
+    return count
 
 
 def _key(entry):

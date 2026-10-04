@@ -301,7 +301,7 @@ fn full_paths(
     let artifacts = manifest["artifacts"]
         .as_object()
         .ok_or("invalid artifacts")?;
-    let expected: BTreeSet<_> = [
+    let mut expected: BTreeSet<_> = [
         "model",
         "tokenizer",
         "ort_dll",
@@ -312,6 +312,7 @@ fn full_paths(
     ]
     .into_iter()
     .collect();
+    if manifest["pack_version"] == "p4-full-prepared-lexical-v1" { expected.insert("lexical_membership"); }
     require(
         artifacts
             .keys()
@@ -331,7 +332,7 @@ fn full_paths(
     } else {
         proof
     };
-    if manifest["pack_version"] == "p4-full-existing-assets-v1" {
+    if manifest["pack_version"] == "p4-full-existing-assets-v1" || manifest["pack_version"] == "p4-full-prepared-lexical-v1" {
         let assets: Value = serde_json::from_str(CURRENT_ASSETS)?;
         for role in ["index", "mapping", "corpus"] {
             let expected = &assets["existing_full_assets"][role];
@@ -352,7 +353,10 @@ fn full_paths(
         if kind == "external_data" {
             continue;
         }
-        let path = full_artifact(repository, root, kind, binding, proof)?;
+        let path = if kind == "lexical_membership" {
+            require(manifest["pack_version"] == "p4-full-prepared-lexical-v1", "run explicit prepare-lexical")?;
+            artifact(root, binding)?
+        } else { full_artifact(repository, root, kind, binding, proof)? };
         require(
             seen.insert(path.clone()),
             "duplicate resolved FULL artifact path",
@@ -566,7 +570,7 @@ fn validate_manifest(v: &Value) -> Result<()> {
     )?;
     if m == Mode::Full {
         let artifacts = v["artifacts"].as_object().ok_or("invalid artifacts")?;
-        let expected: BTreeSet<_> = [
+        let mut expected: BTreeSet<_> = [
             "model",
             "tokenizer",
             "ort_dll",
@@ -577,6 +581,11 @@ fn validate_manifest(v: &Value) -> Result<()> {
         ]
         .into_iter()
         .collect();
+        if v["pack_version"] == "p4-full-prepared-lexical-v1" {
+            expected.insert("lexical_membership");
+            validate_binding(&artifacts["lexical_membership"])?;
+            require(artifacts["lexical_membership"]["path"] == "lexical-membership.sqlite", "local membership required")?;
+        }
         require(
             artifacts
                 .keys()
@@ -734,6 +743,7 @@ pub struct SemanticEngine {
     mode: Mode,
     rows: usize,
     full_members: Vec<(i64, i64)>,
+    fts_members: Vec<(i64,i64,i64)>,
     pub open_timings_ms: Value,
 }
 impl SemanticEngine {
@@ -810,7 +820,12 @@ impl SemanticEngine {
             lexical.prepare("SELECT text,document_id,entry_id FROM search_fts LIMIT 0")?;
         }
         let member_start = Instant::now();
-        let full_members = if mode == Mode::Full { load_full_members(&base)? } else { Vec::new() };
+        let fts_members = if mode == Mode::Full {
+            require(manifest["pack_version"] == "p4-full-prepared-lexical-v1", "FULL membership missing: run explicit prepare-lexical")?;
+            load_prepared_members(&paths["lexical_membership"], &manifest)?
+        } else { Vec::new() };
+        let mut full_members: Vec<_> = fts_members.iter().map(|&(_,e,d)| (e,d)).collect();
+        full_members.sort_unstable(); full_members.dedup();
         let membership_ms = ms(member_start);
         let mapping = readonly(&paths["mapping"])?;
         validate_mapping(&mapping, rows)?;
@@ -864,7 +879,10 @@ impl SemanticEngine {
         )?;
         index.change_expansion_search(128);
         require(index.expansion_search() == 128, "ef_search mismatch")?;
-        let open_timings_ms = json!({"metadata":metadata_ms,"tokenizer":tokenizer_ms,"ort":ort_ms,"ann":ms(start),"total":ms(total),"membership_scan":membership_ms,
+        let open_timings_ms = json!({"metadata":metadata_ms,"tokenizer":tokenizer_ms,"ort":ort_ms,"ann":ms(start),"total":ms(total),"membership_load":membership_ms,
+            "fts_membership_count":fts_members.len(),
+            "fts_membership_payload_bytes":fts_members.len() * 24,
+            "fts_membership_allocation_bytes":fts_members.capacity() * 24,
             "membership_count":full_members.len(),
             "membership_payload_bytes":full_members.len() * std::mem::size_of::<(i64,i64)>(),
             "membership_allocation_bytes":full_members.capacity() * std::mem::size_of::<(i64,i64)>()});
@@ -879,6 +897,7 @@ impl SemanticEngine {
             mode,
             rows,
             full_members,
+            fts_members,
             open_timings_ms,
         })
     }
@@ -930,6 +949,8 @@ impl SemanticEngine {
             512
         };
         let matches = self.index.search(&vector, depth)?;
+        let index_search_ms = ms(start);
+        let mapping_start = Instant::now();
         let dense = dense_hits_for(
             &self.mapping,
             &matches.keys,
@@ -937,13 +958,15 @@ impl SemanticEngine {
             self.rows,
             self.mode,
         ).map_err(|e| format!("dense_mapping: {e}; tokenize_ms={tokenize_ms}; ort_ms={ort_ms}; total_ms={}", ms(total)))?;
+        let dense_mapping_ms = ms(mapping_start);
         let ann_ms = ms(start);
         let start = Instant::now();
         let mut lexical_stages = (0.0, 0.0);
+        let mut lexical_work = (0usize,0usize,0usize);
         let (lexical, pins) = if self.mode == Mode::Pilot {
             lexical_hits(&self.lexical, query, &compiled)?
         } else {
-            full_lexical_hits_cached(&self.lexical, query, &compiled, &self.full_members, &mut lexical_stages).map_err(|e|
+            full_lexical_hits_ranked(&self.lexical, query, &compiled, &self.full_members, &self.fts_members, total, &mut lexical_stages, &mut lexical_work).map_err(|e|
                 format!("full_lexical: {e}; tokenize_ms={tokenize_ms}; ort_ms={ort_ms}; ann_ms={ann_ms}; lexical_ms={}; total_ms={}", ms(start), ms(total)))?
         };
         let bm25_ms = ms(start);
@@ -1024,7 +1047,8 @@ impl SemanticEngine {
         let fusion_ms = ms(start);
         let elapsed = ms(total);
         require(elapsed <= 5000.0, "query_budget_exceeded")?;
-        result["timings_ms"] = json!({"tokenize":tokenize_ms,"ort":ort_ms,"ann":ann_ms,"bm25":bm25_ms,"pins_sql":lexical_stages.0,"bm25_sql":lexical_stages.1,"fusion_evidence":fusion_ms,"total":elapsed});
+        result["timings_ms"] = json!({"tokenize":tokenize_ms,"ort":ort_ms,"ann":ann_ms,"index_search":index_search_ms,"dense_mapping":dense_mapping_ms,"bm25":bm25_ms,"pins_sql":lexical_stages.0,"bm25_sql":lexical_stages.1,"fusion_evidence":fusion_ms,"total":elapsed});
+        result["lexical_work"] = json!({"cursor_rows":lexical_work.0,"eligible_rows":lexical_work.1,"boundary_ties":lexical_work.2});
         Ok(result)
     }
 }
@@ -1178,14 +1202,55 @@ fn lexical_hits(c: &Connection, q: &str, compiled: &str) -> Result<(Vec<Value>, 
 }
 // Exact p4_corpus.TRUST; source/evidence resolution is a separate output check.
 // Raw document depth is applied before entry deduplication in fuse.
+#[cfg(test)]
 const FULL_DOCUMENT_TRUST: &str = "e.conflicted=0
  AND d.status IN ('source_backed','generated_from_evidence')
  AND e.kind!='episode'
  AND EXISTS (SELECT 1 FROM entry_evidence v
              WHERE v.entry_id=e.id AND v.status='source_backed')";
+fn load_prepared_members(path: &Path, manifest: &Value) -> Result<Vec<(i64,i64,i64)>> {
+    require(manifest["artifacts"]["lexical_membership"]["path"] == "lexical-membership.sqlite", "local membership required: run explicit prepare-lexical")?;
+    let bytes = std::fs::read(path)?;
+    require(sha256(&bytes) == text(&manifest["artifacts"]["lexical_membership"],"sha256")?, "membership digest mismatch: run explicit prepare-lexical")?;
+    let c = readonly(path)?;
+    let integrity: String = c.query_row("PRAGMA integrity_check",[],|r| r.get(0))?;
+    require(integrity == "ok", "membership corrupt: run explicit prepare-lexical")?;
+    let tables: Vec<String> = c.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")?.query_map([],|r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
+    require(tables == ["members","meta"], "membership schema mismatch: run explicit prepare-lexical")?;
+    let columns: Vec<(String,String,i64,i64)> = c.prepare("PRAGMA table_info(members)")?.query_map([],|r| Ok((r.get(1)?,r.get(2)?,r.get(3)?,r.get(5)?)))?.collect::<rusqlite::Result<_>>()?;
+    require(columns == [("fts_rowid".into(),"INTEGER".into(),0,1),("entry_id".into(),"INTEGER".into(),1,0),("document_id".into(),"INTEGER".into(),1,0)], "membership schema mismatch: run explicit prepare-lexical")?;
+    let meta_columns: Vec<(String,String,i64,i64)> = c.prepare("PRAGMA table_info(meta)")?.query_map([],|r| Ok((r.get(1)?,r.get(2)?,r.get(3)?,r.get(5)?)))?.collect::<rusqlite::Result<_>>()?;
+    require(meta_columns == [("key".into(),"TEXT".into(),0,1),("value".into(),"TEXT".into(),1,0)], "membership meta schema: run explicit prepare-lexical")?;
+    let meta_count: i64 = c.query_row("SELECT count(*) FROM meta",[],|r| r.get(0))?;
+    require(meta_count == 4, "membership meta keys: run explicit prepare-lexical")?;
+    let mut stmt = c.prepare("SELECT key,value FROM meta ORDER BY key")?;
+    let meta: BTreeMap<String,String> = stmt.query_map([],|r| Ok((r.get(0)?,r.get(1)?)))?.collect::<rusqlite::Result<_>>()?;
+    let declaration = &manifest["lexical_membership"];
+    let rows = declaration["rows"].as_u64().ok_or("membership rows: run explicit prepare-lexical")?;
+    let expected = BTreeMap::from([
+        ("version".to_owned(),"p4-full-membership-v1".to_owned()),
+        ("snapshot_sha256".to_owned(),text(&manifest["snapshot"],"sha256")?.to_owned()),
+        ("snapshot_size".to_owned(),manifest["snapshot"]["size"].as_u64().ok_or("snapshot size")?.to_string()),
+        ("rows".to_owned(),rows.to_string())]);
+    require(meta == expected && declaration["version"] == "p4-full-membership-v1" &&
+        declaration["snapshot_sha256"] == manifest["snapshot"]["sha256"] &&
+        declaration["snapshot_size"] == manifest["snapshot"]["size"], "membership binding mismatch: run explicit prepare-lexical")?;
+    let mut stmt = c.prepare("SELECT fts_rowid,entry_id,document_id FROM members ORDER BY fts_rowid")?;
+    let mut cursor = stmt.query([])?;
+    let mut members = Vec::new();
+    while let Some(row) = cursor.next()? {
+        let item: (i64,i64,i64) = (row.get(0)?,row.get(1)?,row.get(2)?);
+        require(members.last().is_none_or(|&(id,_,_)| id < item.0), "membership duplicate/order: run explicit prepare-lexical")?;
+        members.push(item);
+    }
+    require(members.len() as u64 == rows, "membership row count mismatch: run explicit prepare-lexical")?;
+    Ok(members)
+}
+#[cfg(test)]
 fn full_members_sql() -> String {
     format!("SELECT e.id,d.id FROM search_fts f CROSS JOIN documents d ON d.id=f.document_id CROSS JOIN entries e ON e.id=d.entry_id WHERE f.entry_id=e.id AND f.text=d.search_text AND {FULL_DOCUMENT_TRUST}")
 }
+#[cfg(test)]
 fn load_full_members(c: &Connection) -> Result<Vec<(i64,i64)>> {
     let mut stmt = c.prepare(&full_members_sql())?;
     let mut cursor = stmt.query([])?;
@@ -1213,6 +1278,56 @@ fn validate_full_document(c: &Connection, did: &str, eid: i64) -> Result<()> {
     let ok: bool = c.query_row(&sql, params![did, eid], |r| r.get(0))?;
     require(ok, "untrusted FULL document")
 }
+fn full_lexical_hits_ranked(c: &Connection, q: &str, compiled: &str, members: &[(i64,i64)], fts: &[(i64,i64,i64)], deadline: Instant, stages: &mut (f64,f64), work: &mut (usize,usize,usize)) -> Result<(Vec<Value>,Vec<Value>)> {
+    let start = Instant::now();
+    let sql = "SELECT DISTINCT e.kind AS kind,e.namespace AS namespace,e.value AS value,'exact' AS match,v.source_id AS source_id,v.evidence_id AS evidence_id,e.id AS entry_id FROM entries e JOIN entry_evidence v ON v.entry_id=e.id JOIN sources s ON s.source_id=v.source_id WHERE e.value=?1 AND v.status='source_backed' AND length(trim(v.evidence_id))>0 UNION SELECT DISTINCT e.kind,e.namespace,e.value,'alias',a.source_id,a.evidence_id,e.id FROM entries e JOIN aliases a ON a.entry_id=e.id JOIN sources s ON s.source_id=a.source_id WHERE a.text=?1 AND a.status='source_backed' AND length(trim(a.evidence_id))>0 ORDER BY kind,namespace,value,match,source_id,evidence_id";
+    let mut pins_stmt = c.prepare_cached(sql)?;
+    let pins = read_pins_cached(&mut pins_stmt,q,Some(members))?;
+    stages.0 = ms(start);
+    let start = Instant::now();
+    let hits = rank_full_hits(c,compiled,fts,deadline,work).map_err(|e| format!("rank cursor: {e}; pins_ms={}; cursor_ms={}",stages.0,ms(start)))?;
+    stages.1 = ms(start);
+    Ok((hits,pins))
+}
+fn rank_full_hits(c: &Connection, compiled: &str, fts: &[(i64,i64,i64)], deadline: Instant, work: &mut (usize,usize,usize)) -> Result<Vec<Value>> {
+    if compiled.is_empty() { return Ok(Vec::new()); }
+    let mut stmt = c.prepare_cached("SELECT rowid,rank FROM search_fts WHERE search_fts MATCH ?1 AND rank MATCH 'bm25()' ORDER BY rank")?;
+    let mut cursor = stmt.query([compiled])?;
+    let mut metadata = c.prepare_cached("SELECT kind,namespace,value FROM entries WHERE id=?")?;
+    let mut chosen: Vec<(f64,String,String,String,i64,i64)> = Vec::new();
+    let mut read = 0usize; let mut eligible = 0usize; let mut ties = 0usize;
+    while let Some(row) = cursor.next()? {
+        read += 1;
+        require(deadline.elapsed().as_secs_f64() <= 5.0,"query_budget_exceeded rank cursor")?;
+        let id: i64 = row.get(0)?; let score: f64 = row.get(1)?;
+        require(score.is_finite(),"nonfinite FTS rank")?;
+        if chosen.len() == 100 && score > chosen[99].0 { break; }
+        let Ok(pos) = fts.binary_search_by_key(&id, |&(r,_,_)| r) else { continue; };
+        let (_,eid,did) = fts[pos]; eligible += 1;
+        if chosen.len() == 100 && score == chosen[99].0 { ties += 1; }
+        let (kind,namespace,value): (String,String,String) = metadata.query_row([eid],|r| Ok((r.get(0)?,r.get(1)?,r.get(2)?)))?;
+        let candidate = (score,kind,namespace,value,did,eid);
+        let pos = chosen.partition_point(|other| {
+            other.0.total_cmp(&candidate.0).then_with(|| (&other.1,&other.2,&other.3,other.4).cmp(&(&candidate.1,&candidate.2,&candidate.3,candidate.4))).is_le()
+        });
+        chosen.insert(pos,candidate);
+        if chosen.len() > 100 { chosen.pop(); }
+    }
+    let mut result = Vec::new();
+    let mut evidence = c.prepare_cached("SELECT source_id,evidence_id FROM documents WHERE id=? AND entry_id=?")?;
+    for (score,kind,namespace,value,did,eid) in chosen {
+        require(deadline.elapsed().as_secs_f64() <= 5.0,"query_budget_exceeded rank evidence")?;
+        let (source,proof): (String,String) = evidence.query_row(params![did,eid],|r| Ok((r.get(0)?,r.get(1)?)))?;
+        let entry = EntryKey::parse(&json!({"kind":kind,"namespace":namespace,"value":value}))?;
+        let hit = json!({"entry":entry.json(),"rank":result.len()+1,"score":score,"chunk_id":null,"document_id":did.to_string(),"source_id":source,"evidence_id":proof});
+        text(&hit,"source_id")?; text(&hit,"evidence_id")?;
+        result.push(hit);
+    }
+    // Work counters are attached to query telemetry, never obtained with COUNT.
+    *work = (read,eligible,ties);
+    Ok(result)
+}
+#[cfg(test)]
 fn full_lexical_hits_cached(c: &Connection, q: &str, compiled: &str, members: &[(i64,i64)], stages: &mut (f64,f64)) -> Result<(Vec<Value>, Vec<Value>)> {
     let start = Instant::now();
     let sql = "SELECT DISTINCT e.kind AS kind,e.namespace AS namespace,e.value AS value,'exact' AS match,v.source_id AS source_id,v.evidence_id AS evidence_id,e.id AS entry_id FROM entries e JOIN entry_evidence v ON v.entry_id=e.id JOIN sources s ON s.source_id=v.source_id WHERE e.value=?1 AND v.status='source_backed' AND length(trim(v.evidence_id))>0 UNION SELECT DISTINCT e.kind,e.namespace,e.value,'alias',a.source_id,a.evidence_id,e.id FROM entries e JOIN aliases a ON a.entry_id=e.id JOIN sources s ON s.source_id=a.source_id WHERE a.text=?1 AND a.status='source_backed' AND length(trim(a.evidence_id))>0 ORDER BY kind,namespace,value,match,source_id,evidence_id";
@@ -2035,6 +2150,42 @@ mod tests {
             )?;
         }
         Ok(())
+    }
+    #[test]
+    fn prepared_role_passes_formal_manifest_entry_and_requires_local_binding() {
+        let mut v = full_manifest();
+        v["pack_version"] = json!("p4-full-prepared-lexical-v1");
+        v["artifacts"]["lexical_membership"] = json!({"path":"lexical-membership.sqlite","size":4096,"sha256":"a".repeat(64)});
+        validate_manifest(&v).unwrap();
+        v["artifacts"]["lexical_membership"]["path"] = json!("../other.sqlite");
+        assert!(validate_manifest(&v).is_err());
+        v["artifacts"]["lexical_membership"]["path"] = json!("lexical-membership.sqlite");
+        v["pack_version"] = json!("p4-full-existing-assets-v1");
+        assert!(validate_manifest(&v).is_err());
+    }
+    #[test]
+    fn rank_cursor_equals_original_full_depth_and_complete_boundary_ties() {
+        let c = Connection::open_in_memory().unwrap(); native_fixture(&c).unwrap();
+        // Hundreds of boundary ties, duplicate valid rows and an invalid row for the same doc.
+        c.execute_batch("UPDATE search_fts SET rowid=rowid+10000; INSERT INTO search_fts VALUES('alpha',1,1); INSERT INTO search_fts VALUES('alpha',1,2);").unwrap();
+        for id in 200..=700 {
+            c.execute("INSERT INTO documents VALUES(?,2,'Other','alpha','alpha','source_backed','s','d2')",[id]).unwrap();
+            c.execute("INSERT INTO search_fts VALUES('alpha',?,2)",[id]).unwrap();
+        }
+        let sql = format!("SELECT f.rowid,e.id,d.id FROM search_fts f CROSS JOIN documents d ON d.id=f.document_id CROSS JOIN entries e ON e.id=d.entry_id WHERE f.entry_id=e.id AND f.text=d.search_text AND {FULL_DOCUMENT_TRUST} ORDER BY f.rowid");
+        let fts: Vec<(i64,i64,i64)> = c.prepare(&sql).unwrap().query_map([],|r| Ok((r.get(0)?,r.get(1)?,r.get(2)?))).unwrap().collect::<rusqlite::Result<_>>().unwrap();
+        let mut work = (0,0,0);
+        let ranked = rank_full_hits(&c,"\"alpha\"",&fts,Instant::now(),&mut work).unwrap();
+        let original = full_lexical_hits(&c,"","\"alpha\"").unwrap().0;
+        assert_eq!(ranked,original); assert_eq!(ranked.len(),100);
+        assert!(work.2 > 400); assert!(work.0 > work.1);
+        c.execute("UPDATE documents SET evidence_id='' WHERE id=700",[]).unwrap();
+        assert_eq!(rank_full_hits(&c,"\"alpha\"",&fts,Instant::now(),&mut work).unwrap(),original);
+        c.execute("UPDATE documents SET evidence_id='' WHERE id=106",[]).unwrap();
+        assert!(rank_full_hits(&c,"\"alpha\"",&fts,Instant::now(),&mut work).is_err());
+        assert!(full_lexical_hits(&c,"","\"alpha\"").is_err());
+        let plan: Vec<String> = c.prepare("EXPLAIN QUERY PLAN SELECT rowid,rank FROM search_fts WHERE search_fts MATCH ?1 AND rank MATCH 'bm25()' ORDER BY rank").unwrap().query_map(["\"alpha\""],|r| r.get(3)).unwrap().collect::<rusqlite::Result<_>>().unwrap();
+        assert!(!plan.iter().any(|p|p.contains("TEMP B-TREE")),"{plan:?}");
     }
     #[test]
     fn full_members_match_original_sql_with_mismatched_rowids_and_sources() {
