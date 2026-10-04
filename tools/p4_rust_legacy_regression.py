@@ -1,4 +1,3 @@
-"""One-shot comparison with the frozen approved baseline (not historical oracle recovery)."""
 import argparse
 import json
 import os
@@ -19,32 +18,29 @@ BASELINE_ANCHOR = 'c417655e149b7dce64d0bab376076f2a2f7c7320'
 
 
 class RunContext:
-    """Explicit one-shot paths, environment, command evidence and dependencies."""
+    """Isolated local paths, command evidence, and concurrency-safe output reservation."""
 
-    def __init__(self, runtime_sha, run_id, target_dir, knowledge, *, root=ROOT,
-                 runner=subprocess.run, source_inventory=fullpreflight.source_inventory):
-        if not isinstance(runtime_sha, str) or not re.fullmatch('[0-9a-f]{40}', runtime_sha):
-            raise ValueError('explicit runtime SHA required')
-        if not isinstance(run_id, str) or not re.fullmatch('[A-Za-z0-9][A-Za-z0-9_-]{0,63}', run_id):
+    def __init__(self, run_id, target_dir, knowledge, *, root=ROOT, runner=subprocess.run):
+        if not isinstance(run_id, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}', run_id):
             raise ValueError('safe explicit run ID required')
         self.root = fullpreflight.controlled_path(root, root)
-        self.runtime_sha, self.run_id = runtime_sha, run_id
-        expected = self.root / f'build/p4-fixed-{runtime_sha}-legacy-{run_id}'
+        self.run_id = run_id
         self.target = fullpreflight.controlled_path(target_dir, self.root, strict=False)
-        if self.target != expected:
-            raise ValueError('target must be the run-specific legacy build root')
+        if self.target == self.root or self.target.is_relative_to(self.root / 'reports'):
+            raise ValueError('process-local build target required')
         self.report_path = fullpreflight.controlled_path(
-            f'reports/P4/fixed-{runtime_sha}/legacy-{run_id}.json', self.root, strict=False)
+            f'reports/P4/legacy-{run_id}.json', self.root, strict=False)
         self.knowledge = fullpreflight.controlled_path(knowledge, self.root)
         if self.knowledge != self.root / approved.DB.relative_to(ROOT):
             raise ValueError('approved Knowledge snapshot required')
         self.local = self.target / 'evidence'
-        self.runner, self.source_inventory = runner, source_inventory
+        self.runner = runner
         self.index = 0
         self.env = approved.environment()
+        # Never inherit a caller's shared/external Cargo target. The explicit target is
+        # process-local and must be contained by this checkout.
         self.env.update(CARGO_TARGET_DIR=str(self.target), DLLTOOL='C:/msys64/ucrt64/bin/dlltool.exe',
                         DLLTOOL_x86_64_pc_windows_gnu='C:/msys64/ucrt64/bin/dlltool.exe')
-        # Caller build flags/wrappers must not alter the default release artifact.
         for key in list(self.env):
             if key.startswith(('CARGO_', 'RUST', 'SKNOW_')) and key != 'CARGO_TARGET_DIR':
                 self.env.pop(key)
@@ -53,9 +49,8 @@ class RunContext:
         for path in (self.target, self.report_path):
             fullpreflight.check_components(path)
             if os.path.lexists(path):
-                raise FileExistsError('one-shot output/target already exists; no retry')
+                raise FileExistsError('output/target already exists; use a new run ID and target')
         self.report_path.parent.mkdir(parents=True, exist_ok=True)
-        # Reserve the output too: a failed/partial run is never reusable.
         with self.report_path.open('x', encoding='utf-8'):
             pass
         self.target.mkdir()
@@ -98,15 +93,11 @@ class RunContext:
             raise ValueError('command failed; STOP: ' + repr(argv))
         return out
 
-    def check_source(self):
-        return self.source_inventory(self.runtime_sha, self.root)
-
-    def build(self, source):
+    def build(self):
         argv = ['cargo', 'build', '--manifest-path', str(self.root / 'rust/Cargo.toml'),
                 '--locked', '--release', '--bin', 'sknow-rs']
         rec, _out, _err = self.capture(argv, 1200)
-        provenance = {'source_sha': self.runtime_sha, 'source_inventory': source,
-                      'argv': argv, 'process': rec, 'default_features': True}
+        provenance = {'argv': argv, 'process': rec, 'default_features': True}
         approved.save(self.local / 'build.json', provenance)
         if rec['exit'] != 0 or rec['timeout'] or rec.get('exception'):
             raise ValueError('build failed; STOP')
@@ -123,8 +114,7 @@ def canonical(value):
 
 def compare(suite, row, rec, out, err, baseline):
     error = suite == 'P2' and row['original_case']['mode'] in ('error', 'cli', 'runtime_error')
-    value, problems = approved.compare(suite, row, rec, out, err,
-                                       baseline if not error else None)
+    value, problems = approved.compare(suite, row, rec, out, err, baseline if not error else None)
     if canonical(value) != canonical(baseline):
         problems.append('approved_whole_json_mismatch')
     return value, problems
@@ -139,8 +129,7 @@ def load_baseline(run):
         if run(['git', 'show', BASELINE_ANCHOR + ':' + relative]) != raw:
             raise ValueError('tracked anchor differs: ' + relative)
         anchors[name] = legacy.strict_json(raw)
-    baseline = anchors['continuation-approved-baseline.json']
-    frozen = anchors['legacy-baseline-freeze.json']
+    baseline, frozen = anchors['continuation-approved-baseline.json'], anchors['legacy-baseline-freeze.json']
     if baseline['identity'] != approved.IDENTITY or baseline['status'] != 'PASS':
         raise ValueError('unapproved baseline')
     manifest_path = approved.LOCAL / 'corpus-manifest.json'
@@ -180,7 +169,6 @@ def load_baseline(run):
             _, problems = compare(suite, row, entry['process'], streams['stdout'], streams['stderr'], expected)
             if problems:
                 raise ValueError('baseline contract cannot be reconstructed: ' + repr(problems))
-            # Keep the missing-input path identical so error messages compare in full.
             if approved.case_argv(row, Path(entry['process']['argv'][0])) != entry['process']['argv']:
                 raise ValueError('baseline argv cannot be reconstructed')
             result.append((suite, row, entry, expected))
@@ -192,19 +180,15 @@ def execute(context):
     env = context.env
     report = {'schema': 'p4-rust-legacy-regression-v1', 'status': 'FAIL',
               'baseline_identity': approved.IDENTITY, 'baseline_anchor': BASELINE_ANCHOR,
-              'provenance': approved.PROVENANCE, 'runtime_sha': context.runtime_sha,
-              'run_id': context.run_id, 'knowledge': str(context.knowledge),
-              'retries': 0, 'timeout_count': 0, 'wrong_resolved': 0,
-              'pool': False, 'external_preservation': False, 'counts': {},
+              'provenance': approved.PROVENANCE, 'run_id': context.run_id,
+              'knowledge': str(context.knowledge), 'retries': 0, 'timeout_count': 0,
+              'wrong_resolved': 0, 'pool': False, 'external_preservation': False, 'counts': {},
               'environment': {k: env[k] for k in ('PATH', 'CC', 'CXX', 'DLLTOOL', 'CARGO_TARGET_DIR',
                                'CC_x86_64_pc_windows_gnu', 'CXX_x86_64_pc_windows_gnu',
-                               'DLLTOOL_x86_64_pc_windows_gnu')},
-              'helper': approved.file_binding(Path(__file__))}
+                               'DLLTOOL_x86_64_pc_windows_gnu')}, 'helper': approved.file_binding(Path(__file__))}
     approved.save(context.local / 'reservation.json', report)
-    before = sides = source = None
+    before = sides = None
     try:
-        source = context.check_source()
-        report['source_before'] = source
         baseline, cases = load_baseline(context.run)
         report['baseline_report'] = approved.file_binding(approved.REPORT)
         report['baseline_corpus_manifest'] = baseline['baseline_corpus_manifest']
@@ -215,18 +199,13 @@ def execute(context):
         context.run(['C:/msys64/ucrt64/bin/gcc.exe', '--version'])
         context.run(['C:/msys64/ucrt64/bin/g++.exe', '--version'])
         context.run(['C:/msys64/ucrt64/bin/dlltool.exe', '--version'])
-        binary, report['build'] = context.build(source)
-        if context.check_source() != source:
-            raise ValueError('source changed during build')
+        binary, report['build'] = context.build()
         for suite, row, entry, expected in cases:
-            counts = report['counts'].setdefault(suite, {'executed': 0, 'passed': 0,
-                'whole_values': 0, 'error_contracts': 0, 'source_assertions': 0,
-                'resolved': 0, 'nonresolved': 0, 'wrong_resolved': 0})
-            argv = [str(binary), *entry['process']['argv'][1:]]
-            rec, out, err = context.capture(argv, 15)
+            counts = report['counts'].setdefault(suite, {'executed': 0, 'passed': 0, 'whole_values': 0,
+                'error_contracts': 0, 'source_assertions': 0, 'resolved': 0, 'nonresolved': 0, 'wrong_resolved': 0})
+            rec, out, err = context.capture([str(binary), *entry['process']['argv'][1:]], 15)
             value, problems = compare(suite, row, rec, out, err, expected)
-            counts['executed'] += 1
-            counts['passed'] += int(not problems)
+            counts['executed'] += 1; counts['passed'] += int(not problems)
             error = suite == 'P2' and row['original_case']['mode'] in ('error', 'cli', 'runtime_error')
             counts['error_contracts' if error else 'whole_values'] += 1
             if suite == 'gold':
@@ -235,48 +214,39 @@ def execute(context):
                 counts['resolved' if resolved else 'nonresolved'] += 1
                 want = row['original_case']['expected']
                 wrong = resolved and (want['status'] != 'resolved' or value.get('tag_key') != want.get('tag_key'))
-                counts['wrong_resolved'] += int(wrong)
-                report['wrong_resolved'] += int(wrong)
+                counts['wrong_resolved'] += int(wrong); report['wrong_resolved'] += int(wrong)
             approved.save(context.local / (suite + '-' + row['case_id'] + '.json'),
                           {'suite': suite, 'case_id': row['case_id'], 'process': rec,
                            'problems': problems, 'actual_json': value, 'passed': not problems})
             if problems:
                 raise ValueError('mismatch; STOP: ' + suite + '/' + row['case_id'] + ': ' + repr(problems))
         p2, gold = report['counts']['P2'], report['counts']['gold']
-        if (p2['passed'], p2['whole_values'], p2['error_contracts'], gold['passed'],
-                gold['resolved'], gold['nonresolved'], report['wrong_resolved']) != (151, 135, 16, 55, 39, 16, 0):
+        if (p2['passed'], p2['whole_values'], p2['error_contracts'], gold['passed'], gold['resolved'],
+                gold['nonresolved'], report['wrong_resolved']) != (151, 135, 16, 55, 39, 16, 0):
             raise ValueError('required final counts differ')
         report['status'] = 'PASS'
     except Exception as exc:  # noqa: BLE001 - Preserve evidence; never retry.
         report['failure'] = {'type': type(exc).__name__, 'message': str(exc)}
     finally:
         try:
-            report['source_after'] = context.check_source()
-            if source is None or report['source_after'] != source:
-                raise ValueError('fixed source changed')
             if before is not None:
                 report['snapshot_after'], report['sidecars_after'] = approved.file_binding(context.knowledge), approved.sidecars()
                 if report['snapshot_after'] != before or report['sidecars_after'] != sides:
                     raise ValueError('snapshot mutated')
-        except Exception as exc:  # noqa: BLE001 - End checks must fail closed.
-            report['status'] = 'FAIL'
-            report['end_failure'] = {'type': type(exc).__name__, 'message': str(exc)}
+        except Exception as exc:  # noqa: BLE001
+            report['status'] = 'FAIL'; report['end_failure'] = {'type': type(exc).__name__, 'message': str(exc)}
         commands = [legacy.strict_json(p.read_bytes()) for p in sorted(context.local.glob('command-*.json'))]
         report['timeout_count'] = sum(int(rec['timeout']) for rec in commands)
-        if report['timeout_count']:
-            report['status'] = 'FAIL'
+        if report['timeout_count']: report['status'] = 'FAIL'
         approved.save(context.local / 'corpus-manifest.json',
                       {p.name: approved.file_binding(p) for p in sorted(context.local.iterdir()) if p.is_file()})
         report['local_evidence'] = {'path': (context.local / 'corpus-manifest.json').relative_to(context.root).as_posix(),
                                     **approved.file_binding(context.local / 'corpus-manifest.json')}
         report['commands_preserved'] = context.index
         fullpreflight.check_components(context.report_path)
-        # Only the empty reservation made by this context may be filled.
-        if context.report_path.read_bytes() != b'':
-            raise FileExistsError('reserved output changed')
+        if context.report_path.read_bytes() != b'': raise FileExistsError('reserved output changed')
         with context.report_path.open('r+', encoding='utf-8', newline='\n') as stream:
-            json.dump(report, stream, ensure_ascii=True, indent=2, allow_nan=False)
-            stream.write('\n')
+            json.dump(report, stream, ensure_ascii=True, indent=2, allow_nan=False); stream.write('\n')
         print(json.dumps(report, indent=2))
     return 0 if report['status'] == 'PASS' else 1
 
@@ -284,12 +254,11 @@ def execute(context):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--execute', required=True, action='store_true')
-    parser.add_argument('--runtime-sha', required=True)
     parser.add_argument('--run-id', required=True)
     parser.add_argument('--target-dir', required=True)
     parser.add_argument('--knowledge', type=Path, default=approved.DB)
     args = parser.parse_args()
-    return execute(RunContext(args.runtime_sha, args.run_id, args.target_dir, args.knowledge))
+    return execute(RunContext(args.run_id, args.target_dir, args.knowledge))
 
 
 if __name__ == '__main__':

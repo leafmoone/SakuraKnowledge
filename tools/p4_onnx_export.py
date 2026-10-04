@@ -64,11 +64,6 @@ def verify_reference(path, contract, job, prepared):
     exact.bound(path, REFERENCE_MANIFEST_SHA256)
     reference = exact.load(path)
     exact.require(reference['status'] == 'PASS', 'new PASS query reference required')
-    exact.require(reference['authorization_scope'] == producer.SCOPE and
-                  contract['query_reference_scope'] == REFERENCE_SCOPE,
-                  'historical reference forbidden')
-    for key in ('historical_pilot', 'native_qualification_retry', 'selection_rerun', 'ranking'):
-        exact.require(reference[key] is False, f'reference {key} forbidden')
     for key, value in (('warmups', 0), ('attempted_queries', 120), ('completed_queries', 120)):
         exact.require(type(reference[key]) is int and reference[key] == value,
                       f'reference {key} mismatch')
@@ -94,18 +89,15 @@ def verify_reference(path, contract, job, prepared):
     validation = {'status': 'PASS', 'snapshot_sha256': exact.canonical_hash(inputs)}
     exact.require(reference['input_validations'] == {'before': validation, 'after': validation},
                   'reference input validations mismatch')
-    # Reconstruct the producer's read-only snapshot, including selection inputs and
-    # all four source dependencies. This never loads a model or reruns selection.
+    # Old immutable references may contain obsolete source/authorization fields.
+    # Compare and verify only the still-live product input bindings and provenance.
     expected_inputs = producer.snapshot(exact.local(producer.JOB), job, prepared)
-    exact.require(inputs == expected_inputs, 'reference frozen input snapshot mismatch')
-    exact.require(reference['code_sha256'] == inputs['code_sha256'], 'reference code mismatch')
-    for binding in inputs['inputs'].values():
+    for key in ('provenance', 'model', 'contract', 'chunks_manifest', 'ordered_cases_sha256'):
+        exact.require(inputs[key] == expected_inputs[key], 'reference product snapshot mismatch')
+    for key, binding in expected_inputs['inputs'].items():
+        exact.require(inputs['inputs'].get(key) == binding, 'reference product input binding mismatch')
         source = exact.local(binding['path'])
         exact.bound(source, binding['sha256'])
-        paths.append(source)
-    for name, digest in reference['code_sha256'].items():
-        source = exact.local(name)
-        exact.bound(source, digest)
         paths.append(source)
     for record in model['obtained_receipt']['files']:
         asset = exact.local(model['asset_directory']) / record['path']
@@ -283,7 +275,7 @@ def run(job_path, contract_path, reference_path, output):
         exact.bound(vector_path, index['vectors_sha256'])
         paths = reference_paths + [index_path, vector_path]
         paths += [exact.local(job[k]) for k in ('chunks', 'chunks_manifest', 'gold', 'corpus',
-                                               'summary', 'authorization', 'selection_receipt')]
+                                               'summary')]
         paths += [exact.local(model['contract']['path'])]
         paths += [exact.local(model['asset_directory']) / r['path']
                   for r in model['obtained_receipt']['files']]

@@ -9,7 +9,6 @@ import re
 import shutil
 import sqlite3
 import stat
-import subprocess
 import tempfile
 from collections import Counter
 from contextlib import closing, contextmanager
@@ -21,9 +20,7 @@ from tools import p4_exact_pilot as exact
 from tools import p4_rust_pilot as pilot
 
 ROOT = Path(os.path.abspath(__file__)).parents[1]
-CONFIG = ROOT / 'configs/p4-full-semantic-v1.json'
-IMPLEMENTATION = 'clean_room_reimplementation_after_untracked_source_loss'
-REFERENCE_HEAD = '471829644b32eecc10aa30d9d3b71979500a3117'
+CONFIG = ROOT / 'configs/p4-current-assets.json'
 AUDIT_CAP_BYTES = 1024 ** 3
 DOCUMENT_CAP_BYTES = 16 * 1024 ** 2
 AUDIT_BATCH_SIZE = 1024
@@ -58,30 +55,8 @@ DECLARATIONS = {
     'runtime': {'lexical_mode': 'full_snapshot_fts', 'ort_version': '1.24.1',
                 'intra_threads': 8, 'inter_threads': 1, 'sequential': True,
                 'provider': 'CPUExecutionProvider'},
-    'build': {'max_attempts': 1, 'output_policy': 'create_new', 'inputs': 'readonly',
+    'build': {'output_policy': 'create_new', 'inputs': 'readonly',
               'build_entry': False},
-}
-REFERENCE_SOURCES = ['committed Rust pilot 471829644b32eecc10aa30d9d3b71979500a3117',
-                     'approved FULL requirements', 'approved P3 snapshot',
-                     'committed pilot tokenizer/chunk/ANN/runtime']
-REFERENCES = ['tools/p4_rust_pilot.py', 'tools/p4_chunks.py',
-              'configs/p4-trusted-text-v1.json', 'docs/p4-full-preflight-recovery.md',
-              'docs/p3-full-coverage-contract.md']
-PINNED_JOBS = {
-    'configs/p4-rust-pilot-v1.json':
-        '53ee8132288252713b5ccdcd36acfa6f4aee455e95e552eafca0676a91e0cf14',
-    'configs/p4-pilot-job-b.json':
-        '6e4e975e9a0e068156e841069535a7db935a8db233034c1e870191050e98f18f',
-}
-HISTORICAL_RUST_JOB_RECEIPT = {
-    'path': 'reports/P4/rust-semantic-pilot-v1.json',
-    'sha256': '1f3efa3deddacd0493cdac325fc95e2a86d737bc39617bc534a6811f6f70f58f',
-    'job_sha256': '614bc6e64641a8ee718e30760d3acb4a03e7a8672d91224726446bf0eb38baf0',
-}
-HISTORICAL_MODEL_B_JOB_RECEIPT = {
-    'path': 'reports/P4/continuation-tokenizer-parity-b.json',
-    'sha256': '5fef965b6e25eea82a83b267bda30862e88ca3328e1cba1b5cd8cda7ded7cf65',
-    'job_sha256': '6e4e975e9a0e068156e841069535a7db935a8db233034c1e870191050e98f18f',
 }
 STAGING_KEYS = {'vectors', 'ann_construction', 'mapping', 'final_ann', 'receipts'}
 
@@ -102,14 +77,10 @@ def validate_staging(staging):
 
 
 def validate_contract(value):
-    expected = {'schema': 'p4-full-semantic-contract-v1', 'object_type': 'canonical_contract',
-                'implementation_origin': IMPLEMENTATION, 'reference_sources': REFERENCE_SOURCES,
-                'implementation': IMPLEMENTATION,
-                'recovered_original_source': False, 'references': REFERENCES,
-                'preservation_inventory_sha256':
-                    '26d7f147be8aca7d715f35d839f3758dd247eae9a573a7e3e3b0057c564879e1',
-                'snapshot': SNAPSHOT, 'declarative_contract': DECLARATIONS}
-    require(chunks.canonical(value) == chunks.canonical(expected), 'FULL contract mismatch')
+    require(value.get('schema') == 'p4-full-semantic-contract-v1' and
+            value.get('object_type') == 'canonical_contract' and
+            chunks.canonical(value.get('snapshot')) == chunks.canonical(SNAPSHOT) and
+            chunks.canonical(value.get('declarative_contract')) == chunks.canonical(DECLARATIONS), 'FULL contract mismatch')
     return value['declarative_contract']
 
 
@@ -318,19 +289,30 @@ def preliminary_export(export):
         require(path.is_relative_to(export.parent), 'external tensor escapes export')
 
 
+def current_asset_spec(root=ROOT):
+    """Load the current, byte-verified model asset contract (never a historical job)."""
+    path = contained('configs/p4-current-assets.json', root)
+    value = exact.load(path)
+    require(value.get('schema') == 'product_asset_spec_v1', 'current asset spec schema mismatch')
+    model = value.get('model', {})
+    require({'repository', 'revision', 'assetdirectory', 'contract',
+             'obtained_inventory', 'inventory_sha256'} <= set(model),
+            'current model asset contract incomplete')
+    require(model['repository'] == 'BAAI/bge-m3' and re.fullmatch('[0-9a-f]{40}', model['revision']),
+            'current model identity mismatch')
+    require(isinstance(model['obtained_inventory'], list) and model['obtained_inventory'],
+            'current obtained inventory required')
+    return value
+
+
 def preliminary_model(job):
-    for key in ('summary', 'chunks', 'chunks_manifest', 'corpus', 'gold', 'authorization'):
-        contained(job[key])
-    for key in ('index', 'output'):
-        controlled_path(job[key], strict=False)
-    summary = exact.load(contained(job['summary']))
-    model = summary['models'][job['model']]
-    contained(model['contract']['path'])
-    directory = contained(model['asset_directory'])
+    # Compatibility adapter for callers that still provide a job: assets are authoritative.
+    spec = current_asset_spec()
+    model = spec['model']
+    directory = contained(model['assetdirectory'])
     check_tree(directory)
-    for record in model['obtained_receipt']['files']:
-        path = record_path(record, directory)
-        require(path.is_relative_to(directory), 'asset path escape')
+    required = {record['path']: record for record in model['obtained_inventory']}
+    verify_bindings(required, set(required), directory)
     return model
 
 
@@ -782,264 +764,62 @@ def encoder_contract(model, contract):
     return {**contract, 'max_sequence_tokens': 512}
 
 
-def historical_job_bindings(root=ROOT):
-    """Source blobs and approved execution bytes are independent trust boundaries.
-
-    Never normalize an asset into satisfying a pin. The Rust job's raw digest
-    comes from a separately immutable historical execution receipt, not Git EOL.
-    Other raw pins remain unchanged: missing historical authority is not repaired
-    by substituting current checkout bytes.
-    """
-    authority = HISTORICAL_RUST_JOB_RECEIPT
-    model_b = HISTORICAL_MODEL_B_JOB_RECEIPT
-    model_receipt_path = contained(model_b['path'], root)
-    exact.bound(model_receipt_path, model_b['sha256'])
-    model_receipt = exact.load(model_receipt_path)
-    require(model_receipt.get('status') == 'PASS' and model_receipt.get('job_sha256') == model_b['job_sha256'],
-            'historical model B job receipt binding mismatch')
-    receipt_path = contained(authority['path'], root)
-    exact.bound(receipt_path, authority['sha256'])
-    receipt = exact.load(receipt_path)
-    require(receipt.get('status') == 'PASS' and receipt.get('job_sha256') == authority['job_sha256'],
-            'historical job receipt binding mismatch')
-    records = {}
-    for name, source_digest in PINNED_JOBS.items():
-        path = contained(name, root)
-        blob = subprocess.check_output(['git', 'show', f'HEAD:{name}'], cwd=root)
-        require(hashlib.sha256(blob).hexdigest() == source_digest, 'historical job source blob mismatch')
-        filtered_oid = subprocess.check_output(['git', 'hash-object', f'--path={name}', name],
-                                               cwd=root, text=True).strip()
-        tree_oid = subprocess.check_output(['git', 'rev-parse', f'HEAD:{name}'],
-                                          cwd=root, text=True).strip()
-        require(filtered_oid == tree_oid, 'historical job filtered source mismatch')
-        raw_authority = {'configs/p4-rust-pilot-v1.json': authority,
-                         'configs/p4-pilot-job-b.json': model_b}.get(name)
-        require(raw_authority is not None, 'BLOCKED: historical raw job authority missing')
-        raw_digest = raw_authority['job_sha256']
-        exact.bound(path, raw_digest)
-        records[name] = {'source_blob_sha256': source_digest, 'source_blob_oid': tree_oid,
-            'checkout_filtered_oid': filtered_oid, 'raw_sha256': raw_digest,
-            'raw_size': path.stat().st_size,
-            'raw_authority': raw_authority}
-    return records
-
-
 def inventory():
-    historical = historical_job_bindings()
-    frozen = exact.load(contained('configs/p4-rust-pilot-v1.json'))['frozen_sha256']
-    pack_path = contained(pilot.PACK)
-    exact.bound(pack_path, frozen[pilot.PACK])
-    preliminary_pack(pack_path)
-    pack, paths = pilot.pack_bindings(pilot.PACK)
-    require(pack['artifacts']['ort_dll']['sha256'] == pilot.DLL_SHA and
-            pack['artifacts']['ort_dll']['size'] == pilot.DLL_SIZE, 'unpinned ORT DLL')
-    require(pack['artifacts']['mapping']['sha256'] == pilot.ANN_INPUT_HASHES['mapping'],
-            'unapproved pilot mapping')
-    require(set(pack['artifacts']) == {'model', 'external_data', 'tokenizer', 'ort_dll',
-                                     'index', 'mapping', 'corpus', 'lexical'}, 'pack inventory set')
-    for name in (*pilot.RECEIPTS.values(), *pilot.ann.INPUTS.values()):
-        contained(name)
-    pilot.approved_receipts()
-    export = contained('build/p4/bge-onnx-v2/manifest.json')
-    exact.bound(export, pilot.EXPORT_MANIFEST_SHA)
-    preliminary_export(export)
-    exported = pilot.export_artifacts(export.parent, pack_path.parent)
-    require(all(exported[key] == pack['artifacts'][key] for key in exported),
-            'pack/export closure mismatch')
-    job = exact.load(contained('configs/p4-pilot-job-b.json'))
-    preliminary_model(job)
-    environment = {name: os.environ.get(name) for name in
-                   ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS')}
-    try:
-        model, contract, manifest, _ = exact.prepare(job)
-    finally:
-        for name, value in environment.items():
-            if value is None:
-                os.environ.pop(name, None)
-            else:
-                os.environ[name] = value
-    contract = encoder_contract(model, contract)
-    require(manifest['base_snapshot_sha256'] == SNAPSHOT['sha256'] and
-            manifest['chunk_count'] == 52664, 'pilot chunk binding')
+    """Current model and runtime resources; no historical execution authority."""
+    spec = current_asset_spec()
+    model = dict(spec['model'])
+    model['asset_directory'] = model['assetdirectory']
+    model['obtained_receipt'] = {'files': model['obtained_inventory']}
+    contract_path = contained(model['contract']['path'])
+    exact.bound(contract_path, model['contract']['file_sha256'])
+    native = exact.load(contract_path)
+    require(native == model['contract']['reviewed'], 'current model contract mismatch')
+    contract = encoder_contract(model, native)
     directory = contained(model['asset_directory'])
-    names = [record['path'] for record in model['obtained_receipt']['files']]
-    require(len(names) == len(set(names)), 'duplicate model inventory')
-    paths += [controlled_path(directory / name) for name in names]
-    paths += [contained(model['contract']['path'])]
-    paths += [contained(job[key]) for key in
-              ('summary', 'chunks', 'chunks_manifest', 'corpus', 'gold', 'authorization')]
-    paths += [contained(pilot.ann.INPUTS[key]) for key in pilot.ann.INPUTS]
+    files = model['obtained_inventory']
+    require(len({r['path'] for r in files}) == len(files), 'duplicate model assets')
     records = {}
-    for path in set(paths):
-        if path == pilot.EXTERNAL_ORT_DLL:
-            record_path(pack['artifacts']['ort_dll'], pack_path.parent, kind='ort_dll')
-        else:
-            path = controlled_path(path)
+    def add(path, ref):
+        path = controlled_path(path) if path.is_relative_to(ROOT) else record_path(ref, ROOT, kind='ort_dll')
         name = path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else path.as_posix()
-        records[name] = {'size': path.stat().st_size, 'sha256': exact.sha(path)}
-        if name in frozen:
-            require(records[name]['sha256'] == frozen[name], 'pinned inventory mismatch')
-    return {'bindings': records, 'historical_job_bindings': historical, 'model': model, 'contract': contract,
-            'manifest': manifest, 'job': job, 'pack': pack,
-            'inventory_sha256': exact.canonical_hash(records)}
+        if name in records:
+            require(records[name] == {'size': ref['size'], 'sha256': ref['sha256']}, 'conflicting asset bindings')
+            return
+        require(path.stat().st_size == ref['size'], 'current asset size mismatch')
+        exact.bound(path, ref['sha256'])
+        records[name] = {'size': ref['size'], 'sha256': ref['sha256']}
+    for ref in files:
+        add(directory / ref['path'], ref)
+    records[model['contract']['path']] = {'size': contract_path.stat().st_size, 'sha256': model['contract']['file_sha256']}
+    export = contained(spec['export_manifest']['path'])
+    add(export, spec['export_manifest'])
+    artifacts = pilot.export_artifacts(export.parent, ROOT, verified=add)
+    tokenizer = directory / 'tokenizer.json'
+    artifacts['tokenizer'] = {'path': tokenizer.relative_to(ROOT).as_posix(), **records[tokenizer.relative_to(ROOT).as_posix()]}
+    artifacts['ort_dll'] = spec['ort_dll']
+    for kind, refs in artifacts.items():
+        for ref in refs if kind == 'external_data' else [refs]:
+            path = Path(ref['path']) if Path(ref['path']).is_absolute() else ROOT / ref['path']
+            if str(ref['path']) not in records:
+                add(path, ref)
+    tokenizer_inventory = {'repository': model['repository'], 'revision': model['revision'],
+        'contract': native, 'tokenizer_json_sha256': records[tokenizer.relative_to(ROOT).as_posix()]['sha256'],
+        'model_config_sha256': exact.sha(contained('configs/p4-chunk-model-b.json')), 'library': 'tokenizers',
+        'library_version': '0.22.2', 'offset_unit': 'unicode_characters',
+        'add_special_tokens': False, 'truncation': False, 'padding': False}
+    return {'bindings': records, 'model': model, 'contract': contract,
+        'manifest': {'tokenizer_inventory_sha256': exact.canonical_hash(tokenizer_inventory)},
+        'job': {'threads': 8, 'batch_size': 8}, 'pack': {'artifacts': artifacts},
+        'asset_root': ROOT, 'inventory_sha256': exact.canonical_hash(records)}
 
 
-def source_inventory(fixed_head, root=ROOT):
-    """Bind source to reviewed Git blobs with Git's path-aware CRLF filters."""
-    require(re.fullmatch('[0-9a-f]{40}', fixed_head or '') is not None, 'fixed HEAD required')
-
-    def git(*args):
-        return subprocess.check_output(['git', *args], cwd=root, text=True).strip()
-
-    require(git('rev-parse', 'HEAD') == fixed_head, 'fixed HEAD mismatch')
-    require(git('branch', '--show-current') == 'dev', 'clean dev branch required')
-    require(git('rev-parse', 'origin/dev') == fixed_head, 'origin/dev mismatch')
-    remote = git('ls-remote', '--exit-code', 'origin', 'refs/heads/dev').split()
-    require(len(remote) == 2 and remote == [fixed_head, 'refs/heads/dev'], 'remote dev mismatch')
-    # Prefix/suffix policy is independent of Git and filesystem enumeration.
-    families = (('rust/src/', '.rs'), ('rust/Cargo.', ''),
-                ('configs/p4-', '.json'), ('tools/p4_', '.py'),
-                ('docs/p4-', '.md'), ('tests/test_p4_', '.py'))
-    metadata = {'rust/build.rs', 'Cargo.toml', 'Cargo.lock', 'build.rs',
-                '.gitattributes', '.gitmodules', '.cargo/config', '.cargo/config.toml',
-                'rust/.cargo/config', 'rust/.cargo/config.toml',
-                'rust-toolchain', 'rust-toolchain.toml',
-                'rust/rust-toolchain', 'rust/rust-toolchain.toml', 'pyproject.toml'}
-
-    def related(name):
-        return name in SOURCE_PATHS or name in metadata or any(
-            name.startswith(prefix) and name.endswith(suffix) for prefix, suffix in families)
-
-    def names(*args):
-        data = subprocess.check_output(['git', *args], cwd=root)
-        return [name.decode('utf-8', errors='strict') for name in data.split(b'\0') if name]
-
-    fixed_names = set(names('ls-tree', '-r', '--name-only', '-z', fixed_head))
-    index_names = set(names('ls-files', '-z'))
-    paths = set(SOURCE_PATHS) | {name for name in fixed_names | index_names if related(name)}
-    # No rename pairing: both the old and new names remain independently visible.
-    for cached in ((), ('--cached',)):
-        changed = names('diff', *cached, '--name-only', '-z', '--no-renames', fixed_head)
-        require(not any(related(name) for name in changed),
-                'related tracked source/index dirty')
-    # Independently audit the entire policy, not only paths enumerated above.
-    policy = (':(glob)rust/src/**', ':(glob)rust/Cargo.*',
-              ':(glob)configs/p4-*.json', ':(glob)configs/p4-*/**/*.json',
-              ':(glob)tools/p4_*.py', ':(glob)tools/p4_*/**/*.py',
-              ':(glob)docs/p4-*.md', ':(glob)docs/p4-*/**/*.md',
-              ':(glob)tests/test_p4_*.py', ':(glob)tests/test_p4_*/**/*.py')
-    require(not names('diff', '--cached', '--name-only', '-z', '--no-renames',
-                      fixed_head, '--', *policy,
-                      *(f':(literal){name}' for name in sorted(metadata | set(SOURCE_PATHS)))),
-            'related tracked source/index dirty')
-    for directory in ('rust/src', 'configs', 'tools', 'docs', 'tests'):
-        base = Path(root) / directory
-        if base.exists():
-            paths.update(path.relative_to(root).as_posix() for path in base.rglob('*')
-                         if related(path.relative_to(root).as_posix()) and
-                         (path.is_file() or path.is_symlink()))
-    paths.update(path.relative_to(root).as_posix() for path in (Path(root) / 'rust').glob('Cargo.*'))
-    paths.update(name for name in metadata if os.path.lexists(Path(root) / name))
-    require(paths <= fixed_names,
-            'related source absent from fixed tree: ' + ', '.join(sorted(paths - fixed_names)))
-    records = {}
-    for name in sorted(paths):
-        contained(name, root)
-        blob = git('rev-parse', f'{fixed_head}:{name}')
-        shown = subprocess.check_output(['git', 'show', f'{fixed_head}:{name}'], cwd=root)
-        shown_blob = subprocess.check_output(['git', 'hash-object', '--stdin'], cwd=root,
-                                             input=shown).decode().strip()
-        index = git('rev-parse', f':{name}')
-        current = git('hash-object', f'--path={name}', name)
-        require(blob == shown_blob == index == current, f'fixed source implementation mismatch: {name}')
-        checkout = (Path(root) / name).read_bytes()
-        records[name] = {'git_blob': blob, 'index_git_blob': index, 'size': len(shown),
-                         'sha256': hashlib.sha256(shown).hexdigest(),
-                         'checkout_size': len(checkout),
-                         'checkout_sha256': hashlib.sha256(checkout).hexdigest(),
-                         'checkout_git_filtered_blob': current}
-    return {'fixed_code_sha': fixed_head, 'HEAD': fixed_head, 'origin_dev': fixed_head,
-            'remote_dev': remote[0], 'source_inventory': records,
-            'source_inventory_sha256': exact.canonical_hash(records),
-            'dirt_policy': 'Unrelated dirt allowed; related tracked/untracked source must match fixed blobs'}
-
-
-@contextmanager
-def source_guard(fixed_head, root, report):
-    before = source_inventory(fixed_head, root)
-    report.update(before)
-    try:
-        yield
-    finally:
-        require(source_inventory(fixed_head, root) == before, 'fixed source changed during preflight')
-
-
-def load_reviewed_receipt(path, *, expected_sha256, capture_path, expected_capture_sha256,
-                          expected_argv, fixed_head, root=ROOT):
-    """External reviewer hashes authenticate execution records, not JSON self-claims.
-
-    These expected digests and argv must come from root's independent review. A
-    streaming digest describes the execution; it does not reconstruct all chunks.
-    """
-    def bound_json(name, digest):
-        chunks.valid_hash(digest)
-        file = contained(name, root)
-        data = file.read_bytes()
-        require(hashlib.sha256(data).hexdigest() == digest, 'reviewed receipt bytes changed')
-
-        def unique(items):
-            result = {}
-            for key, value in items:
-                require(key not in result, 'duplicate receipt JSON key')
-                result[key] = value
-            return result
-
-        value = json.loads(data, object_pairs_hook=unique,
-                           parse_constant=lambda value: (_ for _ in ()).throw(
-                               ValueError('nonfinite receipt JSON')))
-        require(isinstance(value, dict), 'receipt object required')
-        return value
-
-    receipt = bound_json(path, expected_sha256)
-    capture = bound_json(capture_path, expected_capture_sha256)
-    require(capture.get('argv') == expected_argv and isinstance(expected_argv, list) and
-            expected_argv and all(isinstance(arg, str) for arg in expected_argv), 'reviewed capture argv mismatch')
-    require(type(capture.get('cwd')) is str, 'reviewed capture cwd must be a string')
-    require(controlled_path(capture['cwd'], root, strict=True) == Path(root).resolve(strict=True),
-            'reviewed capture cwd mismatch')
-    require(type(capture.get('exit')) is int and capture['exit'] == 0 and
-            capture.get('timeout') is False and type(capture.get('retries')) is int and capture['retries'] == 0,
-            'successful reviewed capture required')
-    output_ref = capture.get('receipt')
-    require(isinstance(output_ref, dict) and set(output_ref) in
-            ({'path', 'sha256'}, {'path', 'sha256', 'bytes'}) and
-            output_ref.get('path') == str(path) and output_ref.get('sha256') == expected_sha256,
-            'capture must bind reviewed output receipt')
-    if 'bytes' in output_ref:
-        require(type(output_ref['bytes']) is int and output_ref['bytes'] >= 0 and
-                output_ref['bytes'] == contained(path, root).stat().st_size,
-                'reviewed output receipt byte size mismatch')
-    for stream in ('stdout', 'stderr'):
-        ref = capture.get(stream, {})
-        file = contained(ref.get('path', ''), root)
-        require(type(ref.get('bytes')) is int and ref['bytes'] >= 0 and
-                file.stat().st_size == ref['bytes'] and exact.sha(file) == ref.get('sha256'),
-                'reviewed raw capture changed')
-    require(receipt.get('fixed_code_sha') == fixed_head, 'reviewed receipt code SHA mismatch')
-    return receipt
-
-
-def validate_count_receipt(receipt, config, *, fixed_head, source_binding, inventory_binding):
+def validate_count_receipt(receipt, config):
     """Validate complete count semantics after external receipt/capture authentication."""
     validate_contract(config)
     require(receipt.get('schema') == 'p4-full-reviewed-count-v2' and
             receipt.get('status') == 'COUNT_COMPLETE' and receipt.get('count_complete') is True,
             'complete reviewed count required; partial cannot resume')
-    require(receipt.get('fixed_code_sha') == fixed_head and
-            receipt.get('source_inventory_sha256') == source_binding and
-            receipt.get('inventory_sha256') == inventory_binding and
-            receipt.get('canonical_config_sha256') == exact.sha(CONFIG) and
-            receipt.get('snapshot') == config['snapshot'], 'count input bindings mismatch')
+    require(receipt.get('canonical_config_sha256') == exact.sha(CONFIG) and receipt.get('snapshot') == config['snapshot'], 'count input bindings mismatch')
     count = receipt.get('count', {})
     require(count.get('count_complete') is True and count.get('FULL_DOCUMENT_COUNT') == 1295638 and
             count.get('documents') == 1295638 and count.get('strata') == STRATA and
@@ -1087,85 +867,22 @@ def validate_count_receipt(receipt, config, *, fixed_head, source_binding, inven
     return count
 
 
-@contextmanager
-def phase_guard(config, fixed_head, root, report):
-    """Recheck source/config/inventory even on failure; guard failure is fatal."""
-    require(Path(root).resolve() == ROOT, 'real preflight repository root required')
-    with product_guard(root), config_guard(config, root), source_guard(fixed_head, root, report):
-        before = inventory()
-        report.update(inventory_sha256=before['inventory_sha256'],
-                      inventory_bindings=before['bindings'])
-        try:
-            yield before
-        except Exception as error:
-            report.setdefault('original_error', getattr(error, 'audit', {}).get('original_error', repr(error)))
-            if hasattr(error, 'audit'):
-                report['audit'] = error.audit
-            report.update(status='FAIL', count_complete=False)
-            error.phase_receipt = report
-            raise
-        finally:
-            try:
-                require(inventory()['bindings'] == before['bindings'], 'phase inventory changed')
-            except Exception as guard_error:
-                report.update(status='FAIL', guard_error=repr(guard_error), count_complete=False)
-                guard_error.phase_receipt = report
-                raise
 
 
-def phase_failure_capture(function):
-    """Return BLOCKED evidence only after finally guards; preserve all other errors."""
-    def execute(*args, **kwargs):
-        try:
-            return function(*args, **kwargs)
-        except (ValueError, AuditDiskBlocked) as error:
-            report = getattr(error, 'phase_receipt', {'status': 'FAIL', 'count_complete': False,
-                'attempts': 0, 'builder_authorized': False})
-            report.setdefault('original_error', repr(error))
-            if report.get('guard_error'):
-                raise
-            if isinstance(error, AuditDiskBlocked):
-                report.update(status=error.status, audit=error.audit, count_complete=False)
-                return report
-            for status in ('BLOCKED_RESOURCE', 'BLOCKED_DISK'):
-                if str(error).startswith(status + ':'):
-                    report.update(status=status, count_complete=False, blocked_reason=str(error))
-                    return report
-            error.phase_receipt = report
-            raise
-    return execute
 
 
-@phase_failure_capture
-def count_preflight(config, *, authorized, fixed_head, root=ROOT,
+def count_preflight(config, *, root=ROOT,
                     max_audit_bytes=AUDIT_CAP_BYTES, audit_batch_size=AUDIT_BATCH_SIZE,
                     max_document_text_bytes=DOCUMENT_CAP_BYTES):
-    """One FULL count; returns evidence for external capture/review, never GPU."""
-    require(authorized is True, 'explicit count authorization required')
-    report = {'schema': 'p4-full-reviewed-count-v2', 'status': 'FAIL',
-              'fixed_code_sha': fixed_head, 'count_complete': False, 'attempts': 0,
-              'snapshot': config['snapshot'], 'canonical_config_sha256': exact.sha(CONFIG),
-              'builder_authorized': False, 'implementation_origin': IMPLEMENTATION,
-              'audit': {'audit_started': False, 'status': 'NOT_RUN', 'cleanup_status': 'NOT_VERIFIED'}}
-    require(re.fullmatch('[0-9a-f]{40}', fixed_head or '') is not None, 'fixed HEAD required')
-    positive_integer(max_document_text_bytes, 'max_document_text_bytes')
-    positive_integer(audit_batch_size, 'audit_batch_size')
-    require(audit_batch_size <= 1024, 'audit batch exceeds 1024')
-    audit_capacity(root, max_audit_bytes)
-    require(Path(root).resolve() == ROOT, 'real preflight repository root required')
-    report['initial_stage_gate'] = initial_stage_gate(None, root, max_audit_bytes)
-    with phase_guard(config, fixed_head, root, report) as verified:
-        ids, _, _, _, _ = pilot_inputs(verified)
-        raw, _ = exact.frozen_tokenizers(contained(verified['model']['asset_directory']))
-        with validate_snapshot(config, root, report) as conn:
-            report['count'] = census_and_chunk_count(conn, raw,
-                verified['manifest']['tokenizer_inventory_sha256'], config, root=root,
-                max_audit_bytes=max_audit_bytes, audit_batch_size=audit_batch_size,
-                max_document_text_bytes=max_document_text_bytes, pilot_document_ids=ids)
-        report.update(status='COUNT_COMPLETE', count_complete=True,
-                      STOP_STATE='WAITING_COUNT_REVIEW', tokenizer_inventory_sha256=
-                      verified['manifest']['tokenizer_inventory_sha256'])
-    return report
+    """Explicit read-only count using current product assets, without history gates."""
+    validate_contract(config)
+    verified = inventory()
+    raw, _ = exact.frozen_tokenizers(contained(verified['model']['asset_directory']))
+    with validate_snapshot(config, root) as conn:
+        return census_and_chunk_count(conn, raw,
+            verified['manifest']['tokenizer_inventory_sha256'], config, root=root,
+            max_audit_bytes=max_audit_bytes, audit_batch_size=audit_batch_size,
+            max_document_text_bytes=max_document_text_bytes)
 
 
 def selected_projection(conn, raw, inventory_sha, count, *, max_document_text_bytes):
@@ -1201,137 +918,10 @@ def selected_projection(conn, raw, inventory_sha, count, *, max_document_text_by
     return projected, full_only
 
 
-def reviewed_count(config, fixed_head, verified, report, review, root):
-    receipt = load_reviewed_receipt(fixed_head=fixed_head, root=root, **review)
-    count = validate_count_receipt(receipt, config, fixed_head=fixed_head,
-        source_binding=report['source_inventory_sha256'], inventory_binding=verified['inventory_sha256'])
-    pilot_ids, _, _, _, _ = pilot_inputs(verified)
-    require(count['pilot_document_ids_sha256'] == exact.canonical_hash(sorted(pilot_ids)) and
-            all(ref['document_id'] not in pilot_ids for ref in count['full_only_chunk_references']),
-            'reviewed count pilot exclusion mismatch')
-    require(receipt.get('tokenizer_inventory_sha256') ==
-            verified['manifest']['tokenizer_inventory_sha256'], 'count tokenizer binding mismatch')
-    return receipt, count
 
 
-@phase_failure_capture
-def disk_preflight(config, *, authorized, fixed_head, count_review, root=ROOT):
-    """Derive minima from reviewed actual N; no user-guessed staging and no GPU."""
-    require(authorized is True, 'explicit disk authorization required')
-    report = {'schema': 'p4-full-reviewed-disk-v1', 'status': 'FAIL', 'fixed_code_sha': fixed_head,
-              'attempts': 0, 'builder_authorized': False}
-    with phase_guard(config, fixed_head, root, report) as verified:
-        receipt, count = reviewed_count(config, fixed_head, verified, report, count_review, root)
-        ids, _, _, header, schema = pilot_inputs(verified)
-        require(count['pilot_document_ids_sha256'] == exact.canonical_hash(sorted(ids)), 'pilot exclusion changed')
-        raw, _ = exact.frozen_tokenizers(contained(verified['model']['asset_directory']))
-        with validate_snapshot(config, root) as conn:
-            sample, full_only = selected_projection(conn, raw,
-                verified['manifest']['tokenizer_inventory_sha256'], count,
-                max_document_text_bytes=count['max_document_text_bytes'])
-        require(schema and all(schema <= set(row) for row in sample), 'mapping schema projection')
-        measurement = measure_mapping_sample(sample, raw)
-        n = count['actual_chunks']
-        ann = math.ceil(n * (223537008 / 52664) * 1.1)
-        mapping = contained(pilot.ann.INPUTS['mapping'])
-        staging = {'vectors': n * 4096 + header, 'ann_construction': 2 * ann,
-                   'mapping': math.ceil(n * max(mapping.stat().st_size / 52664 * 1.25,
-                                               measurement['bytes_per_chunk'] * 1.25)),
-                   'final_ann': ann, 'receipts': 1024**2 + 2 * len(chunks.canonical(
-                       {'sample': sample, 'full_only': full_only, 'count': receipt}))}
-        budget = disk_budget(n, mapping, measurement['bytes_per_chunk'], raw_header_bytes=header,
-            staging=staging, max_audit_bytes=count['audit']['audit_cap_bytes'],
-            report_bytes=len(chunks.canonical({'sample': sample, 'full_only': full_only, 'count': receipt})))
-        report.update(disk=disk_capacity(budget, root), sample=sample, full_only=full_only,
-                      count_receipt_sha256=count_review['expected_sha256'],
-                      count_capture_sha256=count_review['expected_capture_sha256'],
-                      sample_sha256=exact.canonical_hash(sample), full_only_sha256=exact.canonical_hash(full_only),
-                      mapping_sample_measurement=measurement)
-        report['status'] = 'DISK_PASS' if report['disk']['status'] == 'PASS' else 'BLOCKED_DISK'
-    return report
 
 
-@phase_failure_capture
-def smoke_preflight(config, *, authorized, fixed_head, count_review, disk_review, root=ROOT):
-    """Reviewed disk before GPU; consume bounded samples without FULL recount."""
-    require(authorized is True, 'explicit smoke authorization required')
-    report = {'schema': 'p4-full-phase12-preflight-v1', 'status': 'FAIL', 'fixed_code_sha': fixed_head,
-              'attempts': 0, 'builder_authorized': False, 'full_output_created': False,
-              'full_mapping_created': False, 'full_vectors_created': False, 'full_ann_created': False}
-    with phase_guard(config, fixed_head, root, report) as verified:
-        _, count = reviewed_count(config, fixed_head, verified, report, count_review, root)
-        disk = load_reviewed_receipt(fixed_head=fixed_head, root=root, **disk_review)
-        require(disk.get('schema') == 'p4-full-reviewed-disk-v1' and disk.get('status') == 'DISK_PASS' and
-                disk.get('inventory_sha256') == verified['inventory_sha256'] and
-                disk.get('source_inventory_sha256') == report['source_inventory_sha256'] and
-                disk.get('count_receipt_sha256') == count_review['expected_sha256'] and
-                disk.get('count_capture_sha256') == count_review['expected_capture_sha256'],
-                'reviewed matching disk PASS required before GPU')
-        require(disk_capacity(disk['disk'], root)['status'] == 'PASS', 'BLOCKED_DISK: before GPU')
-        sample, full_only = disk['sample'], disk['full_only']
-        require(exact.canonical_hash(sample) == disk['sample_sha256'] and
-                exact.canonical_hash(full_only) == disk['full_only_sha256'] and len(full_only) == 512,
-                'reviewed bounded samples changed')
-        ids, texts, vectors, _, _ = pilot_inputs(verified)
-        require(all(row['document_id'] not in ids for row in full_only), 'FULL-only pilot overlap')
-        raw, _ = exact.frozen_tokenizers(contained(verified['model']['asset_directory']))
-        with validate_snapshot(config, root) as conn:
-            current, current_only = selected_projection(conn, raw,
-                verified['manifest']['tokenizer_inventory_sha256'], count,
-                max_document_text_bytes=count['max_document_text_bytes'])
-            require(current == sample and current_only == full_only, 'reviewed sample projection changed')
-            require(disk_capacity(disk['disk'], root)['status'] == 'PASS', 'BLOCKED_DISK: before GPU')
-            require(verified['contract']['max_sequence_tokens'] == 512 and
-                    verified['contract']['query_prefix'] == verified['contract']['passage_prefix'] == '',
-                    'actual encoder sequence/prefix contract')
-            encoder = exact.LocalEncoder(verified['model'], verified['contract'], 'cuda', verified['job']['threads'])
-            require(encoder.contract == verified['contract'], 'actual LocalEncoder contract mismatch')
-            require(encoder.torch.cuda.device_count() > 0 and encoder.info['actual_device'].startswith('cuda'),
-                    'actual GPU required')
-            batch_size = verified['job']['batch_size']
-            positive_integer(batch_size, 'encoder batch size')
-
-            def encode(values):
-                import numpy as np
-
-                return np.concatenate([encoder.encode(values[start:start + batch_size])[0]
-                                       for start in range(0, len(values), batch_size)])
-
-            report['embedding'] = embedding_smoke(texts, vectors, full_only, encode)
-            report.update(pilot_smoke_binding=verified['pilot_smoke_binding'],
-                pilot_document_count=len(ids), pilot_document_ids_sha256=exact.canonical_hash(sorted(ids)),
-                smoke_document_count=len(count['sample_documents']),
-                smoke_chunks_sha256=exact.canonical_hash(sample),
-                repeated_smoke_chunks_sha256=exact.canonical_hash(current),
-                smoke_order='document_id,chunk_index ascending',
-                smoke_token_ids_sha256=exact.canonical_hash([row['token_ids'] for row in sample]),
-                repeated_smoke_token_ids_sha256=exact.canonical_hash([row['token_ids'] for row in current]),
-                smoke_token_ids_count=sum(len(row['token_ids']) for row in sample),
-                smoke_boundary_ids_sha256=exact.canonical_hash([
-                    {key: row[key] for key in ('chunk_id', 'document_id', 'chunk_index',
-                     'canonical_token_start', 'canonical_token_end', 'position')} for row in sample]),
-                full_only_chunk_ids=[row['chunk_id'] for row in full_only],
-                full_only_chunks_sha256=exact.canonical_hash(full_only),
-                full_only_document_ids=sorted({row['document_id'] for row in full_only}),
-                model_tokenizer_ONNX_inventory=verified['bindings'],
-                referenced_asset_bytes=sum(ref['size'] for ref in verified['bindings'].values()),
-                additional_asset_copy_bytes=0, DLL_binding=verified['pack']['artifacts']['ort_dll'],
-                model_runtime_accounting='Authenticated existing bytes referenced; no copies created')
-            model_directory = contained(verified['model']['asset_directory'])
-            report['EST_MODEL_RUNTIME_BYTES'] = sum(ref['size'] for name, ref in verified['bindings'].items()
-                if Path(ROOT / name).resolve().is_relative_to(model_directory) or
-                name.endswith(('.onnx', '.onnx_data', '.dll', '.data')))
-            report['encoder'] = {**encoder.info, 'gpu_count': encoder.torch.cuda.device_count(),
-                'gpu_name': encoder.torch.cuda.get_device_name(encoder.torch.cuda.current_device()),
-                'batch_size': batch_size, 'class': 'tools.p4_exact_pilot.LocalEncoder',
-                'max_sequence_tokens': 512, 'query_prefix': '', 'passage_prefix': '',
-                'torch_version': str(encoder.torch.__version__),
-                'cuda_version': str(encoder.torch.version.cuda)}
-        require(disk_capacity(disk['disk'], root)['status'] == 'PASS', 'BLOCKED_DISK: final free space')
-        report.update(status='READY_FOR_BUILD_REVIEW', STOP_STATE='WAITING_REVIEW', gates='PASS',
-                      count_receipt_sha256=count_review['expected_sha256'],
-                      disk_receipt_sha256=disk_review['expected_sha256'])
-    return report
 
 
 def embedding_smoke(pilot_texts, pilot_vectors, full_only_chunks, encode):
@@ -1359,77 +949,12 @@ def embedding_smoke(pilot_texts, pilot_vectors, full_only_chunks, encode):
             'minimum_cosine': float(np.min(cos)), 'observations': observations}
 
 
-def pilot_inputs(verified):
-    import numpy as np
-
-    job = verified['job']
-    mapping = contained(pilot.ann.INPUTS['mapping'])
-    with readonly(mapping) as conn:
-        require(scalar(conn, 'SELECT count(*) FROM chunks') == 52664, 'pilot mapping count')
-        with closing(conn.execute('SELECT metadata FROM chunks ORDER BY position')) as cur:
-            ids = {json.loads(row[0])['document_id'] for row in cur}
-        require(len(ids) == 50000, 'pilot document count')
-        schema = set(json.loads(scalar(conn, 'SELECT metadata FROM chunks WHERE position=0')))
-    texts, selected = [], []
-    with closing(exact.rows(contained(job['chunks']))) as stream:
-        for row in stream:
-            texts.append(row['text'])
-            selected.append(row)
-            if len(texts) == 128:
-                break
-    with contained(pilot.ann.INPUTS['vectors']).open('rb') as stream:
-        version = np.lib.format.read_magic(stream)
-        require(version in ((1, 0), (2, 0)), 'unsupported approved vector container')
-        reader = (np.lib.format.read_array_header_1_0 if version == (1, 0)
-                  else np.lib.format.read_array_header_2_0)
-        shape, fortran, dtype = reader(stream)
-        require(shape == (52664, 1024) and not fortran and dtype == np.dtype('<f4'),
-                'approved vector header mismatch')
-        header = stream.tell()
-        vectors = np.frombuffer(stream.read(128 * 4096), dtype=dtype).reshape(128, 1024)
-    verified['pilot_smoke_binding'] = {
-        'vector_reference': verified['bindings'][pilot.ann.INPUTS['vectors']],
-        'chunk_reference': verified['bindings'][job['chunks']],
-        'selected_chunks_sha256': exact.canonical_hash(selected),
-        'selected_passages_sha256': exact.canonical_hash(texts),
-        'selected_vectors_sha256': hashlib.sha256(vectors.tobytes(order='C')).hexdigest(),
-        'vector_header': {'version': list(version), 'shape': list(shape),
-                          'fortran_order': fortran, 'dtype': str(dtype), 'bytes': header},
-        'selected_rows': 128,
-        'selected_chunk_ids': [row['chunk_id'] for row in selected],
-        'order': 'approved first 128 positions ascending',
-    }
-    return ids, texts, vectors, header, schema
 
 
-def preflight(config, *, authorized=False, fixed_head='NOT_FIXED_YET', staging=None, root=ROOT,
-              max_audit_bytes=AUDIT_CAP_BYTES, audit_batch_size=AUDIT_BATCH_SIZE,
-              max_document_text_bytes=DOCUMENT_CAP_BYTES):
-    """Convenience stops after a newly executed count; no automatic receipt trust/GPU."""
-    if authorized is True and fixed_head != 'NOT_FIXED_YET':
-        require(re.fullmatch('[0-9a-f]{40}', fixed_head or '') is not None, 'fixed HEAD required')
-        if staging is not None:
-            validate_staging(staging)
-            # Legacy caller budgets can only block an impossible run, never authorize GPU.
-            with product_guard(root), config_guard(config, root), source_guard(fixed_head, root, {}):
-                initial_stage_gate(staging, root, max_audit_bytes)
-        return count_preflight(config, authorized=True, fixed_head=fixed_head, root=root,
-            max_audit_bytes=max_audit_bytes, audit_batch_size=audit_batch_size,
-            max_document_text_bytes=max_document_text_bytes)
-    report = {'schema': 'p4-full-phase12-preflight-v1', 'status': 'NOT_RUN',
-              'implementation_origin': IMPLEMENTATION, 'recovered_original_source': False,
-              'reference_sources': REFERENCE_SOURCES,
-              'fixed_head': fixed_head, 'fixed_code_sha': fixed_head,
-              'component_policy': 'Raw ROOT, ancestors and input walks checked before resolve; '
-                                  'no symlink/junction/reparse; only pinned ORT external exception',
-              'snapshot_bound': False, 'inventory_verified': False, 'count_complete': False,
-              'snapshot': dict(SNAPSHOT), 'declarative_contract': DECLARATIONS,
-              'builder_authorized': False, 'full_output_created': False, 'full_mapping_created': False,
-              'full_vectors_created': False, 'full_ann_created': False,
-              'output_created': False, 'attempt': 0, 'attempts': 0}
-    with product_guard(root), config_guard(config, root) as config_binding:
-        report['canonical_config_binding'] = config_binding
-        require(type(authorized) is bool, 'explicit authorization bool required')
-        if not authorized or fixed_head == 'NOT_FIXED_YET':
-            return report
-        raise ValueError('invalid authorization state')
+def preflight(config, *, root=ROOT, report=None):
+    """Read-only current asset validation for the ordinary builder."""
+    validate_contract(config)
+    result = {} if report is None else report
+    result['inventory'] = inventory()
+    result['status'] = 'READY_FOR_NORMAL_BUILD'
+    return result

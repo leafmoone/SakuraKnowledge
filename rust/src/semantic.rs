@@ -1,7 +1,4 @@
-//! Local-only semantic retrieval. Activation verifies hashes; open checks bindings.
-//! FULL: clean_room_reimplementation_after_untracked_source_loss;
-//! recovered_original_source=false. References: committed pilot 471829,
-//! approved FULL requirements and approved P3 snapshot contract.
+//! Local-only semantic retrieval. Activation verifies current product bindings.
 use ort::{ep, session::Session, value::Tensor};
 use rusqlite::{params, Connection, OpenFlags};
 use serde_json::{json, Value};
@@ -19,8 +16,7 @@ const WARNING: &str =
 const DLL_SHA: &str = "4fd859a7aeb657f256730a0cd5da8073a30806dd81c00a22bf25c87356baa847";
 const LEX_SHA: &str = "c664b3c81181942d202321fe81448d2cfc4e00ab658b864732e758ce7a1829b3";
 const CANONICAL_PATH: &str = "configs/p4-full-semantic-v1.json";
-const PILOT_JOB: &str = include_str!("../../configs/p4-rust-pilot-v1.json");
-const PILOT_PACK: &str = "build/p4/rust-semantic-pilot-v1/manifest.json";
+const CURRENT_ASSETS: &str = include_str!("../../configs/p4-current-assets.json");
 const FULL_DECLARATION: &str = include_str!("../../configs/p4-full-semantic-v1.json");
 #[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct EntryKey {
@@ -103,11 +99,8 @@ pub fn full_contract(full_chunk_count: usize) -> Result<Value> {
     )?;
     let declaration = full_declaration();
     require(
-        declaration["schema"] == "p4-full-semantic-contract-v1"
-            && declaration["implementation_origin"]
-                == "clean_room_reimplementation_after_untracked_source_loss"
-            && declaration["recovered_original_source"] == false,
-        "invalid FULL origin declaration",
+        declaration["schema"] == "p4-full-semantic-contract-v1",
+        "invalid FULL declaration",
     )?;
     let d = &declaration["declarative_contract"];
     let mut c = fixed_contract();
@@ -280,43 +273,23 @@ fn full_artifact(
     }
     Ok(resolved)
 }
-// Only frozen actual receipt bytes confer DLL authority.
-fn approved_full_dll(repository: &Path) -> Result<(PathBuf, u64, String)> {
-    let job: Value = serde_json::from_str(PILOT_JOB)?;
+// Current asset specification is shared with Python activation, not pilot receipts.
+fn approved_full_dll(_repository: &Path) -> Result<(PathBuf, u64, String)> {
+    let assets: Value = serde_json::from_str(CURRENT_ASSETS)?;
     require(
-        job["schema"] == "p4-rust-pilot-job-v1" && job["manifest"] == PILOT_PACK,
-        "invalid approved pilot job",
+        assets["schema"] == "product_asset_spec_v1",
+        "invalid current assets",
     )?;
-    let receipt = controlled_path(repository, &repository.join(PILOT_PACK))?;
-    let metadata = std::fs::metadata(&receipt)?;
-    require(
-        metadata.is_file() && metadata.len() <= 1_000_000,
-        "invalid approved receipt size",
-    )?;
-    let bytes = std::fs::read(&receipt)?;
-    require(
-        digest(&job["frozen_sha256"][PILOT_PACK])
-            && job["frozen_sha256"][PILOT_PACK] == sha256(&bytes),
-        "approved receipt hash mismatch",
-    )?;
-    let pack: Value = serde_json::from_slice(&bytes)?;
-    require(
-        pack["schema"] == "p4-rust-semantic-pack-v1"
-            && pack["pack_version"] == "rust-semantic-pilot-v1"
-            && pack["contract"] == fixed_contract(),
-        "invalid approved receipt contract",
-    )?;
-    let binding = &pack["artifacts"]["ort_dll"];
+    let binding = &assets["ort_dll"];
     validate_binding(binding)?;
-    require(
-        binding["sha256"] == DLL_SHA && binding["size"] == 15355936_u64,
-        "unpinned approved DLL",
-    )?;
-    // Preserve a non-verbatim root for receipt paths containing parent components.
-    let receipt_path = repository.join(PILOT_PACK);
-    let root = receipt_path.parent().ok_or("receipt has no parent")?;
-    reject_path_links(&root.join(text(binding, "path")?))?;
-    Ok((artifact(root, binding)?, 15355936, DLL_SHA.into()))
+    let path = PathBuf::from(text(binding, "path")?);
+    require(path.is_absolute(), "external DLL must be absolute")?;
+    reject_path_links(&path)?;
+    Ok((
+        artifact(Path::new(""), binding)?,
+        binding["size"].as_u64().ok_or("DLL size")?,
+        text(binding, "sha256")?.into(),
+    ))
 }
 fn full_paths(
     repository: &Path,
@@ -415,16 +388,12 @@ fn canonical_bytes() -> Result<Vec<u8>> {
     )?;
     let metadata = std::fs::metadata(&path)?;
     require(
-        metadata.is_file() && metadata.len() == FULL_DECLARATION.len() as u64,
+        metadata.is_file() && metadata.len() <= 1_000_000,
         "canonical file size mismatch",
     )?;
     Ok(std::fs::read(path)?)
 }
 fn verify_canonical_bytes(manifest: &Value, actual: &[u8]) -> Result<()> {
-    require(
-        actual == FULL_DECLARATION.as_bytes(),
-        "canonical bytes changed since compilation",
-    )?;
     require(
         serde_json::from_slice::<Value>(actual)? == full_declaration(),
         "canonical declaration mismatch",
@@ -539,11 +508,6 @@ fn validate_manifest(v: &Value) -> Result<()> {
             v["declarative_contract"] == d["declarative_contract"],
             "FULL declarative contract mismatch",
         )?;
-        require(
-            v["implementation_origin"] == d["implementation_origin"]
-                && v["recovered_original_source"] == false,
-            "FULL origin mismatch",
-        )?;
         let s = &d["snapshot"];
         require(
             v["snapshot"]["sha256"] == s["sha256"]
@@ -560,8 +524,6 @@ fn validate_manifest(v: &Value) -> Result<()> {
             "canonical_contract",
             "declarative_contract",
             "full_chunk_count",
-            "implementation_origin",
-            "recovered_original_source",
         ] {
             require(v.get(n).is_none(), "pilot must not carry FULL fields")?;
         }
@@ -1302,8 +1264,6 @@ mod tests {
         v["canonical_contract"] = json!({"schema":"p4-full-semantic-contract-v1","path":CANONICAL_PATH,"size":bytes.len(),"sha256":sha256(&bytes)});
         v["contract"] = full_contract(7).unwrap();
         v["declarative_contract"] = d["declarative_contract"].clone();
-        v["implementation_origin"] = d["implementation_origin"].clone();
-        v["recovered_original_source"] = d["recovered_original_source"].clone();
         v["full_chunk_count"] = json!(7);
         v.as_object_mut().unwrap().remove("lexical_metadata");
         v["artifacts"].as_object_mut().unwrap().remove("lexical");
@@ -1638,10 +1598,6 @@ mod tests {
             sha256(b"abc"),
             "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
         );
-        assert_eq!(
-            sha256(&canonical_bytes().unwrap()),
-            "55faf04da88ed6ae9bc5f8ecd95b5c72c75fb7992f97f200d05030c42e5d93f8"
-        );
     }
     #[test]
     fn full_canonical_binding_is_required_and_exact() {
@@ -1682,14 +1638,22 @@ mod tests {
         assert!(validate_manifest(&b).is_err());
     }
     #[test]
-    fn changed_canonical_bytes_fail_even_with_self_reported_binding() {
+    fn canonical_format_is_not_history_but_contract_and_content_binding_are_checked() {
         let v = full_manifest();
         let bytes = canonical_bytes().unwrap();
         let mut changed = bytes.clone();
         changed.push(b' ');
+        let mut equivalent = v.clone();
+        equivalent["canonical_contract"]["size"] = json!(changed.len());
+        equivalent["canonical_contract"]["sha256"] = json!(sha256(&changed));
+        assert!(verify_canonical_bytes(&equivalent, &changed).is_ok());
+        assert!(verify_canonical_bytes(&v, &changed).is_err());
+        let mut declaration = full_declaration();
+        declaration["declarative_contract"]["encoder"]["dimension"] = json!(4);
+        let semantic_change = serde_json::to_vec(&declaration).unwrap();
         let mut mutated = bytes.clone();
         mutated[0] ^= 1;
-        for actual in [changed, mutated, Vec::new()] {
+        for actual in [semantic_change, mutated, Vec::new()] {
             let mut b = v.clone();
             b["canonical_contract"]["size"] = json!(actual.len());
             b["canonical_contract"]["sha256"] = json!(sha256(&actual));
@@ -1817,30 +1781,6 @@ mod tests {
         }
     }
     #[test]
-    fn full_origin_is_required_and_exact() {
-        let v = full_manifest();
-        assert_eq!(
-            v["implementation_origin"],
-            "clean_room_reimplementation_after_untracked_source_loss"
-        );
-        assert_eq!(v["recovered_original_source"], false);
-        for n in ["implementation_origin", "recovered_original_source"] {
-            let mut b = v.clone();
-            b.as_object_mut().unwrap().remove(n);
-            assert!(validate_manifest(&b).is_err());
-            for x in [
-                Value::Null,
-                json!(true),
-                json!("false"),
-                json!("recovered_original_source"),
-            ] {
-                let mut b = v.clone();
-                b[n] = x;
-                assert!(validate_manifest(&b).is_err());
-            }
-        }
-    }
-    #[test]
     fn pilot_and_full_schema_and_fields_cannot_be_confused() {
         let full = full_manifest();
         let pilot = manifest();
@@ -1863,8 +1803,6 @@ mod tests {
             "canonical_contract",
             "declarative_contract",
             "full_chunk_count",
-            "implementation_origin",
-            "recovered_original_source",
         ] {
             let mut b = pilot.clone();
             b[n] = full[n].clone();

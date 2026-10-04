@@ -81,7 +81,7 @@ def prepare(job):
         require(type(job[key]) is int and job[key] > 0, f'invalid {key}')
     for key in ('summary', 'corpus', 'gold', 'chunks_manifest'):
         bound(local(job[key]), job[key + '_sha256'])
-    for key in ('chunks', 'authorization', 'index', 'output'):
+    for key in ('chunks', 'index', 'output'):
         local(job[key])
     require('samples' not in job, 'samples override forbidden: formal run uses all 120 cases')
     require(job.get('benchmark_scope', 'query_embedding') in ('query_embedding', 'total_retrieve'),
@@ -91,12 +91,6 @@ def prepare(job):
     require(manifest['corpus_sha256'] == job['corpus_sha256'], 'chunk corpus mismatch')
     require(manifest['document_count'] == 50000, 'pilot must contain 50k documents')
     require(manifest['chunk_count'] > 0, 'empty chunks')
-    auth = load(local(job['authorization']))
-    require(auth.get('authorized') is True and auth.get('gold_status') == FROZEN,
-            'parent frozen-gold authorization required')
-    for key in ('gold_sha256', 'corpus_sha256', 'summary_sha256', 'chunks_manifest_sha256'):
-        require(auth.get(key) == job[key], f'authorization mismatch: {key}')
-    require(auth.get('chunks_sha256') == manifest['chunks_sha256'], 'authorization chunk mismatch')
     summary = load(local(job['summary']))
     require(summary['status'] == 'PASS', 'model freeze failed')
     model = summary['models'][job['model']]

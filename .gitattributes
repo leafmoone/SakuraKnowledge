@@ -1,16 +1,12 @@
 # Raw evidence must be byte-verbatim: no EOL normalization, no diff text.
 reports/P2/raw/** -text -diff
-# New f99 review receipts bind byte-verbatim; historical receipts remain untouched.
-reports/P2/review-f99-*.json -text -diff
-reports/P2/review-b754-*.json -text -diff
-# New P3 receipts and replay decisions bind exact committed bytes.
-reports/P3/*.json -text -diff
-reports/P3/*.jsonl -text -diff
-# A-L new raw streams are stored once and committed byte-verbatim.
+# Preserved source observations and review decisions retain their original bytes.
+reports/P3/*decisions*.jsonl -text
+reports/P3/*candidates*.jsonl -text
 reports/P3/close-raw/** -text -diff
 # Final A-I raw streams retain exact bytes, including UTF-8 and CRLF.
 reports/P3/final-raw/** -text -diff
-# P4 frozen retrieval labels and new continuation receipts retain exact hash bytes.
+# Frozen retrieval labels and immutable product inputs retain original bytes.
 reports/P4/retrieval-gold.json -text
 reports/P4/continuation-*.json -text whitespace=cr-at-eol
 configs/p4-trusted-text-v1.json -text whitespace=cr-at-eol

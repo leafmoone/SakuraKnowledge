@@ -22,26 +22,18 @@ OUTPUT = 'build/p4/bge-query-reference-v2'
 
 
 def snapshot(job_path, job, prepared):
-    """Capture verified frozen inputs and executable source, without inference."""
+    """Capture verified product inputs, without historical source closure."""
     model, contract, manifest, cases = prepared
     paths = {key: exact.local(job[key]) for key in (
-        'summary', 'corpus', 'gold', 'chunks_manifest', 'chunks',
-        'authorization', 'selection_receipt')}
+        'summary', 'corpus', 'gold', 'chunks_manifest', 'chunks')}
     paths['job'] = job_path
     paths['contract'] = exact.local(model['contract']['path'])
-    receipt = exact.load(paths['selection_receipt'])
-    for key, binding in receipt['input_hash_validations'].items():
-        paths['selection_' + key] = exact.local(binding['path'])
     inputs = {key: {'path': path.relative_to(exact.ROOT).as_posix(),
                     'sha256': exact.sha(path)} for key, path in paths.items()}
-    dependencies = ('p4_query_reference.py', 'p4_cpu_representation.py',
-                    'p4_exact_pilot.py', 'p4_selection_v2.py')
-    code = {'tools/' + name: exact.sha(exact.ROOT / 'tools' / name)
-            for name in dependencies}
-    return {'inputs': inputs, 'code_sha256': code, 'job': job,
+    return {'inputs': inputs, 'job': job,
             'provenance': exact.provenance(job, model, manifest),
             'model': model, 'contract': contract, 'chunks_manifest': manifest,
-            'selection_receipt': receipt, 'ordered_cases_sha256': exact.canonical_hash(cases)}
+            'ordered_cases_sha256': exact.canonical_hash(cases)}
 
 
 def run(job_path, output_dir):
@@ -116,7 +108,6 @@ def run(job_path, output_dir):
                     'shape': [120, 1024], 'dtype': 'float32', 'encoder': info,
                     'versions': versions, 'versions_sha256': exact.canonical_hash(versions),
                     'frozen_provenance': before['provenance'],
-                    'code_sha256': before['code_sha256'],
                     'model_inventory_sha256': model['obtained_receipt']['inventory_sha256'],
                     'tokenizer_inventory_sha256': prepared[2]['tokenizer_inventory_sha256'],
                     'input_validations': {

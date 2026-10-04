@@ -91,33 +91,13 @@ def test_pack_verification_exception_only_for_ort_role(external_dll):
         pilot.pack_bindings(bad_manifest)
 
 
-def test_freeze_and_check_preserve_absolute_dll_and_reject_other_external(external_dll, monkeypatch):
+def test_job_uses_pack_assets_without_historical_source_closure(external_dll, monkeypatch):
     root, dll = external_dll
+    calls = []
     monkeypatch.setattr(pilot, 'pack_bindings', lambda manifest: (
-        {'snapshot': {'identity': 'snapshot'}}, [dll]))
-    monkeypatch.setattr(pilot, 'approved_receipts', lambda: None)
-    monkeypatch.setattr(pilot, 'load', lambda path: {})
-    monkeypatch.setattr(pilot.ann.selection, 'BINDINGS', {})
-    monkeypatch.setattr(pilot.subprocess, 'check_output', lambda *args, **kwargs: 'commit\n')
-    names = [pilot.ann.selection.JOB, pilot.ann.selection.CONFIG, pilot.ann.selection.SOURCE,
-             pilot.ann.RETRY_CONFIG, pilot.ann.INPUTS['queries'], pilot.ann.INPUTS['ranks'],
-             f'{pilot.ann.RETRY_RAW}/{pilot.SELECTED}.json',
-             'rust/Cargo.toml', 'rust/Cargo.lock', 'binary']
-    for name in names:
-        path = root / name
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(b'local')
-    job = pilot.freeze_job('binary', output='job.json')
-    assert job['frozen_sha256'][dll.as_posix()] == pilot.DLL_SHA
-    assert 'binary' in job['frozen_sha256']
-    pilot.check_frozen(job)
-    other = dll.with_name('other.dll')
-    other.write_bytes(dll.read_bytes())
-    job['frozen_sha256'][other.as_posix()] = pilot.DLL_SHA
-    with pytest.raises(ValueError, match='escapes repository'):
-        pilot.check_frozen(job)
-    del job['frozen_sha256'][other.as_posix()]
-    dll.write_bytes(b'changed!!!')
-    job['frozen_sha256'][dll.as_posix()] = pilot.sha(dll)
-    with pytest.raises(ValueError, match='unpinned ORT DLL'):
-        pilot.check_frozen(job)
+        calls.append(manifest) or {'snapshot': {'identity': 'snapshot'}}, [dll]))
+    (root / 'binary').write_bytes(b'local')
+    job = pilot.create_job('binary', output='job.json')
+    assert 'frozen_sha256' not in job and 'code_sha' not in job
+    pilot.validate_job(job)
+    assert calls == [pilot.PACK, pilot.PACK]

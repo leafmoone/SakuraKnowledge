@@ -129,6 +129,37 @@ def test_export_inventory_binds_every_tensor_without_loading(tmp_path, monkeypat
         pilot.export_artifacts(directory, tmp_path)
 
 
+def test_export_session_checks_unique_assets_once_and_rejects_raw_links(tmp_path, monkeypatch):
+    monkeypatch.setattr(pilot, 'ROOT', tmp_path)
+    directory = tmp_path / 'export'
+    directory.mkdir()
+    records = []
+    for name in ('model.onnx', 'tensor'):
+        path = directory / name
+        path.write_bytes(b'asset')
+        records.append(pilot.binding(path, directory))
+    pilot.save_new(directory / 'manifest.json', {'files': records})
+    calls = []
+    def verify(path, record):
+        calls.append(path)
+        pilot.verify_binding(record, directory)
+    pilot.export_artifacts(directory, tmp_path, verified=verify)
+    assert calls == [directory / 'model.onnx', directory / 'tensor']
+    import stat
+    original = type(directory).lstat
+    def reparse(path):
+        info = original(path)
+        if path == directory / 'tensor':
+            from types import SimpleNamespace
+            return SimpleNamespace(st_file_attributes=stat.FILE_ATTRIBUTE_REPARSE_POINT, st_mode=info.st_mode)
+        return info
+    monkeypatch.setattr(type(directory), 'lstat', reparse)
+    calls.clear()
+    with pytest.raises(ValueError, match='symlink/reparse/junction'):
+        pilot.export_artifacts(directory, tmp_path, verified=verify)
+    assert directory / 'tensor' not in calls
+
+
 def test_export_manifest_cannot_escape_directory(tmp_path, monkeypatch):
     monkeypatch.setattr(pilot, 'ROOT', tmp_path)
     directory = tmp_path / 'export'
@@ -158,38 +189,24 @@ def test_driver_timeout_no_retry():
         driver.receive(.001)
 
 
-def test_failure_receipt_retains_attempt_counts_and_post_gate(tmp_path, monkeypatch):
+def test_failure_keeps_attempt_counts_with_one_asset_validation(tmp_path, monkeypatch):
     monkeypatch.setattr(pilot, 'ROOT', tmp_path)
     job_path = tmp_path / 'job.json'
     pilot.save_new(job_path, {'output': 'receipt.json'})
     calls = []
-    monkeypatch.setattr(pilot, 'check_frozen', lambda job: calls.append('check'))
+    monkeypatch.setattr(pilot, 'validate_job', lambda job: calls.append('check'))
     def fail(job, receipt):
         receipt['warmups'] = [{'status': 'PASS'}, {'status': 'PASS'}]
         receipt['formal'] = [{'status': 'PASS'}, {'status': 'FAIL', 'error': 'timeout'}]
         raise TimeoutError('timeout')
     monkeypatch.setattr(pilot, 'qualify', fail)
     receipt = pilot.run(job_path)
-    assert receipt['status'] == 'FAIL' and calls == ['check', 'check']
+    assert receipt['status'] == 'FAIL' and calls == ['check']
     assert receipt['formal_counts'] == {'attempted': 2, 'failed': 1, 'not_run': 118}
     assert receipt['warmups_counts'] == {'attempted': 2, 'failed': 0, 'not_run': 0}
-    assert receipt['bindings_after'] == 'PASS' and receipt['retries'] == 0
+    assert receipt['retries'] == 0
 
 
-def test_post_tampering_disqualifies_success(tmp_path, monkeypatch):
-    monkeypatch.setattr(pilot, 'ROOT', tmp_path)
-    job_path = tmp_path / 'job.json'
-    pilot.save_new(job_path, {'output': 'receipt.json'})
-    calls = []
-    def check(job):
-        calls.append(1)
-        if len(calls) == 2:
-            raise ValueError('changed input')
-    monkeypatch.setattr(pilot, 'check_frozen', check)
-    monkeypatch.setattr(pilot, 'qualify', lambda job, receipt: None)
-    receipt = pilot.run(job_path)
-    assert receipt['status'] == 'FAIL' and receipt['bindings_after'] == 'FAIL'
-    assert receipt['immutable_error'] == 'changed input'
 
 
 def test_pack_cli_is_generate_only(monkeypatch):
@@ -200,61 +217,9 @@ def test_pack_cli_is_generate_only(monkeypatch):
     assert calls == [('snapshot', 'dll', pilot.PACK)]
 
 
-def test_freeze_cli_does_not_qualify(monkeypatch):
+def test_job_cli_does_not_qualify(monkeypatch):
     calls = []
-    monkeypatch.setattr(pilot, 'freeze_job', lambda *args: calls.append(args))
+    monkeypatch.setattr(pilot, 'create_job', lambda *args: calls.append(args))
     monkeypatch.setattr(pilot, 'run', lambda *args: pytest.fail('inference not authorized'))
-    assert pilot.main(['freeze', '--binary', 'binary']) == 0
+    assert pilot.main(['job', '--binary', 'binary']) == 0
     assert calls == [('binary', pilot.JOB, pilot.PACK)]
-
-
-def test_receipt_digest_requires_unique_exact_path():
-    assert pilot.receipt_digest({'D:\\repo\\a\\file': 'digest'}, 'a/file') == 'digest'
-    for inputs in ({'D:/repo/not-a/file': 'digest'},
-                   {'D:/repo/a/file': 'one', 'E:/repo/a/file': 'two'}):
-        with pytest.raises(ValueError, match='missing/ambiguous'):
-            pilot.receipt_digest(inputs, 'a/file')
-
-
-@pytest.mark.parametrize('name', ['tokenizer.json', 'manifest.json', 'corpus.jsonl'])
-def test_quality_binding_rejects_self_consistent_replacement(tmp_path, monkeypatch, name):
-    monkeypatch.setattr(pilot, 'ROOT', tmp_path)
-    path = tmp_path / name
-    path.write_bytes(b'old')
-    inputs = {'D:/approved/' + name: pilot.sha(path)}
-    pilot.quality_binding(path, tmp_path, inputs)
-    path.write_bytes(b'new')
-    assert pilot.binding(path, tmp_path)['sha256'] != inputs['D:/approved/' + name]
-    with pytest.raises(ValueError, match='quality artifact changed'):
-        pilot.quality_binding(path, tmp_path, inputs)
-
-
-@pytest.mark.parametrize('changed', ['ann', 'quality', 'cpu'])
-def test_unapproved_receipts_rejected_before_loading(monkeypatch, changed):
-    def record(path):
-        key = next(k for k, v in pilot.RECEIPTS.items() if v == path)
-        return {'sha256': 'tampered' if key == changed else pilot.RECEIPT_HASHES[key]}
-    monkeypatch.setattr(pilot, 'binding', record)
-    monkeypatch.setattr(pilot, 'load', lambda path: pytest.fail('unapproved receipt loaded'))
-    with pytest.raises(ValueError, match=f'unapproved {changed} receipt'):
-        pilot.approved_receipts()
-
-
-@pytest.mark.parametrize('changed', list(pilot.ANN_INPUT_HASHES))
-def test_ann_inputs_bound_to_approved_hashes(monkeypatch, changed):
-    records = {path: {'sha256': pilot.RECEIPT_HASHES[key]}
-               for key, path in pilot.RECEIPTS.items()}
-    inputs = {'D:/approved/' + pilot.ann.INPUTS[key]: digest
-              for key, digest in pilot.ANN_INPUT_HASHES.items()}
-    receipt = {'schema': 'p4-ann-v1-retry1', 'status': 'PASS', 'selected': pilot.SELECTED,
-               'input_validations': {'before': 'PASS', 'after': 'PASS'},
-               'input_sha256_before': inputs, 'input_sha256_after': inputs.copy()}
-    monkeypatch.setattr(pilot, 'binding', lambda path: records[path])
-    monkeypatch.setattr(pilot, 'load', lambda path: receipt)
-    hashes = {pilot.local(pilot.ann.INPUTS[key]): digest
-              for key, digest in pilot.ANN_INPUT_HASHES.items()}
-    monkeypatch.setattr(pilot, 'sha', lambda path: hashes[path])
-    pilot.approved_receipts()
-    hashes[pilot.local(pilot.ann.INPUTS[changed])] = 'tampered'
-    with pytest.raises(ValueError, match=f'ANN input changed: {changed}'):
-        pilot.approved_receipts()

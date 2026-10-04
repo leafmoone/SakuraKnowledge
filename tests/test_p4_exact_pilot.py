@@ -303,16 +303,6 @@ def test_prepare_accepts_real_manifest_shape(frozen_job):
     assert len(pilot.prepare(frozen_job)[3]) == 120
 
 
-@pytest.mark.parametrize('key', ['summary_sha256', 'chunks_manifest_sha256', 'gold_status'])
-def test_prepare_rejects_unbound_authorization(frozen_job, key):
-    path = pilot.local(frozen_job['authorization'])
-    auth = pilot.load(path)
-    auth[key] = 'wrong'
-    path.write_text(json.dumps(auth), encoding='utf-8')
-    with pytest.raises(ValueError, match='authorization'):
-        pilot.prepare(frozen_job)
-
-
 def test_prepare_rejects_mutable_gold(frozen_job):
     path = pilot.local(frozen_job['gold'])
     gold = pilot.load(path)

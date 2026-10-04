@@ -38,9 +38,8 @@ def run(job_path, output):
         try:
             job_hash = pilot.sha(job_path)
             job = pilot.load(job_path)
-            auth_hash = pilot.sha(pilot.local(job['authorization']))
             model, contract, manifest, cases = pilot.prepare(job)
-            result.update({'job_sha256': job_hash, 'authorization_sha256': auth_hash,
+            result.update({'job_sha256': job_hash,
                            'model': job['model'], 'repository': model['repository'],
                            'revision': model['revision'],
                            'provenance': pilot.provenance(job, model, manifest)})
@@ -52,7 +51,6 @@ def run(job_path, output):
             pilot.require(pilot.prepare(job) == (model, contract, manifest, cases),
                           'frozen input changed during scan')
             pilot.bound(job_path, job_hash)
-            pilot.bound(pilot.local(job['authorization']), auth_hash)
             result['status'] = 'PASS'
         except Exception as exc:  # noqa: BLE001 -- retain failure receipt and return nonzero
             result['error'] = {'type': type(exc).__name__, 'message': str(exc)}

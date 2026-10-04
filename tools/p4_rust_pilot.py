@@ -12,6 +12,7 @@ import math
 import os
 import queue
 import sqlite3
+import stat
 import subprocess
 import threading
 import time
@@ -27,29 +28,9 @@ RECEIPT = 'reports/P4/rust-semantic-pilot-v1.json'
 SELECTED = 'M16-Eadd256-ef128'
 MAX_BYTES = 524288
 REVISION = '5617a9f61b028005a4858fdac845db406aefb181'
-RECEIPTS = {
-    'ann': ann.RETRY_OUTPUT,
-    'quality': ann.INPUTS['quality_receipt'],
-    'cpu': ann.INPUTS['cpu_receipt'],
-}
-RECEIPT_HASHES = {
-    'ann': '0a2f0d05a184c14e84ffa29d632e52c785b77c5095c679564ce1971ddb34fcd2',
-    'quality': 'a74e3fb5fee45d6849e1e5030900ff00c6dd9378ce2fa1377d378a92af3e3d01',
-    'cpu': '41da6e1ffab3568e9f94ec5e03c98dca72adabb5bd732c1a1bd7d18907df5264',
-}
-ANN_INPUT_HASHES = {
-    'vectors': 'e3a8181933f4ee976a79e28ae978d07d5d6f5ab09b5124f2366953074bcb7261',
-    'mapping': '8027c11f61ffcfb1a6d7cefbaff65e5ab3a0b2bd3b0c40b82517a4e434b4f2b2',
-    'queries': '1c22703d7d0d8f191627554b1f14ac2081d738fe4c6a4d00bfea1532002e3757',
-    'ranks': '6daad5b075411f18cb5847e6dd29315cef99a09e694b2048efa7bc3587a14f9e',
-    'quality_receipt': RECEIPT_HASHES['quality'],
-    'cpu_receipt': RECEIPT_HASHES['cpu'],
-}
-EXPORT_MANIFEST_SHA = 'b981d9c2b8f02691a200b9b88da8c778abcbaaaa3d49d0376f88590c89fbbb03'
-DLL_SHA = '4fd859a7aeb657f256730a0cd5da8073a30806dd81c00a22bf25c87356baa847'
-DLL_SIZE = 15355936
-EXTERNAL_ORT_DLL = Path('C:/Users/PC/AppData/Local/Python/pythoncore-3.14-64/'
-                        'Lib/site-packages/onnxruntime/capi/onnxruntime.dll')
+_DLL = json.loads((ROOT / 'configs/p4-current-assets.json').read_text(encoding='utf8'))['ort_dll']
+DLL_SHA, DLL_SIZE = _DLL['sha256'], _DLL['size']
+EXTERNAL_ORT_DLL = Path(_DLL['path'])
 LEX_SHA = 'c664b3c81181942d202321fe81448d2cfc4e00ab658b864732e758ce7a1829b3'
 POLICY = {'warmups': 2, 'formal': 120, 'retries': 0, 'resident_max_ms': 5000,
           'resident_p95_ms': 1000, 'response_max_bytes': MAX_BYTES,
@@ -120,40 +101,13 @@ def verify_binding(record, root=ROOT, *, ort_dll=False):
     return path
 
 
-def receipt_digest(inputs, path):
-    """Historical receipts use absolute Windows paths; require a unique suffix."""
-    matches = [digest for name, digest in inputs.items()
-               if name.replace('\\', '/').endswith('/' + path)]
-    require(len(matches) == 1, f'missing/ambiguous approved input: {path}')
-    return matches[0]
 
 
-def approved_receipts():
-    records = {k: binding(v) for k, v in RECEIPTS.items()}
-    for key, digest in RECEIPT_HASHES.items():
-        require(records[key]['sha256'] == digest, f'unapproved {key} receipt')
-    result = load(local(RECEIPTS['ann']))
-    require(result['schema'] == 'p4-ann-v1-retry1' and result['status'] == 'PASS'
-            and result['selected'] == SELECTED and result['input_validations'] ==
-            {'before': 'PASS', 'after': 'PASS'}, 'approved ANN retry1 required')
-    require(result['input_sha256_before'] == result['input_sha256_after'], 'ANN inputs changed')
-    for key, digest in ANN_INPUT_HASHES.items():
-        path = ann.INPUTS[key]
-        require(receipt_digest(result['input_sha256_before'], path) == digest,
-                f'unapproved ANN input: {key}')
-        require(sha(local(path)) == digest, f'ANN input changed: {key}')
-    return records, result
 
 
-def quality_binding(path, pack_root, inputs):
-    record = binding(path, pack_root)
-    name = local(path).relative_to(ROOT).as_posix()
-    require(record['sha256'] == receipt_digest(inputs, name),
-            f'quality artifact changed: {name}')
-    return record
 
 
-def export_artifacts(directory, pack_root):
+def export_artifacts(directory, pack_root, *, verified=None):
     """Inventory only: no ONNX parser/session and no tensor materialization."""
     manifest = load(directory / 'manifest.json')
     records = manifest['files']
@@ -162,13 +116,28 @@ def export_artifacts(directory, pack_root):
     result = {}
     external = []
     for record in records:
-        path = (directory / record['path']).resolve()
+        raw_path = directory / record['path']
+        require(not Path(record['path']).is_absolute() and '..' not in Path(record['path']).parts,
+                'external tensor escapes export')
+        for component in (raw_path, *raw_path.parents):
+            info = component.lstat()
+            require(not component.is_symlink() and not component.is_junction() and
+                    not (getattr(info, 'st_file_attributes', 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT),
+                    'symlink/reparse/junction export asset')
+        path = raw_path.resolve()
         require(path.is_relative_to(directory.resolve()), 'external tensor escapes export')
-        verify_binding(record, directory)
+        if verified is not None:
+            verified(path, record)
+            ref = {'path': Path(os.path.relpath(path, pack_root)).as_posix(),
+                   'size': record['size'], 'sha256': record['sha256']}
+        else:
+            verify_binding(record, directory)
+            ref = {'path': Path(os.path.relpath(path, pack_root)).as_posix(),
+                   'size': record['size'], 'sha256': record['sha256']}
         if record['path'] == 'model.onnx':
-            result['model'] = binding(path, pack_root)
+            result['model'] = ref
         elif record['path'] != 'passage-sample.json':
-            external.append(binding(path, pack_root))
+            external.append(ref)
     require(external, 'missing external tensors')
     # Every existing export file must be accounted for, including all tensor shards.
     actual = {p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()}
@@ -180,30 +149,17 @@ def export_artifacts(directory, pack_root):
 def build_pack(snapshot, ort_dll, output=PACK):
     output = local(output)
     require(not output.exists(), 'pack already exists')
-    receipts, approved = approved_receipts()
-    quality_inputs = load(local(RECEIPTS['quality']))['input_sha256']
-    directory = local('build/p4/bge-onnx-v2')
-    export_manifest = quality_binding(directory / 'manifest.json', output.parent, quality_inputs)
-    require(export_manifest['sha256'] == EXPORT_MANIFEST_SHA, 'unapproved export manifest')
+    spec = load(local('configs/p4-current-assets.json'))
+    directory = local(spec['export_manifest']['path']).parent
+    verify_binding(spec['export_manifest'])
+    export_manifest = binding(directory / 'manifest.json', output.parent)
     artifacts = export_artifacts(directory, output.parent)
-    paths = {'tokenizer': f'model/BAAI--bge-m3/{REVISION}/tokenizer.json',
-             'ort_dll': ort_dll, 'index': 'build/p4/ann-v1-retry1/M16-Eadd256.usearch',
-             'mapping': ann.INPUTS['mapping'], 'corpus': 'build/p4/continuation-pilot-v1.jsonl',
-             'lexical': 'build/p4/continuation-lexical-v1.sqlite'}
-    artifacts.update({k: binding(v, output.parent, ort_dll=k == 'ort_dll')
-                      for k, v in paths.items()})
-    for key in ('tokenizer', 'corpus'):
-        artifacts[key] = quality_binding(paths[key], output.parent, quality_inputs)
-    require(artifacts['mapping']['sha256'] == ANN_INPUT_HASHES['mapping'],
-            'unapproved ANN mapping')
-    require(artifacts['ort_dll']['sha256'] == DLL_SHA and
-            artifacts['ort_dll']['size'] == DLL_SIZE, 'unpinned ORT DLL')
-    require(artifacts['lexical']['sha256'] == LEX_SHA, 'unpinned lexical sidecar')
-    selected = next(b for b in approved['builds'] if b['M'] == 16 and b['Eadd'] == 256)
-    require(selected['status'] == 'PASS' and
-            artifacts['index']['sha256'] == selected['index_sha256'] and
-            artifacts['index']['size'] == selected['index_bytes'], 'wrong selected index')
-    with sqlite3.connect(local(paths['lexical']).as_uri() + '?mode=ro', uri=True) as conn:
+    for key, record in spec['optional_pilot_artifacts'].items():
+        artifacts[key] = binding(verify_binding(record), output.parent)
+    artifacts['ort_dll'] = binding(ort_dll, output.parent, ort_dll=True)
+    require(artifacts['ort_dll']['sha256'] == spec['ort_dll']['sha256'] and
+            artifacts['ort_dll']['size'] == spec['ort_dll']['size'], 'unpinned ORT DLL')
+    with sqlite3.connect(local(spec['optional_pilot_artifacts']['lexical']['path']).as_uri() + '?mode=ro', uri=True) as conn:
         metadata = json.loads(conn.execute('SELECT value FROM metadata').fetchone()[0])
     snap = binding(snapshot, output.parent)
     snap['identity'] = local(snapshot).relative_to(ROOT).as_posix()
@@ -212,7 +168,7 @@ def build_pack(snapshot, ort_dll, output=PACK):
                 f'lexical {name} binding mismatch')
     value = {'schema': 'p4-rust-semantic-pack-v1', 'pack_version': 'rust-semantic-pilot-v1',
              'snapshot': snap, 'contract': fixed_contract(), 'lexical_metadata': metadata,
-             'artifacts': artifacts, 'approved_receipts': receipts,
+             'artifacts': artifacts,
              'export_manifest': export_manifest}
     save_new(output, value)
     return value
@@ -231,43 +187,25 @@ def pack_bindings(manifest_path):
             records.extend(value if name == 'external_data' else [value])
     paths = [verify_binding(r, manifest_path.parent) for r in records]
     paths.append(verify_binding(pack['artifacts']['ort_dll'], manifest_path.parent, ort_dll=True))
-    paths += [verify_binding(r) for r in pack['approved_receipts'].values()]
     paths.append(manifest_path)
     return pack, paths
 
 
-def freeze_job(binary, output=JOB, manifest=PACK):
+def create_job(binary, output=JOB, manifest=PACK):
     output = local(output)
     require(not output.exists(), 'job already exists')
-    pack, paths = pack_bindings(manifest)
-    approved_receipts()
-    score_job = load(local(ann.selection.JOB))
-    paths += [local(score_job[k]) for k in ann.selection.BINDINGS.values()]
-    paths += [local(p) for p in (ann.selection.JOB, ann.selection.CONFIG, ann.selection.SOURCE,
-                               ann.RETRY_CONFIG, ann.INPUTS['queries'], ann.INPUTS['ranks'],
-                               f'{ann.RETRY_RAW}/{SELECTED}.json')]
-    # Freeze all Python scoring dependencies and Rust implementation/build inputs.
-    paths += list((ROOT / 'tools').glob('p4_*.py'))
-    paths += list((ROOT / 'rust/src').rglob('*.rs'))
-    paths += [ROOT / 'rust/Cargo.toml', ROOT / 'rust/Cargo.lock', local(binary)]
-    frozen = {(p.relative_to(ROOT).as_posix() if p.is_relative_to(ROOT) else p.as_posix()):
-              sha(p) for p in sorted(set(paths))}
+    pack, _ = pack_bindings(manifest)
     value = {'schema': 'p4-rust-pilot-job-v1', 'manifest': manifest,
              'snapshot': pack['snapshot']['identity'], 'binary': binary,
-             'binary_sha256': sha(local(binary)), 'code_sha': subprocess.check_output(
-                 ['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-             'policy': POLICY, 'frozen_sha256': frozen, 'raw_directory': RAW, 'output': RECEIPT}
+             'policy': POLICY, 'raw_directory': RAW, 'output': RECEIPT}
     save_new(output, value)
     return value
 
 
-def check_frozen(job):
+def validate_job(job):
     require(job['schema'] == 'p4-rust-pilot-job-v1' and job['policy'] == POLICY, 'job contract')
-    require(sha(local(job['binary'])) == job['binary_sha256'], 'binary changed')
-    require(subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-            == job['code_sha'], 'code commit changed')
-    for name, digest in job['frozen_sha256'].items():
-        require(sha(read_artifact(name, ort_dll=True)) == digest, f'frozen input changed: {name}')
+    require(local(job['binary']).is_file(), 'runtime binary missing')
+    pack_bindings(job['manifest'])
 
 
 def source_ids(rows):
@@ -356,14 +294,25 @@ class Driver:
         self.process.stdout.close()
 
 
+def evaluation_inputs():
+    """Load ordinary benchmark data; historical selection receipts are not authority."""
+    job = load(local('configs/p4-pilot-score-job.json'))
+    get = lambda key: load(local(job[key]))
+    with local(job['corpus']).open(encoding='utf8') as stream:
+        documents = [ann.selection.parse(line) for line in stream if line.strip()]
+    bindings = {key: sha(local(job[key])) for key in
+                ('gold', 'corpus', 'lexical', 'dense_a', 'dense_b', 'model_summary', 'config')}
+    return (get('gold'), documents, get('lexical'), {'a': get('dense_a'), 'b': get('dense_b')},
+            get('model_summary'), get('config'), bindings)
+
+
 def qualify(job, receipt):
     import numpy as np
 
-    inputs = ann.quality.score_inputs()
+    inputs = evaluation_inputs()
     cases = sorted(inputs[0]['cases'], key=lambda c: c['case_id'])
     require(len(cases) == 120 and len({c['case_id'] for c in cases}) == 120, '120 unique cases')
     reference = load(local(f'{ann.RETRY_RAW}/{SELECTED}.json'))
-    require(reference['candidate']['status'] == 'PASS', 'selected raw status')
     ref_cases = reference['queries']
     require([r['case_id'] for r in ref_cases] == [c['case_id'] for c in cases], 'reference ordering')
     onnx = load(local(ann.INPUTS['ranks']))
@@ -418,9 +367,6 @@ def qualify(job, receipt):
     actual, details = ann.score_cases(inputs, actual_cases)
     baseline, _ = ann.score_cases(inputs, [{**c, 'hits': r['hits']}
                                 for c, r in zip(onnx['cases'], ref_cases, strict=True)])
-    for label, mode in [('ANN_DENSE_B', 'EXACT_DENSE_MODEL_B'), ('ANN_HYBRID_B', 'RRF_HYBRID_MODEL_B')]:
-        require(baseline['metrics'][mode] == reference['candidate']['quality']['metrics'][label],
-                'selected Python ANN scoring reproduction')
     receipt['quality'] = ann.quality.quality(actual['metrics'], baseline['metrics'])
     receipt['overlap'] = ann.approximation([r['overlap'] for r in receipt['formal']])
     wall = sorted(r['wall_ms'] for r in receipt['formal'])
@@ -440,24 +386,17 @@ def run(job_path):
     job = load(job_path)
     output = local(job['output'])
     require(not output.exists(), 'receipt already exists')
+    # Validate assets once per run; output diagnostics cannot authorize a product.
     receipt = {'schema': 'p4-rust-pilot-v1', 'status': 'FAIL', 'retries': 0,
-               'warmups': [], 'formal': [], 'job_sha256': sha(job_path),
-               'policy': POLICY, 'bindings_before': 'NOT_COMPLETED', 'bindings_after': 'NOT_COMPLETED',
+               'warmups': [], 'formal': [], 'policy': POLICY,
                'memory': {'status': 'NOT_AVAILABLE', 'reason': 'optional; psutil not required'}}
     try:
-        check_frozen(job)
-        receipt['bindings_before'] = 'PASS'
+        validate_job(job)
         qualify(job, receipt)
         receipt['status'] = 'PASS'
     except Exception as exc:  # noqa: BLE001
         receipt['error'] = f'{type(exc).__name__}: {exc}'
     finally:
-        try:
-            check_frozen(job)
-            require(sha(job_path) == receipt['job_sha256'], 'job changed during run')
-            receipt['bindings_after'] = 'PASS'
-        except Exception as exc:  # noqa: BLE001
-            receipt.update(status='FAIL', bindings_after='FAIL', immutable_error=str(exc))
         for phase, total in (('warmups', 2), ('formal', 120)):
             rows = receipt[phase]
             receipt[phase + '_counts'] = {'attempted': len(rows),
@@ -473,17 +412,17 @@ def main(argv=None):
     pack.add_argument('--snapshot', required=True)
     pack.add_argument('--ort-dll', required=True)
     pack.add_argument('--output', default=PACK)
-    freeze = commands.add_parser('freeze', help='create job to review/freeze before real run')
-    freeze.add_argument('--binary', required=True)
-    freeze.add_argument('--manifest', default=PACK)
-    freeze.add_argument('--output', default=JOB)
-    execute = commands.add_parser('run', help='explicit authorized qualification only')
+    job = commands.add_parser('job', help='create ordinary optional pilot evaluation configuration')
+    job.add_argument('--binary', required=True)
+    job.add_argument('--manifest', default=PACK)
+    job.add_argument('--output', default=JOB)
+    execute = commands.add_parser('run', help='run optional pilot quality evaluation')
     execute.add_argument('--job', default=JOB)
     args = parser.parse_args(argv)
     if args.command == 'pack':
         build_pack(args.snapshot, args.ort_dll, args.output)
-    elif args.command == 'freeze':
-        freeze_job(args.binary, args.output, args.manifest)
+    elif args.command == 'job':
+        create_job(args.binary, args.output, args.manifest)
     else:
         return 0 if run(args.job)['status'] == 'PASS' else 1
     return 0

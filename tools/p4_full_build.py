@@ -1,8 +1,9 @@
-"""Explicit future FULL executor; implementation is not execution authorization."""
+"""Supported ordinary P4 builder lifecycle."""
 import argparse
 import hashlib
 import heapq
 import json
+import math
 import os
 import sqlite3
 import subprocess
@@ -16,25 +17,8 @@ from tools import p4_full_acceptance as acceptance
 from tools import p4_full_preflight as full
 
 ROOT = full.ROOT
-OUTPUT = 'build/p4-full-semantic-v1'
-AUTH_SCHEMA = 'p4-full-build-authorization-v1'
-RETRY_SCHEMA = 'p4-full-build-retry-authorization-v1'
-RETRY_OUTPUT = 'build/p4-full-semantic-v1-retry1'
-FAILURE_CLASS = 'HARNESS_AUTHORITY_DOMAIN_MISMATCH'
-POLICY_EXCEPTION = 'EXPLICIT_ATTEMPT2_AFTER_VERIFIED_HARNESS_DEFECT'
-ATTEMPT1_RESULT_SHA = 'd5c7c1b0bc900af1f547c544e8fd95309e1a9395'
-ATTEMPT1_IMPLEMENTATION_SHA = '3eeda16b4f1c99b01430979819e5c079243d1f08'
-ATTEMPT1_BINDINGS = {
-    'authorization': {'path': 'build/p4-full-build-authorization-3eeda16b.json', 'size': 12988,
-        'sha256': '9571003d333444e19b9974b0ce28b0e2cd4694ed6cadbe3293e1f2967fcb99c7'},
-    'attempt1_lock': {'path': 'build/p4-full-semantic-v1.attempt1.lock', 'size': 30372,
-        'sha256': '955b9a2e424579ff9363e942824b1911ff015db3e173c4f86b962fad40ef0220'},
-    'execution_receipt': {'path': 'build/p4-full-semantic-v1/execution-receipt.json', 'size': 107066,
-        'sha256': '34bf78970a3f269d9f2f1fd362458111e159c9e1df06319a7180353b38128d4a'},
-    'command_receipt': {'path': 'reports/P4/full-semantic-build-command.json', 'size': 7335,
-        'sha256': '69fa69d3c1e4e7dee95f3317034385fd72dd2567db3287ed880fe3b7598ef71b'},
-    'handoff': {'path': 'reports/P4/full-semantic-build-handoff.json', 'size': 1140,
-        'sha256': '3ab30ecacf4eb3a3af6498906578db0ddfb2ed5d623035183220a2b53e3692eb'}}
+OUTPUT = 'build/p4-current-semantic-v1'
+ASSET_SPEC = 'configs/p4-current-assets.json'
 EXECUTOR_ORIGIN = 'clean_room_full_build_executor_v1'
 require = full.require
 PRODUCTS = ('chunks.sqlite', 'corpus.jsonl', 'vectors.npy', 'vectors.usearch',
@@ -71,223 +55,104 @@ def binding(path, directory):
     return {'path': name, 'size': path.stat().st_size, 'sha256': full.exact.sha(path)}
 
 
-def authorize(path, expected_sha256, *, fixed_head, root):
-    require(path is not None and expected_sha256 is not None,
-            'future explicit FULL authorization and independently reviewed SHA256 required')
-    full.chunks.valid_hash(expected_sha256)
-    require(isinstance(fixed_head, str) and len(fixed_head) == 40 and
-            all(c in '0123456789abcdef' for c in fixed_head), 'fixed HEAD required')
-    path = full.contained(path, root)
-    require(full.exact.sha(path) == expected_sha256, 'authorization hash mismatch')
-    value = read_json(path)
-    require(isinstance(value, dict) and set(value) == {'schema', 'operation', 'fixed_code_sha',
-            'preflight_producer_sha', 'preflight_evidence_sha', 'reviewed_source_bindings',
-            'output', 'max_attempts', 'count_review', 'disk_review', 'smoke_review', 'executor_bindings'},
-            'exact future authorization fields required')
-    require(value['schema'] == AUTH_SCHEMA and value['operation'] == 'execute_full' and
-            value['fixed_code_sha'] == fixed_head and value['output'] == OUTPUT and
-            type(value['max_attempts']) is int and value['max_attempts'] == 1, 'future authorization policy mismatch')
-    authenticate_executor_bindings(value, fixed_head=fixed_head, root=root)
-    return value
+def validate_partial_vectors(path, *, rows, dimension=1024):
+    """Read-only vector validation; no historical receipt or attempt authority."""
+    import numpy as np
+    vectors = np.load(path, mmap_mode='r', allow_pickle=False)
+    try:
+        require(vectors.shape == (rows, dimension) and vectors.dtype == np.float32,
+                'vector shape/dtype mismatch')
+        max_error = 0.0
+        for start in range(0, rows, 1024):
+            batch = vectors[start:start + 1024]
+            require(np.isfinite(batch).all(), 'nonfinite vectors')
+            error = float(np.max(np.abs(np.linalg.norm(batch, axis=1) - 1)))
+            require(error <= 1e-5, 'vector normalization failed')
+            max_error = max(max_error, error)
+        return {'ROWS': rows, 'DIM': dimension, 'DTYPE': 'float32', 'FINITE': 'PASS',
+                'NORMALIZATION': 'PASS', 'max_norm_error': max_error}
+    finally:
+        close_memmap(vectors)
 
 
-def authenticate_executor_bindings(value, *, fixed_head, root):
-    for field in ('preflight_producer_sha', 'preflight_evidence_sha'):
-        sha = value[field]
-        require(isinstance(sha, str) and len(sha) == 40 and all(c in '0123456789abcdef' for c in sha),
-                'future authorization policy mismatch')
-    require(isinstance(value['reviewed_source_bindings'], dict) and
-            set(value['reviewed_source_bindings']) == {'count', 'disk', 'smoke'},
-            'reviewed preflight source bindings required')
-    for digest in value['reviewed_source_bindings'].values():
-        full.chunks.valid_hash(digest)
-    require(isinstance(value['executor_bindings'], dict) and set(value['executor_bindings']) ==
-            EXECUTOR_PATHS, 'executor source closure required')
-    for name, digest in value['executor_bindings'].items():
-        full.chunks.valid_hash(digest)
-        require(full.exact.sha(full.contained(name, root)) == digest, 'executor source changed')
-        current = subprocess.check_output(['git', 'hash-object', '--path=' + name, name], cwd=root, text=True).strip()
-        approved = subprocess.check_output(['git', 'rev-parse', fixed_head + ':' + name], cwd=root, text=True).strip()
-        require(current == approved, 'executor does not match fixed Git source')
-    return value
+def partial_parity_metrics(actual, expected, actual_tokens, expected_tokens):
+    import numpy as np
+    require(actual.shape == expected.shape and actual_tokens == expected_tokens, 'sample shape/token mismatch')
+    require(actual.dtype == expected.dtype == np.float32 and np.isfinite(actual).all() and
+            np.isfinite(expected).all(), 'sample FP32/finite mismatch')
+    norms, expected_norms = np.linalg.norm(actual, axis=1), np.linalg.norm(expected, axis=1)
+    require(np.all(expected_norms > 0) and np.all(norms > 0), 'sample zero norms')
+    metrics = {'max_component_error': float(np.max(np.abs(actual - expected))),
+        'minimum_cosine': float(np.min(np.sum(actual * expected, axis=1) / (norms * expected_norms))),
+        'max_norm_error': float(max(np.max(np.abs(norms - 1)), np.max(np.abs(expected_norms - 1))))}
+    require(metrics['max_component_error'] <= 1e-4 and metrics['minimum_cosine'] >= .99999 and
+            metrics['max_norm_error'] <= 1e-5, 'CPU sample parity failed')
+    return metrics
 
 
-def attempt1_history_binding():
-    return {'result_sha': ATTEMPT1_RESULT_SHA, 'implementation_sha': ATTEMPT1_IMPLEMENTATION_SHA,
-            **{k: dict(v) for k, v in ATTEMPT1_BINDINGS.items()}, 'completed_documents': 0,
-            'completed_chunks': 0, 'completed_embeddings': 0, 'completed_ann': 0,
-            'snapshot_after_hash_status': 'UNCHANGED'}
+def partial_cpu_worker(request):
+    """Fresh-process CPU parity over explicit current products, never historical authority."""
+    import numpy as np
+    verified = full.inventory()
+    require(verified['inventory_sha256'] == request['inventory_sha256'], 'CPU model inventory mismatch')
+    require(verified['manifest']['tokenizer_inventory_sha256'] == request['tokenizer_inventory_sha256'],
+            'CPU tokenizer mismatch')
+    encoder = full.exact.LocalEncoder(verified['model'], verified['contract'], 'cpu', 8)
+    info = encoder.info
+    require(info['actual_device'] == 'cpu' and info['actual_dtype'] == 'torch.float32' and
+            info['threads'] == info['interop_threads'] == 8, 'CPU actual configuration mismatch')
+    output = full.contained(request['product_directory'])
+    positions = request['positions']
+    require(positions and positions == sorted(set(positions)) and all(type(p) is int and p >= 0 for p in positions),
+            'CPU positions invalid')
+    vectors = np.load(output / 'vectors.npy', mmap_mode='r', allow_pickle=False)
+    metrics = {'max_component_error': 0.0, 'minimum_cosine': 1.0, 'max_norm_error': 0.0}
+    try:
+        with full.readonly(output / 'chunks.sqlite') as db:
+            for start in range(0, len(positions), 8):
+                selected = positions[start:start + 8]
+                rows = []
+                for pos in selected:
+                    row = db.execute('SELECT row_json FROM projection WHERE position=?', (pos,)).fetchone()
+                    require(row is not None and pos < len(vectors), 'CPU mapping position missing')
+                    rows.append(json.loads(row[0]))
+                expected, tokens = encoder.encode([row['text'] for row in rows])
+                values = partial_parity_metrics(np.asarray(vectors[selected]), expected,
+                    [row['inference_token_count'] for row in rows], tokens)
+                metrics['max_component_error'] = max(metrics['max_component_error'], values['max_component_error'])
+                metrics['minimum_cosine'] = min(metrics['minimum_cosine'], values['minimum_cosine'])
+                metrics['max_norm_error'] = max(metrics['max_norm_error'], values['max_norm_error'])
+    finally:
+        close_memmap(vectors)
+    return {'schema': 'p4-cpu-parity-response-v1', 'status': 'PASS',
+        'request_sha256': full.exact.canonical_hash(request), 'positions': positions,
+        'sample_count': len(positions), 'process_id': os.getpid(), 'encoder': info, 'metrics': metrics}
 
 
-def validate_retry_history_and_no_retry_product(*, root, check_new=True):
-    old = full.contained(OUTPUT, root)
-    require(old.is_dir(), 'Attempt1 output missing')
-    require(not (old / 'manifest.json').exists(), 'Attempt1 manifest must be absent')
-    require({p.name for p in old.iterdir()} == {'execution-receipt.json'},
-            'unexpected Attempt1 product')
-    for key, ref in ATTEMPT1_BINDINGS.items():
-        path = full.contained(ref['path'], root)
-        require(path.is_file() and path.stat().st_size == ref['size'] and
-                full.exact.sha(path) == ref['sha256'], 'Attempt1 history mismatch: ' + key)
-    receipt = read_json(full.contained(ATTEMPT1_BINDINGS['execution_receipt']['path'], root))
-    require(receipt.get('status') == 'FAIL' and type(receipt.get('attempts')) is int and
-            receipt['attempts'] == 1 and receipt.get('phase') == 'reservation' and
-            receipt.get('snapshot_after_hash_status') == 'UNCHANGED', 'Attempt1 receipt state mismatch')
-    for key in ('completed_documents', 'completed_chunks', 'completed_embeddings', 'completed_ann'):
-        require(type(receipt.get(key)) is int and receipt[key] == 0, 'Attempt1 completed counts mismatch')
-    if check_new:
-        output = full.controlled_path(RETRY_OUTPUT, root, strict=False)
-        full.check_components(output)
-        require(not output.exists(), 'Attempt2 output already exists')
-        require(not attempt_lock(output, 2).exists(), 'Attempt2 already reserved; no attempt3')
-    return attempt1_history_binding()
+def run_partial_cpu_worker(request):
+    import sys
+    command = [sys.executable, '-X', 'utf8', '-c',
+        'import json,sys; from tools import p4_full_build as b; print(json.dumps(b.partial_cpu_worker(json.load(sys.stdin)),sort_keys=True))']
+    env = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1')
+    child = subprocess.run(command, input=full.chunks.canonical(request), cwd=ROOT, env=env,
+                           capture_output=True, check=False)
+    require(child.returncode == 0, 'fresh CPU worker failed: ' + child.stderr.decode('utf8', errors='replace'))
+    response = read_json_bytes(child.stdout)
+    require(response['status'] == 'PASS' and response['request_sha256'] == full.exact.canonical_hash(request) and
+            response['positions'] == request['positions'] and response['sample_count'] == len(request['positions']) and
+            response['process_id'] != os.getpid(), 'CPU response coverage mismatch')
+    info = response['encoder']
+    require(info['actual_device'] == 'cpu' and info['actual_dtype'] == 'torch.float32' and
+            info['threads'] == info['interop_threads'] == 8, 'CPU response actual thread/device mismatch')
+    metrics = response['metrics']
+    require(all(math.isfinite(metrics[k]) for k in ('max_component_error', 'minimum_cosine', 'max_norm_error')) and
+            metrics['max_component_error'] <= 1e-4 and metrics['minimum_cosine'] >= .99999 and
+            metrics['max_norm_error'] <= 1e-5, 'CPU response parity failed')
+    return response
 
 
-def validate_retry_policy(value, fixed_head):
-    require(isinstance(value, dict) and set(value) == {'schema', 'operation', 'fixed_code_sha',
-        'attempt_number', 'max_total_attempts', 'retry_of', 'failure_class', 'preflight_producer_sha',
-        'preflight_evidence_sha', 'reviewed_source_bindings', 'output', 'previous_output',
-        'count_review', 'disk_review', 'smoke_review', 'executor_bindings'}, 'exact retry fields required')
-    require(value['schema'] == RETRY_SCHEMA and value['operation'] == 'execute_full_retry' and
-            value['fixed_code_sha'] == fixed_head and value['output'] == RETRY_OUTPUT and
-            value['previous_output'] == OUTPUT and value['failure_class'] == FAILURE_CLASS and
-            type(value['attempt_number']) is int and value['attempt_number'] == 2 and
-            type(value['max_total_attempts']) is int and value['max_total_attempts'] == 2,
-            'explicit Attempt2 retry policy mismatch')
-    require(full.chunks.canonical(value['retry_of']) == full.chunks.canonical(attempt1_history_binding()),
-            'retry history binding mismatch')
-
-
-def authorize_retry(path, expected_sha256, *, fixed_head, root, check_sources=True):
-    require(path is not None and expected_sha256 is not None, 'explicit retry authorization required')
-    full.chunks.valid_hash(expected_sha256)
-    require(isinstance(fixed_head, str) and len(fixed_head) == 40 and
-            all(c in '0123456789abcdef' for c in fixed_head), 'fixed HEAD required')
-    path = full.contained(path, root)
-    require(full.exact.sha(path) == expected_sha256, 'retry authorization hash mismatch')
-    value = read_json(path)
-    validate_retry_policy(value, fixed_head)
-    if check_sources:
-        authenticate_executor_bindings(value, fixed_head=fixed_head, root=root)
-    return value
-
-
-def authenticate_acceptance_repair(producer_bytes, record, root, auth):
-    # Exact reviewed before/after Git bytes pin the three approved edit regions.
-    name = 'tools/p4_full_acceptance.py'
-    require(hashlib.sha256(producer_bytes).hexdigest() ==
-            '21583b2b2a38afee54bddccbdbbbbdf7f369dff23cc2946495d62d602e721c8c',
-            'unapproved acceptance repair producer')
-    require(isinstance(auth, dict) and set(auth.get('executor_bindings', {})) == EXECUTOR_PATHS,
-            'executor source closure required')
-    require(full.exact.sha(full.contained(name, root)) == auth['executor_bindings'][name],
-            'acceptance repair checkout mismatch')
-    current = subprocess.check_output(['git', 'hash-object', '--path=' + name, name], cwd=root, text=True).strip()
-    fixed = subprocess.check_output(['git', 'rev-parse', auth['fixed_code_sha'] + ':' + name], cwd=root, text=True).strip()
-    require(current == fixed == record['git_blob'], 'acceptance repair fixed source mismatch')
-    shown = subprocess.check_output(['git', 'show', fixed], cwd=root)
-    require(hashlib.sha256(shown).hexdigest() ==
-            '1210800f6e56f8ff91f07fbcb5577ff5720f085bfba35341bba6ee88b90e42a0',
-            'unapproved acceptance repair diff')
-
-
-def authenticate_rust_harness(producer_bytes, record, root, auth):
-    name = 'rust/src/semantic.rs'
-    require(isinstance(auth, dict) and isinstance(auth.get('executor_bindings'), dict) and
-            set(auth['executor_bindings']) == EXECUTOR_PATHS, 'executor source closure required')
-    require(full.exact.sha(full.contained(name, root)) == auth['executor_bindings'][name],
-            'executor source changed')
-    blob = subprocess.check_output(['git', 'hash-object', '--path=' + name, name], cwd=root, text=True).strip()
-    approved = subprocess.check_output(['git', 'rev-parse', auth['fixed_code_sha'] + ':' + name],
-                                       cwd=root, text=True).strip()
-    require(blob == approved == record['git_blob'], 'executor does not match fixed Git source')
-    shown = subprocess.check_output(['git', 'show', approved], cwd=root)
-    start = b'    #[test]\n    fn builder_synthetic_reader_interop() {'
-    end = b'    #[test]\n    fn full_paths_controlled_assets_receipt_exception_and_aliases() {'
-    module = b'#[cfg(test)]\nmod tests {\n'
-    require(shown.count(start) == shown.count(end) == shown.count(module) == 1,
-            'unapproved Rust test harness')
-    first, last = shown.index(start), shown.index(end)
-    require(shown.index(module) < first < last and module in producer_bytes,
-            'unapproved Rust test harness')
-    require(hashlib.sha256(shown[first:last]).hexdigest() == APPROVED_RUST_HARNESS_SHA256,
-            'unapproved Rust test harness')
-    require(shown[:first] + shown[last:] == producer_bytes,
-            'shared preflight Rust implementation changed')
-
-
-def authenticate_preflight_source(receipt, producer, expected, current, root, *, auth=None):
-    """Authenticate historical inventory without claiming that producer is today's HEAD."""
-    records = receipt.get('source_inventory')
-    require(isinstance(records, dict) and records and
-            full.exact.canonical_hash(records) == expected == receipt.get('source_inventory_sha256'),
-            'reviewed preflight source inventory mismatch')
-    families = (('rust/src/', '.rs'), ('rust/Cargo.', ''), ('configs/p4-', '.json'),
-                ('tools/p4_', '.py'), ('docs/p4-', '.md'), ('tests/test_p4_', '.py'))
-    metadata = {'rust/build.rs', 'Cargo.toml', 'Cargo.lock', 'build.rs', '.gitattributes',
-                '.gitmodules', '.cargo/config', '.cargo/config.toml', 'rust/.cargo/config',
-                'rust/.cargo/config.toml', 'rust-toolchain', 'rust-toolchain.toml',
-                'rust/rust-toolchain', 'rust/rust-toolchain.toml', 'pyproject.toml'}
-    tree = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', '-z', producer], cwd=root)
-    names = {name.decode('utf-8') for name in tree.split(b'\0') if name}
-    expected_names = set(full.SOURCE_PATHS) | {name for name in names if name in metadata or any(
-        name.startswith(prefix) and name.endswith(suffix) for prefix, suffix in families)}
-    require(set(records) == expected_names, 'historical source closure mismatch')
-    for name, record in records.items():
-        require(isinstance(record, dict) and set(record) == {'git_blob', 'index_git_blob', 'size',
-                'sha256', 'checkout_size', 'checkout_sha256', 'checkout_git_filtered_blob'},
-                'historical source record mismatch')
-        blob = subprocess.check_output(['git', 'rev-parse', producer + ':' + name], cwd=root, text=True).strip()
-        shown = subprocess.check_output(['git', 'show', producer + ':' + name], cwd=root)
-        require(record['git_blob'] == record['index_git_blob'] == record['checkout_git_filtered_blob'] == blob and
-                type(record['size']) is int and record['size'] == len(shown) and
-                record['sha256'] == hashlib.sha256(shown).hexdigest(), 'historical producer blob mismatch')
-        full.chunks.valid_hash(record['checkout_sha256'])
-        require(type(record['checkout_size']) is int and record['checkout_size'] >= 0,
-                'historical checkout size mismatch')
-        require(name in current, 'shared preflight implementation changed')
-        if name == 'tools/p4_full_acceptance.py' and current[name]['git_blob'] != blob:
-            authenticate_acceptance_repair(shown, current[name], root, auth)
-        elif name == 'rust/src/semantic.rs' and current[name]['git_blob'] != blob:
-            authenticate_rust_harness(shown, current[name], root, auth)
-        else:
-            require(name in EXECUTOR_PATHS or current[name]['git_blob'] == blob,
-                    'shared preflight implementation changed')
-    additions = set(current) - set(records)
-    require(all(name in EXECUTOR_PATHS or name.startswith('docs/') and name.endswith('.md') or
-                name.startswith('tests/') and name.endswith('.py') for name in additions),
-            'unreviewed implementation added')
-
-
-def reviewed_preflight(auth, config, verified, report, root):
-    producer, evidence = auth['preflight_producer_sha'], auth['preflight_evidence_sha']
-    receipts = {}
-    for name in ('count', 'disk', 'smoke'):
-        review = auth[name + '_review']
-        receipt = full.load_reviewed_receipt(fixed_head=producer, root=root, **review)
-        authenticate_preflight_source(receipt, producer, auth['reviewed_source_bindings'][name],
-                                      report['source_inventory'], root, auth=auth)
-        # Raw captures are externally authenticated; unchanged receipts are Git-published evidence.
-        file = full.contained(review['path'], root)
-        relative = file.relative_to(Path(root).resolve()).as_posix()
-        shown = subprocess.check_output(['git', 'show', evidence + ':' + relative], cwd=root)
-        require(hashlib.sha256(shown).hexdigest() == review['expected_sha256'],
-                'reviewed preflight evidence Git binding mismatch')
-        require(receipt.get('inventory_sha256') == verified['inventory_sha256'],
-                'reviewed phase inventory mismatch')
-        receipts[name] = receipt
-    receipt = receipts['count']
-    count = full.validate_count_receipt(receipt, config, fixed_head=producer,
-        source_binding=auth['reviewed_source_bindings']['count'], inventory_binding=verified['inventory_sha256'])
-    pilot_ids, _, _, _, _ = full.pilot_inputs(verified)
-    require(count['pilot_document_ids_sha256'] == full.exact.canonical_hash(sorted(pilot_ids)) and
-            all(ref['document_id'] not in pilot_ids for ref in count['full_only_chunk_references']),
-            'reviewed count pilot exclusion mismatch')
-    require(receipt.get('tokenizer_inventory_sha256') == verified['manifest']['tokenizer_inventory_sha256'],
-            'count tokenizer binding mismatch')
-    report['preflight_provenance'] = {'producer_sha': producer, 'evidence_sha': evidence,
-                                    'reviewed_source_bindings': auth['reviewed_source_bindings']}
-    return count, receipts['disk'], receipts['smoke']
+def read_json_bytes(value):
+    return json.loads(value, parse_constant=lambda v: (_ for _ in ()).throw(ValueError('nonfinite JSON')))
 
 
 def index_factory(declaration):
@@ -340,33 +205,18 @@ def phase(report, name):
 
 
 def attempt_lock(output, attempt_number=1):
-    require(type(attempt_number) is int and attempt_number in (1, 2), 'no attempt3')
-    return output.with_name(output.name + f'.attempt{attempt_number}.lock')
+    return output.with_name(output.name + '.build.lock')
 
 
-def reserve(output, report, *, attempt_number=1):
-    require(type(attempt_number) is int and attempt_number in (1, 2), 'no attempt3')
-    if attempt_number == 2:
-        require(report.get('attempts') == 1 and report.get('attempt_reserved') is False,
-                'retry requires historical1 and no current claim')
-        require(output == ROOT / RETRY_OUTPUT and report.get('retry_of') == attempt1_history_binding(),
-                'explicit retry history/output required')
-        validate_retry_history_and_no_retry_product(root=ROOT)
+def reserve(output, report):
     require(not output.exists(), 'output already exists; no overwrite')
-    lock = attempt_lock(output, attempt_number)
-    require(not lock.exists(), 'attempt already reserved; no retry')
+    lock = attempt_lock(output)
+    require(not lock.exists(), 'attempt already reserved')
     output.parent.mkdir(parents=True, exist_ok=True)
     with lock.open('xb') as stream:
-        report.update(attempts=attempt_number, attempt_number=attempt_number,
-                      attempt_reserved=True, attempt_lock=str(lock))
-        payload = {'executor_origin': EXECUTOR_ORIGIN, 'attempt': attempt_number,
-                   'activation': report.get('activation', {})}
-        if attempt_number == 2:
-            payload.update(retry_of=report['retry_of'], fixed_code_sha=report['fixed_code_sha'],
-                           authorization_sha256=report['authorization_sha256'])
-        stream.write(full.chunks.canonical(payload) + b'\n')
-        stream.flush()
-        os.fsync(stream.fileno())
+        report.update(attempts=1, attempt_number=1, attempt_reserved=True, attempt_lock=str(lock))
+        stream.write(full.chunks.canonical({'executor_origin': EXECUTOR_ORIGIN}) + b'\n')
+        stream.flush(); os.fsync(stream.fileno())
     output.mkdir(exist_ok=False)
 
 
@@ -550,25 +400,10 @@ def build_stream(stream, tokenizer, inventory_sha, encoder, index, output, decla
             full.exact.validate_vectors(loaded[start:start + batch_size], dimension)
         phase(report, 'sample_reference_parity')
         reference = reference() if callable(reference) else reference
-        metrics = {'max_component_error': 0.0, 'minimum_cosine': 1.0, 'max_norm_error': 0.0}
-        with full.readonly(output / 'chunks.sqlite') as db:
-            for start in range(0, len(sample['positions']), batch_size):
-                check_capacity()
-                positions = sample['positions'][start:start + batch_size]
-                rows = [json.loads(db.execute('SELECT row_json FROM projection WHERE position=?', (p,)).fetchone()[0])
-                        for p in positions]
-                expected_vectors, tokens = reference.encode([row['text'] for row in rows])
-                full.exact.validate_vectors(expected_vectors, dimension)
-                require(expected_vectors.shape == (len(rows), dimension) and
-                        tokens == [row['inference_token_count'] for row in rows], 'reference shape/tokens mismatch')
-                actual = np.asarray(loaded[positions])
-                norms = np.linalg.norm(actual, axis=1)
-                cosine = np.sum(actual * expected_vectors, axis=1) / (norms * np.linalg.norm(expected_vectors, axis=1))
-                metrics['max_component_error'] = max(metrics['max_component_error'], float(np.max(np.abs(actual - expected_vectors))))
-                metrics['minimum_cosine'] = min(metrics['minimum_cosine'], float(np.min(cosine)))
-                metrics['max_norm_error'] = max(metrics['max_norm_error'], float(np.max(np.abs(norms - 1))))
-                require(metrics['max_component_error'] <= 1e-4 and metrics['minimum_cosine'] >= .99999 and
-                        metrics['max_norm_error'] <= 1e-5, 'sample reference parity failed')
+        if hasattr(reference, 'verify_sample'):
+            metrics = reference.verify_sample(output, sample['positions'])
+        else:
+            metrics = verify_sample_reference(loaded, output, sample, batch_size, reference, dimension, check_capacity)
         report['sample_parity'] = {'count': len(sample['positions']), **metrics}
         phase(report, 'ann_construction')
         check_capacity()
@@ -595,6 +430,37 @@ def build_stream(stream, tokenizer, inventory_sha, encoder, index, output, decla
         close_memmap(loaded)
     return {'documents': sum(census.values()), 'chunks': position,
             'streaming_sha256': digest.hexdigest(), 'strata': dict(census)}
+
+
+def verify_sample_reference(loaded, output, sample, batch_size, reference, dimension, check_capacity):
+    import numpy as np
+    metrics = {'max_component_error': 0.0, 'minimum_cosine': 1.0, 'max_norm_error': 0.0}
+    with full.readonly(output / 'chunks.sqlite') as db:
+        for start in range(0, len(sample['positions']), batch_size):
+            check_capacity()
+            positions = sample['positions'][start:start + batch_size]
+            rows = [json.loads(db.execute('SELECT row_json FROM projection WHERE position=?', (p,)).fetchone()[0])
+                    for p in positions]
+            expected, tokens = reference.encode([row['text'] for row in rows])
+            full.exact.validate_vectors(expected, dimension)
+            require(expected.shape == (len(rows), dimension), 'reference shape mismatch')
+            values = partial_parity_metrics(np.asarray(loaded[positions]), expected,
+                                           [row['inference_token_count'] for row in rows], tokens)
+            metrics['max_component_error'] = max(metrics['max_component_error'], values['max_component_error'])
+            metrics['minimum_cosine'] = min(metrics['minimum_cosine'], values['minimum_cosine'])
+            metrics['max_norm_error'] = max(metrics['max_norm_error'], values['max_norm_error'])
+    return metrics
+
+
+class FreshCPUReference:
+    def __init__(self, verified):
+        self.verified = verified
+
+    def verify_sample(self, output, positions):
+        request = {'product_directory': Path(output).relative_to(ROOT).as_posix(), 'positions': positions,
+            'inventory_sha256': self.verified['inventory_sha256'],
+            'tokenizer_inventory_sha256': self.verified['manifest']['tokenizer_inventory_sha256']}
+        return run_partial_cpu_worker(request)['metrics']
 
 
 def attach_inventory(value, output):
@@ -626,7 +492,7 @@ def attach_inventory(value, output):
 
 def manifest(config, verified, output, rows):
     artifacts = {}
-    pilot_root = (ROOT / full.pilot.PACK).parent
+    pilot_root = verified.get('asset_root', ROOT)
     for name in ('model', 'tokenizer', 'ort_dll', 'external_data'):
         records = verified['pack']['artifacts'][name]
         artifacts[name] = ([binding(pilot_root / record['path'], output) for record in records]
@@ -636,7 +502,6 @@ def manifest(config, verified, output, rows):
     declaration = config['declarative_contract']
     return attach_inventory({'schema': acceptance.PACK_SCHEMA, 'object_type': 'runtime_pack',
             'pack_version': 'p4-full-semantic-v1',
-            'implementation_origin': full.IMPLEMENTATION, 'recovered_original_source': False,
             'canonical_contract': {'schema': config['schema'], **binding(ROOT / acceptance.CANONICAL_PATH, ROOT)},
             'declarative_contract': declaration, 'full_chunk_count': rows,
             'contract': acceptance.runtime_contract(declaration, rows),
@@ -646,8 +511,8 @@ def manifest(config, verified, output, rows):
 
 def new_report():
     return {'schema': 'p4-full-build-receipt-v1', 'status': 'FAIL', 'attempts': 0,
-            'executor_origin': EXECUTOR_ORIGIN, 'implementation_origin': full.IMPLEMENTATION,
-            'recovered_original_source': False, 'phase': 'activation', 'phases': [], 'input_hashes': {},
+            'executor_origin': EXECUTOR_ORIGIN,
+            'phase': 'activation', 'phases': [], 'input_hashes': {},
             'completed_documents': 0, 'completed_chunks': 0, 'completed_embeddings': 0,
             'completed_ann': 0, 'last_position': None, 'retained_partial': False}
 
@@ -742,13 +607,8 @@ def lifecycle(output, report, work, *, snapshot=None, finalize=lambda: None, att
     original = None
     try:
         phase(report, 'reservation')
-        if attempt_number == 1:
-            reserve(output, report)
-        else:
-            reserve(output, report, attempt_number=attempt_number)
+        reserve(output, report)
         value = work()
-        if attempt_number == 2:
-            value['build_provenance'] = retry_build_provenance(report)
         phase(report, 'final_input_guards')
         finalize()
         phase(report, 'manifest_publication')
@@ -772,16 +632,19 @@ def lifecycle(output, report, work, *, snapshot=None, finalize=lambda: None, att
                 if original is not None:
                     raise original from terminal_error
                 raise
+        if report.get('attempt_reserved'):
+            lock = report.get('attempt_lock')
+            try:
+                if lock:
+                    Path(lock).unlink(missing_ok=True)
+                    report['lock_released'] = True
+            except OSError as cleanup_error:
+                if original is None:
+                    raise
+                original.add_note(f'lock cleanup failed: {cleanup_error!r}')
     if original is not None:
         raise original
     return report
-
-
-def retry_build_provenance(report):
-    return {'attempt_number': 2, 'prior_attempt_result': 'FAIL', 'prior_failure_class': FAILURE_CLASS,
-            'retry_authorization_sha256': report['authorization_sha256'],
-            'attempt1_execution_receipt_sha256': ATTEMPT1_BINDINGS['execution_receipt']['sha256'],
-            'attempt1_result_sha': ATTEMPT1_RESULT_SHA}
 
 
 def validate_activation_dll(verified):
@@ -798,575 +661,51 @@ def validate_activation_dll(verified):
     return path
 
 
-def _execute(auth, config, fixed_head, report, authorization, authorization_sha):
-    retry = auth.get('schema') == RETRY_SCHEMA
-    attempt_number = 2 if retry else 1
-    output = ROOT / (RETRY_OUTPUT if retry else OUTPUT)
-    if not retry:
-        full.assert_no_product(ROOT)
-        full.check_components(output)
-        require(not attempt_lock(output).exists(), 'attempt already reserved; no retry')
-    # Activation guards must EXIT before claiming the sole attempt.
-    with full.config_guard(config), full.source_guard(fixed_head, ROOT, report):
-        if retry:
-            authenticate_executor_bindings(auth, fixed_head=fixed_head, root=ROOT)
-        verified = full.inventory()
-        if retry:
-            full.historical_job_bindings(root=ROOT)
-        validate_activation_dll(verified)
-        count, disk, smoke = reviewed_preflight(auth, config, verified, report, ROOT)
-        for receipt in (disk, smoke):
-            require(receipt.get('inventory_sha256') == verified['inventory_sha256'] and
-                    receipt.get('count_receipt_sha256') == auth['count_review']['expected_sha256'],
-                    'reviewed phase bindings mismatch')
-        require(disk.get('schema') == 'p4-full-reviewed-disk-v1' and disk.get('status') == 'DISK_PASS' and
-                disk.get('count_capture_sha256') == auth['count_review']['expected_capture_sha256'], 'reviewed disk PASS required')
-        require(smoke.get('schema') == 'p4-full-phase12-preflight-v1' and
-                smoke.get('status') == 'READY_FOR_BUILD_REVIEW' and smoke.get('gates') == 'PASS' and
-                smoke.get('disk_receipt_sha256') == auth['disk_review']['expected_sha256'], 'reviewed smoke PASS required')
-
-        def capacity():
-            require(full.disk_capacity(disk['disk'])['status'] == 'PASS', 'BLOCKED_DISK: executor')
-
-        capacity()
-        snapshot = full.contained(config['snapshot']['path'])
-        snapshot_ref = binding(snapshot, ROOT)
-        require(all(snapshot_ref[k] == config['snapshot'][k] for k in ('path', 'size', 'sha256')),
-                'activation snapshot size/SHA mismatch')
-        import torch
-        require(torch.cuda.is_available() and torch.cuda.device_count() > 0, 'GPU unavailable')
-        if retry:
-            validate_retry_history_and_no_retry_product(root=ROOT)
-        report['activation'] = {'snapshot': snapshot_ref, 'inventory': verified['bindings'],
-                                'dll': verified['pack']['artifacts']['ort_dll'], 'disk': full.disk_capacity(disk['disk']),
-                                'gpu_available': True, 'authorization_sha256': authorization_sha, 'fixed_source': fixed_head,
-                                'output_absent': not output.exists(), 'lock_absent': not attempt_lock(output, attempt_number).exists()}
-        report['input_hashes'] = verified['bindings']
-        records = [(snapshot, config['snapshot'], 'snapshot')]
-        for name, record in verified['bindings'].items():
-            kind = 'ort_dll' if Path(name).is_absolute() else 'input'
-            records.append((Path(name) if kind == 'ort_dll' else full.contained(name), {'path': name, **record}, kind))
-
-    def work():
-        with full.config_guard(config), full.source_guard(fixed_head, ROOT, report), acceptance._inventory_guard(records):
-            raw, _ = full.exact.frozen_tokenizers(full.contained(verified['model']['asset_directory']))
-
-            def encoder(device):
-                capacity()
-                result = full.exact.LocalEncoder(verified['model'], verified['contract'], device, verified['job']['threads'])
-                require(result.info['actual_dtype'] == 'torch.float32', 'actual FP32 required')
-                if device == 'cuda':
-                    require(result.info['actual_device'].startswith('cuda'), 'actual GPU required')
-                    report['encoder'] = result.info
-                else:
-                    report['reference_encoder'] = {'path': 'independent_pinned_cpu_LocalEncoder', **result.info}
-                return result
-
-            with full.readonly(snapshot) as conn, closing(full.documents(conn)) as stream:
-                report['build'] = build_stream(stream, raw, verified['manifest']['tokenizer_inventory_sha256'],
-                    lambda: encoder('cuda'), lambda: index_factory(config['declarative_contract']), output,
-                    config['declarative_contract'], count, batch_size=verified['job']['batch_size'],
-                    check_capacity=capacity, reference=lambda: encoder('cpu'), report=report)
-            phase(report, 'runtime_manifest_validation')
-            value = manifest(config, verified, output, count['actual_chunks'])
-            acceptance.validate_full_manifest(value, config, pack_root=output)
-            capacity()
-        return value
-
-    def finalize():
-        with full.config_guard(config), full.source_guard(fixed_head, ROOT, report), acceptance._inventory_guard(records):
-            require(full.inventory()['bindings'] == verified['bindings'], 'executor inventory changed')
-            if retry:
-                authorize_retry(authorization, authorization_sha, fixed_head=fixed_head, root=ROOT)
-                validate_retry_history_and_no_retry_product(root=ROOT, check_new=False)
-            else:
-                authorize(authorization, authorization_sha, fixed_head=fixed_head, root=ROOT)
-
-    if retry:
-        return lifecycle(output, report, work, snapshot=snapshot, finalize=finalize, attempt_number=2)
-    return lifecycle(output, report, work, snapshot=snapshot, finalize=finalize)
-
-
-def execute(*, authorization=None, expected_authorization_sha256=None, fixed_head='NOT_FIXED_YET'):
+def execute(*, output=None):
+    """Run the real builder from current assets and measured product inputs."""
+    config = read_json(full.CONFIG)
+    full.validate_contract(config)
+    target = Path(output) if output else ROOT / OUTPUT
+    full.check_components(target)
+    require(not target.exists(), 'output already exists')
     report = new_report()
-    report.update(fixed_code_sha=fixed_head, authorization_sha256=expected_authorization_sha256)
-    try:
-        auth = authorize(authorization, expected_authorization_sha256, fixed_head=fixed_head, root=ROOT)
-        config = read_json(full.CONFIG)
-        full.validate_contract(config)
-        return _execute(auth, config, fixed_head, report, authorization, expected_authorization_sha256)
-    except BaseException as error:
-        failed(report, error)
-        raise
-
-
-def verify_fixed_current_dev(fixed_head, root):
-    for ref in ('HEAD', 'origin/dev'):
-        require(subprocess.check_output(['git', 'rev-parse', ref], cwd=root, text=True).strip() == fixed_head,
-                'retry fixed HEAD/origin dev mismatch')
-
-
-def execute_retry(*, authorization=None, expected_authorization_sha256=None, fixed_head='NOT_FIXED_YET'):
-    report = new_report()
-    report.update(attempts=1, attempt_reserved=False, attempt_number=2,
-                  fixed_code_sha=fixed_head, authorization_sha256=expected_authorization_sha256,
-                  retry_of=attempt1_history_binding(), BUILD_POLICY_EXCEPTION=POLICY_EXCEPTION)
-    try:
-        verify_fixed_current_dev(fixed_head, ROOT)
-        auth = authorize_retry(authorization, expected_authorization_sha256, fixed_head=fixed_head,
-                               root=ROOT, check_sources=False)
-        validate_retry_history_and_no_retry_product(root=ROOT, check_new=False)
-        config = read_json(full.CONFIG)
-        full.validate_contract(config)
-        return _execute(auth, config, fixed_head, report, authorization, expected_authorization_sha256)
-    except BaseException as error:
-        failed(report, error)
-        raise
-
-
-def attempt2_readiness(*, fixed_head):
-    """One read-only resource probe; never authorize/reserve/project/embed/build ANN."""
-    report = {'schema': 'p4-full-semantic-attempt2-readiness-v1',
-              'ATTEMPT2_IMPLEMENTATION_SHA': fixed_head, 'SECOND_ATTEMPT_STARTED': 'NO',
-              'SECOND_ATTEMPT_AUTHORIZED': 'NO', 'FORMAL_BUILD_ATTEMPTS_TOTAL': 1,
-              'STOP_STATE': 'WAITING_REVIEW', 'status': 'FAIL', 'checks': {}}
-    before = {}
-    gate = 'FIXED_SOURCE'
-    cancellation = None
-    try:
-        verify_fixed_current_dev(fixed_head, ROOT)
-        report['FIXED_SOURCE'] = 'PASS'
-        gate = 'ATTEMPT1_HISTORY'
-        for key, ref in ATTEMPT1_BINDINGS.items():
-            path = full.contained(ref['path'], ROOT)
-            before[key] = {'size': path.stat().st_size, 'sha256': full.exact.sha(path)}
-        report['history'] = validate_retry_history_and_no_retry_product(root=ROOT)
-        report['ATTEMPT1_HISTORY'] = 'PASS'
-        gate = 'CANONICAL_CONTRACT'
-        config = read_json(full.CONFIG)
-        full.validate_contract(config)
-        report['CANONICAL_CONTRACT'] = 'PASS'
-        source_report = new_report()
-        gate = 'AUTHORITY_PARITY'
-        with full.config_guard(config), full.source_guard(fixed_head, ROOT, source_report):
-            report['historical_jobs'] = full.historical_job_bindings(root=ROOT)
-            dll = acceptance._approved_dll_path()
-            verified = full.inventory()
-            require(validate_activation_dll(verified) == dll, 'readiness authority parity mismatch')
-            report['dll'] = binding(dll, ROOT)
-            report['inventory_sha256'] = verified['inventory_sha256']
-            report['AUTHORITY_PARITY'] = 'PASS'
-            gate = 'SNAPSHOT'
-            snapshot = full.contained(config['snapshot']['path'], ROOT)
-            report['snapshot'] = binding(snapshot, ROOT)
-            require(all(report['snapshot'][k] == config['snapshot'][k] for k in ('path', 'size', 'sha256')),
-                    'readiness snapshot mismatch')
-            report['SNAPSHOT'] = 'PASS'
-            gate = 'DISK'
-            auth = read_json(full.contained(ATTEMPT1_BINDINGS['authorization']['path'], ROOT))
-            review = auth['disk_review']
-            disk_path = full.contained(review['path'], ROOT)
-            require(full.exact.sha(disk_path) == review['expected_sha256'], 'readiness reviewed disk hash mismatch')
-            disk = read_json(disk_path)
-            report['fresh_disk'] = full.disk_capacity(disk['disk'])
-            require(report['fresh_disk']['status'] == 'PASS', 'readiness fresh disk FAIL')
-            report['DISK'] = 'PASS'
-            gate = 'GPU'
-            import torch
-            report['gpu'] = {'available': torch.cuda.is_available(), 'device_count': torch.cuda.device_count()}
-            require(report['gpu']['available'] and report['gpu']['device_count'] > 0, 'readiness GPU unavailable')
-            report['GPU'] = 'PASS'
-        gate = 'FINAL_HISTORY'
-        validate_retry_history_and_no_retry_product(root=ROOT)
-        report['FINAL_HISTORY'] = 'PASS'
-        report.update(ATTEMPT2_OUTPUT_ABSENT='YES', ATTEMPT2_LOCK_ABSENT='YES', status='PASS')
-    except BaseException as error:  # noqa: BLE001 - preserve cancellation evidence, then propagate below
-        report[gate] = 'FAIL'
-        report['status'] = 'FAIL'
-        report['error'] = {'type': type(error).__name__, 'message': str(error), 'gate': gate}
-        if not isinstance(error, Exception):
-            cancellation = error
-    finally:
-        report['attempt1_before'] = before
-        report['attempt1_after'] = {}
-        report['after_errors'] = []
-        for key, ref in ATTEMPT1_BINDINGS.items():
-            try:
-                path = full.contained(ref['path'], ROOT)
-                report['attempt1_after'][key] = {'size': path.stat().st_size, 'sha256': full.exact.sha(path)}
-            except BaseException as error:  # noqa: BLE001 - retain secondary error without losing first/cancellation
-                report['after_errors'].append({'binding': key, 'type': type(error).__name__, 'message': str(error)})
-                if not isinstance(error, Exception) and cancellation is None:
-                    cancellation = error
-        report['ATTEMPT1_PRESERVED'] = ('YES' if before == report['attempt1_after'] and
-            len(before) == len(ATTEMPT1_BINDINGS) and not report['after_errors'] else 'NO')
-        if report['ATTEMPT1_PRESERVED'] != 'YES':
-            report['status'] = 'FAIL'
-        for key in ('ATTEMPT1_HISTORY', 'AUTHORITY_PARITY', 'SNAPSHOT', 'DISK', 'GPU'):
-            report.setdefault(key, 'NOT_RUN')
-        report['ATTEMPT2_OUTPUT_ABSENT'] = 'NO' if (ROOT / RETRY_OUTPUT).exists() else 'YES'
-        report['ATTEMPT2_LOCK_ABSENT'] = 'NO' if attempt_lock(ROOT / RETRY_OUTPUT, 2).exists() else 'YES'
-    if cancellation is not None:
-        cancellation.readiness_receipt = report
-        raise cancellation
-    return report
-
-
-def validate_partial_vectors(path, *, rows=1366520, dimension=1024):
-    import numpy as np
-    vectors = np.load(path, mmap_mode='r', allow_pickle=False)
-    try:
-        require(vectors.shape == (rows, dimension) and vectors.dtype == np.float32,
-                'partial vector shape/dtype mismatch')
-        max_error = 0.0
-        for start in range(0, rows, 1024):
-            batch = vectors[start:start + 1024]
-            require(np.isfinite(batch).all(), 'partial nonfinite vectors')
-            error = float(np.max(np.abs(np.linalg.norm(batch, axis=1) - 1)))
-            require(error <= 1e-5, 'partial vector normalization failed')
-            max_error = max(max_error, error)
-        return {'ROWS': rows, 'DIM': dimension, 'DTYPE': 'float32', 'FINITE': 'PASS',
-                'NORMALIZATION': 'PASS', 'max_norm_error': max_error, 'sha256': full.exact.sha(path)}
-    finally:
-        close_memmap(vectors)
-
-
-def partial_parity_metrics(actual, expected, actual_tokens, expected_tokens):
-    import numpy as np
-    require(actual.shape == expected.shape and actual_tokens == expected_tokens,
-            'partial sample shape/token mismatch')
-    require(np.isfinite(actual).all() and np.isfinite(expected).all(), 'partial sample nonfinite')
-    norms = np.linalg.norm(actual, axis=1)
-    expected_norms = np.linalg.norm(expected, axis=1)
-    require(np.all(expected_norms > 0) and np.all(norms > 0), 'partial sample zero norms')
-    metrics = {'max_component_error': float(np.max(np.abs(actual - expected))),
-               'minimum_cosine': float(np.min(np.sum(actual * expected, axis=1) / (norms * expected_norms))),
-               'max_norm_error': float(max(np.max(np.abs(norms - 1)), np.max(np.abs(expected_norms - 1))))}
-    require(metrics['max_component_error'] <= 1e-4 and metrics['minimum_cosine'] >= .99999 and
-            metrics['max_norm_error'] <= 1e-5, 'partial CPU sample parity failed')
-    return metrics
-
-
-def partial_cpu_worker(request):
-    """Fresh interpreter only: pinned CPU LocalEncoder initialized before parallel work."""
-    import numpy as np
-    require(request['schema'] == 'p4-partial-cpu-request-v1', 'CPU request schema')
-    require(full.exact.sha(Path(__file__)) == request['source_sha256'], 'CPU worker source changed')
-    require(full.exact.sha(full.CONFIG) == request['config_sha256'], 'CPU worker config changed')
     verified = full.inventory()
-    require(verified['inventory_sha256'] == request['inventory_sha256'] and
-            verified['manifest']['tokenizer_inventory_sha256'] == request['tokenizer_inventory_sha256'],
-            'CPU worker model/tokenizer inventory changed')
-    require(verified['job']['threads'] == 8, 'CPU worker threads must be8')
-    encoder = full.exact.LocalEncoder(verified['model'], verified['contract'], 'cpu', 8)
-    require(encoder.info['actual_dtype'] == 'torch.float32' and encoder.info['actual_device'] == 'cpu' and
-            encoder.info['threads'] == encoder.info['interop_threads'] == 8, 'CPU worker actual config mismatch')
-    output = full.contained(RETRY_OUTPUT, ROOT)
-    for name, ref in request['products'].items():
-        path = output / name
-        require(path.stat().st_size == ref['bytes'] and full.exact.sha(path) == ref['sha256'],
-                'CPU worker partial product changed')
-    positions = request['positions']
-    require(len(positions) == len(set(positions)) == 1200 and positions == sorted(positions), 'CPU sample positions')
-    metrics = {'max_component_error': 0.0, 'minimum_cosine': 1.0, 'max_norm_error': 0.0}
-    vectors = np.load(output / 'vectors.npy', mmap_mode='r', allow_pickle=False)
-    try:
-        with full.readonly(output / 'chunks.sqlite') as db:
-            db.execute('PRAGMA query_only=ON')
-            require(select_sample(db, len(vectors))['positions'] == positions, 'CPU deterministic sample mismatch')
-            for start in range(0, 1200, 8):
-                selected = positions[start:start + 8]
-                rows = [json.loads(db.execute('SELECT row_json FROM projection WHERE position=?', (p,)).fetchone()[0])
-                        for p in selected]
-                expected, tokens = encoder.encode([row['text'] for row in rows])
-                values = partial_parity_metrics(np.asarray(vectors[selected]), expected,
-                    [row['inference_token_count'] for row in rows], tokens)
-                metrics['max_component_error'] = max(metrics['max_component_error'], values['max_component_error'])
-                metrics['minimum_cosine'] = min(metrics['minimum_cosine'], values['minimum_cosine'])
-                metrics['max_norm_error'] = max(metrics['max_norm_error'], values['max_norm_error'])
-    finally:
-        close_memmap(vectors)
-    return {'schema': 'p4-partial-cpu-response-v1', 'status': 'PASS',
-            'request_sha256': full.exact.canonical_hash(request), 'positions': positions,
-            'sample_count': 1200, 'metrics': metrics, 'encoder': encoder.info,
-            'process_id': os.getpid(), 'process': 'FRESH_PYTHON_CPU_WORKER'}
+    snapshot = full.contained(config['snapshot']['path'])
+    snapshot_ref = binding(snapshot, ROOT)
+    require(all(snapshot_ref[k] == config['snapshot'][k] for k in ('path', 'size', 'sha256')),
+            'snapshot content mismatch')
+    raw, _ = full.exact.frozen_tokenizers(full.contained(verified['model']['asset_directory']))
+    with full.readonly(snapshot) as conn:
+        count = full.census_and_chunk_count(conn, raw, verified['manifest']['tokenizer_inventory_sha256'], config)
+    # Conservative schema-independent reserve; checked again before each batch.
+    required = count['actual_chunks'] * (4096 + 3 * 5000 + 8192) * 2
+    def capacity():
+        import shutil
+        require(shutil.disk_usage(ROOT).free >= required, 'BLOCKED_DISK: builder reserve')
+    capacity()
+    records = [(snapshot, config['snapshot'], 'snapshot')]
+    records += [(Path(n) if Path(n).is_absolute() else ROOT / n, {'path': n, **r},
+                 'ort_dll' if Path(n).is_absolute() else 'input') for n, r in verified['bindings'].items()]
+    def encoder(device):
+        capacity()
+        result = full.exact.LocalEncoder(verified['model'], verified['contract'], device, verified['job']['threads'])
+        require(result.info['actual_dtype'] == 'torch.float32', 'actual FP32 required')
+        if device == 'cuda':
+            require(result.info['actual_device'].startswith('cuda'), 'actual GPU required')
+        return result
+    def work():
+        with acceptance._inventory_guard(records), full.readonly(snapshot) as conn, closing(full.documents(conn)) as stream:
+            report['build'] = build_stream(stream, raw, verified['manifest']['tokenizer_inventory_sha256'],
+                lambda: encoder('cuda'), lambda: index_factory(config['declarative_contract']), target,
+                config['declarative_contract'], count, batch_size=verified['job']['batch_size'],
+                check_capacity=capacity, reference=FreshCPUReference(verified), report=report)
+            value = manifest(config, verified, target, count['actual_chunks'])
+            acceptance.validate_full_manifest(value, config, pack_root=target)
+            return value
+    return lifecycle(target, report, work, snapshot=snapshot)
 
 
-def run_partial_cpu_worker(request):
-    import sys
-    command = [sys.executable, '-X', 'utf8', '-c',
-        'import json,sys; from tools import p4_full_build as b; print(json.dumps(b.partial_cpu_worker(json.load(sys.stdin)),sort_keys=True))']
-    env = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1')
-    child = subprocess.run(command, input=full.chunks.canonical(request), cwd=ROOT, env=env, capture_output=True, check=False)
-    require(child.returncode == 0, 'fresh CPU worker failed: ' + child.stderr.decode('utf8', errors='replace'))
-    response = json.loads(child.stdout.decode('utf8'))
-    require(response['status'] == 'PASS' and response['request_sha256'] == full.exact.canonical_hash(request) and
-            response['positions'] == request['positions'] and response['sample_count'] == 1200 and
-            response['process_id'] != os.getpid(), 'CPU response authority/coverage mismatch')
-    info = response['encoder']
-    require(info['actual_device'] == 'cpu' and info['actual_dtype'] == 'torch.float32' and
-            info['threads'] == info['interop_threads'] == 8, 'CPU response actual thread/device mismatch')
-    metrics = response['metrics']
-    require(metrics['max_component_error'] <= 1e-4 and metrics['minimum_cosine'] >= .99999 and
-            metrics['max_norm_error'] <= 1e-5, 'CPU response parity failed')
-    response['request'] = request
-    response['command'] = command
-    response['command_exit'] = child.returncode
-    response['stderr_sha256'] = hashlib.sha256(child.stderr).hexdigest()
-    return response
-
-
-PARTIAL_PRODUCTS = {'chunks.sqlite': (3675488256, '67471db26e04420a905e0726d4582531e2270eb2d3ed528b79b0e3f8fcfcbe2c'),
-    'corpus.jsonl': (1316930137, '6097c0c93eb75f624d549ff062d37b70cc0dbb069fae812194ba7f2a8acf301f'),
-    'sample.json': (16747, '2f61ba6325ff6ec6984e49299b9b86caf6daef2f3b7858f6ed9e45a72611b7ad'),
-    'vectors.npy': (5597266048, 'b81cdaf057a41c8882f52cfbe322adcc0f93c88103e2f141bf9cd942724ec78a')}
-ATTEMPT2_HISTORY = {
-    'build/p4-full-build-attempt2-authorization-6755d33d.json': 'b375582035fa4902cf9fd5114e228d5c3813e12913ed8f86a6b97456f4a466c3',
-    'build/p4-full-semantic-v1-retry1.attempt2.lock': '849cd1c52bd9844f3cbf0c904d4612af4af717854164834daac1030c8f5284fb',
-    'build/p4-full-semantic-v1-retry1/execution-receipt.json': '7d9f8ffa5cebc2ddb162f970a000b3b5948d23b521d938e008a334e00ece57c4',
-    'reports/P4/full-semantic-attempt2-command.json': '79f8b8ad6552395417b134738cb3cee98dc8140adaadd2a53af2ebd89e5ffe48',
-    'reports/P4/full-semantic-attempt2-handoff.json': '51fbe167df48db8a0fbb0964a0c396386a4b63a7455997086a1b46e220f7e660'}
-CONTINUATION_SCHEMA = 'p4-attempt2-partial-continuation-authorization-v1'
-
-
-def validate_partial_preservation(*, root, new_absent=True):
-    validate_retry_history_and_no_retry_product(root=root, check_new=False)
-    for name, digest in ATTEMPT2_HISTORY.items():
-        require(full.exact.sha(full.contained(name, root)) == digest, 'Attempt2 history changed')
-    output = full.contained(RETRY_OUTPUT, root)
-    receipt = read_json(output / 'execution-receipt.json')
-    require(receipt['status'] == 'FAIL' and receipt['phase'] == 'sample_reference_parity' and
-            receipt['attempts'] == receipt['attempt_number'] == 2 and receipt['attempt_reserved'] is True and
-            receipt['completed_documents'] == 1295638 and receipt['completed_chunks'] ==
-            receipt['completed_embeddings'] == 1366520 and receipt['completed_ann'] == 0 and
-            receipt['snapshot_after_hash_status'] == 'UNCHANGED', 'Attempt2 partial state mismatch')
-    for name, (size, digest) in PARTIAL_PRODUCTS.items():
-        path = full.controlled_path(output / name, root)
-        require(path.stat().st_size == size and full.exact.sha(path) == digest, 'partial product changed: ' + name)
-    require(not any((output / name).exists() for name in TRANSIENTS), 'unsafe SQLite transients')
-    if new_absent:
-        for name in ('vectors.usearch', 'manifest.json', 'continuation-receipt.json',
-                     'continuation-receipt.json.staging'):
-            require(not (output / name).exists(), 'continuation product already exists; no overwrite')
-    return output
-
-
-CPU_SOURCE_BINDING_SHA = 'b4c0185718eda9dfe982638ab567b395c7867ee3f5a9e4833826954691b50b8a'
-
-
-def validate_cpu_qualification_source(root):
-    import ast
-    path = full.contained('reports/P4/attempt2-partial-cpu-source-binding.json', root)
-    require(full.exact.sha(path) == CPU_SOURCE_BINDING_SHA, 'independent CPU source evidence changed')
-    evidence = read_json(path)
-    original = evidence['qualification_source_reconstructed_utf8'].encode('utf8')
-    require(hashlib.sha256(original).hexdigest() == evidence['qualification_source_raw_sha256'] and
-            len(original) == evidence['qualification_source_bytes'] and
-            evidence['request']['source_sha256'] == evidence['qualification_source_raw_sha256'] and
-            full.exact.canonical_hash(evidence['request']) == evidence['original_response']['request_sha256'],
-            'historical CPU source/request mismatch')
-    source = (Path(root) / 'tools/p4_full_build.py').read_text('utf8')
-    nodes = {n.name: n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef)}
-    for name, record in evidence['worker_regions'].items():
-        node = nodes[name]
-        region = '\n'.join(source.splitlines()[node.lineno - 1:node.end_lineno]) + '\n'
-        require(hashlib.sha256(region.encode()).hexdigest() == record['sha256'], 'CPU worker/helper changed')
-    for name, digest in evidence['transitive_source_bindings'].items():
-        require(full.exact.sha(full.contained(name, root)) == digest, 'CPU transitive source changed')
-    transitive_path = full.contained('reports/P4/attempt2-partial-cpu-transitive-binding.json', root)
-    require(full.exact.sha(transitive_path) ==
-            '97a3642145628cb11f044185370d1f9beb4e1272ffdfe42189e89c0e5f8f120e',
-            'independent transitive evidence changed')
-    transitive = read_json(transitive_path)
-    for name, record in transitive['bindings'].items():
-        path = full.contained(name, root)
-        require(full.exact.sha(path) == record['raw_sha256'], 'CPU transitive source changed')
-        shown = subprocess.check_output(['git', 'show', transitive['historical_commit'] + ':' + name], cwd=root)
-        require(hashlib.sha256(shown).hexdigest() == record['historical_git_source_sha256'] and
-                path.read_bytes().replace(b'\r\n', b'\n') == shown, 'CPU historical transitive source mismatch')
-    return evidence
-
-
-def authorize_continuation(path, digest, *, fixed_head, root):
-    require(path is not None and digest is not None, 'separate explicit continuation authorization required')
-    full.chunks.valid_hash(digest)
-    require(full.exact.sha(full.contained(path, root)) == digest, 'continuation authorization hash mismatch')
-    value = read_json(full.contained(path, root))
-    require(set(value) == {'schema', 'operation', 'fixed_code_sha', 'output', 'qualification',
-        'executor_bindings', 'preflight_producer_sha', 'preflight_evidence_sha', 'reviewed_source_bindings',
-        'count_review', 'disk_review', 'smoke_review'}, 'exact continuation authorization fields')
-    require(value['schema'] == CONTINUATION_SCHEMA and value['operation'] == 'continue_attempt2_partial' and
-            value['fixed_code_sha'] == fixed_head and value['output'] == RETRY_OUTPUT,
-            'continuation authorization policy mismatch')
-    authenticate_executor_bindings(value, fixed_head=fixed_head, root=root)
-    ref = value['qualification']
-    require(set(ref) == {'path', 'sha256'} and ref['path'] == 'reports/P4/attempt2-partial-qualification.json',
-            'qualification receipt path mismatch')
-    require(full.exact.sha(full.contained(ref['path'], root)) == ref['sha256'], 'qualification hash mismatch')
-    qualification = read_json(full.contained(ref['path'], root))
-    evidence = validate_cpu_qualification_source(root)
-    require(qualification['cpu_source_binding_sha256'] == CPU_SOURCE_BINDING_SHA and
-            qualification['qualification_source_raw_sha256'] == evidence['qualification_source_raw_sha256'],
-            'qualification historical CPU source mismatch')
-    require(qualification['status'] == 'QUALIFIED' and qualification['mapping'] == 'QUALIFIED' and
-            qualification['embeddings'] == 'QUALIFIED' and qualification['sample_parity'] == 'PASS' and
-            qualification['attempt2_result_sha'] == '33601978374d241827c7b698475f3c33f8273b0d' and
-            qualification['history'] == ATTEMPT2_HISTORY and
-            qualification['products'] == {n: {'bytes': s, 'sha256': h} for n, (s, h) in PARTIAL_PRODUCTS.items()},
-            'qualification authority mismatch')
-    return value
-
-
-def continue_partial(*, authorization=None, expected_authorization_sha256=None, fixed_head='NOT_FIXED_YET'):
-    """Future separately authorized ANN-only continuation; never reserve/encode/replace old FAIL."""
-    import numpy as np
-    report = {'schema': 'p4-attempt2-continuation-receipt-v1', 'status': 'FAIL', 'attempts': 2,
-              'formal_build_attempts_total': 2, 'attempt3_created': False, 'completed_ann': 0,
-              'fixed_code_sha': fixed_head, 'phase': 'activation', 'continuation_claimed': False}
-    output = ROOT / RETRY_OUTPUT
-    claimed = False
-    original_error = None
-    try:
-        verify_fixed_current_dev(fixed_head, ROOT)
-        auth = authorize_continuation(authorization, expected_authorization_sha256, fixed_head=fixed_head, root=ROOT)
-        validate_partial_preservation(root=ROOT)
-        config = read_json(full.CONFIG)
-        full.validate_contract(config)
-        with full.config_guard(config), full.source_guard(fixed_head, ROOT, report):
-            verified = full.inventory()
-            validate_activation_dll(verified)
-            count, disk, _ = reviewed_preflight(auth, config, verified, report, ROOT)
-            require(count['actual_chunks'] == 1366520, 'continuation count mismatch')
-            require(full.disk_capacity(disk['disk'])['status'] == 'PASS', 'continuation disk blocked')
-            snapshot = full.contained(config['snapshot']['path'], ROOT)
-            snapshot_before = binding(snapshot, ROOT)
-            require(all(snapshot_before[k] == config['snapshot'][k] for k in ('path', 'size', 'sha256')),
-                    'continuation snapshot mismatch')
-            validate_partial_preservation(root=ROOT)
-            # An exclusive continuation receipt is the one-shot claim, never a new build lock/attempt.
-            receipt_path = output / 'continuation-receipt.json'
-            with receipt_path.open('xb') as file:
-                claimed = True
-                report['continuation_claimed'] = True
-                file.write(full.chunks.canonical(report) + b'\n')
-                file.flush()
-                os.fsync(file.fileno())
-            vectors = np.load(output / 'vectors.npy', mmap_mode='r', allow_pickle=False)
-            index = reopened = None
-            try:
-                report['phase'] = 'ann_construction'
-                started = time.perf_counter()
-                index = index_factory(config['declarative_contract'])
-                for start in range(0, 1366520, 8):
-                    require(full.disk_capacity(disk['disk'])['status'] == 'PASS', 'continuation disk blocked')
-                    rows = vectors[start:start + 8]
-                    index.add(np.arange(start, start + len(rows), dtype=np.uint64), rows,
-                              threads=config['declarative_contract']['runtime']['intra_threads'], copy=True)
-                    report['completed_ann'] = start + len(rows)
-                verify_keys(index, 1366520)
-                # Exclusive reservation prevents native save from overwriting a foreign index.
-                with (output / 'vectors.usearch').open('xb'):
-                    pass
-                index.save(str(output / 'vectors.usearch'))
-                report['ann_build_seconds'] = time.perf_counter() - started
-                report['phase'] = 'ann_readonly_reload'
-                reopened = index_factory(config['declarative_contract'])
-                reopened.view(str(output / 'vectors.usearch'))
-                verify_keys(reopened, 1366520)
-                value = manifest(config, verified, output, 1366520)
-                value['build_provenance'] = {'formal_build_attempts_total': 2, 'attempt2_original_result': 'FAIL',
-                    'attempt2_failure_phase': 'sample_reference_parity',
-                    'attempt2_failure_class': 'CPU_REFERENCE_ENCODER_PROCESS_GLOBAL_THREAD_INIT',
-                    'partial_embedding_reused': True, 'partial_vectors_sha256': PARTIAL_PRODUCTS['vectors.npy'][1],
-                    'partial_mapping_sha256': PARTIAL_PRODUCTS['chunks.sqlite'][1],
-                    'continuation_implementation_sha': fixed_head}
-                value['inventory_exclusions']['execution-receipt.json'] = 'immutable_original_attempt2_FAIL_history'
-                value['inventory_exclusions']['continuation-receipt.json'] = 'terminal_continuation_binding_externally'
-                acceptance.validate_full_manifest(value, config, pack_root=output)
-                validate_partial_preservation(root=ROOT, new_absent=False)
-                authorize_continuation(authorization, expected_authorization_sha256, fixed_head=fixed_head, root=ROOT)
-                require(binding(snapshot, ROOT) == snapshot_before, 'continuation snapshot changed')
-                save_new(output / 'manifest.json', value)
-                report.update(status='RECOVERED_FROM_QUALIFIED_ATTEMPT2_PARTIAL', phase='complete',
-                              manifest_sha256=full.exact.sha(output / 'manifest.json'))
-            finally:
-                close_index(reopened)
-                close_index(index)
-                close_memmap(vectors)
-    except BaseException as error:
-        report.update(status='FAIL', error_type=type(error).__name__, error_message=str(error))
-        error.continuation_receipt = report
-        original_error = error
-        raise
-    finally:
-        if claimed:
-            try:
-                report['snapshot_after'] = binding(snapshot, ROOT)
-                report['snapshot_after_hash_status'] = 'UNCHANGED' if report['snapshot_after'] == snapshot_before else 'CHANGED'
-                if report['snapshot_after_hash_status'] != 'UNCHANGED':
-                    raise ValueError('continuation terminal snapshot changed')
-            except BaseException as error:  # noqa: BLE001 - retain secondary evidence and propagate cancellation below
-                report.update(status='FAIL', terminal_error=repr(error))
-                report.setdefault('snapshot_after_hash_status', 'HASH_FAILED')
-                report.setdefault('finalization_errors', []).append(repr(error))
-                if original_error is None:
-                    original_error = error
-            # Stage/fsync before atomically replacing only our owned FAIL claim.
-            # Any stage durability failure leaves on-disk FAIL, never unflushed success.
-            try:
-                publish_continuation_receipt(receipt_path, report)
-            except BaseException as error:  # noqa: BLE001 - preserve original/cancellation and fail-closed claim
-                report.update(status='FAIL', terminal_error=repr(error))
-                report.setdefault('finalization_errors', []).append(repr(error))
-                if original_error is None:
-                    original_error = error
-            if original_error is not None:
-                original_error.continuation_receipt = report
-                raise original_error
-    return report
-
-
-def publish_continuation_receipt(receipt_path, report):
-    # Explicit narrow exception: one exclusive same-directory temporary receipt.
-    # A hard interruption may retain it; the existing claim blocks another run.
-    stage = receipt_path.with_name(receipt_path.name + '.staging')
-    owned = False
-    first_error = None
-    try:
-        with stage.open('xb') as file:
-            owned = True
-            file.write(full.chunks.canonical(report) + b'\n')
-            file.flush()
-            os.fsync(file.fileno())
-        try:
-            os.replace(stage, receipt_path)
-            owned = False  # Replacement consumed the temporary; no post-success cleanup call.
-        except BaseException as original:
-            # Replacement may finish before cancellation is delivered. Fail closed
-            # in our claim; retain scrub failures as secondary to original error.
-            failure = dict(report, status='FAIL', publication_error='replacement interrupted',
-                           publication_durability='NOT_GUARANTEED under hard process termination')
-            try:
-                with receipt_path.open('wb') as file:
-                    file.write(full.chunks.canonical(failure) + b'\n')
-                    file.flush()
-            except BaseException as scrub_error:  # noqa: BLE001 - preserve first cancellation
-                original.publication_scrub_error = repr(scrub_error)
-            raise
-    except BaseException as error:
-        first_error = error
-        raise
-    finally:
-        if owned:
-            try:
-                stage.unlink(missing_ok=True)
-            except BaseException as cleanup_error:  # Preserve first failure/cancellation.
-                if first_error is None:
-                    raise
-                first_error.publication_cleanup_error = repr(cleanup_error)
-
-
-def synthetic_run(root):
+def synthetic_run(root, output=None):
     """Synthetic authorities, real FULL validator; never actual FULL acceptance."""
     import copy
     from contextlib import ExitStack
@@ -1418,7 +757,7 @@ def synthetic_run(root):
             n += 1
     count = {'actual_chunks': n, 'documents': 20, 'strata': {'bangumi.subject': 20},
              'streaming_sha256': digest.hexdigest(), 'max_document_text_bytes': 10000}
-    output, report = root / 'synthetic-pack', new_report()
+    output, report = (Path(output), new_report()) if output is not None else (root / 'synthetic-pack', new_report())
     report['synthetic'] = True
     report['activation'] = {'output_absent': not output.exists(), 'lock_absent': not attempt_lock(output).exists(),
                             'gpu_available': 'SYNTHETIC', 'inventory': {}, 'fixed_source': 'SYNTHETIC'}
@@ -1446,7 +785,7 @@ def synthetic_run(root):
         for name, filename in (('index', 'vectors.usearch'), ('mapping', 'chunks.sqlite'), ('corpus', 'corpus.jsonl')):
             artifacts[name] = binding(output / filename, output)
         value = attach_inventory({'schema': acceptance.PACK_SCHEMA, 'object_type': 'runtime_pack',
-            'synthetic': True, 'implementation_origin': full.IMPLEMENTATION, 'recovered_original_source': False,
+            'synthetic': True,
             'canonical_contract': {'schema': config['schema'], **binding(config_path, root)},
             'snapshot': {'identity': config['snapshot']['path'], **binding(snapshot, output)},
             'contract': acceptance.runtime_contract(declaration, n),
@@ -1455,8 +794,8 @@ def synthetic_run(root):
         with ExitStack() as stack:
             for obj, name, replacement in ((acceptance, 'ROOT', root), (acceptance, 'CONFIG', config_path),
                     (acceptance, 'validate_contract', lambda value: declaration if value == config else None),
-                    (acceptance.pilot, 'DLL_SIZE', artifacts['ort_dll']['size']),
-                    (acceptance.pilot, 'DLL_SHA', artifacts['ort_dll']['sha256'])):
+                    (acceptance, 'approved_full_dll', lambda: {'path': str(root / 'ort_dll'),
+                        'size': artifacts['ort_dll']['size'], 'sha256': artifacts['ort_dll']['sha256']})):
                 stack.enter_context(patch.object(obj, name, replacement))
             acceptance.validate_full_manifest(value, config, pack_root=output)
         report['manifest_validator'] = 'actual_FULL_validator_with_synthetic_authorities'
@@ -1468,30 +807,24 @@ def synthetic_run(root):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    modes = parser.add_mutually_exclusive_group(required=True)
-    for mode in ('validate', 'dry-run', 'synthetic', 'execute-full', 'execute-full-retry', 'continue-attempt2-partial'):
-        modes.add_argument('--' + mode, action='store_true')
-    parser.add_argument('--authorization')
-    parser.add_argument('--expected-authorization-sha256')
-    parser.add_argument('--fixed-head', default='NOT_FIXED_YET')
+    parser.add_argument('--output', help='readiness receipt destination (default: stdout)')
+    parser.add_argument('--execute', action='store_true', help='run the supported ordinary builder lifecycle')
+    parser.add_argument('--synthetic', action='store_true', help='run the supported synthetic lifecycle')
     args = parser.parse_args()
-    if args.continue_attempt2_partial:
-        result = continue_partial(authorization=args.authorization,
-            expected_authorization_sha256=args.expected_authorization_sha256, fixed_head=args.fixed_head)
-    elif args.execute_full_retry:
-        result = execute_retry(authorization=args.authorization,
-            expected_authorization_sha256=args.expected_authorization_sha256, fixed_head=args.fixed_head)
-    elif args.execute_full:
-        result = execute(authorization=args.authorization,
-                         expected_authorization_sha256=args.expected_authorization_sha256, fixed_head=args.fixed_head)
+    if args.execute:
+        result = execute(output=args.output)
     elif args.synthetic:
         with tempfile.TemporaryDirectory(prefix='p4-full-synthetic-') as directory:
             result = synthetic_run(Path(directory))
     else:
         config = read_json(full.CONFIG)
         full.validate_contract(config)
-        result = {'status': 'SOURCE_CONFIG_VALID', 'attempts': 0, 'executor_origin': EXECUTOR_ORIGIN,
-                  'source_sha256': full.exact.sha(Path(__file__)), 'config_sha256': full.exact.sha(full.CONFIG)}
+        result = {'status': 'READY_FOR_NORMAL_BUILD', 'attempts': 0,
+                  'executor_origin': EXECUTOR_ORIGIN,
+                  'source_sha256': full.exact.sha(Path(__file__)),
+                  'config_sha256': full.exact.sha(full.CONFIG)}
+    if args.output and not args.execute:
+        save_new(args.output, result)
     print(json.dumps(result, sort_keys=True))
 
 

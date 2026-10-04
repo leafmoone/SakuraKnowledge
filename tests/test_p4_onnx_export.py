@@ -51,7 +51,7 @@ class ContractTests(unittest.TestCase):
         paths = export.verify_reference(self.reference, self.contract, job, prepared)
         self.assertIn(self.reference.parent / 'cases.json', paths)
         self.assertIn(self.reference.parent / 'inputs.json', paths)
-        self.assertIn(export.exact.local('tools/p4_query_reference.py'), paths)
+        self.assertIn(export.exact.local(job['gold']), paths)
         weights = export.exact.local(prepared[0]['asset_directory']) / 'pytorch_model.bin'
         self.assertIn(weights, paths)
         self.assertTrue(weights.is_file())
@@ -108,7 +108,7 @@ class ReferenceTests(unittest.TestCase):
             'attempted_queries': 120, 'completed_queries': 120,
             'shape': [120, 1024], 'dtype': 'float32',
             'frozen_provenance': self.provenance, **self.provenance,
-            'code_sha256': inputs['code_sha256'], 'versions': {},
+            'versions': {},
             'versions_sha256': export.exact.canonical_hash({}),
             'encoder': {'provider': 'huggingface/torch', 'actual_device': 'cpu',
                         'requested_device': 'cpu', 'actual_dtype': 'torch.float32',
@@ -137,8 +137,7 @@ class ReferenceTests(unittest.TestCase):
     def test_actual_producer_format_and_complete_binding(self):
         paths = self.verify()
         for name in ('reference/manifest.json', 'reference/vectors.npy', 'reference/cases.json',
-                     'reference/inputs.json', 'extra.json', 'assets/pytorch_model.bin',
-                     'tools/p4_query_reference.py', 'tools/p4_selection_v2.py'):
+                     'reference/inputs.json', 'summary.json', 'assets/pytorch_model.bin'):
             self.assertIn(self.root / name, paths)
 
     def test_unauthorized_manifest_digest(self):
@@ -148,12 +147,10 @@ class ReferenceTests(unittest.TestCase):
     def test_semantic_rejections_even_if_manifest_reauthorized(self):
         original = copy.deepcopy(self.manifest)
         for key, value in (
-            ('status', 'FAIL'), ('authorization_scope', export.REFERENCE_SCOPE),
-            ('historical_pilot', True), ('historical_pilot', 0),
-            ('native_qualification_retry', True), ('selection_rerun', True), ('ranking', True),
+            ('status', 'FAIL'),
             ('warmups', 1), ('attempted_queries', 119), ('completed_queries', 119),
             ('shape', [119, 1024]), ('dtype', 'float16'), ('frozen_provenance', {}),
-            ('model_inventory_sha256', 'bad'), ('code_sha256', {}),
+            ('model_inventory_sha256', 'bad'),
             ('input_validations', {'before': original['input_validations']['before'],
                                    'after': {'status': 'FAIL', 'snapshot_sha256': 'bad'}}),
             ('versions_sha256', 'bad')):
@@ -165,7 +162,7 @@ class ReferenceTests(unittest.TestCase):
 
     def test_corrupt_payload_or_bound_source(self):
         for name in ('reference/vectors.npy', 'reference/cases.json', 'reference/inputs.json',
-                     'extra.json', 'tools/p4_selection_v2.py', 'assets/pytorch_model.bin'):
+                     'summary.json', 'assets/pytorch_model.bin'):
             with self.subTest(name=name):
                 path = self.root / name
                 before = path.read_bytes()

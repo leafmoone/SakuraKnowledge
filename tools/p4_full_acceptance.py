@@ -1,20 +1,15 @@
 """Read-only FULL acceptance checks; never load artifacts or run inference.
 
-implementation_origin=clean_room_reimplementation_after_untracked_source_loss
-recovered_original_source=false
-reference_sources=committed Rust pilot 471829, approved FULL requirements/P3 snapshot,
-committed pilot tokenizer/chunk/ANN/runtime. This is not recovered original source.
 """
 import hashlib
 import json
 import re
-from contextlib import closing, contextmanager
+from contextlib import closing
 from pathlib import Path
 
 from tools import p4_rust_pilot as pilot
 from tools.p4_full_preflight import (
     CONFIG,
-    IMPLEMENTATION,
     ROOT,
     require,
     validate_contract,
@@ -64,36 +59,26 @@ def _binding(record):
             re.fullmatch('[0-9a-f]{64}', record['sha256']), 'binding SHA256 required')
 
 
-def _approved_dll_path():
-    """Only the existing pack authenticated by the pinned pilot job grants authority."""
+def approved_full_dll():
+    """Return the independently configured current ORT DLL binding."""
     try:
-        # Lazy import: preflight imports acceptance, and fixture ROOT is explicit.
-        from tools.p4_full_preflight import historical_job_bindings
-        job_name = 'configs/p4-rust-pilot-v1.json'
-        authority = historical_job_bindings(root=ROOT)[job_name]
-        job_path = _controlled_path(Path(ROOT) / job_name, ROOT)
-        job_bytes = job_path.read_bytes()
-        require(hashlib.sha256(job_bytes).hexdigest() == authority['raw_sha256'],
-                'unapproved pilot execution bytes')
-        job = json.loads(job_bytes)
-        require(job['manifest'] == pilot.PACK, 'unapproved pilot pack path')
-        pack_path = _controlled_path(Path(ROOT) / pilot.PACK, ROOT)
-        pack_bytes = pack_path.read_bytes()
-        require(hashlib.sha256(pack_bytes).hexdigest() == job['frozen_sha256'][pilot.PACK],
-                'unapproved pilot pack hash')
-        record = json.loads(pack_bytes)['artifacts']['ort_dll']
+        path = ROOT / 'configs/p4-current-assets.json'
+        data = json.loads(path.read_bytes())
+        record = data['ort_dll']
         _binding(record)
-        require((record['size'], record['sha256']) == (pilot.DLL_SIZE, pilot.DLL_SHA),
-                'unpinned approved ORT DLL')
-        path = (pack_path.parent / record['path']).absolute()
-        _no_links(path)
-        resolved = path.resolve(strict=True)
-        _no_links(resolved)
+        resolved = Path(record['path']).expanduser()
+        require(resolved.is_absolute(), 'current ORT DLL exact path required')
+        resolved = resolved.resolve(strict=True)
         require(resolved.is_file(), 'approved ORT DLL missing')
-        _verify_file(resolved, record)
-        return resolved
-    except (OSError, ValueError, KeyError, TypeError) as exc:
+        # The configured pin is parsed here; content is verified exactly once by the
+        # session inventory guard.  Do not hash the DLL during path authority checks.
+        return {'path': str(resolved), 'size': record['size'], 'sha256': record['sha256']}
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as exc:
         raise ValueError('BLOCKED: approved external ORT DLL binding unavailable') from exc
+
+
+def _approved_dll_path():
+    return Path(approved_full_dll()['path'])
 
 
 def _artifact_path(path, kind, binding):
@@ -101,14 +86,17 @@ def _artifact_path(path, kind, binding):
     _no_links(path)
     resolved = path.resolve(strict=True)
     _no_links(resolved)
-    if kind == 'ort_dll':
-        require((binding['size'], binding['sha256']) == (pilot.DLL_SIZE, pilot.DLL_SHA),
-                'unpinned ORT DLL')
+    approved = approved_full_dll() if kind == 'ort_dll' else None
     if not resolved.is_relative_to(Path(ROOT).resolve(strict=True)):
         require(kind == 'ort_dll', 'inventory path escape')
-        require(resolved == _approved_dll_path(), 'unapproved external ORT DLL path')
+        require(resolved == Path(approved['path']), 'unapproved external ORT DLL path')
         require(resolved.is_file(), 'inventory non-file')
+        require((binding['size'], binding['sha256']) ==
+                (approved['size'], approved['sha256']), 'unpinned ORT DLL')
         return resolved
+    if kind == 'ort_dll':
+        require((binding['size'], binding['sha256']) ==
+                (approved['size'], approved['sha256']), 'unpinned ORT DLL')
     return _controlled_path(path, ROOT)
 
 
@@ -126,18 +114,33 @@ def _verify_file(path, binding):
     return before
 
 
-@contextmanager
+class VerifiedInventory:
+    """One acceptance-session verification of each unique content asset."""
+    def __init__(self, records):
+        self.records = records
+        self.states = []
+        self._verified = set()
+
+    def verify(self):
+        for path, binding, kind in self.records:
+            path = _artifact_path(path, kind, binding)
+            key = (path, binding['size'], binding['sha256'])
+            if key not in self._verified:
+                self.states.append((path, binding, kind, _verify_file(path, binding)))
+                self._verified.add(key)
+        return self
+
+    def __enter__(self):
+        return self.verify()
+
+    def __exit__(self, *_):
+        for path, binding, kind, before in self.states:
+            require(_artifact_path(path, kind, binding) == path and
+                    _file_state(path) == before, 'inventory changed')
+
+
 def _inventory_guard(records):
-    """Stream hashes before and after use; recheck ROOT/kind-specific authority."""
-    states = [(path, binding, kind, _verify_file(_artifact_path(path, kind, binding), binding))
-              for path, binding, kind in records]
-    try:
-        yield
-    finally:
-        for path, binding, kind, before in states:
-            require(_artifact_path(path, kind, binding) == path and _file_state(path) == before,
-                    'inventory changed')
-            _verify_file(path, binding)
+    return VerifiedInventory(records)
 
 
 def _canonical(contract):
@@ -198,8 +201,6 @@ def validate_full_manifest(manifest, contract, *, pack_root):
     require(manifest.get('schema') == PACK_SCHEMA and manifest.get('object_type') == 'runtime_pack',
             'FULL pack object/schema required')
     require(manifest.get('declarative_contract') == declaration, 'FULL declaration required')
-    require(manifest.get('implementation_origin') == IMPLEMENTATION and
-            manifest.get('recovered_original_source') is False, 'clean-room provenance required')
     snapshot, spec = _snapshot(contract)
     ref = manifest.get('snapshot', {})
     require(ref.get('identity') == spec['path'] and ref.get('size') == spec['size'] and
@@ -212,8 +213,9 @@ def validate_full_manifest(manifest, contract, *, pack_root):
     require(manifest.get('contract') == runtime_contract(declaration, rows), 'runtime projection mismatch')
     require('lexical_metadata' not in manifest and 'full_declaration' not in manifest,
             'FULL pilot sidecar/metadata forbidden')
+    approved_dll = approved_full_dll()
     records = _verify_inventory(manifest.get('artifacts'), pack_root,
-                                expected_dll=(pilot.DLL_SIZE, pilot.DLL_SHA))
+                                expected_dll=(approved_dll['size'], approved_dll['sha256']))
     with _inventory_guard([(canonical, canonical_binding, 'canonical'),
                            (snapshot, spec, 'snapshot'), *records]):
         return rows

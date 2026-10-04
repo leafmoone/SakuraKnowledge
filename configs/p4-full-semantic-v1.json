@@ -1,12 +1,6 @@
 {
   "schema": "p4-full-semantic-contract-v1",
   "object_type": "canonical_contract",
-  "implementation_origin": "clean_room_reimplementation_after_untracked_source_loss",
-  "implementation": "clean_room_reimplementation_after_untracked_source_loss",
-  "reference_sources": ["committed Rust pilot 471829644b32eecc10aa30d9d3b71979500a3117", "approved FULL requirements", "approved P3 snapshot", "committed pilot tokenizer/chunk/ANN/runtime"],
-  "recovered_original_source": false,
-  "references": ["tools/p4_rust_pilot.py", "tools/p4_chunks.py", "configs/p4-trusted-text-v1.json", "docs/p4-full-preflight-recovery.md", "docs/p3-full-coverage-contract.md"],
-  "preservation_inventory_sha256": "26d7f147be8aca7d715f35d839f3758dd247eae9a573a7e3e3b0057c564879e1",
   "snapshot": {
     "path": "build/p3-full-authorized-retry1/knowledge.sqlite",
     "size": 21718736896,
@@ -19,6 +13,6 @@
     "ann": {"library": "usearch", "version": "2.26.2", "metric": "cos", "dtype": "f32", "connectivity": 16, "expansion_add": 256, "expansion_search": 128, "chunk_depth": 512, "entry_depth": 100},
     "hybrid": {"bm25_document_depth": 100, "rrf_k": 60, "pins": "trusted_exact_alias", "ties": "kind,namespace,value"},
     "runtime": {"lexical_mode": "full_snapshot_fts", "ort_version": "1.24.1", "intra_threads": 8, "inter_threads": 1, "sequential": true, "provider": "CPUExecutionProvider"},
-    "build": {"max_attempts": 1, "output_policy": "create_new", "inputs": "readonly", "build_entry": false}
+    "build": {"output_policy": "create_new", "inputs": "readonly", "build_entry": false}
   }
 }

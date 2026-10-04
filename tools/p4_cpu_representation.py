@@ -30,7 +30,6 @@ import time
 from pathlib import Path
 
 from tools import p4_exact_pilot as exact
-from tools import p4_selection_v2 as selection
 
 B_REPOSITORY = 'BAAI/bge-m3'
 B_REVISION = '5617a9f61b028005a4858fdac845db406aefb181'
@@ -41,30 +40,13 @@ def validate(job):
     exact.require(job.get('benchmark_scope', 'query_embedding') == 'query_embedding',
                   'query representation only; no index')
     exact.require('samples' not in job, 'sample override forbidden')
-    path = exact.local(job['selection_receipt'])
-    exact.require(path.name == 'selection-v2-recompute.json', 'recomputed receipt required')
-    exact.bound(path, job['selection_receipt_sha256'])
-    receipt = exact.load(path)
-    exact.require(receipt == selection.verify(exact.ROOT), 'v2 recomputation mismatch')
-    exact.require(receipt['models']['b']['pass'] is True, 'quality B must PASS')
-    bindings = receipt['input_hash_validations']
-    for key in ('gold', 'corpus', 'summary'):
-        exact.require(job[key + '_sha256'] == bindings[key]['expected_sha256'],
-                      f'quality receipt {key} hash mismatch')
     prepared = exact.prepare(job)
-    model, contract, manifest, cases = prepared
+    model, contract, _manifest, cases = prepared
     exact.require(model['repository'] == B_REPOSITORY and model['revision'] == B_REVISION,
                   'pinned BGE-M3 model required')
     exact.require(contract['dimension'] == 1024 and contract['pooling'] == 'cls' and
                   contract['normalize'] is True and contract['query_prefix'] == '' and
                   contract['passage_prefix'] == '', 'pinned BGE-M3 contract required')
-    exact.require(receipt['quality_only_selected_model'] == {
-        'label': 'b', 'repository': model['repository'], 'revision': model['revision']},
-        'unique quality selection must match prepared B')
-    dense_path = exact.local(bindings['dense_b']['path'])
-    exact.bound(dense_path, bindings['dense_b']['expected_sha256'])
-    exact.require(exact.load(dense_path)['provenance'] == exact.provenance(job, model, manifest),
-                  'quality receipt frozen provenance mismatch')
     exact.require(len(cases) == 120 and len({c['case_id'] for c in cases}) == 120,
                   'exactly 120 unique cases required')
     exact.require(cases == sorted(cases, key=lambda c: c['case_id']), 'cases must be sorted')

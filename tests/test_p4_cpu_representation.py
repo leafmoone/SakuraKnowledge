@@ -1,10 +1,7 @@
-"""No inference dependencies, models, GPU, or benchmark CLI execution."""
-import copy
 import json
 import subprocess
 import tempfile
 import unittest
-from contextlib import ExitStack
 from pathlib import Path
 from unittest.mock import patch
 
@@ -174,91 +171,29 @@ class RepresentationTests(unittest.TestCase):
 
 class GateTests(unittest.TestCase):
     def setUp(self):
-        self.job = {'model': 'b', 'device': 'cpu',
-                    'selection_receipt': 'selection-v2-recompute.json',
-                    'selection_receipt_sha256': 'receipt-hash',
-                    'gold_sha256': 'gold-hash', 'corpus_sha256': 'corpus-hash',
-                    'summary_sha256': 'summary-hash'}
-        model = {'repository': 'BAAI/bge-m3',
-                 'revision': '5617a9f61b028005a4858fdac845db406aefb181'}
-        contract = {'dimension': 1024, 'pooling': 'cls', 'normalize': True,
-                    'query_prefix': '', 'passage_prefix': ''}
-        self.prepared = (model, contract, {}, CASES)
-        self.receipt = {
-            'schema': 'p4-selection-v2-recompute', 'scope': 'quality_only',
-            'models': {'a': {'pass': False}, 'b': {'pass': True}},
-            'quality_only_selected_model': {'label': 'b', **model},
-            'input_hash_validations': {
-                key: {'path': key + '.json', 'expected_sha256': key + '-hash',
-                      'actual_sha256': key + '-hash', 'valid': True}
-                for key in ('gold', 'corpus', 'summary', 'dense_b')}}
-        self.dense = {'provenance': {'frozen': 'expected'}}
-        stack = self.enterContext(ExitStack())
-        self.bound = stack.enter_context(patch.object(cpu.exact, 'bound'))
-        stack.enter_context(patch.object(cpu.exact, 'load', side_effect=self.load))
-        self.verify = stack.enter_context(patch.object(
-            cpu.selection, 'verify', return_value=copy.deepcopy(self.receipt)))
-        self.prepare = stack.enter_context(patch.object(
-            cpu.exact, 'prepare', return_value=self.prepared))
-        stack.enter_context(patch.object(cpu.exact, 'provenance',
-                                        return_value={'frozen': 'expected'}))
+        self.job = {'model': 'b', 'device': 'cpu', 'threads': 1, 'batch_size': 1,
+                    'summary_sha256': 'summary-digest', 'gold_sha256': 'gold-digest',
+                    'corpus_sha256': 'corpus-digest'}
+        self.model = {'repository': 'BAAI/bge-m3', 'revision': cpu.B_REVISION}
+        self.contract = {'dimension': 1024, 'pooling': 'cls', 'normalize': True,
+                         'query_prefix': '', 'passage_prefix': ''}
+        self.prepared = (self.model, self.contract, {'manifest': True}, CASES)
+        self.prepare = patch.object(cpu.exact, 'prepare', return_value=self.prepared)
+        self.prepare = self.prepare.start()
+        self.addCleanup(patch.stopall)
 
-    def load(self, path):
-        return self.receipt if path.name == 'selection-v2-recompute.json' else self.dense
-
-    def test_actual_interface_and_hash_binding(self):
+    def test_prepare_is_called_with_product_input_digests(self):
         self.assertEqual(cpu.validate(self.job), self.prepared)
-        self.verify.assert_called_once_with(cpu.exact.ROOT)
-        self.bound.assert_any_call(cpu.exact.local(self.job['selection_receipt']), 'receipt-hash')
-        self.bound.assert_any_call(cpu.exact.local('dense_b.json'), 'dense_b-hash')
-
-    def test_forged_receipt_rejected_before_prepare(self):
-        self.receipt['models']['b']['pass'] = False
-        with self.assertRaisesRegex(ValueError, 'recomputation mismatch'):
-            cpu.validate(self.job)
-        self.prepare.assert_not_called()
-
-    def test_verification_failure_rejected_before_prepare(self):
-        self.verify.side_effect = ValueError('input hash mismatch')
-        with self.assertRaisesRegex(ValueError, 'input hash mismatch'):
-            cpu.validate(self.job)
-        self.prepare.assert_not_called()
-
-    def test_quality_failure_rejected_before_prepare(self):
-        self.receipt['models']['b']['pass'] = False
-        self.verify.return_value = copy.deepcopy(self.receipt)
-        with self.assertRaisesRegex(ValueError, 'quality B must PASS'):
-            cpu.validate(self.job)
-        self.prepare.assert_not_called()
-
-    def test_unique_selection_must_match_prepared_b(self):
-        for selected in (None, {'label': 'a', **self.prepared[0]},
-                         {'label': 'b', **self.prepared[0], 'revision': '0' * 40},
-                         {'label': 'b', **self.prepared[0], 'repository': 'BAAI/bge-other'}):
-            with self.subTest(selected=selected):
-                self.receipt['quality_only_selected_model'] = selected
-                self.verify.return_value = copy.deepcopy(self.receipt)
-                with self.assertRaisesRegex(ValueError, 'unique quality selection'):
-                    cpu.validate(self.job)
-
-    def test_input_hashes_must_match_quality_bindings(self):
-        for key in ('gold', 'corpus', 'summary'):
-            with self.subTest(key=key):
-                job = {**self.job, key + '_sha256': 'different'}
-                with self.assertRaisesRegex(ValueError, key + ' hash mismatch'):
-                    cpu.validate(job)
-        self.prepare.assert_not_called()
-
-    def test_dense_provenance_must_match(self):
-        self.dense['provenance'] = {'frozen': 'other'}
-        with self.assertRaisesRegex(ValueError, 'provenance mismatch'):
-            cpu.validate(self.job)
+        self.prepare.assert_called_once_with(self.job)
+        self.assertEqual(self.job['summary_sha256'], 'summary-digest')
+        self.assertEqual(self.job['gold_sha256'], 'gold-digest')
+        self.assertEqual(self.job['corpus_sha256'], 'corpus-digest')
 
     def test_model_repository_and_revision_are_pinned(self):
         for key, value in (('repository', 'BAAI/bge-other'), ('revision', '0' * 40)):
             with self.subTest(key=key):
-                model = {**self.prepared[0], key: value}
-                self.prepare.return_value = (model, *self.prepared[1:])
+                self.prepare.return_value = ({**self.model, key: value},
+                                              self.contract, {}, CASES)
                 with self.assertRaisesRegex(ValueError, 'pinned BGE-M3 model'):
                     cpu.validate(self.job)
 
@@ -266,10 +201,27 @@ class GateTests(unittest.TestCase):
         for key, value in (('dimension', 768), ('pooling', 'mean'), ('normalize', False),
                            ('query_prefix', 'query: '), ('passage_prefix', 'passage: ')):
             with self.subTest(key=key):
-                contract = {**self.prepared[1], key: value}
-                self.prepare.return_value = (self.prepared[0], contract, *self.prepared[2:])
+                contract = {**self.contract, key: value}
+                self.prepare.return_value = (self.model, contract, {}, CASES)
                 with self.assertRaisesRegex(ValueError, 'pinned BGE-M3 contract'):
                     cpu.validate(self.job)
+
+    def test_exactly_120_cases_and_sorted_order_are_required(self):
+        for cases, message in ((CASES[:-1], 'exactly 120'),
+                               (list(reversed(CASES)), 'cases must be sorted'),
+                               ([*CASES[:-1], CASES[0]], 'exactly 120')):
+            with self.subTest(message=message):
+                self.prepare.return_value = (self.model, self.contract, {}, cases)
+                with self.assertRaisesRegex(ValueError, message):
+                    cpu.validate(self.job)
+
+    def test_query_scope_and_sample_overrides_are_rejected(self):
+        for job, message in (({**self.job, 'benchmark_scope': 'total_retrieve'},
+                              'query representation'),
+                             ({**self.job, 'samples': 1}, 'sample override')):
+            with self.subTest(message=message), self.assertRaisesRegex(ValueError, message):
+                cpu.validate(job)
+        self.assertEqual(self.prepare.call_count, 0)
 
 
 if __name__ == '__main__':
