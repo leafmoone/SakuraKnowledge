@@ -188,6 +188,7 @@ def evaluate(*, binary, output, results, existing_pack=False, verified_session=N
                                     row.update(wall_ms=(time.perf_counter() - start) * 1000,
                                                response_bytes=size, backend_ms=response.get('timings_ms'))
                                     build.save_new(destination / f'{phase}-{case["case_id"]}.json', response)
+                                    require_success_response(response)
                                     acceptance.validate_response(response, snapshot_conn=conn, session=session)
                                     scores = score_response(case, response, manifest)
                                     require(row['wall_ms'] <= 5000 and response['timings_ms']['total'] <= 5000,
@@ -201,7 +202,7 @@ def evaluate(*, binary, output, results, existing_pack=False, verified_session=N
                                     row['error'] = str(exc)
                                     report['failures'].append(f'{phase}/{case["case_id"]}: {exc}')
                                     if (driver.process.poll() is not None or
-                                            isinstance(exc, (TimeoutError, OSError)) or
+                                            isinstance(exc, (TimeoutError, OSError, RustFailure)) or
                                             'EOF/oversize JSONL response' in str(exc)):
                                         raise
                         if all(r['status'] == 'PASS' for r in report['formal']):
@@ -225,6 +226,17 @@ def evaluate(*, binary, output, results, existing_pack=False, verified_session=N
                 report['failures'].append(str(exc))
         build.save_new(destination / 'evaluation.json', report)
     return report
+
+
+class RustFailure(RuntimeError):
+    """A received terminal Rust FAIL envelope, not a malformed success response."""
+
+
+def require_success_response(response):
+    if response.get('status') == 'FAIL':
+        require(isinstance(response.get('error'), str) and response.get('retries') == 0,
+                'invalid Rust failure envelope')
+        raise RustFailure(response['error'])
 
 
 def main(argv=None):

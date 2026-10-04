@@ -733,6 +733,7 @@ pub struct SemanticEngine {
     manifest: Value,
     mode: Mode,
     rows: usize,
+    full_members: Vec<(i64, i64)>,
     pub open_timings_ms: Value,
 }
 impl SemanticEngine {
@@ -808,6 +809,9 @@ impl SemanticEngine {
             validate_snapshot_policy(&lexical, mode)?;
             lexical.prepare("SELECT text,document_id,entry_id FROM search_fts LIMIT 0")?;
         }
+        let member_start = Instant::now();
+        let full_members = if mode == Mode::Full { load_full_members(&base)? } else { Vec::new() };
+        let membership_ms = ms(member_start);
         let mapping = readonly(&paths["mapping"])?;
         validate_mapping(&mapping, rows)?;
         let metadata_ms = ms(total);
@@ -860,7 +864,10 @@ impl SemanticEngine {
         )?;
         index.change_expansion_search(128);
         require(index.expansion_search() == 128, "ef_search mismatch")?;
-        let open_timings_ms = json!({"metadata":metadata_ms,"tokenizer":tokenizer_ms,"ort":ort_ms,"ann":ms(start),"total":ms(total)});
+        let open_timings_ms = json!({"metadata":metadata_ms,"tokenizer":tokenizer_ms,"ort":ort_ms,"ann":ms(start),"total":ms(total),"membership_scan":membership_ms,
+            "membership_count":full_members.len(),
+            "membership_payload_bytes":full_members.len() * std::mem::size_of::<(i64,i64)>(),
+            "membership_allocation_bytes":full_members.capacity() * std::mem::size_of::<(i64,i64)>()});
         Ok(Self {
             tokenizer,
             session,
@@ -871,6 +878,7 @@ impl SemanticEngine {
             manifest,
             mode,
             rows,
+            full_members,
             open_timings_ms,
         })
     }
@@ -931,10 +939,11 @@ impl SemanticEngine {
         ).map_err(|e| format!("dense_mapping: {e}; tokenize_ms={tokenize_ms}; ort_ms={ort_ms}; total_ms={}", ms(total)))?;
         let ann_ms = ms(start);
         let start = Instant::now();
+        let mut lexical_stages = (0.0, 0.0);
         let (lexical, pins) = if self.mode == Mode::Pilot {
             lexical_hits(&self.lexical, query, &compiled)?
         } else {
-            full_lexical_hits(&self.lexical, query, &compiled).map_err(|e|
+            full_lexical_hits_cached(&self.lexical, query, &compiled, &self.full_members, &mut lexical_stages).map_err(|e|
                 format!("full_lexical: {e}; tokenize_ms={tokenize_ms}; ort_ms={ort_ms}; ann_ms={ann_ms}; lexical_ms={}; total_ms={}", ms(start), ms(total)))?
         };
         let bm25_ms = ms(start);
@@ -979,7 +988,7 @@ impl SemanticEngine {
                     "document evidence mismatch",
                 )?;
                 if self.mode == Mode::Full {
-                    validate_full_document(&self.base, did, eid)?;
+                    validate_full_document_cached(&self.base, did, eid, &self.full_members)?;
                 }
                 add_source(&self.base, &mut sources, &doc.3)?;
                 evidence.insert((doc.3.clone(),doc.4.clone(),did.to_owned()),json!({"document_id":did,"entry_id":eid.to_string(),"source_id":doc.3,"evidence_id":doc.4,"status":doc.2}));
@@ -1015,7 +1024,7 @@ impl SemanticEngine {
         let fusion_ms = ms(start);
         let elapsed = ms(total);
         require(elapsed <= 5000.0, "query_budget_exceeded")?;
-        result["timings_ms"] = json!({"tokenize":tokenize_ms,"ort":ort_ms,"ann":ann_ms,"bm25":bm25_ms,"fusion_evidence":fusion_ms,"total":elapsed});
+        result["timings_ms"] = json!({"tokenize":tokenize_ms,"ort":ort_ms,"ann":ann_ms,"bm25":bm25_ms,"pins_sql":lexical_stages.0,"bm25_sql":lexical_stages.1,"fusion_evidence":fusion_ms,"total":elapsed});
         Ok(result)
     }
 }
@@ -1114,9 +1123,17 @@ fn dense_hits_for(
     Ok(hits)
 }
 fn read_pins(stmt: &mut rusqlite::Statement<'_>, q: &str) -> Result<Vec<Value>> {
+    read_pins_cached(stmt, q, None)
+}
+fn read_pins_cached(stmt: &mut rusqlite::Statement<'_>, q: &str, members: Option<&[(i64,i64)]>) -> Result<Vec<Value>> {
     let mut cursor = stmt.query([q])?;
     let mut pins = Vec::new();
     while let Some(r) = cursor.next()? {
+        if let Some(members) = members {
+            let eid: i64 = r.get(6)?;
+            let pos = members.partition_point(|&(entry, _)| entry < eid);
+            if members.get(pos).map(|&(entry, _)| entry) != Some(eid) { continue; }
+        }
         let k = EntryKey::parse(
             &json!({"kind":r.get::<_,String>(0)?,"namespace":r.get::<_,String>(1)?,"value":r.get::<_,String>(2)?}),
         )?;
@@ -1166,11 +1183,55 @@ const FULL_DOCUMENT_TRUST: &str = "e.conflicted=0
  AND e.kind!='episode'
  AND EXISTS (SELECT 1 FROM entry_evidence v
              WHERE v.entry_id=e.id AND v.status='source_backed')";
+fn full_members_sql() -> String {
+    format!("SELECT e.id,d.id FROM search_fts f CROSS JOIN documents d ON d.id=f.document_id CROSS JOIN entries e ON e.id=d.entry_id WHERE f.entry_id=e.id AND f.text=d.search_text AND {FULL_DOCUMENT_TRUST}")
+}
+fn load_full_members(c: &Connection) -> Result<Vec<(i64,i64)>> {
+    let mut stmt = c.prepare(&full_members_sql())?;
+    let mut cursor = stmt.query([])?;
+    let mut members = Vec::new();
+    while let Some(row) = cursor.next()? {
+        members.push((row.get::<_,i64>(0)?, row.get::<_,i64>(1)?));
+    }
+    members.sort_unstable();
+    members.dedup();
+    Ok(members)
+}
+fn validate_full_document_cached(c: &Connection, did: &str, eid: i64, members: &[(i64,i64)]) -> Result<()> {
+    // Use SQLite's actual integer ID; preserve its original parameter coercion.
+    let mut stmt = c.prepare_cached("SELECT d.id FROM documents d WHERE d.id=? AND d.entry_id=? AND EXISTS(SELECT 1 FROM sources s WHERE s.source_id=d.source_id) AND length(trim(d.evidence_id))>0")?;
+    let mut rows = stmt.query(params![did,eid])?;
+    let ok = match rows.next()? {
+        Some(row) => members.binary_search(&(eid,row.get::<_,i64>(0)?)).is_ok(),
+        None => false,
+    };
+    require(ok, "untrusted FULL document")
+}
+#[cfg(test)]
 fn validate_full_document(c: &Connection, did: &str, eid: i64) -> Result<()> {
     let sql=format!("SELECT EXISTS(SELECT 1 FROM documents d JOIN entries e ON e.id=d.entry_id WHERE d.id=? AND e.id=? AND {FULL_DOCUMENT_TRUST} AND EXISTS(SELECT 1 FROM sources s WHERE s.source_id=d.source_id) AND length(trim(d.evidence_id))>0 AND EXISTS(SELECT 1 FROM search_fts f WHERE f.document_id=d.id AND f.entry_id=e.id AND f.text=d.search_text))");
     let ok: bool = c.query_row(&sql, params![did, eid], |r| r.get(0))?;
     require(ok, "untrusted FULL document")
 }
+fn full_lexical_hits_cached(c: &Connection, q: &str, compiled: &str, members: &[(i64,i64)], stages: &mut (f64,f64)) -> Result<(Vec<Value>, Vec<Value>)> {
+    let start = Instant::now();
+    let sql = "SELECT DISTINCT e.kind AS kind,e.namespace AS namespace,e.value AS value,'exact' AS match,v.source_id AS source_id,v.evidence_id AS evidence_id,e.id AS entry_id FROM entries e JOIN entry_evidence v ON v.entry_id=e.id JOIN sources s ON s.source_id=v.source_id WHERE e.value=?1 AND v.status='source_backed' AND length(trim(v.evidence_id))>0 UNION SELECT DISTINCT e.kind,e.namespace,e.value,'alias',a.source_id,a.evidence_id,e.id FROM entries e JOIN aliases a ON a.entry_id=e.id JOIN sources s ON s.source_id=a.source_id WHERE a.text=?1 AND a.status='source_backed' AND length(trim(a.evidence_id))>0 ORDER BY kind,namespace,value,match,source_id,evidence_id";
+    let mut stmt = c.prepare_cached(sql)?;
+    let pins = read_pins_cached(&mut stmt, q, Some(members));
+    stages.0 = ms(start);
+    let pins = pins.map_err(|e| format!("pins SQL: {e}; pins_ms={}", stages.0))?;
+    let start = Instant::now();
+    let hits = if compiled.is_empty() { Vec::new() } else {
+        let sql=format!("SELECT e.kind,e.namespace,e.value,bm25(search_fts) AS score,d.id,d.source_id,d.evidence_id FROM search_fts JOIN documents d ON d.id=search_fts.document_id JOIN entries e ON e.id=d.entry_id WHERE search_fts MATCH ? AND search_fts.entry_id=e.id AND search_fts.text=d.search_text AND {FULL_DOCUMENT_TRUST} ORDER BY score,e.kind,e.namespace,e.value,d.id LIMIT 100");
+        let mut stmt = c.prepare_cached(&sql)?;
+        let hits = read_lexical(&mut stmt, compiled);
+        stages.1 = ms(start);
+        hits.map_err(|e| format!("BM25 SQL: {e}; pins_ms={}; bm25_ms={}", stages.0, stages.1))?
+    };
+    stages.1 = ms(start);
+    Ok((hits,pins))
+}
+#[cfg(test)]
 fn full_lexical_hits(c: &Connection, q: &str, compiled: &str) -> Result<(Vec<Value>, Vec<Value>)> {
     let eligible=format!("e.conflicted=0 AND e.kind!='episode' AND EXISTS(SELECT 1 FROM documents d WHERE d.entry_id=e.id AND {FULL_DOCUMENT_TRUST} AND EXISTS(SELECT 1 FROM search_fts f WHERE f.document_id=d.id AND f.entry_id=e.id AND f.text=d.search_text))");
     let sql=format!("SELECT DISTINCT e.kind AS kind,e.namespace AS namespace,e.value AS value,'exact' AS match,v.source_id AS source_id,v.evidence_id AS evidence_id FROM entries e JOIN entry_evidence v ON v.entry_id=e.id JOIN sources s ON s.source_id=v.source_id WHERE e.value=?1 AND v.status='source_backed' AND length(trim(v.evidence_id))>0 AND {eligible} UNION SELECT DISTINCT e.kind,e.namespace,e.value,'alias',a.source_id,a.evidence_id FROM entries e JOIN aliases a ON a.entry_id=e.id JOIN sources s ON s.source_id=a.source_id WHERE a.text=?1 AND a.status='source_backed' AND length(trim(a.evidence_id))>0 AND {eligible} ORDER BY kind,namespace,value,match,source_id,evidence_id");
@@ -1974,6 +2035,47 @@ mod tests {
             )?;
         }
         Ok(())
+    }
+    #[test]
+    fn full_members_match_original_sql_with_mismatched_rowids_and_sources() {
+        let c = Connection::open_in_memory().unwrap();
+        native_fixture(&c).unwrap();
+        let pristine = load_full_members(&c).unwrap();
+        for q in ["Shared","shared","Alpha","Beta"] {
+            assert_eq!(full_lexical_hits(&c,q,"\"alpha\"").unwrap(),
+                full_lexical_hits_cached(&c,q,"\"alpha\"",&pristine,&mut (0.0,0.0)).unwrap());
+        }
+        c.execute_batch("UPDATE search_fts SET rowid=rowid+10000; INSERT INTO search_fts(text,document_id,entry_id) VALUES('alpha',1,1); DELETE FROM search_fts WHERE document_id=2; UPDATE search_fts SET text='wrong' WHERE document_id=3; UPDATE search_fts SET entry_id=2 WHERE document_id=4; INSERT INTO search_fts VALUES('alpha',999,1); UPDATE documents SET source_id='missing' WHERE id=5; UPDATE documents SET evidence_id=' ' WHERE id=6; UPDATE documents SET status='unverified' WHERE id=7; INSERT INTO sources VALUES('different','{}'); UPDATE aliases SET source_id='different' WHERE evidence_id='a1'; UPDATE entry_evidence SET source_id='missing' WHERE entry_id=2;").unwrap();
+        let members = load_full_members(&c).unwrap();
+        assert!(members.binary_search(&(1,1)).is_ok());
+        assert_eq!(members.iter().filter(|&&p| p == (1,1)).count(),1);
+        for id in [2,3,4,7,107,108,109,999] { assert!(members.iter().all(|&(_,d)| d != id)); }
+        // Corpus membership is independent of document output provenance.
+        for id in [5,6,106] { assert!(members.iter().any(|&(_,d)| d == id)); }
+        for q in ["Shared","shared","Alpha","Beta","Conflict","Episode","Untrusted",""] {
+            for compiled in ["", "\"alpha\""] {
+                let old = full_lexical_hits(&c,q,compiled);
+                let new = full_lexical_hits_cached(&c,q,compiled,&members,&mut (0.0,0.0));
+                match (old,new) {
+                    (Ok(old),Ok(new)) => assert_eq!(old,new,"query {q}, compiled {compiled}"),
+                    (Err(old),Err(new)) => assert!(new.to_string().starts_with(&old.to_string())),
+                    _ => panic!("different outcome for {q}/{compiled}"),
+                }
+            }
+        }
+        for eid in 1..=5 {
+            for did in 1..=110 {
+                assert_eq!(validate_full_document(&c,&did.to_string(),eid).is_ok(),
+                    validate_full_document_cached(&c,&did.to_string(),eid,&members).is_ok(),"{eid}/{did}");
+            }
+        }
+        assert!(validate_full_document_cached(&c,"5",1,&members).is_err());
+        assert!(validate_full_document_cached(&c,"6",1,&members).is_err());
+        let plan: Vec<String> = c.prepare(&format!("EXPLAIN QUERY PLAN {}",full_members_sql())).unwrap()
+            .query_map([],|r| r.get(3)).unwrap().collect::<rusqlite::Result<_>>().unwrap();
+        assert!(plan[0].contains("SCAN f VIRTUAL TABLE"),"{plan:?}");
+        assert!(plan.iter().any(|p| p.contains("SEARCH d USING INTEGER PRIMARY KEY")));
+        assert!(plan.iter().any(|p| p.contains("SEARCH e USING INTEGER PRIMARY KEY")));
     }
     #[test]
     fn full_sql_trust_matches_approved_corpus_predicate() {

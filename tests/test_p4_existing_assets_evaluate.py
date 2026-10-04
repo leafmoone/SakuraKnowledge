@@ -23,6 +23,15 @@ def response():
             'hybrid': [candidate], 'candidates': [candidate]}
 
 
+def test_rust_failure_envelope_preserves_actual_stage():
+    response = {'status': 'FAIL', 'error': 'full_lexical: BM25 SQL: interrupted', 'retries': 0}
+    with pytest.raises(runner.RustFailure, match='BM25 SQL: interrupted'):
+        runner.require_success_response(response)
+    with pytest.raises(ValueError, match='invalid Rust failure envelope'):
+        runner.require_success_response({'status': 'FAIL', 'retries': 1})
+    runner.require_success_response({'status': 'PASS'})
+
+
 def test_independent_branch_scoring_and_negative_denominators():
     result = runner.score_response(CASE, response(), MANIFEST)
     assert set(result) == {'lexical', 'dense', 'final'}

@@ -1,6 +1,137 @@
 # Current stage status
 
-## Outcome: PARTIAL / BLOCKED_FULL_FTS_PIN_MEMBERSHIP
+## Current round: PARTIAL / BLOCKED_FULL_BM25_DEADLINE
+
+Baseline `37318ebeb6812a1df1a4a1adeeafbc891854207a`, current `dev`.
+The newly authorized engine-lifetime FULL membership index removed repeated pin
+and output-document FTS scans. It **does not establish FULL route acceptance**:
+the unchanged frozen P4-003 failed in original BM25 within the same five-second
+overall query budget. No further real run or BM25 optimization was attempted.
+
+### Implementation and equivalence
+
+Only current-engine memory stores sorted, deduplicated `Vec<(entry_id,document_id)>`.
+One startup traversal, no text retention, disk cache, sidecar, schema change,
+rowid assumption, ANN/gold-derived membership or new dependency:
+
+```sql
+SELECT e.id,d.id
+FROM search_fts f
+CROSS JOIN documents d ON d.id=f.document_id
+CROSS JOIN entries e ON e.id=d.entry_id
+WHERE f.entry_id=e.id AND f.text=d.search_text AND
+ e.conflicted=0 AND d.status IN ('source_backed','generated_from_evidence')
+ AND e.kind!='episode' AND EXISTS (
+ SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id AND v.status='source_backed')
+```
+
+Actual snapshot read-only EXPLAIN: `SCAN f VIRTUAL TABLE INDEX 0:`, then
+`SEARCH d USING INTEGER PRIMARY KEY`, `SEARCH e USING INTEGER PRIMARY KEY`,
+and covering `entry_evidence_entry(entry_id,status)` in the trust EXISTS.
+Pins retain original exact/alias source joins, evidence/status/nonblank checks,
+case sensitivity, UNION dedup and typed-key ordering, filtering by any qualifying
+cached document for that entry. Document output uses the exact cached pair and
+retains its own document-source existence, nonblank evidence, provenance equality,
+trusted identity and source loading. It cannot borrow another document's output
+proof. Original MATCH/BM25, ranking, raw depth, fusion and filters are unchanged.
+
+Tiny SQLite tests compare original SQL complete outputs and fail-closed outcomes
+with the new implementation: FTS rowid shifted by 10,000, duplicate rows,
+missing/wrong text/entry/document binding, missing document source, blank document
+evidence, untrusted/conflicted/episode entries, ambiguous aliases, differently
+sourced aliases and absent identity-proof source. Same-entry valid and invalid
+documents cannot cross-satisfy output checks. Integer ID reads fail rather than
+silently skipping. The cache assumes the bound snapshot remains immutable for
+that engine lifetime; there is no persistent mtime/stat cache.
+
+### Actual run and budget
+
+The existing immutable candidate was reused, not recreated:
+`build/p4-existing-assets-a19f919-v1/manifest.json`, 27,727 bytes, SHA256
+`f7738e6c565c698a5952ee704f00f5216347b7153a8c43d1791378ae45b506ed`.
+Existing complete ANN key/1,200-sample reader evidence was reused, not re-probed.
+Actual command, explicit UTF-8 environment and existing UCRT64/project Cargo cache:
+
+```text
+cargo test --manifest-path rust/Cargo.toml --features semantic
+cargo build --release --manifest-path rust/Cargo.toml --features semantic --bin semantic_pilot
+python -m tools.p4_existing_assets_evaluate --binary build/p4-usearch-native-fix/rust-target/release/semantic_pilot.exe --output build/p4-existing-assets-a19f919-v1 --existing-pack --results build/p4-existing-assets-37318eb-membership-evaluation-v1
+```
+
+Run exit **1**, original raw evidence retained in that exclusively created directory.
+Release binary 19,577,696 bytes, SHA256
+`46a5837134d1761453cac4019b084e1716532f5d9a568a283c79cbb96716b991`.
+Initialization scan/sort/dedup **116855.8434 ms**, **1,295,638 pairs**;
+logical tuple payload **20,730,208 bytes**, actual Vec capacity allocation
+**33,554,432 bytes**. These are index storage sizes, **not process RSS increment**;
+RSS delta was **NOT_RUN / not measured**. Startup internal total **119764.5383 ms**
+(includes membership; metadata total 117047.9484 ms), observed wall
+**120130.8201 ms**. Existing policy specifies a **120-second response-wait timeout**,
+not an explicit wall comparison: the response was received, but wall exceeded
+120 seconds. Neither startup performance nor a strict 120-second wall gate is
+claimed PASS; wall-budget compliance is **FAIL if 120 seconds is the required wall
+budget**. The pre-existing code did not define/enforce that additional comparison;
+no tolerance or alternate timing metric was adopted to turn it into PASS.
+
+Two warmups passed, not counted as formal cases. Formal P4-001 and P4-002 passed
+actual response source/evidence/identity validation. Formal backend timings (ms):
+
+| Case | pins SQL | BM25 SQL | fusion/evidence | total |
+|---|---:|---:|---:|---:|
+| P4-001 | 0.2115 | 191.3441 | 21.7260 | 314.7155 |
+| P4-002 | 0.1499 | 992.1124 | 17.6968 | 1108.5756 |
+
+Formal **P4-003 FAIL**, actual Rust envelope:
+`full_lexical: BM25 SQL: interrupted; pins_ms=0.5073; bm25_ms=3676.3955;
+tokenize_ms=0.4981; ort_ms=74.7758; ann_ms=1248.2777;
+lexical_ms=3677.5516; total_ms=5001.5066`.
+ANN is charged to that same overall five seconds; BM25 did not receive five
+additional seconds. Original SQL, unchanged:
+
+```sql
+SELECT e.kind,e.namespace,e.value,bm25(search_fts) AS score,
+ d.id,d.source_id,d.evidence_id
+FROM search_fts JOIN documents d ON d.id=search_fts.document_id
+JOIN entries e ON e.id=d.entry_id
+WHERE search_fts MATCH ? AND search_fts.entry_id=e.id
+ AND search_fts.text=d.search_text AND FULL_DOCUMENT_TRUST
+ORDER BY score,e.kind,e.namespace,e.value,d.id LIMIT 100
+```
+
+Actual query: `生産スキルを極めた俺の異世界創造ハーレムライフ! ~上手に現代巣作りできました~`.
+Read-only EXPLAIN with the reference compiled MATCH binding (34 unique overlapping
+CJK bigrams joined by OR, original tokenizer unchanged) reports:
+`SCAN search_fts VIRTUAL TABLE INDEX 0:M3`, document/entry PK probes,
+covering `entry_evidence_entry`, `USE TEMP B-TREE FOR ORDER BY`.
+This is a plan observation, not authorization to alter scoring or truncate
+candidates. No large BM25 query was repeated.
+
+The original runner mislabeled the valid P4-003 FAIL envelope as response-version
+mismatch and attempted P4-004 against the dying driver. P4-004 had no completed
+response: its recorded EOF is a **transport attempt, NOT_RUN retrieval**, not a
+second genuine product failure. Original JSON/raw files were not rewritten.
+Correct interpretation: **2 formal PASS, 1 formal FAIL, 117 formal NOT_RUN**.
+Runner now recognizes valid Rust FAIL envelopes before success-schema validation,
+retains their exact error and stops. This small reporting fix was tested, not
+used to rerun the large assets. Full frozen quality is **NOT_RUN**: two successes
+are insufficient for any stratum gate or complete identity error claim.
+FULL exact-dense overlap remains independently **NOT_RUN**, oracle absent.
+
+### Checks, non-execution and prior limitations
+
+Rust semantic final regression **30 library + 2 dependency-probe + 1 main PASS**,
+exit 0 (library 0.49s). First new fixture failed because it unwrapped an expected
+blank-evidence BM25 rejection; corrected to compare both fail-closed outcomes,
+not loosen production evidence checks. Runner-focused **13 passed in 0.12s**,
+Ruff all and diff-check PASS. No full Python or actual 206-case rerun: shared
+Python/P2/P3 behavior was untouched except narrow runner error-envelope reporting.
+Previous actual 151+55 evidence below remains prior-round evidence, not a new run.
+No embeddings/ANN rebuild, candidate recreation, MSVC installation or Python
+extension compilation occurred. Large-file performance used one serial stream.
+The two earlier overwritten unknown logs remain unrecoverable and unstaged;
+no guessed restoration or new log overwrite was performed.
+
+## Prior round outcome (baseline): PARTIAL / BLOCKED_FULL_FTS_PIN_MEMBERSHIP
 
 Baseline: `a19f919af505b076d1129583b100abe7d6d13384`, branch `dev`.
 This round fixed current configuration, lifecycle and reusable acceptance and
