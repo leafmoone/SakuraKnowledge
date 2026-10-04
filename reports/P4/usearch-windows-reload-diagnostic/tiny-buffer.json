@@ -1,0 +1,1 @@
+{"native_buffer_api": "PASS", "read_only_mmap": "PASS", "key_vector_check": "PASS", "lifetime": "index.reset/delete/gc before memoryview.release/mmap.close PASS", "full_probe": "NOT_RUN"}

@@ -1,0 +1,123 @@
+{
+  "python": "3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]",
+  "pointer_bits": 64,
+  "usearch_version": "2.26.2",
+  "native_path": "D:\\SakuraTool\\SakuraKnowledge\\.venv-p4-ann\\Lib\\site-packages\\usearch\\compiled.cp314-win_amd64.pyd",
+  "native_sha256": "9350ea33165f21340deed856416c9925fb0acd60a9a9466f25d09b0a6ff6e26c",
+  "installation_metadata": {
+    "INSTALLER": "pip\n",
+    "WHEEL": "Wheel-Version: 1.0\nGenerator: setuptools (84.0.0)\nRoot-Is-Purelib: false\nTag: cp314-cp314-win_amd64\n\n",
+    "direct_url.json": null
+  },
+  "source_tag": "v2.26.2",
+  "sources": {
+    "include/usearch/index.hpp": {
+      "url": "https://raw.githubusercontent.com/unum-cloud/usearch/v2.26.2/include/usearch/index.hpp",
+      "bytes": 215885,
+      "sha256": "42141603ddd0a48d286849aa2d763acefa9c315f9ae983beebe0f8df73a8c3ee"
+    },
+    "include/usearch/index_dense.hpp": {
+      "url": "https://raw.githubusercontent.com/unum-cloud/usearch/v2.26.2/include/usearch/index_dense.hpp",
+      "bytes": 118525,
+      "sha256": "d57d57eb192656d85e8e2b5857ce4710414e6affa77968c1822edf604a2f6904"
+    },
+    "python/lib.cpp": {
+      "url": "https://raw.githubusercontent.com/unum-cloud/usearch/v2.26.2/python/lib.cpp",
+      "bytes": 76274,
+      "sha256": "988ff28c99c90dfd2793f3c0767e2de5922c7636367ce608e4c3fd11b78329bf"
+    }
+  },
+  "LOCAL_BINARY_MATCH": "NOT_ESTABLISHED by version label alone",
+  "before": {
+    "build/p4-attempt2-continuation-authorization-5f8ba761.json": {
+      "bytes": 13359,
+      "sha256": "5f61cf9999805c69ca0793fb4555a8ee503fb06160f35b36f40cebdc0cebdb1f"
+    },
+    "build/p4-full-build-attempt2-authorization-6755d33d.json": {
+      "bytes": 14395,
+      "sha256": "b375582035fa4902cf9fd5114e228d5c3813e12913ed8f86a6b97456f4a466c3"
+    },
+    "build/p4-full-build-authorization-3eeda16b.json": {
+      "bytes": 12988,
+      "sha256": "9571003d333444e19b9974b0ce28b0e2cd4694ed6cadbe3293e1f2967fcb99c7"
+    },
+    "build/p4-full-semantic-v1-retry1.attempt2.lock": {
+      "bytes": 31588,
+      "sha256": "849cd1c52bd9844f3cbf0c904d4612af4af717854164834daac1030c8f5284fb"
+    },
+    "build/p4-full-semantic-v1-retry1/chunks.sqlite": {
+      "bytes": 3675488256,
+      "sha256": "67471db26e04420a905e0726d4582531e2270eb2d3ed528b79b0e3f8fcfcbe2c"
+    },
+    "build/p4-full-semantic-v1-retry1/continuation-receipt.json": {
+      "bytes": 47242,
+      "sha256": "6a7de996719d6b36435f32a909c12d5a98441c2f1decdc503c4a9a1fc4a8c3e9"
+    },
+    "build/p4-full-semantic-v1-retry1/corpus.jsonl": {
+      "bytes": 1316930137,
+      "sha256": "6097c0c93eb75f624d549ff062d37b70cc0dbb069fae812194ba7f2a8acf301f"
+    },
+    "build/p4-full-semantic-v1-retry1/execution-receipt.json": {
+      "bytes": 108705,
+      "sha256": "7d9f8ffa5cebc2ddb162f970a000b3b5948d23b521d938e008a334e00ece57c4"
+    },
+    "build/p4-full-semantic-v1-retry1/sample.json": {
+      "bytes": 16747,
+      "sha256": "2f61ba6325ff6ec6984e49299b9b86caf6daef2f3b7858f6ed9e45a72611b7ad"
+    },
+    "build/p4-full-semantic-v1-retry1/vectors.npy": {
+      "bytes": 5597266048,
+      "sha256": "b81cdaf057a41c8882f52cfbe322adcc0f93c88103e2f141bf9cd942724ec78a"
+    },
+    "build/p4-full-semantic-v1-retry1/vectors.usearch": {
+      "bytes": 5800312336,
+      "sha256": "7a1f9da2983fb3e92aae336f64967f116b917ec8c4d91526eaf6f99498b09b10"
+    },
+    "build/p4-full-semantic-v1.attempt1.lock": {
+      "bytes": 30372,
+      "sha256": "955b9a2e424579ff9363e942824b1911ff015db3e173c4f86b962fad40ef0220"
+    },
+    "build/p4-full-semantic-v1/execution-receipt.json": {
+      "bytes": 107066,
+      "sha256": "34bf78970a3f269d9f2f1fd362458111e159c9e1df06319a7180353b38128d4a"
+    },
+    "reports/P4/attempt2-continuation-command.json": {
+      "bytes": 3420,
+      "sha256": "09ceb0f8ce36cb53638feadfce236bb69e9e408d49754159ad0de49c29af85d6"
+    },
+    "reports/P4/attempt2-continuation-handoff.json": {
+      "bytes": 2791,
+      "sha256": "3173455cf87f9a8cea16a19aa25a6e8699dba4b06aa5bc2ce64f5a7dfe90e157"
+    },
+    "reports/P4/full-semantic-attempt2-command.json": {
+      "bytes": 7639,
+      "sha256": "79f8b8ad6552395417b134738cb3cee98dc8140adaadd2a53af2ebd89e5ffe48"
+    },
+    "reports/P4/full-semantic-attempt2-handoff.json": {
+      "bytes": 3221,
+      "sha256": "51fbe167df48db8a0fbb0964a0c396386a4b63a7455997086a1b46e220f7e660"
+    },
+    "reports/P4/full-semantic-build-command.json": {
+      "bytes": 7335,
+      "sha256": "69fa69d3c1e4e7dee95f3317034385fd72dd2567db3287ed880fe3b7598ef71b"
+    },
+    "reports/P4/full-semantic-build-handoff.json": {
+      "bytes": 1140,
+      "sha256": "3ab30ecacf4eb3a3af6498906578db0ddfb2ed5d623035183220a2b53e3692eb"
+    }
+  },
+  "win32": {
+    "stat": 5800312336,
+    "GetFileSizeEx": 5800312336,
+    "GetFileSize_null_high": 1505345040,
+    "last_error": 0
+  },
+  "raw_serialization": {
+    "prefix_hex": "f8d9140000100000",
+    "rows_candidate": 1366520,
+    "row_bytes_candidate": 4096,
+    "matrix_end_candidate": 5597265928,
+    "dense_header_hex": "7573656172636802001a000200630b0e0ff8d9140000000000000000000000000000040000000000000000000000000000000000000000000000000000000000f8d914000000000010000000000000002000000000000000040000000000000050f0000000000000000000000000000000000000000000000000000000000000"
+  },
+  "full_native_probe_started": false
+}
