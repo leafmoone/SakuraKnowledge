@@ -5,6 +5,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     use std::io::{Read, Seek, SeekFrom};
     use usearch::{Index, MetricKind, ScalarKind};
     let args: Vec<String> = std::env::args().collect();
+    if args.len() == 4 && args[1] == "--saved-five-query" {
+        return saved_five_query(&args[2], &args[3]);
+    }
     if args.len() != 4 {
         return Err("usage: usearch_path_probe index sample vectors.npy".into());
     }
@@ -77,6 +80,60 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         serde_json::json!({"METADATA":"PASS","PATH_VIEW":"PASS", "FULL_KEY_AUDIT":"PASS", "count":1366520,"missing":0,"duplicates":0,"out_of_range":0,"FIXED_SAMPLE_VECTOR_MAPPING":"PASS","sample_count":1200,"comparison":"EXACT_FP32_BITS","FULL_RUNTIME_QUALIFICATION":"NOT_RUN","FULL_QUALITY_ACCEPTANCE":"NOT_RUN"})
     );
     Ok(())
+}
+
+#[cfg(feature = "semantic")]
+fn query_vector(value: &serde_json::Value) -> Result<Vec<f32>, Box<dyn std::error::Error>> {
+    let vector: Vec<f32> = value["vector"].as_array().ok_or("saved vector missing")?
+        .iter().map(|v| v.as_f64().map(|n| n as f32).ok_or("invalid component")).collect::<Result<_, _>>()?;
+    let norm = vector.iter().map(|&v| f64::from(v).powi(2)).sum::<f64>().sqrt();
+    if vector.len() != 1024 || vector.iter().any(|v| !v.is_finite()) || (norm - 1.0).abs() > 1e-4 {
+        return Err("invalid saved normalized f32 query".into());
+    }
+    Ok(vector)
+}
+
+#[cfg(feature = "semantic")]
+fn saved_five_query(index_path: &str, responses: &str) -> Result<(), Box<dyn std::error::Error>> {
+    use std::fs::File;
+    use std::time::Instant;
+    use usearch::{Index, MetricKind, ScalarKind};
+    let start = Instant::now();
+    let metadata = Index::metadata(index_path)?;
+    let index = Index::new(&metadata.into())?;
+    index.view(index_path)?;
+    index.change_expansion_search(128);
+    if index.size() != 1366520 || index.dimensions() != 1024 || index.metric_kind() != MetricKind::Cos
+        || index.scalar_kind() != ScalarKind::F32 || index.connectivity() != 16 || index.expansion_search() != 128 {
+        return Err("original ANN contract mismatch".into());
+    }
+    let open_ms = start.elapsed().as_secs_f64() * 1000.0;
+    let mut cases = Vec::new();
+    for name in ["P4-033", "P4-035", "P4-039", "P4-042", "P4-064"] {
+        let value: serde_json::Value = serde_json::from_reader(File::open(std::path::Path::new(responses).join(format!("formal-{name}.json")))?)?;
+        if value["case_id"] != name { return Err("case mismatch".into()); }
+        let vector = query_vector(&value)?;
+        let start = Instant::now();
+        let found = index.search(&vector, 512)?;
+        if found.keys.len() != 512 || found.distances.len() != 512
+            || found.distances.iter().any(|v| !v.is_finite())
+            || found.distances.windows(2).any(|w| w[0] > w[1]) { return Err("invalid ANN result".into()); }
+        cases.push(serde_json::json!({"case_id":name,"positions":found.keys,"distances":found.distances,
+            "search_ms":start.elapsed().as_secs_f64()*1000.0}));
+    }
+    println!("{}",serde_json::json!({"new_measurement_not_historical":true,"open_ms":open_ms,"ef_search":128,"depth":512,"cases":cases}));
+    Ok(())
+}
+
+#[cfg(all(test, feature = "semantic"))]
+mod saved_query_tests {
+    #[test]
+    fn validates_saved_f32_vector_without_encoding() {
+        let mut v = vec![0.0;1024]; v[0] = 1.0;
+        assert!(super::query_vector(&serde_json::json!({"vector":v})).is_ok());
+        assert!(super::query_vector(&serde_json::json!({"vector":[1.0]})).is_err());
+        assert!(super::query_vector(&serde_json::json!({"vector":vec![0.0;1024]})).is_err());
+    }
 }
 
 #[cfg(not(feature = "semantic"))]

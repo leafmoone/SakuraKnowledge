@@ -1,6 +1,82 @@
 # Current stage status
 
-## Current round: CLI_FIXED / OFFLINE_DIAGNOSED / QUALITY_FAIL
+## Current round: FIVE_QUERY_EXACT_DIAGNOSED / HISTORICAL_QUALITY_FAIL
+
+Baseline `c8bcff6fe1533dfd39fe6d149cf04de0af412242`, ordinary `dev` delivery.
+One focused diagnostic: `reports/P4/five-query-exact-c8bcff6.json`. All five original
+formal responses contain finite 1024-component Rust f32 query vectors matching
+frozen query text; **no re-encoding, prefix change or model initialization**.
+
+Readonly `vectors.npy` memmap: float32 `(1366520,1024)`. Five queries share **one**
+sequential vector traversal, 4096-row blocks, float64 dot/norms computing genuine
+Cosine (distance `1-cosine`), not a dot-only assumption of perfect normalization.
+Target scores use indexed typed-identity lookup of **all entity chunks**, then
+small random vector reads; global strict-greater ranks and tolerance intervals
+are accumulated during that one pass. Each target has one mapped chunk here.
+Exact top512 chunks and first-occurrence top100 entities use the existing dense
+mapping/dedup/cap semantics. Exact equal-score position ordering is a deterministic
+diagnostic convention, **not a claim about ANN tie order**. Near tolerance `1e-7`
+is reported independently without rounding/reordering; all five target rank
+intervals are singletons, so target inclusion conclusions are not float-last-bit
+ties. Global chunk rank, 512 candidate cutoff and 100 entity cap stay distinct.
+
+After the scan showed exact top1/2 targets absent saved ANN entities, one authorized
+readonly batch extended the existing `usearch_path_probe --saved-five-query <index>
+<saved-response-directory>` mode. Same patched Rust USearch dependency, Cos/F32,
+M16, ef_search128, depth512, path view; no engine/model, integrity audit, index build
+or parameter search. **New measurement, not historical raw chunks.** Its mapped
+entity top100 order matches saved results in all five cases. Raw new512/exact512
+chunks, chunk IDs/positions/scores and entity mappings are retained in the single
+JSON. Historical ANN raw512 overlap is unavailable; never retroactively reported.
+
+| Case / accepted target | Exact global chunk rank | Exact entity rank before cap | New ANN raw chunk / entity rank | Classification |
+| --- | ---: | ---: | --- | --- |
+| P4-033 subject 554333 | 112 | 112 | 101 / 101 | **B**, within512 but outside100 entity cap on both paths |
+| P4-035 subject 93628 | 1 | 1 | absent within512 / absent | **A**, new ANN omits exact top1 |
+| P4-039 character 96679 | 1 | 1 | absent within512 / absent | **A**, new ANN omits exact top1 |
+| P4-042 subject 463806 | 9967 | not within512 | absent within512 / absent | **C**, exact representation/relevance rank too low for candidate budget |
+| P4-064 danbooru.wiki page 77750 | 2 | 2 | absent within512 / absent | **A**, new ANN omits exact top2 |
+
+Cosines respectively `.5805982874/.6555053021/.6222436527/.4816997630/.6262797101`.
+A classifications refer directly to this new original-parameter raw measurement;
+matching saved entity rankings supports reproducibility but does not conjure
+historical raw512 data. No D mapping bug was found by these targeted checks; this
+is **not** independent certification of the whole mapping/index. For P4-033 only
+within512 entity ranks are established, not an unmeasured global entity rank.
+New exact512 intersections are respectively 446/339/359/322/395, diagnostic counts
+for these five queries only, **not FULL exact-overlap PASS**.
+
+### Resources and execution limits
+
+Exact scan: **18,824.9134 ms**; float64 block payload 33,554,432 bytes plus score/
+rank/top buffers, readonly memmap 5.6 GB data backing; RSS **NOT_MEASURED**. ANN
+view open 107.0158 ms; five searches 25.3377/30.9939/26.6663/28.1944/27.7846 ms,
+probe exit0, empty stderr. UTF-8 explicitly enabled. No large-asset hashing, FTS,
+membership preparation, corpus encoding, pack/index rebuild, MSVC, production
+ranking/gold/depth/threshold changes, real120 rerun or broad integrity probe.
+
+### Minimal general follow-up, not a case-route patch
+
+035/039/064 now show an ANN recall gap at the fixed original settings; a separate
+controlled index/search quality qualification is the first follow-up, with CPU/
+latency/recall tradeoffs and held-out entity/document-group splits. This round did
+**not** vary ef_search, rebuild the graph, or select parameters on gold. Reranking
+cannot recover absent candidates (especially 039, also absent lexical). 033 would
+require revisiting the100 entity candidate contract to admit rank101/112, adding
+mapping/scoring/response cost and possible five-second-budget regression; no cap
+was enlarged here. 042 remains low even under exact Cos, so ANN tuning alone does
+not solve its dense miss. The previously explained RRF consensus/tie losses still
+apply to lexical-only 035/042/064; protecting single-branch hits can trade away
+crosslingual dense gains and requires independent validation, not per-case rules.
+Historical runtime PASS / quality FAIL remains unchanged. These five are targeted
+development diagnostics, not generalization or FULL exact-overlap acceptance.
+
+Checks: five small Python cosine/rank/mapping tests PASS (including nonunit norms,
+zero/nonfinite/empty rejection, deterministic ties, duplicate positions, entity
+cap and unmapped rows); one Rust saved-vector parsing/norm test PASS; probe release
+build PASS. Only related tests/static checks, not the whole suite.
+
+## Previous round: CLI_FIXED / OFFLINE_DIAGNOSED / QUALITY_FAIL
 
 Baseline `95042a5b961a693f03085fa74ca7e5977d27f49e`. The prepare CLI now prints its
 result without attempting a second JSON write to the directory it just published.
