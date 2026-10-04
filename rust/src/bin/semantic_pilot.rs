@@ -11,7 +11,7 @@ pub use sakura_knowledge_runtime::match_query;
 use sakura_knowledge_runtime::semantic;
 
 #[cfg(feature = "semantic")]
-const MAX_RESPONSE_BYTES: usize = 524288;
+const MAX_RESPONSE_BYTES: usize = 1048576;
 
 #[cfg(feature = "semantic")]
 #[derive(Default)]

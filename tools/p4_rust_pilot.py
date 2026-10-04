@@ -26,7 +26,7 @@ JOB = 'configs/p4-rust-pilot-v1.json'
 RAW = 'build/p4/rust-semantic-pilot-v1/qualification'
 RECEIPT = 'reports/P4/rust-semantic-pilot-v1.json'
 SELECTED = 'M16-Eadd256-ef128'
-MAX_BYTES = 524288
+MAX_BYTES = 1048576
 REVISION = '5617a9f61b028005a4858fdac845db406aefb181'
 _DLL = json.loads((ROOT / 'configs/p4-current-assets.json').read_text(encoding='utf8'))['ort_dll']
 DLL_SHA, DLL_SIZE = _DLL['sha256'], _DLL['size']

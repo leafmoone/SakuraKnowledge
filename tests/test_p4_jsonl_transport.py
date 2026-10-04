@@ -7,7 +7,7 @@ from tools.p4_rust_pilot import MAX_BYTES, Driver
 
 
 @pytest.mark.parametrize(('code', 'reason'), [
-    ("import sys;sys.stdout.buffer.write(b'x'*(524289));sys.stdout.flush();\nwhile True: sys.stdout.buffer.write(b'x'*65536);sys.stdout.flush()", 'oversize'),
+    ("import sys;sys.stdout.buffer.write(b'x'*(1048577));sys.stdout.flush();\nwhile True: sys.stdout.buffer.write(b'x'*65536);sys.stdout.flush()", 'oversize'),
     ("import sys;sys.stdout.write('partial');sys.stdout.flush()", 'unterminated'),
     ("pass", 'EOF'),
 ], ids=['oversize-continuing', 'partial-exit', 'early-eof'])
@@ -25,10 +25,10 @@ def test_terminal_failure_reaps_real_child(code, reason, tmp_path):
 
 
 def test_normal_error_and_utf8_exact_boundary_exit_naturally(tmp_path):
-    # Exactly512KiB including UTF-8 and newline; unmodified complete JSON accepted.
+    # Exactly1MiB including UTF-8 and newline; unmodified complete JSON accepted.
     code = """import sys,json
 v={'status':'PASS','text':'日'}
-n=524288-len((json.dumps(v,ensure_ascii=False,separators=(',',':'))+'\\n').encode())
+n=1048576-len((json.dumps(v,ensure_ascii=False,separators=(',',':'))+'\\n').encode())
 v['text'] += 'x'*n
 sys.stdout.buffer.write((json.dumps(v,ensure_ascii=False,separators=(',',':'))+'\\n').encode());sys.stdout.flush()
 sys.stdout.write('{"status":"FAIL","error":"normal","retries":0}\\n');sys.stdout.flush()

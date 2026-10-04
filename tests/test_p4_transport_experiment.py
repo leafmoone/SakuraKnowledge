@@ -14,8 +14,9 @@ def test_only_expected_width_diff_and_explicit_contract_binding():
     expected = copy.deepcopy(original)
     expected['declarative_contract']['ann']['expansion_search'] = 2048
     assert experiment == expected
+    assert full.validate_contract(experiment)['ann']['expansion_search'] == 2048
     with pytest.raises(ValueError):
-        full.validate_contract(experiment)
+        full.validate_contract(experiment, expected_expansion_search=128)
     assert full.validate_contract(experiment, expected_expansion_search=2048)['ann']['expansion_search'] == 2048
     for width in (True, 1024, 0, '2048'):
         with pytest.raises(ValueError):

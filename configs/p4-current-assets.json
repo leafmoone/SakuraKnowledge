@@ -114,7 +114,7 @@
       "dtype": "f32",
       "connectivity": 16,
       "expansion_add": 256,
-      "expansion_search": 128,
+      "expansion_search": 2048,
       "chunk_depth": 512,
       "entry_depth": 100
     },

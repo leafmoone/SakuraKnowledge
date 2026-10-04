@@ -10,7 +10,7 @@
     "corpus": {"documents": 1295638, "strata": {"bangumi.subject": 690068, "bangumi.character": 221960, "bangumi.person": 102338, "danbooru.wiki": 281272}, "moegirl": 0, "local_tag": 0, "index_episodes": false},
     "encoder": {"repository": "BAAI/bge-m3", "revision": "5617a9f61b028005a4858fdac845db406aefb181", "pooling": "cls", "normalize": true, "dtype": "float32", "dimension": 1024, "query_prefix": "", "passage_prefix": "", "max_sequence_tokens": 512},
     "chunk": {"version": "paragraph-model-tokenizer-v1", "max_tokens": 384, "overlap": 64, "order": "document_id,chunk_index ascending"},
-    "ann": {"library": "usearch", "version": "2.26.2", "metric": "cos", "dtype": "f32", "connectivity": 16, "expansion_add": 256, "expansion_search": 128, "chunk_depth": 512, "entry_depth": 100},
+    "ann": {"library": "usearch", "version": "2.26.2", "metric": "cos", "dtype": "f32", "connectivity": 16, "expansion_add": 256, "expansion_search": 2048, "chunk_depth": 512, "entry_depth": 100},
     "hybrid": {"bm25_document_depth": 100, "rrf_k": 60, "pins": "trusted_exact_alias", "ties": "kind,namespace,value"},
     "runtime": {"lexical_mode": "full_snapshot_fts", "ort_version": "1.24.1", "intra_threads": 8, "inter_threads": 1, "sequential": true, "provider": "CPUExecutionProvider"},
     "build": {"output_policy": "create_new", "inputs": "readonly", "build_entry": false}

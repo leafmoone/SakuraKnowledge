@@ -489,12 +489,13 @@ def _verify_response_snapshot(response, conn):
             len(response['trusted_pins']) == len(active_pins), 'inactive/duplicate proof collection')
 
 
-def validate_response(response, *, snapshot_conn=None, session=None):
+def validate_response(response, *, snapshot_conn=None, session=None, experimental_ef2048=False):
     """Validate every response's provenance; caller owns session and connection."""
     count = validate_response_structure(response)
     require(snapshot_conn is not None, 'controlled readonly snapshot connection required')
-    contract = json.loads(Path(CONFIG).read_bytes())
-    _, canonical, canonical_binding = _canonical(contract)
+    config = Path(ROOT) / 'configs/p4-ef2048-transport-experiment.json' if experimental_ef2048 else CONFIG
+    contract = json.loads(Path(config).read_bytes())
+    _, canonical, canonical_binding = _canonical(contract, experimental_ef2048)
     snapshot, spec = _snapshot(contract)
     databases = _rows(snapshot_conn, 'PRAGMA database_list')
     require(len(databases) == 1 and databases[0][1] == 'main' and

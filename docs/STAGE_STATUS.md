@@ -1,6 +1,96 @@
 # Current stage status
 
-## Current round: TRANSPORT_PROTOCOL_PASS / QUERY_RESULT_FAIL / DEFAULT_RETAINED128
+## Current round: USABLE_DEV2048 / RUNTIME120_PASS / QUALITY_FAIL
+
+Baseline `3ee34e250318152e6fb899dfa21e8d006b41b0de`. Authorized normal delivery
+upgrades the active Rust sender and Python receiver response budget to **1048576
+bytes (1MiB), serialized UTF-8 including JSONL newline and case_id**. Clients must
+synchronize this protocol budget; **not a PASS under the old512KiB contract**.
+No success candidates, text or evidence removed; bounded serialization/full short
+FAIL on oversize, original ranking/depth512/entity100/RRF/model/gold remain unchanged.
+
+### Actual complete end-to-end evidence
+
+Existing runner, UTF-8 environment explicitly set, serial real I/O:
+`build/p4-1mib-3ee34e2-diagnostic-v1/evaluation.json`: P4-110 **PASS**, complete
+673446bytes, wall947.2657ms including serialize/transmit, source/typed closure checked.
+Then a **fresh entire120**, not stitched partials:
+`build/p4-1mib-3ee34e2-evaluation-v1/evaluation.json`:2warmups PASS,
+**120/120 runtime/source/typed-identity/5s PASS**, failures[], natural process exit0,
+joined reader, no active termination. One live caller-owned AcceptanceSession was
+shared between diagnostic and full run; stable asset content verified once, no repeated
+corpus/model/vector/ANN hashing or rebuilding. Full runner top-level status **FAIL**
+because quality gate is preserved separately, not interpreted as runtime failure.
+
+Actual formal E2E wall p50 / nearest-p95 / max ms:
+**473.33965 /1029.35670 /1350.24770**. Response byte p50 / nearest-p95 / max:
+**362754.5 /418356 /673491**, all<=1MiB. Startup wall2205.5672ms,
+backend2173.9919ms (ANN107.2402ms, membership259.4073ms). Startup is the measured
+resident open, not a claim OS cold caches were flushed. Sender per-case serialize
+and completed flush timing is retained in runner stderr; E2E includes both.
+
+| Final R10 / MRR / nDCG | actual2048 formal |
+| --- | --- |
+| lexical30 |1 / .97777778 / .98333333 |
+| semantic40 |.975 / .90625 / .92385989 |
+| crosslingual30 |.600 / .32009259 / .38791388 |
+| ambiguous-positive10 |.650 / .42928571 / .43072693 |
+
+**QUALITY_FAIL:** semantic Recall@10 target1 not met (.975); all other original
+quality checks PASS, identity promotion errors0/120 and negative0/10. Negative
+nonempty rate1.0 remains an explicit knowledge gap rather than identity promotion.
+Old full128 semanticR10 .925/MRR.8475/nDCG.866662 improved globally; lexical/ambiguity
+unchanged, crosslingual small tradeoff074positive/095negative preserved as prior
+all120 comparison. P4-033 entity100 cutoff remains unresolved; P4-042 low exact
+representation rank remains, notwithstanding its final ranking improvement. These120
+are development/regression selection cases, **not independent generalization**.
+
+### Current default and directly usable pack
+
+Dev default **2048** adopted under expanded delivery authorization despite the known
+quality gate FAIL: canonical `configs/p4-full-semantic-v1.json`, current assets,
+preflight expected declaration, Rust actual setter/runtime all2048. Effective width
+2048, wanted512/entity100 unchanged. Legacy pilot fixed128 contract is not changed.
+Fixed experimental path remains compatible with the now-identical2048 declaration;
+experiment tests no longer falsely require default128 or reject the current declaration.
+
+Actual120 used rebuilt1MiB experimental binary
+`build/p4-transport-ef2048-f2bdc11/rust-target/release/semantic_pilot.exe`
+and `build/p4-transport-ef2048-f2bdc11-v1/manifest.json` (strict explicit2048 contract).
+Current default build:
+`build/p4-usearch-native-fix/rust-target/release/semantic_pilot.exe`;
+current pack `build/p4-dev-2048-1mib-3ee34e2-v1/manifest.json`.
+Only canonical binding switches to the default path; parsed declarations/runtime and
+large-artifact references equal the actual120 candidate. Local membership copied once
+without rebuild to satisfy its existing local role. Default metadata role/inventory/
+projection and membership checks pass, native fixture confirms actual setter2048.
+The shared actual-run session had closed before default publication: **no renewed large
+content hash and no second120 claimed**; full content validation applies to actual-run
+asset bytes, metadata/fixture equivalence supports default wiring. Old manifests/raw
+outputs remain untouched, including historical rejected512KiB responses.
+
+From repository root, PowerShell (stdin EOF exits naturally):
+
+```powershell
+$env:PYTHONUTF8='1'; $env:PYTHONIOENCODING='utf-8'
+$env:PATH='C:/msys64/ucrt64/bin;'+$env:PATH
+'{"case_id":"manual","query":"初音ミク","limit":100,"include_vector":false}' |
+  & ./build/p4-usearch-native-fix/rust-target/release/semantic_pilot.exe `
+    ./build/p3-full-authorized-retry1/knowledge.sqlite `
+    ./build/p4-dev-2048-1mib-3ee34e2-v1/manifest.json
+```
+
+Related protocol/cleanup tests24PASS before real run; final related Python165PASS
+4Windows symlink skips in9.06s; Rust33library+2dependency+1sender+1main PASS,
+size-boundary sender0.12s, library0.41s. Touched Ruff/diff PASS. A combined test/build
+shell timed out30s after Rust tests while compiling default release; rerun completed
+build5.44s exit0, no ambiguous compile result converted to PASS. No whole Python/
+206/matrix/exact/full-key audits/model training or new backend. Field size attribution
+was not needed to remove the proven budget mismatch; main-body contribution remains
+NOT_MEASURED, no text-size cause is fabricated. Four outcomes:
+**TRANSPORT_PASS / RUNTIME120_PASS / QUALITY_FAIL / ADOPTED_DEV2048_WITH_LIMITS**.
+
+## Previous round: TRANSPORT_PROTOCOL_PASS / QUERY_RESULT_FAIL / DEFAULT_RETAINED128
 
 Baseline `f2bdc1160640be3612ce0798feb386080c78e4ed`. This round sends exactly one
 new real P4-110 diagnostic, not a recovery of lost historical bytes and not an

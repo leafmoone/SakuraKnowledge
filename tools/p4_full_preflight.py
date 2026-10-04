@@ -50,7 +50,7 @@ DECLARATIONS = {
     'chunk': {'version': 'paragraph-model-tokenizer-v1', 'max_tokens': 384,
               'overlap': 64, 'order': 'document_id,chunk_index ascending'},
     'ann': {'library': 'usearch', 'version': '2.26.2', 'metric': 'cos', 'dtype': 'f32',
-            'connectivity': 16, 'expansion_add': 256, 'expansion_search': 128,
+            'connectivity': 16, 'expansion_add': 256, 'expansion_search': 2048,
             'chunk_depth': 512, 'entry_depth': 100},
     'hybrid': {'bm25_document_depth': 100, 'rrf_k': 60, 'pins': 'trusted_exact_alias',
                'ties': 'kind,namespace,value'},
@@ -78,7 +78,7 @@ def validate_staging(staging):
             'explicit nonzero staging budgets required')
 
 
-def validate_contract(value, *, expected_expansion_search=128):
+def validate_contract(value, *, expected_expansion_search=2048):
     require(type(expected_expansion_search) is int and expected_expansion_search in (128, 2048),
             'explicit supported expected width required')
     expected = json.loads(json.dumps(DECLARATIONS))

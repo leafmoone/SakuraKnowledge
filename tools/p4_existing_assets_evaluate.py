@@ -134,7 +134,7 @@ def finish_driver(driver, report):
         process.stdout.close()
 
 
-def evaluate(*, binary, output, results, existing_pack=False, verified_session=None, diagnostic_case=None):
+def evaluate(*, binary, output, results, existing_pack=False, verified_session=None, diagnostic_case=None, experimental_ef2048=False):
     """Create-new candidate and result directory. Return retained report on failure."""
     candidate = build.full.controlled_path(ROOT / output, ROOT, strict=False)
     destination = build.full.controlled_path(ROOT / results, ROOT, strict=False)
@@ -156,6 +156,10 @@ def evaluate(*, binary, output, results, existing_pack=False, verified_session=N
         from contextlib import nullcontext
         with (nullcontext(verified_session) if verified_session is not None else acceptance.AcceptanceSession()) as session:
             cases, config, bindings, records = freeze_inputs()
+            if experimental_ef2048:
+                require(experimental_ef2048 is True and existing_pack, 'explicit existing experimental pack required')
+                config = build.read_json(ROOT / 'configs/p4-ef2048-transport-experiment.json')
+                build.full.validate_contract(config, expected_expansion_search=2048)
             report['inputs'] = bindings
             binary_ref = build.binding(executable, ROOT)
             report['binary'] = binary_ref
@@ -165,7 +169,7 @@ def evaluate(*, binary, output, results, existing_pack=False, verified_session=N
             with session.guard(records):
                 if existing_pack:
                     manifest = build.read_json(candidate / 'manifest.json')
-                    acceptance.validate_full_manifest(manifest, config, pack_root=candidate, session=session)
+                    acceptance.validate_full_manifest(manifest, config, pack_root=candidate, session=session, experimental_ef2048=experimental_ef2048)
                 else:
                     manifest = build.existing_assets(output=output, session=session)
                 report['manifest'] = build.binding(candidate / 'manifest.json', ROOT)
@@ -202,7 +206,7 @@ def evaluate(*, binary, output, results, existing_pack=False, verified_session=N
                                                response_bytes=size, backend_ms=response.get('timings_ms'))
                                     build.save_new(destination / f'{phase}-{case["case_id"]}.json', response)
                                     require_success_response(response)
-                                    acceptance.validate_response(response, snapshot_conn=conn, session=session)
+                                    acceptance.validate_response(response, snapshot_conn=conn, session=session, experimental_ef2048=experimental_ef2048)
                                     scores = score_response(case, response, manifest)
                                     require(row['wall_ms'] <= 5000 and response['timings_ms']['total'] <= 5000,
                                             'resident query budget exceeded')
