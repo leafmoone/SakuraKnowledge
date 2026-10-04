@@ -113,6 +113,10 @@ def quality_gate(lexical, final):
 
 def finish_driver(driver, report):
     """EOF is the successful shutdown path; kill is failure recovery only."""
+    if isinstance(driver, pilot.Driver):
+        report['process_shutdown'] = driver.close(terminal=bool(report.get('failures')))
+        report['exit_code'] = report['process_shutdown']['exit_code']
+        return
     process = driver.process
     try:
         process.stdin.close()

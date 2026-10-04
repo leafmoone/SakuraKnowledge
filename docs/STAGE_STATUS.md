@@ -1,6 +1,76 @@
 # Current stage status
 
-## Current round: GLOBAL_ADOPTION_NOT_VALIDATED / DEFAULT_RETAINED128
+## Current round: TRANSPORT_PROTOCOL_PASS / QUERY_RESULT_FAIL / DEFAULT_RETAINED128
+
+Baseline `f2bdc1160640be3612ce0798feb386080c78e4ed`. This round sends exactly one
+new real P4-110 diagnostic, not a recovery of lost historical bytes and not an
+ANN-width comparison. Experimental binary:
+`build/p4-transport-ef2048-f2bdc11/rust-target/release/semantic_pilot.exe`;
+compiled explicitly with `SKNOW_P4_EXPERIMENTAL_EF2048=1` in an isolated Cargo target.
+Unset selects production128; other compile values rejected. Fixed
+`configs/p4-ef2048-transport-experiment.json` must equal production parsed canonical
+except search width2048. All other canonical/runtime/asset roles remain checked.
+Python explicit experimental validation defaults off; expected width is never taken
+from untrusted manifest self-declaration. Production configs remain128(effective512).
+
+New pack `build/p4-transport-ef2048-f2bdc11-v1/manifest.json`: actual/declarative/runtime
+2048, original big assets referenced unchanged; existing membership copied, not
+rebuilt, because local member role is required. Stage checks only derived membership;
+one caller-owned session verifies stable published paths once before real query.
+No ANN build/corpus encode/model/RRF/depth/gold/5s/512KiB changes.
+
+### Exact new failure evidence
+
+Exclusive `reports/P4/transport-f2bdc11/diagnostic.json`, `response.jsonl`, `stderr.log`.
+Complete intended JSONL after adding case_id: **673445 UTF-8 bytes including newline**,
+above524288(512KiB). New sender returns **123-byte complete FAIL** with
+`error=response_too_large`, `retries=0`, case_id P4-110. No truncated success sent.
+Measured wall999.9672ms; retrieval998.7712ms, serialization0.9429ms,
+transmission0.0184ms (write+flush). Natural stdin EOF child exit0, reader joined,
+no active termination. Stdout is protocol only; case-linked trace is stderr.
+
+**MAJOR FIELD SIZE ATTRIBUTION: NOT_MEASURED / incomplete requirement.** Exact total
+and oversize category are established, but no top-field contribution bytes were
+recorded. Session and child had already closed when this gap was recognized; no
+second big hash or real query is performed, no history filled from fixture ratios.
+Conditional next protocol proposal only: if repeated provenance dominates, a new
+version could use local source/evidence/document references with lossless dedup;
+if unique required text dominates, explicit chunks/at-need fetch would change client
+interaction and need authorization. Neither proposal is selected or implemented;
+no claim evidence/text is the measured main cause.
+
+Four separate outcomes: **TRANSPORT protocol PASS; P4-110 query result FAIL;
+complete120 RUNTIME NOT_RUN; QUALITY NOT_RUN; ADOPTION NOT_VALIDATED**. Original
+109+this error are not stitched into a120 receipt. Offline .975<1 is not a gate pass.
+Production default128 remains; no additional real query/FTS/hash/performance run.
+
+Sender serializes once into bounded retained bytes while counting every JSON UTF-8
+byte exactly, then writes only a complete approved line (newline included). Success
+fields/ranks/provenance unchanged. Size count is exact, not a claimed total from a
+lower bound. Serialization/transmission failures have distinct case-linked stderr;
+transmission timing ends after flush. Last error-trace additions were after the real
+binary build, so this real run does not verify those additions. Rust size boundary
+fixture covers exact524288-byte line and multi-byte oversize short envelope.
+
+Receiver preserves bounded MAX+1 failure prefix/read length and distinguishes
+EOF/oversize/unterminated/reader exception/timeout. Terminal faults record poll first,
+terminate only the owned child immediately, bounded wait with kill fallback, join
+reader, close pipes. Natural EOF and active termination recorded separately. Queue
+producer shutdown checks avoid blocked queue threads. Real Python tiny children cover
+UTF-8 exact newline boundary, continued oversize stdout, partial early exit, natural
+normal FAIL/EOF, blocked timeout and exception forwarding/reaping; no process-name kill,
+communicate/unbounded reads/limit increase. Request timeout includes request send
+elapsed time, and runner wall measurement includes retrieval+serialization+transmit.
+
+Related Python163PASS4Windows symlink skips before final additions; Rust33library,
+2dependency,1sender,1main PASS. Initial compile failed on const string match and
+metadata fixtures failed on unexpected default keyword; fixed with const byte check
+and preserved default validator calling convention, not relaxed acceptance.
+Final related Python165PASS4Windows-symlink skips in8.75s, touched Ruff/diff PASS;
+final Rust33+2+1+1PASS (library0.46s/sender0.06s). No whole Python/legacy206 suite. Historical complete runtime
+PASS/quality FAIL remains separate; FULL exact-overlap/generalization NOT_RUN.
+
+## Previous round: GLOBAL_ADOPTION_NOT_VALIDATED / DEFAULT_RETAINED128
 
 Baseline `60feb51cfedad62e1ae9a8594c4980e1499f0c63`. Single compact comparison:
 `reports/P4/ef-comparison-60feb51.json`. Before search, existing Rust binding

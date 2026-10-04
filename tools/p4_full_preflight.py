@@ -78,11 +78,15 @@ def validate_staging(staging):
             'explicit nonzero staging budgets required')
 
 
-def validate_contract(value):
+def validate_contract(value, *, expected_expansion_search=128):
+    require(type(expected_expansion_search) is int and expected_expansion_search in (128, 2048),
+            'explicit supported expected width required')
+    expected = json.loads(json.dumps(DECLARATIONS))
+    expected['ann']['expansion_search'] = expected_expansion_search
     require(value.get('schema') == 'p4-full-semantic-contract-v1' and
             value.get('object_type') == 'canonical_contract' and
             chunks.canonical(value.get('snapshot')) == chunks.canonical(SNAPSHOT) and
-            chunks.canonical(value.get('declarative_contract')) == chunks.canonical(DECLARATIONS), 'FULL contract mismatch')
+            chunks.canonical(value.get('declarative_contract')) == chunks.canonical(expected), 'FULL contract mismatch')
     return value['declarative_contract']
 
 

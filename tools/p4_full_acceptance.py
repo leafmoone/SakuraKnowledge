@@ -205,14 +205,17 @@ def _inventory_guard(records, session=None):
     return (session if session is not None else AcceptanceSession()).guard(records)
 
 
-def _canonical(contract):
-    declaration = validate_contract(contract)
-    require(Path(CONFIG).absolute() == Path(ROOT).absolute() / CANONICAL_PATH,
+def _canonical(contract, experimental_ef2048=False):
+    require(type(experimental_ef2048) is bool, 'explicit experiment flag required')
+    declaration = validate_contract(contract, expected_expansion_search=2048) if experimental_ef2048 else validate_contract(contract)
+    canonical_path = 'configs/p4-ef2048-transport-experiment.json' if experimental_ef2048 else CANONICAL_PATH
+    config = Path(ROOT) / canonical_path if experimental_ef2048 else CONFIG
+    require(Path(config).absolute() == Path(ROOT).absolute() / canonical_path,
             'controlled canonical path required')
-    path = _controlled_path(CONFIG, ROOT)
+    path = _controlled_path(config, ROOT)
     data = path.read_bytes()
     require(json.loads(data) == contract, 'canonical bytes do not contain approved contract')
-    binding = {'path': CANONICAL_PATH, 'size': len(data),
+    binding = {'path': canonical_path, 'size': len(data),
                'sha256': hashlib.sha256(data).hexdigest()}
     return declaration, path, binding
 
@@ -284,13 +287,13 @@ def _verify_inventory(artifacts, pack_root, *, expected_dll, prepared=False):
     return records
 
 
-def validate_full_manifest(manifest, contract, *, pack_root, session=None):
+def validate_full_manifest(manifest, contract, *, pack_root, session=None, experimental_ef2048=False):
     """Verify actual FULL inventory; optionally reuse a caller-owned session.
 
     Synthetic tests patch authorities, not product facts, and are not actual FULL
     acceptance. Standalone callers get fresh content verification on every call.
     """
-    declaration, canonical, canonical_binding = _canonical(contract)
+    declaration, canonical, canonical_binding = _canonical(contract, experimental_ef2048)
     require(manifest.get('canonical_contract') == {'schema': contract['schema'],
             **canonical_binding}, 'canonical binding mismatch')
     require(manifest.get('schema') == PACK_SCHEMA and manifest.get('object_type') == 'runtime_pack',

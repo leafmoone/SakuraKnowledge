@@ -15,7 +15,14 @@ const WARNING: &str =
     "Retrieval relevance is not verified identity or permission to promote identity.";
 const DLL_SHA: &str = "4fd859a7aeb657f256730a0cd5da8073a30806dd81c00a22bf25c87356baa847";
 const LEX_SHA: &str = "c664b3c81181942d202321fe81448d2cfc4e00ab658b864732e758ce7a1829b3";
-const CANONICAL_PATH: &str = "configs/p4-full-semantic-v1.json";
+const CANONICAL_PATH: &str = match option_env!("SKNOW_P4_EXPERIMENTAL_EF2048") {
+    None => "configs/p4-full-semantic-v1.json",
+    Some(value) => {
+        let bytes = value.as_bytes();
+        if bytes.len() == 1 && bytes[0] == b'1' { "configs/p4-ef2048-transport-experiment.json" }
+        else { panic!("SKNOW_P4_EXPERIMENTAL_EF2048 must be unset or 1") }
+    },
+};
 const CURRENT_ASSETS: &str = include_str!("../../configs/p4-current-assets.json");
 const FULL_DECLARATION: &str = include_str!("../../configs/p4-full-semantic-v1.json");
 #[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
@@ -89,7 +96,11 @@ pub fn fixed_contract() -> Value {
 }
 /// The exact shared Python declaration, embedded rather than read at runtime.
 pub fn full_declaration() -> Value {
-    serde_json::from_str(FULL_DECLARATION).expect("embedded FULL declaration must be JSON")
+    let mut declaration: Value = serde_json::from_str(FULL_DECLARATION).expect("embedded FULL declaration must be JSON");
+    if option_env!("SKNOW_P4_EXPERIMENTAL_EF2048") == Some("1") {
+        declaration["declarative_contract"]["ann"]["expansion_search"] = json!(2048);
+    }
+    declaration
 }
 /// Runtime projection; the positive chunk count belongs to the activated pack.
 pub fn full_contract(full_chunk_count: usize) -> Result<Value> {

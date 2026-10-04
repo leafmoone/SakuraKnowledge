@@ -265,40 +265,79 @@ class Driver:
         self.lines = queue.Queue(maxsize=2)
         self.last_raw = b''
         self.transport_failure = None
+        self.shutdown = None
+        self.reader_stop = threading.Event()
         def reader():
-            while True:
-                raw = self.process.stdout.readline(MAX_BYTES + 1)
-                self.lines.put(raw)
-                if not raw or len(raw) > MAX_BYTES:
-                    break
-        threading.Thread(target=reader, daemon=True).start()
+            try:
+                while not self.reader_stop.is_set():
+                    raw = self.process.stdout.readline(MAX_BYTES + 1)
+                    while not self.reader_stop.is_set():
+                        try:
+                            self.lines.put(raw, timeout=.1)
+                            break
+                        except queue.Full:
+                            continue
+                    if not raw or len(raw) > MAX_BYTES:
+                        break
+            except Exception as exc:  # noqa: BLE001 - propagate reader failures to controller
+                if not self.reader_stop.is_set():
+                    self.lines.put(exc)
+        self.reader_thread = threading.Thread(target=reader, daemon=True)
+        self.reader_thread.start()
 
     def receive(self, timeout):
         try:
             raw = self.lines.get(timeout=timeout)
         except queue.Empty as exc:
+            if hasattr(self, 'process'):
+                self.transport_failure = {'kind': 'timeout', 'read_bytes': len(self.last_raw), 'complete_response': False}
+                self.close(terminal=True)
             raise TimeoutError('Rust response timeout; no retry') from exc
+        if isinstance(raw, Exception):
+            self.transport_failure = {'kind': 'reader_exception', 'read_bytes': 0, 'complete_response': False}
+            self.close(terminal=True)
+            raise RuntimeError(f'Rust reader exception: {raw}') from raw  # noqa: TRY004 - I/O failure, not invalid type
         self.last_raw = raw
         reason = 'EOF' if not raw else 'oversize' if len(raw) > MAX_BYTES else 'unterminated' if not raw.endswith(b'\n') else None
         if reason:
             self.transport_failure = {'kind': reason, 'read_bytes': len(raw), 'limit_bytes': MAX_BYTES,
                                       'truncated_prefix': reason == 'oversize', 'complete_response': False}
+            self.transport_failure['poll_before_termination'] = self.process.poll() if hasattr(self, 'process') else None
+            if hasattr(self, 'process'):
+                self.close(terminal=True)
             raise ValueError(f'EOF/oversize JSONL response: kind={reason}; read_bytes={len(raw)}; limit_bytes={MAX_BYTES}')
         return ann.selection.parse(raw.decode('utf-8')), len(raw)
 
     def request(self, case):
+        started = time.perf_counter()
         data = {'case_id': case['case_id'], 'query': case['query'], 'limit': 100,
                 'include_vector': True}
         self.process.stdin.write((json.dumps(data, ensure_ascii=False) + '\n').encode('utf-8'))
         self.process.stdin.flush()
-        return self.receive(POLICY['query_timeout_seconds'])
+        return self.receive(max(0, POLICY['query_timeout_seconds'] - (time.perf_counter() - started)))
 
-    def close(self):
-        if self.process.poll() is None:
+    def close(self, terminal=False):
+        if self.shutdown is not None:
+            return self.shutdown
+        before = self.process.poll()
+        active = terminal and before is None
+        self.reader_stop.set()
+        if active:
+            self.process.terminate()
+        else:
+            self.process.stdin.close()
+        try:
+            code = self.process.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            active = True
             self.process.kill()
-        self.process.wait(timeout=10)
+            code = self.process.wait(timeout=2)
+        self.reader_thread.join(timeout=2)
         self.process.stdin.close()
         self.process.stdout.close()
+        self.shutdown = {'poll_before': before, 'actively_terminated': active, 'exit_code': code,
+                         'reader_joined': not self.reader_thread.is_alive()}
+        return self.shutdown
 
 
 def evaluation_inputs():

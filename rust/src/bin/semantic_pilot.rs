@@ -11,6 +11,52 @@ pub use sakura_knowledge_runtime::match_query;
 use sakura_knowledge_runtime::semantic;
 
 #[cfg(feature = "semantic")]
+const MAX_RESPONSE_BYTES: usize = 524288;
+
+#[cfg(feature = "semantic")]
+#[derive(Default)]
+struct BoundedJson {
+    bytes: Vec<u8>,
+    total: usize,
+}
+#[cfg(feature = "semantic")]
+impl std::io::Write for BoundedJson {
+    fn write(&mut self, data: &[u8]) -> std::io::Result<usize> {
+        self.total = self.total.checked_add(data.len()).ok_or(std::io::ErrorKind::InvalidData)?;
+        let room = (MAX_RESPONSE_BYTES - 1).saturating_sub(self.bytes.len());
+        self.bytes.extend_from_slice(&data[..room.min(data.len())]);
+        Ok(data.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> { Ok(()) }
+}
+#[cfg(feature = "semantic")]
+fn send_response(output: &mut impl std::io::Write, value: &serde_json::Value, case_id: &str, retrieval_ms: f64) -> semantic::Result<()> {
+    use std::time::Instant;
+    let start = Instant::now();
+    let mut buffer = BoundedJson::default();
+    if let Err(error) = serde_json::to_writer(&mut buffer,value) {
+        eprintln!("{}",serde_json::json!({"case_id":case_id,"phase":"serialization","error":error.to_string(),"serialize_ms":start.elapsed().as_secs_f64()*1000.0}));
+        return Err(error.into());
+    }
+    let total_bytes = buffer.total + 1; // UTF-8 serialized bytes plus JSONL newline.
+    let serialize_ms = start.elapsed().as_secs_f64()*1000.0;
+    let oversized = total_bytes > MAX_RESPONSE_BYTES;
+    if oversized {
+        buffer.bytes = serde_json::to_vec(&serde_json::json!({"case_id":case_id,"status":"FAIL","error":"response_too_large","retries":0,"response_bytes":total_bytes,"limit_bytes":MAX_RESPONSE_BYTES}))?;
+        if buffer.bytes.len()+1 > MAX_RESPONSE_BYTES { return Err("failure envelope too large".into()); }
+    }
+    buffer.bytes.push(b'\n');
+    let start = Instant::now();
+    if let Err(error) = output.write_all(&buffer.bytes).and_then(|_|output.flush()) {
+        eprintln!("{}",serde_json::json!({"case_id":case_id,"phase":"transmission","error":error.to_string(),"transmit_ms":start.elapsed().as_secs_f64()*1000.0}));
+        return Err(error.into());
+    }
+    let transmit_ms = start.elapsed().as_secs_f64()*1000.0;
+    eprintln!("{}",serde_json::json!({"case_id":case_id,"retrieval_ms":retrieval_ms,"serialize_ms":serialize_ms,"transmit_ms":transmit_ms,"response_bytes":total_bytes,"sent_bytes":buffer.bytes.len(),"response_too_large":oversized}));
+    Ok(())
+}
+
+#[cfg(feature = "semantic")]
 fn main() -> semantic::Result<()> {
     use serde_json::{json, Value};
     use std::io::{BufRead, Write};
@@ -48,24 +94,41 @@ fn main() -> semantic::Result<()> {
         if let Some(value) = request.get("include_vector") {
             options.include_vector = value.as_bool().ok_or("include_vector must be boolean")?;
         }
+        let started = std::time::Instant::now();
         match engine.retrieve(query, &options) {
             Ok(mut result) => {
                 result["case_id"] = json!(case_id);
-                writeln!(output, "{result}")?;
-                output.flush()?;
+                send_response(&mut output,&result,case_id,started.elapsed().as_secs_f64()*1000.0)?;
             }
             Err(error) => {
-                writeln!(
-                    output,
-                    "{}",
-                    json!({"case_id":case_id,"status":"FAIL","error":error.to_string(),"retries":0})
-                )?;
-                output.flush()?;
+                send_response(&mut output,&json!({"case_id":case_id,"status":"FAIL","error":error.to_string(),"retries":0}),case_id,started.elapsed().as_secs_f64()*1000.0)?;
                 return Err(error);
             }
         }
     }
     Ok(())
+}
+
+#[cfg(all(test, feature = "semantic"))]
+mod tests {
+    use super::*;
+    #[test]
+    fn utf8_newline_boundary_and_oversize_are_complete_envelopes() {
+        let mut output=Vec::new();
+        let mut value=serde_json::json!({"case_id":"tiny","status":"PASS","text":""});
+        let overhead=serde_json::to_vec(&value).unwrap().len()+1;
+        value["text"]=serde_json::json!("x".repeat(MAX_RESPONSE_BYTES-overhead));
+        send_response(&mut output,&value,"tiny",1.0).unwrap();
+        assert_eq!(output.len(),MAX_RESPONSE_BYTES);
+        assert_eq!(output.last(),Some(&b'\n'));
+        output.clear();value["text"]=serde_json::json!("日".repeat(MAX_RESPONSE_BYTES));
+        let total=serde_json::to_vec(&value).unwrap().len()+1;
+        send_response(&mut output,&value,"tiny",1.0).unwrap();
+        let failed:serde_json::Value=serde_json::from_slice(&output).unwrap();
+        assert_eq!(failed["error"],"response_too_large");
+        assert_eq!(failed["response_bytes"],total);
+        assert!(output.len()<MAX_RESPONSE_BYTES);
+    }
 }
 
 #[cfg(not(feature = "semantic"))]
