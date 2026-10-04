@@ -1,6 +1,106 @@
 # Current stage status
 
-## Current round: PARTIAL / RUNTIME_PASS / QUALITY_FAIL
+## Current round: CLI_FIXED / OFFLINE_DIAGNOSED / QUALITY_FAIL
+
+Baseline `95042a5b961a693f03085fa74ca7e5977d27f49e`. The prepare CLI now prints its
+result without attempting a second JSON write to the directory it just published.
+A real `main()` tiny SQLite fixture traverses prepare/publication/manifest read,
+checks exactly one staging-manifest write, and checks the derived row; production
+asset validators are substituted only for tiny assets. No real candidate rebuilt.
+
+### One 120-case replay table
+
+`reports/P4/saved-results-95042a5-cases.json` is the sole delivered table, generated
+by `python -m tools.p4_saved_results_analysis --results
+build/p4-prepared-lexical-5c8526e-evaluation-v1 --output <exclusive-new-json>
+--inspect-union-misses`. It covers all 120 frozen cases and every accepted target,
+with raw lexical document ranks, compact entity ranks, dense ranks, final/output
+and untruncated fused ranks, duplicate counts, union coverage, actual pins and
+source locators, five variant metrics, and precise per-branch RRF contributions
+for displaced targets. Saved full hybrid/candidate rankings reconstruct exactly
+in **120/120** cases; original lexical/dense/final aggregates and `quality_gate`
+reproduce exactly. The old raw `total_quality: NOT_RUN` is not authoritative.
+Raw responses, evaluation, frozen gold/questions and published pack are unchanged.
+This is five arithmetic views of the **same stored branches**, not five retrieval
+runs. Original depth-100 raw ranks, first-occurrence typed identity dedup, k=60,
+pins-first typed ordering and current scoring are preserved.
+
+| Variant | lexical R10/MRR/nDCG | semantic R10/MRR/nDCG | crosslingual R10/MRR/nDCG | ambiguous-positive R10/MRR/nDCG |
+| --- | --- | --- | --- | --- |
+| lexical | .800/.648/.686 | .950/.866/.886 | .067/.067/.067 | .500/.369/.371 |
+| dense | .333/.185/.219 | .850/.750/.775 | .600/.514/.535 | .400/.203/.216 |
+| lexical + actual pins | 1/.978/.983 | .950/.866/.886 | .067/.067/.067 | .500/.369/.371 |
+| dense + actual pins | 1/.978/.983 | .850/.750/.775 | .600/.514/.535 | .400/.203/.216 |
+| current full RRF + pins | 1/.978/.983 | .925/.848/.867 | .600/.320/.388 | .650/.429/.431 |
+
+Group query counts are 30/40/30/20; the last group has 10 positive and 10 empty-target
+negative cases, with positives only in relevance means. Every variant's negative
+nonempty-return rate is 1.0 and identity-promotion error rate is zero; these are
+independent measures. A returned candidate is not an asserted answer or identity.
+No arbitrary threshold was added to clear negative responses.
+
+### Semantic target-level causes, not a single aggregate guess
+
+All 40 semantic cases have zero actual pins; all observed semantic target lexical
+raw ranks equal compact entity ranks, so document duplicates do not explain these
+losses. Three cases improve rank: P4-032 target subject 665897 (3 -> 1), P4-046
+subject 195693 (6 -> 2), P4-066 danbooru.wiki page 27453 (7 -> 1). Three regress:
+- P4-035 subject 93628: lexical 1, absent dense top100, final 5. Three dual-branch
+  entries outrank its single contribution `1/61=.016393442623`: character 155765
+  (L12,D4,sum .029513888889), subjects 330545 (L25,D49,.020939017809) and 382360
+  (L29,D81,.018328153638). Dense-only subject 489554 at D1 ties the target score
+  and sorts ahead by typed key. R10 stays hit; MRR/nDCG regress.
+- P4-042 subject 463806: lexical 1, absent dense top100, final 5. Subjects 586762
+  (L16,D57,.021704903284), 503763 (L24,D74,.019367448472), 506242
+  (L57,D60,.016880341880) outrank it; dense-only subject 157362 at D1 ties
+  `1/61` and typed-key sorts ahead. R10 stays hit; MRR/nDCG regress.
+- P4-064 danbooru.wiki page 77750: lexical 1, absent dense top100, final 12.
+  Ten dual-branch pages have strictly larger sums, not eleven: 77751 (L3,D17),
+  59596 (L14,D11), 59595 (L5,D31), 77476 (L16,D23), 10364 (L4,D53), 77745
+  (L2,D66), 77595 (L10,D77), 149928 (L25,D49), 77816 (L21,D99), 77744 (L70,D50).
+  Dense-only page 127833 at D1 ties `1/61` and typed-key sorts ahead. The JSON
+  records both reciprocal contributions and sums for all eleven preceding entries,
+  plus the new top10 displacing entries. This is the **one new R10 loss**, not
+  the sole quality regression; MRR/nDCG also lose on 035/042.
+
+Two already-missed semantic targets remain misses: P4-033 subject 554333 is in
+lexical union at document/entity 99, absent dense; untruncated fusion rank 188,
+therefore outside final output cap100, not absent branch coverage. P4-039 character
+96679 is absent both stored branches. Indexed readonly document-PK and chunks
+`document_id` lookups confirm document 785252 source-backed and one mapped chunk;
+source text describes the 15-year-old Basel university researcher, locator retained
+in table. Presence does not prove query answerability or ANN failure. Analogous
+indexed checks are in the table for all other union-missed accepted targets.
+No FTS/MATCH query, model initialization, ANN search, vector scan, corpus encoding,
+or large snapshot/model/vector hashing was run. Exact comparison was **NOT_RUN**:
+fusion regressions are fully explained offline; ANN versus representation for
+union misses stays **UNKNOWN**, not inferred from absence.
+
+### Ranking decision and follow-up
+
+No production ranking change: equal-RRF consensus boost and typed ties match the
+specified algorithm, not a discovered code defect. No case/group route, parameter
+sweep or selection of a configuration on these 40 cases. A general follow-up could
+compare branch-union candidate reranking using independently trained/calibrated
+query-document relevance, with original source/identity checks unchanged. Cost:
+extra candidate scoring CPU/model dependency and latency validation; it could lose
+crosslingual dense gains or lexical exact-hit precision. A simpler one-branch
+policy costs little CPU but the all-group table shows the tradeoff: lexical+pins
+loses crosslingual R10 .600 -> .067; dense+pins loses semantic .925 -> .850.
+Neither is proposed as a quality-pass replacement. Before any new ranking choice,
+use separate development/validation/test splits grouped by entity/document to
+avoid name/translation leakage. The diagnosed 120 cases are now development/
+regression evidence, **not independent generalization**.
+
+Verification: `python -m pytest -q tests/test_p4_build_entry.py
+ tests/test_p4_saved_results_analysis.py`: **13 passed in 0.74s**, exit 0;
+touched-file Ruff and `git diff --check`: PASS, exit 0. Offline replay verified
+all 120 full rankings and the saved quality gate; tiny fixtures cover duplicates,
+multiple targets, stored pins/negative nonempty returns, boundary displacement and
+hard rejection of reconstruction mismatches. No whole Python suite, legacy 206,
+ANN probe or real 120-case rerun.
+
+## Previous round: PARTIAL / RUNTIME_PASS / QUALITY_FAIL
 
 Baseline `5c8526e8444e8bf7c6f1742998733180621b6555`; ordinary `dev` delivery only.
 Explicit prepared membership and rank-cursor BM25 now run the unchanged FULL

@@ -11,6 +11,53 @@ from tools import p4_full_build as build
 from tools import p4_full_preflight as full
 
 
+def test_real_main_prepares_tiny_pack_without_writing_over_directory(tmp_path, monkeypatch, capsys):
+    import sys
+    from contextlib import closing
+    source = tmp_path / 'source'
+    source.mkdir()
+    snapshot = tmp_path / 'snapshot.sqlite'
+    with closing(sqlite3.connect(snapshot)) as c, c:
+        c.executescript("CREATE TABLE entries(id INTEGER PRIMARY KEY,kind TEXT,conflicted INTEGER);"
+                       "CREATE TABLE documents(id INTEGER PRIMARY KEY,entry_id INTEGER,status TEXT,search_text TEXT);"
+                       "CREATE TABLE entry_evidence(entry_id INTEGER,status TEXT);"
+                       "CREATE VIRTUAL TABLE search_fts USING fts5(text,document_id UNINDEXED,entry_id UNINDEXED);"
+                       "INSERT INTO entries VALUES(1,'subject',0);"
+                       "INSERT INTO documents VALUES(9,1,'source_backed','tiny');"
+                       "INSERT INTO entry_evidence VALUES(1,'source_backed');"
+                       "INSERT INTO search_fts VALUES('tiny',9,1);")
+    spec = {**build.binding(snapshot, tmp_path), 'path': 'snapshot.sqlite'}
+    (tmp_path / 'contract').write_text(json.dumps({'snapshot': spec}))
+    (source / 'manifest.json').write_text(json.dumps({'pack_version': 'p4-full-existing-assets-v1',
+        'snapshot': {**spec, 'path': '../snapshot.sqlite'}, 'artifacts': {}}))
+    monkeypatch.setattr(build, 'ROOT', tmp_path)
+    monkeypatch.setattr(full, 'FULL_CONTRACT', tmp_path / 'contract')
+    monkeypatch.setattr(acceptance, 'validate_full_manifest', lambda *a, **k: 1)
+    monkeypatch.setattr(acceptance, 'approved_full_dll', lambda: {'size': 1, 'sha256': 'a' * 64})
+    monkeypatch.setattr(acceptance, '_verify_inventory', lambda *a, **k: [])
+    monkeypatch.setattr(acceptance, '_verify_existing_roles', lambda *a: None)
+    class Session:
+        def guard(self, records):
+            return nullcontext()
+        def close(self):
+            pass
+    monkeypatch.setattr(acceptance, 'AcceptanceSession', Session)
+    calls = []
+    original = build.save_new
+    def save(path, value):
+        calls.append(build.Path(path))
+        original(path, value)
+    monkeypatch.setattr(build, 'save_new', save)
+    monkeypatch.setattr(sys, 'argv', ['p4_full_build', '--prepare-lexical', '--existing-pack', 'source', '--output', 'published'])
+    build.main()
+    result = json.loads(capsys.readouterr().out)
+    output = tmp_path / 'published'
+    assert output.is_dir() and (output / 'manifest.json').is_file()
+    assert result['manifest'] == json.loads((output / 'manifest.json').read_text())
+    assert len(calls) == 1 and calls[0].name == 'manifest.json'
+    assert acceptance.validate_prepared_membership(output / 'lexical-membership.sqlite', result['manifest']) == 1
+
+
 def test_prepare_cleanup_keeps_primary_error_and_unrelated_stage(tmp_path, monkeypatch):
     import shutil
     root = tmp_path

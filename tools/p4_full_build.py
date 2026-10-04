@@ -1040,7 +1040,7 @@ def main():
                   'executor_origin': EXECUTOR_ORIGIN,
                   'source_sha256': full.exact.sha(Path(__file__)),
                   'config_sha256': full.exact.sha(full.CONFIG)}
-    if args.output and not (args.execute or args.existing_assets):
+    if args.output and not (args.execute or args.existing_assets or args.prepare_lexical):
         save_new(args.output, result)
     print(json.dumps(result, sort_keys=True))
 
