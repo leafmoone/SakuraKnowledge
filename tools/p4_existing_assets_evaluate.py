@@ -156,10 +156,6 @@ def evaluate(*, binary, output, results, existing_pack=False, verified_session=N
         from contextlib import nullcontext
         with (nullcontext(verified_session) if verified_session is not None else acceptance.AcceptanceSession()) as session:
             cases, config, bindings, records = freeze_inputs()
-            if experimental_ef2048:
-                require(experimental_ef2048 is True and existing_pack, 'explicit existing experimental pack required')
-                config = build.read_json(ROOT / 'configs/p4-ef2048-transport-experiment.json')
-                build.full.validate_contract(config, expected_expansion_search=2048)
             report['inputs'] = bindings
             binary_ref = build.binding(executable, ROOT)
             report['binary'] = binary_ref

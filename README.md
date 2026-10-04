@@ -2,7 +2,30 @@
 
 Independent offline knowledge core: Python 3.11+ and a read-only Rust CLI. Basic structured queries need no model/GPU/service/Pool. Optional semantic retrieval uses the locally prepared CPU model and evidence-preserving hybrid pack. Current dev delivery: **runtime120 PASS / quality FAIL** (semantic Recall@10 .975 < original target1); usable with that known limitation, not independently generalized.
 
-## Windows local entry (PowerShell 5.1+)
+## Portable Windows x64 CPU candidate
+
+Current assembled local directory: `D:/Sakura 发行/知识 CPU 可移动 包`.
+It is a directory package (no installer/ZIP/public upload), with its own `sknow-config.json`,
+`bin`, runtime DB/mapping/membership/I8 ANN and ONNX model assets. No Python/toolchain is
+needed to query it. From that directory:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./sknow.ps1 lookup hatsune_miku
+powershell -NoProfile -ExecutionPolicy Bypass -File ./sknow.ps1 retrieve 'blue hair' --limit 5
+'{"case_id":"one","query":"miku","limit":5}' | powershell -NoProfile -File ./sknow.ps1 serve
+```
+
+Package I8 is explicit (encoder still FP32):1024/Cos/M16/add256/search2048. Its120-case
+source/identity/runtime validation passed; quality remains FAIL semanticR10 .975<1.
+Crosslingual Recall@10 is .5333 vs saved FP32 .6000: additional2/30 loss, not a claim that
+quantization preserves every result. Repo default stays FP32; smaller portable is a known-
+limits candidate. Model assets/licenses/DLLs are local; queries never fetch/build anything.
+Actual Chinese/spaces directory relocation worked with PATH only Windows system directories;
+this is **same-machine relocation**, not a fresh-machine test. RSS/Pi integration NOT_RUN.
+Export/build commands and exact sizes are in `docs/STAGE_STATUS.md`; original mother DB,
+FP32 vectors/index/mapping remain protected and absent from the package.
+
+## Repository Windows local entry (PowerShell 5.1+)
 
 From this repository (not a portable standalone distribution):
 
@@ -48,7 +71,7 @@ Semantic single and resident responses share **1MiB serialized UTF-8 including n
 clients must match this budget. Oversize returns explicit FAIL, never a truncated success.
 Single-query startup cost is additional to retrieval; resident5s evidence does not claim a
 cold single process finishes under5s. Default ef2048/wanted512/entity100, no reranker.
-Pi integration and portable asset packaging are **NOT_RUN**.
+Pi integration is **NOT_RUN**. Portable packaging is separately validated above.
 
 ## Local audited sources
 

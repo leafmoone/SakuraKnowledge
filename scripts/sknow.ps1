@@ -1,10 +1,22 @@
 # Repository-local native entry; no automatic builds/downloads or global configuration.
 $ErrorActionPreference = 'Stop'
-$root = Split-Path -Parent $PSScriptRoot
+$root = if (Test-Path (Join-Path $PSScriptRoot 'sknow-config.json')) { $PSScriptRoot } else { Split-Path -Parent $PSScriptRoot }
 $utf8 = [System.Text.UTF8Encoding]::new($false)
 $target = Join-Path $root 'build/p4-usearch-native-fix/rust-target/release'
 $db = Join-Path $root 'build/p3-full-authorized-retry1/knowledge.sqlite'
 $pack = Join-Path $root 'build/p4-dev-2048-1mib-3ee34e2-v1/manifest.json'
+$childPath = 'C:/msys64/ucrt64/bin;' + $env:PATH
+$configPath = Join-Path $root 'sknow-config.json'
+if (Test-Path -LiteralPath $configPath) {
+    $config = Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    foreach ($value in @($config.bin,$config.database,$config.manifest)) {
+        if ([IO.Path]::IsPathRooted($value) -or $value -match '(^|[\\/])\.\.([\\/]|$)') { throw 'Config paths must stay inside package' }
+    }
+    $target = Join-Path $root $config.bin
+    $db = Join-Path $root $config.database
+    $pack = Join-Path $root $config.manifest
+    $childPath = $target + ';' + [Environment]::GetFolderPath('System') + ';' + $env:SystemRoot
+}
 function Quote-NativeArgument([string]$value) {
     # Windows CommandLineToArgvW quoting, including embedded quotes/trailing slashes.
     return '"' + ([regex]::Replace([regex]::Replace($value, '(\\*)"', '$1$1\"'), '(\\+)$', '$1$1')) + '"'
@@ -30,7 +42,7 @@ if ($command -eq 'serve') {
     # Forward complete JSONL stdin through .NET, avoiding native argument quoting loss.
     $start = [System.Diagnostics.ProcessStartInfo]::new($exe)
     $start.UseShellExecute = $false
-    $start.EnvironmentVariables['PATH'] = 'C:/msys64/ucrt64/bin;' + $env:PATH
+    $start.EnvironmentVariables['PATH'] = $childPath
     $start.EnvironmentVariables['PYTHONUTF8'] = '1'
     $start.EnvironmentVariables['PYTHONIOENCODING'] = 'utf-8'
     $start.RedirectStandardInput = $true
@@ -47,7 +59,7 @@ if ($command -eq 'serve') {
 }
 $start = [System.Diagnostics.ProcessStartInfo]::new($exe)
 $start.UseShellExecute = $false
-$start.EnvironmentVariables['PATH'] = 'C:/msys64/ucrt64/bin;' + $env:PATH
+$start.EnvironmentVariables['PATH'] = $childPath
 $start.EnvironmentVariables['PYTHONUTF8'] = '1'
 $start.EnvironmentVariables['PYTHONIOENCODING'] = 'utf-8'
 $forward = @($command)

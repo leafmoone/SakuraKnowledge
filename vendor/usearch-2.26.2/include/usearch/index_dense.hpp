@@ -252,7 +252,11 @@ inline void fix_pre_2_10_metadata(index_dense_head_t& head) {
  */
 inline index_dense_metadata_result_t index_dense_metadata_from_path(char const* file_path) noexcept {
     index_dense_metadata_result_t result;
+#if defined(_WIN32)
+    std::unique_ptr<std::FILE, int (*)(std::FILE*)> file(utf8_fopen(file_path, L"rb"), &std::fclose);
+#else
     std::unique_ptr<std::FILE, int (*)(std::FILE*)> file(std::fopen(file_path, "rb"), &std::fclose);
+#endif
     if (!file)
         return result.failed(std::strerror(errno));
 

@@ -208,8 +208,8 @@ def _inventory_guard(records, session=None):
 def _canonical(contract, experimental_ef2048=False):
     require(type(experimental_ef2048) is bool, 'explicit experiment flag required')
     declaration = validate_contract(contract, expected_expansion_search=2048) if experimental_ef2048 else validate_contract(contract)
-    canonical_path = 'configs/p4-ef2048-transport-experiment.json' if experimental_ef2048 else CANONICAL_PATH
-    config = Path(ROOT) / canonical_path if experimental_ef2048 else CONFIG
+    canonical_path = CANONICAL_PATH
+    config = CONFIG
     require(Path(config).absolute() == Path(ROOT).absolute() / canonical_path,
             'controlled canonical path required')
     path = _controlled_path(config, ROOT)
@@ -493,7 +493,7 @@ def validate_response(response, *, snapshot_conn=None, session=None, experimenta
     """Validate every response's provenance; caller owns session and connection."""
     count = validate_response_structure(response)
     require(snapshot_conn is not None, 'controlled readonly snapshot connection required')
-    config = Path(ROOT) / 'configs/p4-ef2048-transport-experiment.json' if experimental_ef2048 else CONFIG
+    config = CONFIG
     contract = json.loads(Path(config).read_bytes())
     _, canonical, canonical_binding = _canonical(contract, experimental_ef2048)
     snapshot, spec = _snapshot(contract)

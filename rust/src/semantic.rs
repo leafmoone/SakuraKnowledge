@@ -154,10 +154,24 @@ pub fn full_contract(full_chunk_count: usize) -> Result<Value> {
     c["full_chunk_count"] = json!(full_chunk_count);
     Ok(c)
 }
+fn portable_contract(full_chunk_count: usize) -> Result<Value> {
+    let mut c = full_contract(full_chunk_count)?;
+    c["ann"]["dtype"] = json!("i8");
+    c["ann_storage"] = json!("i8");
+    Ok(c)
+}
+fn portable_declaration() -> Value {
+    let mut d = full_declaration();
+    d["declarative_contract"]["ann"]["dtype"] = json!("i8");
+    d
+}
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Mode {
     Pilot,
     Full,
+}
+fn is_portable(v: &Value) -> bool {
+    v["pack_version"] == "portable-cpu-i8-v1"
 }
 fn mode(v: &Value) -> Result<Mode> {
     match v["contract"]["lexical_mode"].as_str() {
@@ -225,6 +239,42 @@ fn artifact(root: &Path, v: &Value) -> Result<PathBuf> {
         "artifact file size mismatch",
     )?;
     Ok(std::fs::canonicalize(p)?)
+}
+fn validate_portable_path(path: &str) -> Result<()> {
+    // Reject Windows escapes even when validation runs on Unix.
+    require(!path.contains('\\') && !path.contains(':') && !path.starts_with('/')
+        && path.split('/').all(|p| !p.is_empty() && p != "." && p != ".."),
+        "portable path must be a normal relative path")
+}
+fn portable_artifact(root: &Path, binding: &Value) -> Result<PathBuf> {
+    validate_binding(binding)?;
+    validate_portable_path(text(binding, "path")?)?;
+    reject_path_links(&root.join(text(binding, "path")?))?;
+    let path = artifact(root, binding)?;
+    require(path.starts_with(std::fs::canonicalize(root)?), "portable artifact escape")?;
+    let mut file = std::io::BufReader::new(std::fs::File::open(&path)?);
+    use sha2::{Digest, Sha256};
+    use std::io::Read;
+    let mut digest = Sha256::new();
+    let mut buffer = vec![0u8; 1024 * 1024];
+    loop { let n=file.read(&mut buffer)?; if n==0 {break;} digest.update(&buffer[..n]); }
+    require(format!("{:x}",digest.finalize()) == text(binding, "sha256")?, "portable artifact digest mismatch")?;
+    Ok(path)
+}
+fn portable_paths(root: &Path, manifest: &Value) -> Result<BTreeMap<String, PathBuf>> {
+    let mut paths = BTreeMap::new();
+    let mut seen = BTreeSet::new();
+    for (name, binding) in std::iter::once(("snapshot", &manifest["snapshot"]))
+        .chain(manifest["artifacts"].as_object().ok_or("invalid artifacts")?.iter()
+            .filter(|(name,_)| name.as_str() != "external_data").map(|(name,b)| (name.as_str(),b))) {
+        let path = portable_artifact(root, binding)?;
+        require(seen.insert(path.clone()), "duplicate portable artifact")?;
+        paths.insert(name.to_owned(),path);
+    }
+    for binding in manifest["artifacts"]["external_data"].as_array().ok_or("external tensors")? {
+        require(seen.insert(portable_artifact(root,binding)?), "duplicate portable tensor")?;
+    }
+    Ok(paths)
 }
 // Check components before canonicalization; junctions are reparse points.
 fn reject_path_links(path: &Path) -> Result<()> {
@@ -434,6 +484,10 @@ fn verify_canonical_bytes(manifest: &Value, actual: &[u8]) -> Result<()> {
 }
 // SHA-256 for the small canonical file; no artifact-sized allocation or subprocess.
 fn sha256(bytes: &[u8]) -> String {
+    sha256_reader(&mut std::io::Cursor::new(bytes)).expect("in-memory SHA256 read")
+}
+// Stream large portable tensors/snapshots without allocating their full contents.
+fn sha256_reader(reader: &mut impl std::io::Read) -> Result<String> {
     const K: [u32; 64] = [
         0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4,
         0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe,
@@ -456,13 +510,31 @@ fn sha256(bytes: &[u8]) -> String {
         0x1f83d9ab,
         0x5be0cd19,
     ];
-    let mut padded = bytes.to_vec();
-    padded.push(0x80);
-    while padded.len() % 64 != 56 {
-        padded.push(0);
-    }
-    padded.extend_from_slice(&((bytes.len() as u64) * 8).to_be_bytes());
-    for block in padded.as_chunks::<64>().0 {
+    let mut length = 0u64;
+    let mut final_blocks = Vec::new();
+    let mut finished = false;
+    loop {
+        let mut block = [0u8; 64];
+        if finished {
+            if final_blocks.is_empty() { break; }
+            block.copy_from_slice(&final_blocks.drain(..64).collect::<Vec<_>>());
+        } else {
+            let mut used = 0;
+            while used < 64 {
+                let n = reader.read(&mut block[used..])?;
+                if n == 0 { break; }
+                used += n;
+            }
+            length += used as u64;
+            if used < 64 {
+                final_blocks.extend_from_slice(&block[..used]);
+                final_blocks.push(0x80);
+                while final_blocks.len() % 64 != 56 { final_blocks.push(0); }
+                final_blocks.extend_from_slice(&length.wrapping_mul(8).to_be_bytes());
+                finished = true;
+                continue;
+            }
+        }
         let mut w = [0u32; 64];
         for (i, word) in block.as_chunks::<4>().0.iter().enumerate() {
             w[i] = u32::from_be_bytes(*word);
@@ -502,20 +574,24 @@ fn sha256(bytes: &[u8]) -> String {
             *state = state.wrapping_add(value);
         }
     }
-    h.iter().map(|word| format!("{word:08x}")).collect()
+    Ok(h.iter().map(|word| format!("{word:08x}")).collect())
 }
 fn validate_manifest(v: &Value) -> Result<()> {
     let m = mode(v)?;
-    let schema = match m {
+    let portable = is_portable(v);
+    let schema = if portable { "p4-rust-semantic-portable-pack-v1" } else { match m {
         Mode::Pilot => "p4-rust-semantic-pack-v1",
         Mode::Full => "p4-rust-semantic-full-pack-v1",
-    };
+    }};
     require(v["schema"] == schema, "unsupported pack schema")?;
     text(v, "pack_version")?;
+
     text(&v["snapshot"], "identity")?;
     validate_binding(&v["snapshot"])?;
     let expected = if m == Mode::Pilot {
         fixed_contract()
+    } else if portable {
+        portable_contract(row_count(v)?)?
     } else {
         full_contract(row_count(v)?)?
     };
@@ -524,7 +600,7 @@ fn validate_manifest(v: &Value) -> Result<()> {
         v.get("full_declaration").is_none(),
         "private FULL declaration wrapper is forbidden",
     )?;
-    if m == Mode::Full {
+    if m == Mode::Full && !portable {
         require(
             v["object_type"] == "runtime_pack",
             "FULL runtime pack required",
@@ -546,7 +622,7 @@ fn validate_manifest(v: &Value) -> Result<()> {
             v["artifacts"].get("lexical").is_none() && v.get("lexical_metadata").is_none(),
             "FULL must not bind a pilot lexical sidecar",
         )?;
-    } else {
+    } else if !portable {
         for n in [
             "canonical_contract",
             "declarative_contract",
@@ -555,7 +631,30 @@ fn validate_manifest(v: &Value) -> Result<()> {
             require(v.get(n).is_none(), "pilot must not carry FULL fields")?;
         }
     }
-    for n in [
+    if portable {
+        require(v["object_type"] == "runtime_pack", "portable runtime pack required")?;
+        require(m == Mode::Full, "portable FULL lexical mode required")?;
+        require(v.get("lexical_metadata").is_none(), "portable pilot metadata forbidden")?;
+        let source = &v["source_snapshot"];
+        validate_binding(source)?;
+        let original = &full_declaration()["snapshot"];
+        require(source == original, "portable source snapshot binding mismatch")?;
+        let artifacts = v["artifacts"].as_object().ok_or("invalid artifacts")?;
+        let expected: BTreeSet<_> = ["model", "tokenizer", "ort_dll", "index", "mapping", "lexical_membership", "external_data"].into_iter().collect();
+        require(artifacts.keys().map(String::as_str).collect::<BTreeSet<_>>() == expected, "portable artifact closed set mismatch")?;
+        require(v["declarative_contract"] == portable_declaration()["declarative_contract"], "portable declarative contract mismatch")?;
+        for (name, binding) in artifacts {
+            if name != "external_data" {
+                validate_binding(binding)?;
+                validate_portable_path(text(binding, "path")?)?;
+            }
+        }
+        for binding in artifacts["external_data"].as_array().ok_or("external_data must be an array")? {
+            validate_binding(binding)?;
+            validate_portable_path(text(binding, "path")?)?;
+        }
+    } else {
+        for n in [
         "model",
         "tokenizer",
         "ort_dll",
@@ -564,6 +663,7 @@ fn validate_manifest(v: &Value) -> Result<()> {
         "corpus",
     ] {
         validate_binding(&v["artifacts"][n])?;
+        }
     }
     let external = v["artifacts"]["external_data"]
         .as_array()
@@ -574,12 +674,12 @@ fn validate_manifest(v: &Value) -> Result<()> {
         validate_binding(t)?;
         require(names.insert(text(t, "path")?), "duplicate external tensor")?;
     }
-    require(
+    if !portable { require(
         v["artifacts"]["ort_dll"]["sha256"] == DLL_SHA
             && v["artifacts"]["ort_dll"]["size"] == 15355936_u64,
         "unpinned ORT DLL",
-    )?;
-    if m == Mode::Full {
+    )?; }
+    if m == Mode::Full && !portable {
         let artifacts = v["artifacts"].as_object().ok_or("invalid artifacts")?;
         let mut expected: BTreeSet<_> = [
             "model",
@@ -618,6 +718,23 @@ fn validate_manifest(v: &Value) -> Result<()> {
                 "duplicate artifact path",
             )?;
         }
+        return Ok(());
+    }
+    if portable {
+        let mut paths = BTreeSet::new();
+        validate_portable_path(text(&v["snapshot"], "identity")?)?;
+        for binding in std::iter::once(&v["snapshot"])
+            .chain(v["artifacts"].as_object().unwrap().iter().filter(|(name,_)| name.as_str() != "external_data").map(|(_,b)| b))
+            .chain(external.iter()) {
+            let path = text(binding, "path")?;
+            validate_portable_path(path)?;
+            require(paths.insert(path), "duplicate portable artifact path")?;
+        }
+        let l = &v["lexical_membership"];
+        require(l["version"] == "p4-full-membership-v1" && l["rows"].as_u64().is_some_and(|n| n > 0)
+            && l["snapshot_sha256"] == v["snapshot"]["sha256"]
+            && l["snapshot_size"] == v["snapshot"]["size"]
+            && l["snapshot_identity"] == v["snapshot"]["identity"], "portable membership binding mismatch")?;
         return Ok(());
     }
     validate_binding(&v["artifacts"]["lexical"])?;
@@ -770,7 +887,15 @@ impl SemanticEngine {
         let mode = mode(&manifest)?;
         let rows = row_count(&manifest)?;
         let root = p.parent().ok_or("manifest has no parent")?;
-        let (paths, bp) = if mode == Mode::Full {
+        let (paths, bp) = if is_portable(&manifest) {
+            reject_path_links(p)?;
+            let paths = portable_paths(root, &manifest)?;
+            reject_path_links(base_db.as_ref())?;
+            let bp = paths["snapshot"].clone();
+            require(std::fs::canonicalize(base_db.as_ref())? == bp, "snapshot path mismatch")?;
+            require(bp.ends_with(text(&manifest["snapshot"], "identity")?), "snapshot identity mismatch")?;
+            (paths, bp)
+        } else if mode == Mode::Full {
             let repository = Path::new(env!("CARGO_MANIFEST_DIR"))
                 .parent()
                 .ok_or("missing controlled repository root")?;
@@ -832,7 +957,7 @@ impl SemanticEngine {
         }
         let member_start = Instant::now();
         let fts_members = if mode == Mode::Full {
-            require(manifest["pack_version"] == "p4-full-prepared-lexical-v1", "FULL membership missing: run explicit prepare-lexical")?;
+            require(is_portable(&manifest) || manifest["pack_version"] == "p4-full-prepared-lexical-v1", "FULL membership missing: run explicit prepare-lexical")?;
             load_prepared_members(&paths["lexical_membership"], &manifest)?
         } else { Vec::new() };
         let mut full_members: Vec<_> = fts_members.iter().map(|&(_,e,d)| (e,d)).collect();
@@ -884,7 +1009,7 @@ impl SemanticEngine {
             index.size() == rows
                 && index.dimensions() == 1024
                 && index.metric_kind() == MetricKind::Cos
-                && index.scalar_kind() == ScalarKind::F32
+                && index.scalar_kind() == if is_portable(&manifest) { ScalarKind::I8 } else { ScalarKind::F32 }
                 && index.connectivity() == 16,
             "index contract mismatch",
         )?;
@@ -1132,7 +1257,8 @@ fn dense_hits_for(
     let mut positions = BTreeSet::new();
     let mut previous = f32::NEG_INFINITY;
     let mut hits = Vec::new();
-    let mut stmt = c.prepare_cached("SELECT metadata FROM chunks WHERE position=?")?;
+    let projected = c.prepare("SELECT chunk_id,document_id,kind,namespace,value,source_id,evidence_id FROM chunks LIMIT 0").is_ok();
+    let mut stmt = c.prepare_cached(if projected { "SELECT json_object('chunk_id',chunk_id,'document_id',document_id,'entry_key',json_object('kind',kind,'namespace',namespace,'value',value),'source_id',source_id,'evidence_id',evidence_id) FROM chunks WHERE position=?" } else {"SELECT metadata FROM chunks WHERE position=?"})?;
     for (&p, &d) in keys.iter().zip(distances) {
         require(
             p < rows as u64 && positions.insert(p),
@@ -1225,9 +1351,11 @@ const FULL_DOCUMENT_TRUST: &str = "e.conflicted=0
  AND EXISTS (SELECT 1 FROM entry_evidence v
              WHERE v.entry_id=e.id AND v.status='source_backed')";
 fn load_prepared_members(path: &Path, manifest: &Value) -> Result<Vec<(i64,i64,i64)>> {
-    require(manifest["artifacts"]["lexical_membership"]["path"] == "lexical-membership.sqlite", "local membership required: run explicit prepare-lexical")?;
-    let bytes = std::fs::read(path)?;
-    require(sha256(&bytes) == text(&manifest["artifacts"]["lexical_membership"],"sha256")?, "membership digest mismatch: run explicit prepare-lexical")?;
+    require(is_portable(manifest) || manifest["artifacts"]["lexical_membership"]["path"] == "lexical-membership.sqlite", "local membership required: run explicit prepare-lexical")?;
+    if !is_portable(manifest) {
+        let bytes = std::fs::read(path)?;
+        require(sha256(&bytes) == text(&manifest["artifacts"]["lexical_membership"],"sha256")?, "membership digest mismatch: run explicit prepare-lexical")?;
+    }
     let c = readonly(path)?;
     let integrity: String = c.query_row("PRAGMA integrity_check",[],|r| r.get(0))?;
     require(integrity == "ok", "membership corrupt: run explicit prepare-lexical")?;
@@ -1238,16 +1366,21 @@ fn load_prepared_members(path: &Path, manifest: &Value) -> Result<Vec<(i64,i64,i
     let meta_columns: Vec<(String,String,i64,i64)> = c.prepare("PRAGMA table_info(meta)")?.query_map([],|r| Ok((r.get(1)?,r.get(2)?,r.get(3)?,r.get(5)?)))?.collect::<rusqlite::Result<_>>()?;
     require(meta_columns == [("key".into(),"TEXT".into(),0,1),("value".into(),"TEXT".into(),1,0)], "membership meta schema: run explicit prepare-lexical")?;
     let meta_count: i64 = c.query_row("SELECT count(*) FROM meta",[],|r| r.get(0))?;
-    require(meta_count == 4, "membership meta keys: run explicit prepare-lexical")?;
+    require(meta_count == if is_portable(manifest) { 5 } else { 4 }, "membership meta keys: run explicit prepare-lexical")?;
     let mut stmt = c.prepare("SELECT key,value FROM meta ORDER BY key")?;
     let meta: BTreeMap<String,String> = stmt.query_map([],|r| Ok((r.get(0)?,r.get(1)?)))?.collect::<rusqlite::Result<_>>()?;
     let declaration = &manifest["lexical_membership"];
     let rows = declaration["rows"].as_u64().ok_or("membership rows: run explicit prepare-lexical")?;
-    let expected = BTreeMap::from([
+    let mut expected = BTreeMap::from([
         ("version".to_owned(),"p4-full-membership-v1".to_owned()),
         ("snapshot_sha256".to_owned(),text(&manifest["snapshot"],"sha256")?.to_owned()),
         ("snapshot_size".to_owned(),manifest["snapshot"]["size"].as_u64().ok_or("snapshot size")?.to_string()),
         ("rows".to_owned(),rows.to_string())]);
+    if is_portable(manifest) {
+        let identity = text(&manifest["snapshot"],"identity")?;
+        require(declaration["snapshot_identity"] == identity, "membership snapshot identity mismatch")?;
+        expected.insert("snapshot_identity".into(),identity.into());
+    }
     require(meta == expected && declaration["version"] == "p4-full-membership-v1" &&
         declaration["snapshot_sha256"] == manifest["snapshot"]["sha256"] &&
         declaration["snapshot_size"] == manifest["snapshot"]["size"], "membership binding mismatch: run explicit prepare-lexical")?;
@@ -1487,6 +1620,38 @@ mod tests {
         v["artifacts"]["external_data"][0]["path"] = json!("tensor");
         v
     }
+    fn portable_manifest() -> Value {
+        let mut v = full_manifest();
+        v["schema"] = json!("p4-rust-semantic-portable-pack-v1");
+        v["pack_version"] = json!("portable-cpu-i8-v1");
+        v["contract"] = portable_contract(7).unwrap();
+        v["declarative_contract"] = portable_declaration()["declarative_contract"].clone();
+        v["source_snapshot"] = full_declaration()["snapshot"].clone();
+        v["snapshot"] = json!({"path":"snapshot.sqlite","identity":"snapshot.sqlite","size":1,"sha256":"a".repeat(64)});
+        v["object_type"] = json!("runtime_pack");
+        v["lexical_membership"] = json!({"version":"p4-full-membership-v1","rows":1,"snapshot_sha256":"a".repeat(64),"snapshot_size":1,"snapshot_identity":"snapshot.sqlite"});
+        v["artifacts"].as_object_mut().unwrap().remove("corpus");
+        v["artifacts"].as_object_mut().unwrap().remove("lexical");
+        v["artifacts"]["lexical_membership"] = json!({"path":"membership.sqlite","size":1,"sha256":"a".repeat(64)});
+        v["artifacts"]["ort_dll"]["sha256"] = json!("a".repeat(64));
+        v["artifacts"]["ort_dll"]["size"] = json!(1);
+        v
+    }
+    #[test]
+    fn portable_manifest_rejects_wrong_ann_paths_and_binding_without_assets() {
+        let v = portable_manifest();
+        validate_manifest(&v).unwrap();
+        let mut wrong_ann = v.clone();
+        wrong_ann["contract"]["ann"]["dtype"] = json!("f32");
+        assert!(validate_manifest(&wrong_ann).is_err());
+        let mut wrong_path = v.clone();
+        wrong_path["artifacts"]["model"]["path"] = json!("../model");
+        assert!(validate_manifest(&wrong_path).is_err());
+        let mut wrong_binding = v;
+        wrong_binding["source_snapshot"]["sha256"] = json!("b".repeat(64));
+        assert!(validate_manifest(&wrong_binding).is_err());
+    }
+
     #[test]
     fn builder_synthetic_reader_interop() {
         // Env input is private to tests; production authority stays immutable.

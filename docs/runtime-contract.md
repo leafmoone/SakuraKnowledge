@@ -3,6 +3,25 @@
 Normative surface that the Rust runtime (`rust/`) implements 1:1 over the
 published snapshot. Both CLIs print JSON only on stdout.
 
+## Response/deadline and projection invariants
+
+- One five-second basic-operation deadline covers nested queries, projections, bounded
+  JSON-size calculation and success/error paths, including inspect. Titles project256
+  Unicode characters; identity values/keys never truncate. Semantic single cold startup
+  is separate; semantic resident wire budget1MiB UTF-8 including newline.
+- Latin-start continuation uses Unicode16 ALNUM; Kana punctuation/combining marks are
+  not words merely because of codepoint block. Template subjects use Python whitespace
+  including U+001C–1F; U+200B/literal identities stay unchanged.
+- RawValue skips ignored deep JSON. Displayed containers recurse depth<=4/children<=16;
+  source payload limit2million bytes. Display scalar strings<=256 chars, integer domain
+  [-2^63,2^64-1], bool/null/finite floats; out-of-domain integer=>null with explicit
+  present/truncated. Display subtrees<=2048 UTF-8 JSON bytes. Mother payload preserved.
+- Proof display cap100 explicitly marks all four source_fields_truncated names; absence
+  must not imply complete evidence. Ordering independent of insertion order.
+- Open verifies actual virtual FTS5 hidden columns and prepares MATCH/BM25/rank LIMIT0
+  without corpus scans; failed open closes. Test harness validates success/error shape
+  before field access and retains failures rather than converting them to pass.
+
 ## Open mode
 
 - Both runtimes open the snapshot **read-only**

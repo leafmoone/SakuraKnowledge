@@ -30,6 +30,7 @@ semantic = ["dep:ort", "dep:tokenizers", "dep:usearch"]
 rusqlite = { version = "0.31", features = ["bundled", "hooks", "limits"] }
 serde_json = { version = "1", features = ["raw_value"] }
 unicode-normalization = "0.1"
+sha2 = "0.10"
 ort = { version = "=2.0.0-rc.12", optional = true, default-features = false, features = ["std", "ndarray", "load-dynamic", "api-24"] }
 tokenizers = { version = "=0.22.2", optional = true, default-features = false, features = ["fancy-regex"] }
 usearch = { version = "=2.26.2", optional = true }

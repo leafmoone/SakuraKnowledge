@@ -1902,6 +1902,18 @@ struct serialization_result_t {
  * This class raises no exceptions and corresponds errors through `serialization_result_t`.
  * The class automatically closes the file when the object is destroyed.
  */
+#if defined(_WIN32)
+inline std::wstring utf8_file_path(char const* path) {
+    int n = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path, -1, nullptr, 0);
+    if (!n) { errno = EINVAL; return {}; }
+    std::wstring result(static_cast<std::size_t>(n), L'\0');
+    if (!MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path, -1, &result[0], n)) { errno = EINVAL; return {}; }
+    result.resize(static_cast<std::size_t>(n - 1)); return result;
+}
+inline std::FILE* utf8_fopen(char const* path, wchar_t const* mode) {
+    auto wide = utf8_file_path(path); return wide.empty() ? nullptr : _wfopen(wide.c_str(), mode);
+}
+#endif
 class output_file_t {
     char const* path_ = nullptr;
     std::FILE* file_ = nullptr;
@@ -1919,7 +1931,11 @@ class output_file_t {
     serialization_result_t open_if_not() noexcept {
         serialization_result_t result;
         if (!file_)
+#if defined(_WIN32)
+            file_ = utf8_fopen(path_, L"wb");
+#else
             file_ = std::fopen(path_, "wb");
+#endif
         if (!file_)
             return result.failed(std::strerror(errno));
         return result;
@@ -1961,7 +1977,11 @@ class input_file_t {
     serialization_result_t open_if_not() noexcept {
         serialization_result_t result;
         if (!file_)
+#if defined(_WIN32)
+            file_ = utf8_fopen(path_, L"rb");
+#else
             file_ = std::fopen(path_, "rb");
+#endif
         if (!file_)
             return result.failed(std::strerror(errno));
         return result;
@@ -2059,7 +2079,7 @@ class memory_mapped_file_t {
 #if defined(USEARCH_DEFINED_WINDOWS)
 
         HANDLE file_handle =
-            CreateFileA(path_, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+            CreateFileW(utf8_file_path(path_).c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
         if (file_handle == INVALID_HANDLE_VALUE)
             return result.failed("Opening file failed!");
 

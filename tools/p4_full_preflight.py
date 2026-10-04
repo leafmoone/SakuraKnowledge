@@ -27,14 +27,6 @@ AUDIT_CAP_BYTES = 1024 ** 3
 DOCUMENT_CAP_BYTES = 16 * 1024 ** 2
 AUDIT_BATCH_SIZE = 1024
 AUDIT_CACHE_KIB = 16384
-SOURCE_PATHS = (
-    'tools/p4_full_preflight.py', 'tests/test_p4_full_preflight.py',
-    'configs/p4-full-semantic-v1.json', 'docs/p4-full-preflight-recovery.md',
-    'tools/p4_chunks.py', 'tools/p4_corpus.py', 'tools/p4_exact_pilot.py',
-    'tools/p4_rust_pilot.py', 'rust/src/semantic.rs', 'rust/src/bin/semantic_pilot.rs',
-    'rust/src/bin/semantic_dependency_probe.rs', 'rust/src/lib.rs', 'rust/src/main.rs',
-    'rust/Cargo.toml', 'rust/Cargo.lock',
-)
 SNAPSHOT = {'path': 'build/p3-full-authorized-retry1/knowledge.sqlite',
             'size': 21718736896,
             'sha256': '61562f2e76fa9a77a44d34adcc2482f44c4fa4950352e84e410b888b035315d9'}

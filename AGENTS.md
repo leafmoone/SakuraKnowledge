@@ -13,7 +13,7 @@
 - Source modules: `src/sakura_knowledge/`.
 - Tests: `tests/`; normal checks are `python -m pytest -q`, `python -m ruff check src tests tools`, and `git diff --check`.
 - Design and contract: `docs/architecture.md`, `docs/data-contract.md`, and `docs/source-adapters.md`.
-- P1 evidence and validation: `reports/P1/P1_REPORT.md` and the adjacent JSON receipts. Do not replace receipts with claims.
+- Current delivery status: `docs/STAGE_STATUS.md`; portable export/assembly: `tools/portable_export.py`, `tools/portable_pack.py`. Keep gold/reference evidence; do not replace receipts with claims.
 
 ## Evidence Boundaries
 
@@ -27,7 +27,7 @@
 
 ## Integration Boundaries
 
-- No models, GPU, services, ORM, or Pool imports are part of the core baseline.
+- Basic core has no models/GPU/services/ORM/Pool. Optional CPU semantic runtime uses explicit frozen local model/index assets; queries never build/download. Runtime exports/I8 builds create new outputs only; preserve mother DB, original mapping, FP32 vectors/index and valid older packs.
 - Pi Skill runtime integration, SakuraPool integration, and full human source-fact review require explicit execution and evidence; do not mark them complete from static files or unit tests.
 - Do not claim a live upstream refresh when only a frozen local cut was audited and built.
 
