@@ -877,8 +877,7 @@ impl SemanticEngine {
                 && index.connectivity() == 16,
             "index contract mismatch",
         )?;
-        index.change_expansion_search(128);
-        require(index.expansion_search() == 128, "ef_search mismatch")?;
+        configure_search_expansion(&index, &manifest["contract"])?;
         let open_timings_ms = json!({"metadata":metadata_ms,"tokenizer":tokenizer_ms,"ort":ort_ms,"ann":ms(start),"total":ms(total),"membership_load":membership_ms,
             "fts_membership_count":fts_members.len(),
             "fts_membership_payload_bytes":fts_members.len() * 24,
@@ -1051,6 +1050,12 @@ impl SemanticEngine {
         result["lexical_work"] = json!({"cursor_rows":lexical_work.0,"eligible_rows":lexical_work.1,"boundary_ties":lexical_work.2});
         Ok(result)
     }
+}
+fn configure_search_expansion(index: &usearch::Index, contract: &Value) -> Result<()> {
+    let width = contract["ann"]["expansion_search"].as_u64().ok_or("positive integer ef_search required")?;
+    require(width > 0 && width <= 65536, "ef_search outside supported range")?;
+    index.change_expansion_search(width as usize);
+    require(index.expansion_search() == width as usize, "ef_search mismatch")
 }
 fn trusted_entry(c: &Connection, k: &EntryKey) -> Result<i64> {
     Ok(c.query_row("SELECT id FROM entries WHERE kind=? AND namespace=? AND value=? AND conflicted=0 AND EXISTS(SELECT 1 FROM entry_evidence v JOIN sources s ON s.source_id=v.source_id WHERE v.entry_id=entries.id AND v.status='source_backed')",params![k.kind,k.namespace,k.value],|r|r.get(0))?)
@@ -2150,6 +2155,17 @@ mod tests {
             )?;
         }
         Ok(())
+    }
+    #[test]
+    fn search_expansion_is_applied_from_contract_not_hardcoded() {
+        let index = usearch::Index::new(&usearch::IndexOptions::default()).unwrap();
+        for width in [128,2048] {
+            configure_search_expansion(&index, &json!({"ann":{"expansion_search":width}})).unwrap();
+            assert_eq!(index.expansion_search(),width as usize);
+        }
+        for invalid in [json!(true),json!(0),json!(-1),json!(1.5),json!(65537)] {
+            assert!(configure_search_expansion(&index,&json!({"ann":{"expansion_search":invalid}})).is_err());
+        }
     }
     #[test]
     fn prepared_role_passes_formal_manifest_entry_and_requires_local_binding() {

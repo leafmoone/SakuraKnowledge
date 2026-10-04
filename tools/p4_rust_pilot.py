@@ -263,6 +263,8 @@ class Driver:
         self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=stderr, cwd=ROOT)
         self.lines = queue.Queue(maxsize=2)
+        self.last_raw = b''
+        self.transport_failure = None
         def reader():
             while True:
                 raw = self.process.stdout.readline(MAX_BYTES + 1)
@@ -276,7 +278,12 @@ class Driver:
             raw = self.lines.get(timeout=timeout)
         except queue.Empty as exc:
             raise TimeoutError('Rust response timeout; no retry') from exc
-        require(raw and raw.endswith(b'\n') and len(raw) <= MAX_BYTES, 'EOF/oversize JSONL response')
+        self.last_raw = raw
+        reason = 'EOF' if not raw else 'oversize' if len(raw) > MAX_BYTES else 'unterminated' if not raw.endswith(b'\n') else None
+        if reason:
+            self.transport_failure = {'kind': reason, 'read_bytes': len(raw), 'limit_bytes': MAX_BYTES,
+                                      'truncated_prefix': reason == 'oversize', 'complete_response': False}
+            raise ValueError(f'EOF/oversize JSONL response: kind={reason}; read_bytes={len(raw)}; limit_bytes={MAX_BYTES}')
         return ann.selection.parse(raw.decode('utf-8')), len(raw)
 
     def request(self, case):

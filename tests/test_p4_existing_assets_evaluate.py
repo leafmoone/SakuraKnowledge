@@ -13,6 +13,46 @@ CASE = {'case_id': 'P4-001', 'query': 'one', 'subset': 'semantic',
 MANIFEST = {'contract': {}, 'pack_version': 'test'}
 
 
+@pytest.mark.parametrize(('raw', 'reason'), [(b'', 'EOF'), (b'partial', 'unterminated'),
+                                             (b'x' * (runner.pilot.MAX_BYTES + 1), 'oversize')], ids=['eof', 'partial', 'oversize'])
+def test_transport_retains_bounded_prefix_and_precise_reason(raw, reason):
+    import queue
+    driver = object.__new__(runner.pilot.Driver)
+    driver.lines = queue.Queue()
+    driver.lines.put(raw)
+    driver.last_raw = b''
+    driver.transport_failure = None
+    with pytest.raises(ValueError, match=f'kind={reason}'):
+        driver.receive(1)
+    assert driver.last_raw == raw
+    assert driver.transport_failure['read_bytes'] == len(raw)
+    assert driver.transport_failure['complete_response'] is False
+    assert driver.transport_failure['truncated_prefix'] == (reason == 'oversize')
+
+
+def test_failed_shutdown_kills_only_owned_process_and_retains_original_error():
+    class Process:
+        def __init__(self):
+            self.stdin = io.BytesIO()
+            self.stdout = io.BytesIO()
+            self.killed = False
+        def wait(self, timeout):
+            if not self.killed:
+                raise TimeoutError('original owned wait timeout')
+            return -9
+        def poll(self):
+            return None if not self.killed else -9
+        def kill(self):
+            self.killed = True
+    class Driver:
+        process = Process()
+    report = {}
+    with pytest.raises(TimeoutError, match='original owned wait timeout'):
+        runner.finish_driver(Driver, report)
+    assert Driver.process.killed and Driver.process.stdout.closed and Driver.process.stdin.closed
+    assert report['exit_code'] == -9
+
+
 def response():
     hit = {'entry': KEY, 'rank': 1}
     candidate = {'entry': KEY, 'hybrid_rank': 1}

@@ -118,10 +118,13 @@ def finish_driver(driver, report):
         process.stdin.close()
         report['exit_code'] = process.wait(timeout=10)
         require(report['exit_code'] == 0, 'resident driver nonzero exit')
-    except Exception:
-        if process.poll() is None:
-            process.kill()
-        report['exit_code'] = process.wait(timeout=10)
+    except Exception as primary:
+        try:
+            if process.poll() is None:
+                process.kill()
+            report['exit_code'] = process.wait(timeout=10)
+        except Exception as cleanup:  # noqa: BLE001 - preserve primary shutdown failure
+            primary.add_note(f'owned child cleanup failed: {cleanup}')
         raise
     finally:
         process.stdout.close()
@@ -207,6 +210,12 @@ def evaluate(*, binary, output, results, existing_pack=False, verified_session=N
                                     row.setdefault('wall_ms', (time.perf_counter() - start) * 1000)
                                     row['error'] = str(exc)
                                     report['failures'].append(f'{phase}/{case["case_id"]}: {exc}')
+                                    transport = getattr(driver, 'transport_failure', None)
+                                    if transport:
+                                        raw_path = destination / f'{phase}-{case["case_id"]}.transport-prefix.bin'
+                                        with raw_path.open('xb') as raw_stream:
+                                            raw_stream.write(driver.last_raw[:pilot.MAX_BYTES + 1])
+                                        row['transport_failure'] = {**transport, 'raw_prefix': raw_path.name}
                                     if (driver.process.poll() is not None or
                                             isinstance(exc, (TimeoutError, OSError, RustFailure)) or
                                             'EOF/oversize JSONL response' in str(exc)):

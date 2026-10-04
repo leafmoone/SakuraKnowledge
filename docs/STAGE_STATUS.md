@@ -1,6 +1,89 @@
 # Current stage status
 
-## Current round: FIVE_QUERY_EXACT_DIAGNOSED / HISTORICAL_QUALITY_FAIL
+## Current round: GLOBAL_ADOPTION_NOT_VALIDATED / DEFAULT_RETAINED128
+
+Baseline `60feb51cfedad62e1ae9a8594c4980e1499f0c63`. Single compact comparison:
+`reports/P4/ef-comparison-60feb51.json`. Before search, existing Rust binding
+`index.get` compared every actual mapped target row for the five entities with
+little-endian FP32 NPY bytes: **5 rows x 1024 components exact-bits PASS**, positions
+561631/93234/827490/468106/1137273. No full-key/sample audit or vector corpus scan.
+All120 saved query vectors validated before search; same readonly Rust index
+instance tested ef1024, then ef2048 **only because exact-top1 P4-039 remained absent
+raw512 at1024**. Cos/F32/M16, wanted512 and entity100 unchanged. Effective width is
+max(ef,wanted): original128 means512, not separate128/256/512 search tiers.
+
+### Complete saved-vector arithmetic comparison
+
+Each tier uses all120 saved embeddings with original lexical rows and actual pins,
+current unchanged RRF/scorer/targets. No encoding/FTS/gold/threshold/model changes.
+
+| Final metrics R10 / MRR / nDCG | saved old full128 | ef1024 replay | ef2048 replay |
+| --- | --- | --- | --- |
+| lexical30 | 1 / .977778 / .983333 | same | same |
+| semantic40 | .925 / .8475 / .866662 | .950 / .8925 / .906991 | .975 / .90625 / .923860 |
+| crosslingual30 | .600 / .320357 / .388228 | .600 / .319299 / .387151 | .600 / .320093 / .387914 |
+| ambiguous-positive10 | .650 / .429286 / .430727 | same | same |
+
+Frozen gate baseline remains **lexical**, not oldfull: semantic R10 .95 therefore
+target1; both tiers still **quality FAIL** despite MRR/nDCG improvements. Negative
+nonempty rate1.0 (10 denominator), promotion errors0 (120/10 denominators) remain
+separate. Dense ordering changes94/99 cases respectively; improvement in any
+relevance metric2/5 cases, regression1/1.1024 improves035/064;2048 also039/042/074.
+P4-095 regresses MRR by .031746/nDCG .032303 in both tiers;074 gains .023810/.022874
+at2048. No claim all cases improve. Raw ranks at1024 vs2048:035 1/1,039 absent/1,
+064 2/2;033 108/109 remains outside100entities,042 absent/absent (exact9967).
+
+ANN search min/median/nearest-p95/max ms:1024
+37.0264/556.0116/2252.1442/2819.4060;2048
+21.5459/144.8210/530.8106/867.5322. **Cold/warm order confounds these measurements**;
+2048 is not demonstrated faster. It was provisionally selected for global recall
+benefit, not warm timing, and required real E2E budget validation.
+
+### Actual candidate E2E failure, preserved rather than retried
+
+Published new `build/p4-prepared-ef2048-60feb51-v1/manifest.json` accurately declared
+2048, canonical/declaration/runtime matched then. Existing immutable ANN/model/
+corpus stayed referenced; the20.8MB derived membership was copied without rebuild
+into the new pack because current protocol requires a local member role. Old pack
+untouched. One existing-runner real E2E attempt:
+`build/p4-ef2048-60feb51-evaluation-v1/` has2warmups PASS, **109 formal PASS,
+P4-110 transport FAIL,10 NOT_RUN**. Successful query wall maximum2707.1703ms;
+this is not a complete120 runtime pass. FULL quality **NOT_RUN**, no aggregate
+pass inferred from partials. Error `EOF/oversize JSONL response` is ambiguous:
+raw failure bytes were not retained then, stderr0bytes, no owned child remains.
+Cleanup wait10s timeout is **not proven retrieval timeout**, oversize or deadlock.
+Driver limit is **524288bytes (512KiB)**, not1MiB. No real query/search rerun.
+
+Production canonical/currentassets retain original128 after incomplete acceptance;
+config bytes match prior defaults. Rust now applies the actual validated contract
+positive integer search width (1..65536), no hardcoded128 at set call; pilot contract
+remains128. Tiny native-index fixture verifies actual setters128/2048 and rejects
+bool/zero/negative/fraction/out-of-range. Failed2048pack bytes remain unchanged;
+its canonical binding no longer matches current128 contract and it is **historical
+unaccepted evidence, not a currently loadable validated candidate**. Next explicit
+acceptance must use improved transport evidence, not treat this fragment as pass.
+
+New instrumentation retains bounded MAX+1 failure prefix and read length,
+distinguishes EOF/oversize/unterminated, labels incomplete/truncated evidence;
+runner saves it exclusively for future failures. Existing owned-child cleanup
+already closes stdin, kills/waits on failure, closes stdout; tiny regression checks
+that path. The size safety limit is unchanged. Lost historical110 bytes cannot be
+reconstructed. Execution also unintentionally verified large assets twice during
+stage/final guards rather than one shared stable-path session: disclosed deviation,
+no further hashing. Future publication must validate roles/small derived asset in
+stage, then shared session verification of stable final paths, as existing prepare
+already does; do not move paths registered in a session.
+
+Rust semantic33+2dependency+1main PASS; probe2tiny tests PASS; related Python
+metadata/preflight/runner/replay155PASS4Windows-symlink skips before transport
+instrumentation; final transport/replay checks18PASS in0.18s, touched Ruff/diff
+PASS. An oversized test parameter initially hit Windows pytest-cache path limits;
+explicit short fixture IDs fixed it without changing assertions. No whole suite/legacy206.
+These120 now form development/regression selection data, not independent
+held-out generalization. Historical complete runtime PASS / quality FAIL and
+FULL exact-overlap NOT_RUN remain unchanged; global adoption **not validated**.
+
+## Previous round: FIVE_QUERY_EXACT_DIAGNOSED / HISTORICAL_QUALITY_FAIL
 
 Baseline `c8bcff6fe1533dfd39fe6d149cf04de0af412242`, ordinary `dev` delivery.
 One focused diagnostic: `reports/P4/five-query-exact-c8bcff6.json`. All five original
