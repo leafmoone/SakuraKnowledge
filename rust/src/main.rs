@@ -26,6 +26,8 @@ const USAGE: &str = "usage: sknow-rs lookup DB QUERY [--kind K --namespace N] [-
        sknow-rs related DB KIND NAMESPACE VALUE [--relation R --kind DSTKIND --limit N]
        sknow-rs ask DB QUERY [--kind K --namespace N --target-tag-namespace T]
        sknow-rs resolve-tag DB QUERY [--target-namespace T --category N --kind K --namespace N --key --limit N]
+       sknow-rs retrieve BASE_DB PACK_MANIFEST QUERY [--limit N --kind K --namespace N]
+         Requires build --features semantic; example: retrieve knowledge.sqlite manifest.json \"blue hair\"
        sknow-rs inspect DB
        sknow-rs runtime
        sknow-rs -h | --help";
@@ -63,16 +65,16 @@ fn semantic_retrieve(args: &[String]) -> ExitCode {
         }
         i += 2;
     }
+    let started = Instant::now();
     let result = SemanticEngine::open(&args[0], &args[1])
         .and_then(|mut engine| engine.retrieve(&args[2], &options));
     match result {
         Ok(value) => {
-            let text = value.to_string();
-            if text.len() > 524288 {
-                return usage_error("semantic response exceeds byte budget");
+            match sakura_knowledge_runtime::semantic_jsonl::send_response(&mut std::io::stdout().lock(),&value,"single",started.elapsed().as_secs_f64()*1000.0) {
+                Ok(false) => ExitCode::SUCCESS,
+                Ok(true) => ExitCode::from(1),
+                Err(error) => { eprintln!("{}",serde_json::json!({"error":"SemanticError","message":error.to_string()})); ExitCode::from(1) }
             }
-            println!("{text}");
-            ExitCode::SUCCESS
         }
         Err(error) => {
             eprintln!(

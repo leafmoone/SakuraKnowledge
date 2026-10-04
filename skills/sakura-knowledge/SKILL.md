@@ -1,9 +1,25 @@
 ---
 name: sakura-knowledge
-description: Query a local evidence-preserving SakuraKnowledge snapshot without network or models.
+description: Query an offline evidence-preserving snapshot; structured exact/alias/tag commands or optional prepared semantic retrieval.
 ---
 
-Use the independent `sknow` executable. Do not call SakuraPool or edit global Pi configuration.
+Use the independent `sknow` executable for basic queries, or repository-local
+`./scripts/sknow.ps1` for native structured commands and prepared semantic retrieval.
+Do not call SakuraPool or edit global Pi configuration. This file is repository-only;
+actual Pi integration is NOT_RUN.
+
+Descriptive prompts (not exact identity/tag resolution):
+`./scripts/sknow.ps1 retrieve 'blue hair character' --limit 5`.
+Resident JSONL: `powershell -NoProfile -File ./scripts/sknow.ps1 serve`;
+send `{"case_id":"q1","query":"初音ミク","limit":5}` then EOF to close.
+The launcher supplies the default DB/ef2048 pack documented in README, never builds or
+downloads during a query. Model/tokenizer/ORT/ANN/membership must already exist locally.
+Single and resident semantic outputs have the same1MiB UTF-8/newline bound; explicit
+oversize FAIL is not truncated success. Candidates with cited evidence are retrieval
+results, **not automatic tags or verified identities**. Original quality gate remains
+FAIL (semantic R10 .975<1);120 is a development regression set, not held-out quality.
+Use lookup/ask/resolve-tag for exact aliases and source-backed tag mapping, not
+semantic similarity as a substitute.
 
 - Exact entity: `sknow lookup DATABASE VALUE --key --kind character --namespace bangumi.character`
 - Search: `sknow search DATABASE QUERY --limit 20`

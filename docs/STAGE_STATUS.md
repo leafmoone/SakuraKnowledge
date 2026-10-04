@@ -1,6 +1,38 @@
 # Current stage status
 
-## Current round: USABLE_DEV2048 / RUNTIME120_PASS / QUALITY_FAIL
+## Current round: NATIVE_SINGLE_AND_RESIDENT_ENTRY_DELIVERED
+
+Baseline `a78943e5af87c25baf7d4375d08f9089778ef7c8`. Single `sknow-rs retrieve`
+and resident `semantic_pilot` now call shared `semantic_jsonl::send_response`:
+complete bounded1MiB UTF-8 including newline, explicit oversize FAIL, no payload
+ranking/depth/model changes. Native help documents retrieve parameters/semantic build.
+`README.md` has build/start/query/serve/default paths/prerequisites and known quality
+limit; repository Skill distinguishes descriptive candidates from exact/tag identity.
+
+`./scripts/sknow.ps1` is a thin PowerShell5.1-compatible local launcher: default DB,
+manifest and release paths explicit, no auto build/download/global config. Basic commands
+forward unchanged; serve streams UTF-8 JSONL into the existing resident, child inherits
+stdout/stderr directly, stdin EOF closes naturally. Native Windows quoting handles spaces,
+embedded quotes/backslashes and empty args; PATH/UTF8 values are set on child process only.
+No PowerShell7/pwsh assumed. Missing paths identify prerequisites/explicit preparation.
+
+Actual default release build both sknow-rs and semantic_pilot exit0 in10.90s;
+Rust34library(including shared boundary fixture)+2dependency+1main PASS. Initial refactor
+called nonexistent open_timings method; corrected to existing field before build/smokes.
+Single formal P4-110 query: **exit0,651775byte complete response**, retained exact query,
+above old512KiB below shared1MiB. It omits resident include_vector/case_id, so size differs
+legitimately from prior673k resident. Cold single open+retrieve trace8713.2085ms,
+serialization2.6011ms/transmit0.7203ms; startup included, **not a resident5s claim**.
+Launcher basic Chinese/Japanese/spaces/quotes preserved exactly; serve2consecutive queries
+`初音ミク` and `中文 日本語 "quote"`: opened+2complete JSON lines, natural EOF exit0.
+No full120 rerun/206/exact/key scan/large content rehash; previous real120runtimePASS /
+semanticRecall.975<1 QUALITY_FAIL remains the unchanged evidence, not newly generalized.
+PowerShell5.1 lacks ArgumentList/StandardInputEncoding; compatibility fixes were locally
+smoked, including fixing double-close of disposed stdin wrapper before final successfulserve.
+Final affected Python10PASS in2.98s (launcher Unicode/empty/quotes/backslashes/nonzero
+exit +6 real-child transport cases), Ruff/diff PASS. Pi actual integration/portable asset bundle NOT_RUN.
+
+## Previous round: USABLE_DEV2048 / RUNTIME120_PASS / QUALITY_FAIL
 
 Baseline `3ee34e250318152e6fb899dfa21e8d006b41b0de`. Authorized normal delivery
 upgrades the active Rust sender and Python receiver response budget to **1048576

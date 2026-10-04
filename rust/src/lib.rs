@@ -12,6 +12,8 @@ mod resolver;
 mod response;
 #[cfg(feature = "semantic")]
 pub mod semantic;
+#[cfg(feature = "semantic")]
+pub mod semantic_jsonl;
 pub use resolver::TagOptions;
 mod search;
 mod unicode16;
