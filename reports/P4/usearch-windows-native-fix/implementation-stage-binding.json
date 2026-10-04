@@ -1,0 +1,120 @@
+{
+  "matrix2_boundary": "11exit0 before gitattributes style-only edit; all native/Rust bound source bytes unchanged verified after",
+  "attribute_exception": "four exact whitespace=-blank-at-eol only; text/eol/filter unchanged; no SHA/auth exemption",
+  "staged_paths": {
+    ".gitattributes": {
+      "raw_sha256": "06d094691de422170d4dce124ee16300967b5d9f8a942d29a08fb2481040bb79",
+      "filtered_blob": "1e0911b1e60551ae326a2464709ebb5f2f281ba3"
+    },
+    "docs/STAGE_STATUS.md": {
+      "raw_sha256": "0cbe5f02672c86d93d2ddfba97d4abee6f624b6f5402895f8345de4301b5cfab",
+      "filtered_blob": "b421aa8b0bf0fcccd09aa54c7bb96c6accf793fb"
+    },
+    "reports/P4/usearch-windows-native-fix/README.md": {
+      "raw_sha256": "e02b8cc545267e6de69a8ad0d3eb73476e234af8703e2470e0f3caefdd4c4be7",
+      "filtered_blob": "f8a291ef75f252e5cc904737af9269a189c95691"
+    },
+    "reports/P4/usearch-windows-native-fix/cargo-source-binding.json": {
+      "raw_sha256": "9758284f5bcf0c5155e702cf4783756185aa6404ad9b59f794ababb6be311b5a",
+      "filtered_blob": "d3731d0a52ab64acb00b5e023eda0ff8a6d2fa8d"
+    },
+    "reports/P4/usearch-windows-native-fix/native.patch": {
+      "raw_sha256": "1405cd27cf54910942b227ecbdc67c90c6dbf68958cc1ce98aa92eadca7bdc3a",
+      "filtered_blob": "cb329c9123f2c20780983bed612722b468712710"
+    },
+    "reports/P4/usearch-windows-native-fix/native_boundary.cpp": {
+      "raw_sha256": "747043c8ad2e71382ade8120cd4af09da4384aa2605193c24aaf2393f0d094a9",
+      "filtered_blob": "3bb9a1e82c4f526ccd6741c07c8bddfa32e78138"
+    },
+    "reports/P4/usearch-windows-native-fix/native_failure_injection.cpp": {
+      "raw_sha256": "dbeec1a640a64faa6a38f21f726c09017cda1873b22ec1574f5d78a859ec1be0",
+      "filtered_blob": "6522f99440b62e463dd150eacc136d5d08144f62"
+    },
+    "reports/P4/usearch-windows-native-fix/native_metadata_failure.cpp": {
+      "raw_sha256": "2f89e2e45317c14c146096da431902b41b906655b2be0b10d99228ac17fcff30",
+      "filtered_blob": "79fc96019407a301f2247586f6da3f8e9d329602"
+    },
+    "reports/P4/usearch-windows-native-fix/native_regression.py": {
+      "raw_sha256": "2874009d3830ef2b9dd1933a09ca01973f90e59ebe63332659e2ae2250f36df0",
+      "filtered_blob": "d5cad7c968c02527267e8ab3a42222b238ac0239"
+    },
+    "reports/P4/usearch-windows-native-fix/patched-source-binding.json": {
+      "raw_sha256": "01b23af1bab779b922da3f8feb652099d31b210d5d7b398eaf1e7b296c103286",
+      "filtered_blob": "6eb7289cfbfabab910479014451d98835a6ede78"
+    },
+    "reports/P4/usearch-windows-native-fix/rust-loader-final-binding.json": {
+      "raw_sha256": "2b0fd0cf41cd8034efe0b923ad271e9edb21ae8aaff52ad3b7b1b5c1ab90300e",
+      "filtered_blob": "4484d3e1af01eba97a41eff1027e9e7550ceacf9"
+    },
+    "reports/P4/usearch-windows-native-fix/source-provenance-original.json": {
+      "raw_sha256": "1cf09d50137c08f5705c1c4a70de78eacbeaaa9fe5e8a519769bbd3a3e53419f",
+      "filtered_blob": "e97f80c6ed9b7fb8afd8ff5f57d0abef9bdf3952"
+    },
+    "rust/Cargo.lock": {
+      "raw_sha256": "c19e25dd9db9eb62e4b60085026f51354bc5779efa9f0ddc45f86b88a683658c",
+      "filtered_blob": "9497cc732bc6c9b3e4380048724b656ef79e6620"
+    },
+    "rust/Cargo.toml": {
+      "raw_sha256": "b1379572cf9d0dbe7b941cf80700c2fb420ab93d145b7acdeaade3dbba6c1bab",
+      "filtered_blob": "febe389e8f0de2975b9aa7ef23d82ad0141913c2"
+    },
+    "rust/examples/usearch_path_probe.rs": {
+      "raw_sha256": "88253d8ece0e63c057c8551aa887ee339cfb509188c65f7b5f107f16d0a172a8",
+      "filtered_blob": "e9f794bd68668e673d5c8cde94cb16f99682ef95"
+    },
+    "vendor/usearch-2.26.2/Cargo.lock": {
+      "raw_sha256": "c6a63810fa3a3a1dd9135d8b7baba7f8db106313585da6f04439461933865aa4",
+      "filtered_blob": "af6344e12fa052e720f28377ad10dcf0e6e42a3f"
+    },
+    "vendor/usearch-2.26.2/Cargo.toml": {
+      "raw_sha256": "dc0f0e6877d8fc234541081c0750e60d89e734b30bd2728c810c91de6ab0609c",
+      "filtered_blob": "869f3bc2ebe7fdad402e31f9a17df25f981b3653"
+    },
+    "vendor/usearch-2.26.2/Cargo.toml.orig": {
+      "raw_sha256": "8d6fc479c84085bef35faf79fad9be1927e0ee5059691604f3756203c3cdb4c1",
+      "filtered_blob": "64901a76e4482d37c9a295eb40335ada120b84f6"
+    },
+    "vendor/usearch-2.26.2/LICENSE": {
+      "raw_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "filtered_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
+    },
+    "vendor/usearch-2.26.2/README.md": {
+      "raw_sha256": "3502570da5a9537cb88604fd6d241c7e05bdbd521e2015c2c0066a84eb87717c",
+      "filtered_blob": "696e717867a77c55591fc9417e021440096c40a4"
+    },
+    "vendor/usearch-2.26.2/build.rs": {
+      "raw_sha256": "92753d20d50bf982c3ebf111db88c5c92e5d2d7c4cad6f19e33f65b58d5c4cb6",
+      "filtered_blob": "94619540a52321548535ac381758382d4ff0d3ac"
+    },
+    "vendor/usearch-2.26.2/include/usearch/index.hpp": {
+      "raw_sha256": "0010e41815317d29bf652e027c7a6f4ef701afa5ac6ac15b808582ef10aa6eb5",
+      "filtered_blob": "609b7fc20cb97d7ba9ffdf454d449ea5638c4491"
+    },
+    "vendor/usearch-2.26.2/include/usearch/index_dense.hpp": {
+      "raw_sha256": "793225fc4dee39ebcfc1ce8dbd0ea5a7876efcdd4b32c212a9c0b97dc40517bc",
+      "filtered_blob": "c6d52d2bed7341aeb943741f88abd419a25c5ed2"
+    },
+    "vendor/usearch-2.26.2/include/usearch/index_plugins.hpp": {
+      "raw_sha256": "a480e64ca5216b46127b34f26c5d9c985f5651a05c2ec7bba680e2536963c456",
+      "filtered_blob": "330d2a7d405c19e35a9fd84d1d779c0ccf331643"
+    },
+    "vendor/usearch-2.26.2/rust/README.md": {
+      "raw_sha256": "efbd6b932445494d95480d5f0bf063db61815f5f7c7ee41194b1f90659748a25",
+      "filtered_blob": "6d97f5b6d39951c814b342fafab897447efd81eb"
+    },
+    "vendor/usearch-2.26.2/rust/lib.cpp": {
+      "raw_sha256": "311b589e95754046f9072230a2ea4a1f5f437f7cb3cdb0b8309b547305d3905b",
+      "filtered_blob": "5a1ea541662039e87e2faf03d58c10d9a24058cc"
+    },
+    "vendor/usearch-2.26.2/rust/lib.hpp": {
+      "raw_sha256": "31e5f967b0b47dc93a0ea35dde8c5bc6f9a87739be7c882d21c833d7072321e2",
+      "filtered_blob": "bcadad2feb730631ce48b8dfc12962c25d10c815"
+    },
+    "vendor/usearch-2.26.2/rust/lib.rs": {
+      "raw_sha256": "7d5eafd002c9ce39ac3548b6aefdb060df8df166d9335360bf92ea721db3c6bb",
+      "filtered_blob": "6c6e3304e20237db4ab144e69850781283d7823b"
+    }
+  },
+  "secret_pattern_scan": "0",
+  "build_source_unchanged": true
+}

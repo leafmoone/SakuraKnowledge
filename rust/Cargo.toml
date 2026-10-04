@@ -33,3 +33,6 @@ unicode-normalization = "0.1"
 ort = { version = "=2.0.0-rc.12", optional = true, default-features = false, features = ["std", "ndarray", "load-dynamic", "api-24"] }
 tokenizers = { version = "=0.22.2", optional = true, default-features = false, features = ["fancy-regex"] }
 usearch = { version = "=2.26.2", optional = true }
+
+[patch.crates-io]
+usearch = { path = "../vendor/usearch-2.26.2" }

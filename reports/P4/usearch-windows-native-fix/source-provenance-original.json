@@ -1,0 +1,73 @@
+{
+  "baseline": "cb55e3fc829d56d846b599d66adaeceaed77f196",
+  "source_root": "C:/Users/PC/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/usearch-2.26.2",
+  "vendor_root": "vendor/usearch-2.26.2",
+  "crate": "usearch",
+  "version": "2.26.2",
+  "excluded": [
+    ".cargo-ok",
+    ".cargo_vcs_info.json"
+  ],
+  "files": [
+    {
+      "path": "build.rs",
+      "sha256": "92753d20d50bf982c3ebf111db88c5c92e5d2d7c4cad6f19e33f65b58d5c4cb6",
+      "size": 3769
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "c6a63810fa3a3a1dd9135d8b7baba7f8db106313585da6f04439461933865aa4",
+      "size": 11811
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "dc0f0e6877d8fc234541081c0750e60d89e734b30bd2728c810c91de6ab0609c",
+      "size": 1514
+    },
+    {
+      "path": "Cargo.toml.orig",
+      "sha256": "8d6fc479c84085bef35faf79fad9be1927e0ee5059691604f3756203c3cdb4c1",
+      "size": 1010
+    },
+    {
+      "path": "include/usearch/index.hpp",
+      "sha256": "42141603ddd0a48d286849aa2d763acefa9c315f9ae983beebe0f8df73a8c3ee",
+      "size": 215885
+    },
+    {
+      "path": "include/usearch/index_dense.hpp",
+      "sha256": "d57d57eb192656d85e8e2b5857ce4710414e6affa77968c1822edf604a2f6904",
+      "size": 118525
+    },
+    {
+      "path": "include/usearch/index_plugins.hpp",
+      "sha256": "a480e64ca5216b46127b34f26c5d9c985f5651a05c2ec7bba680e2536963c456",
+      "size": 189561
+    },
+    {
+      "path": "README.md",
+      "sha256": "3502570da5a9537cb88604fd6d241c7e05bdbd521e2015c2c0066a84eb87717c",
+      "size": 31663
+    },
+    {
+      "path": "rust/lib.cpp",
+      "sha256": "311b589e95754046f9072230a2ea4a1f5f437f7cb3cdb0b8309b547305d3905b",
+      "size": 19817
+    },
+    {
+      "path": "rust/lib.hpp",
+      "sha256": "31e5f967b0b47dc93a0ea35dde8c5bc6f9a87739be7c882d21c833d7072321e2",
+      "size": 6408
+    },
+    {
+      "path": "rust/lib.rs",
+      "sha256": "7d5eafd002c9ce39ac3548b6aefdb060df8df166d9335360bf92ea721db3c6bb",
+      "size": 107700
+    },
+    {
+      "path": "rust/README.md",
+      "sha256": "efbd6b932445494d95480d5f0bf063db61815f5f7c7ee41194b1f90659748a25",
+      "size": 10056
+    }
+  ]
+}

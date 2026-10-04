@@ -18,3 +18,9 @@ configs/p4-chunk-model-*.json -text whitespace=cr-at-eol
 configs/p4-pilot-job-*.json -text whitespace=cr-at-eol
 configs/p4-onnx-representation-v3.json -text whitespace=cr-at-eol
 reports/P4/onnx-quality-v3*.json -text whitespace=cr-at-eol
+# Exact upstream/evidence paths retain existing trailing blanks; style exception only.
+# No text/EOL/filter changes and no SHA/authentication exemption.
+vendor/usearch-2.26.2/README.md whitespace=-blank-at-eol
+vendor/usearch-2.26.2/rust/README.md whitespace=-blank-at-eol
+vendor/usearch-2.26.2/Cargo.toml.orig whitespace=-blank-at-eol
+reports/P4/usearch-windows-native-fix/native.patch whitespace=-blank-at-eol

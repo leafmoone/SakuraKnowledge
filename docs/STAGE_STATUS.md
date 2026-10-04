@@ -542,3 +542,22 @@ allows exactly one same-directory exclusive receipt staging, cleaning only own t
 on catchable completion; hard interruptions and directory durability are limitations.
 Full Python/Rust matrix required on final fixed implementation; no real continuation,
 ANN or manifest executed here. Formal attempts2, Attempt3NO, STOP WAITING_REVIEW.
+
+### Windows native reader correction — partial completion
+
+Baseline cb55e3f diagnostic confirmed Win32 low32 file-length truncation and actual
+read-only buffer key/sample-vector audits, without changing the historical FAIL.
+USearch2.26.2 is now project-local vendored through optional semantic Cargo patch.
+Minimal Windows mapping uses checked GetFileSizeEx; metadata uses checked 64-bit
+seek/tell for END and both prefix widths. Serialization/ANN/scalar policy unchanged.
+Actual UCRT64 native sparse boundary regressions distinguish metadata-only fixtures
+from valid ANN packs; old failure-first receipts remain immutable.
+
+Python rebuilt-extension and path validation are BLOCKED_TOOLCHAIN: no compatible
+MSVC/Windows SDK found in checked existing locations; GCC native/Rust testing does
+not substitute for cp314 extension validation. The old Python environment is unchanged.
+New Rust bottom-level metadata->create->view probe is not FULLSemanticRuntime E2E.
+Original continuation remains FAIL; attempts2, Attempt3NO, no new manifest or pack.
+Runtime qualification and quality acceptance remain NOT_RUN. See
+reports/P4/usearch-windows-native-fix/README.md and adjacent receipts for actual
+build/test/probe bindings; do not infer complete cross-language success.

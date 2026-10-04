@@ -1,0 +1,85 @@
+//! Isolated read-only native path probe; not FULLSemanticRuntime E2E.
+#[cfg(feature = "semantic")]
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    use std::fs::File;
+    use std::io::{Read, Seek, SeekFrom};
+    use usearch::{Index, MetricKind, ScalarKind};
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() != 4 {
+        return Err("usage: usearch_path_probe index sample vectors.npy".into());
+    }
+    let metadata = Index::metadata(&args[1])?;
+    if metadata.dimensions != 1024 || metadata.metric != MetricKind::Cos {
+        return Err("metadata contract mismatch".into());
+    }
+    let index = Index::new(&metadata.into())?;
+    index.view(&args[1])?;
+    if index.size() != 1366520
+        || index.dimensions() != 1024
+        || index.metric_kind() != MetricKind::Cos
+        || index.scalar_kind() != ScalarKind::F32
+        || index.connectivity() != 16
+    {
+        return Err("native index contract mismatch".into());
+    }
+    // Size plus exactly one count for every expected key establishes no missing,
+    // duplicate or out-of-range keys without introducing an API/fallback change.
+    for key in 0..1366520 {
+        if index.count(key) != 1 {
+            return Err(format!("key audit failed: {key}").into());
+        }
+    }
+    let sample: serde_json::Value = serde_json::from_reader(File::open(&args[2])?)?;
+    let positions = sample["positions"].as_array().ok_or("sample positions")?;
+    if positions.len() != 1200 {
+        return Err("sample size".into());
+    }
+    let mut file = File::open(&args[3])?;
+    let mut prefix = [0u8; 12];
+    file.read_exact(&mut prefix[..8])?;
+    if &prefix[..6] != b"\x93NUMPY" {
+        return Err("NPY magic".into());
+    }
+    let header_bytes = if prefix[6] == 1 {
+        file.read_exact(&mut prefix[8..10])?;
+        u16::from_le_bytes([prefix[8], prefix[9]]) as usize
+    } else if prefix[6] == 2 {
+        file.read_exact(&mut prefix[8..12])?;
+        u32::from_le_bytes(prefix[8..12].try_into()?) as usize
+    } else {
+        return Err("NPY version".into());
+    };
+    let mut header = vec![0; header_bytes];
+    file.read_exact(&mut header)?;
+    let header = std::str::from_utf8(&header)?;
+    if !header.contains("'<f4'") || !header.contains("False") || !header.contains("1366520, 1024") {
+        return Err("NPY shape/dtype/order".into());
+    }
+    let data_offset = file.stream_position()?;
+    let mut actual = vec![0f32; 1024];
+    let mut raw = vec![0u8; 4096];
+    for position in positions {
+        let key = position.as_u64().ok_or("sample key")?;
+        if index.get(key, &mut actual)? != 1 {
+            return Err("vector count".into());
+        }
+        file.seek(SeekFrom::Start(data_offset + key * 4096))?;
+        file.read_exact(&mut raw)?;
+        for (i, chunk) in raw.as_chunks::<4>().0.iter().enumerate() {
+            if actual[i].to_bits() != u32::from_le_bytes(*chunk) {
+                return Err(format!("FP32 mapping mismatch key={key} component={i}").into());
+            }
+        }
+    }
+    drop(index);
+    println!(
+        "{}",
+        serde_json::json!({"METADATA":"PASS","PATH_VIEW":"PASS", "FULL_KEY_AUDIT":"PASS", "count":1366520,"missing":0,"duplicates":0,"out_of_range":0,"FIXED_SAMPLE_VECTOR_MAPPING":"PASS","sample_count":1200,"comparison":"EXACT_FP32_BITS","FULL_RUNTIME_QUALIFICATION":"NOT_RUN","FULL_QUALITY_ACCEPTANCE":"NOT_RUN"})
+    );
+    Ok(())
+}
+
+#[cfg(not(feature = "semantic"))]
+fn main() {
+    panic!("semantic feature required");
+}
