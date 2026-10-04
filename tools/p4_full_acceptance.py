@@ -1,11 +1,9 @@
-"""Read-only FULL acceptance checks; never load artifacts or run inference.
-
-"""
+"""Read-only FULL acceptance checks; never load artifacts or run inference."""
 import hashlib
 import json
 import re
-from contextlib import closing
-from pathlib import Path
+from contextlib import closing, contextmanager
+from pathlib import Path, PureWindowsPath
 
 from tools import p4_rust_pilot as pilot
 from tools.p4_full_preflight import (
@@ -31,6 +29,21 @@ def runtime_contract(declaration, rows):
             **declaration['hybrid'], 'full_chunk_count': rows}
 
 
+def _absolute(path):
+    # Path.absolute() on Windows normalizes away traversed symlink/junction components.
+    path = Path(path)
+    require(not path.drive or path.is_absolute(), 'drive-relative path forbidden')
+    return path if path.is_absolute() else Path.cwd() / path
+
+
+def _safe_name(name):
+    require(isinstance(name, str) and name and '\x00' not in name, 'binding path required')
+    windows = PureWindowsPath(name)
+    require(not windows.drive or windows.is_absolute(), 'drive-relative path forbidden')
+    require(all(':' not in part for part in windows.parts[1:] if windows.drive) and
+            (windows.drive or ':' not in name), 'alternate stream path forbidden')
+
+
 def _no_links(path):
     for part in (path, *path.parents):
         require(not part.is_symlink() and
@@ -40,7 +53,7 @@ def _no_links(path):
 
 def _controlled_path(path, root):
     """Allow relative parent traversal only when the final file remains in ROOT."""
-    path, root = Path(path).absolute(), Path(root).absolute()
+    path, root = _absolute(path), _absolute(root)
     _no_links(path)
     _no_links(root)
     resolved = path.resolve(strict=True)
@@ -53,7 +66,7 @@ def _controlled_path(path, root):
 def _binding(record):
     require(isinstance(record, dict) and set(record) == {'path', 'size', 'sha256'},
             'file binding required')
-    require(isinstance(record['path'], str) and record['path'], 'binding path required')
+    _safe_name(record['path'])
     require(type(record['size']) is int and record['size'] > 0, 'positive binding size required')
     require(isinstance(record['sha256'], str) and
             re.fullmatch('[0-9a-f]{64}', record['sha256']), 'binding SHA256 required')
@@ -62,19 +75,20 @@ def _binding(record):
 def approved_full_dll():
     """Return the independently configured current ORT DLL binding."""
     try:
-        path = ROOT / 'configs/p4-current-assets.json'
+        path = _controlled_path(ROOT / 'configs/p4-current-assets.json', ROOT)
         data = json.loads(path.read_bytes())
         record = data['ort_dll']
         _binding(record)
         resolved = Path(record['path']).expanduser()
         require(resolved.is_absolute(), 'current ORT DLL exact path required')
+        _no_links(resolved)
         resolved = resolved.resolve(strict=True)
+        _no_links(resolved)
         require(resolved.is_file(), 'approved ORT DLL missing')
-        # The configured pin is parsed here; content is verified exactly once by the
-        # session inventory guard.  Do not hash the DLL during path authority checks.
+        # Content verification belongs to the session, not path authority checks.
         return {'path': str(resolved), 'size': record['size'], 'sha256': record['sha256']}
     except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as exc:
-        raise ValueError('BLOCKED: approved external ORT DLL binding unavailable') from exc
+        raise ValueError(f'BLOCKED: approved external ORT DLL binding unavailable: {exc}') from exc
 
 
 def _approved_dll_path():
@@ -82,7 +96,7 @@ def _approved_dll_path():
 
 
 def _artifact_path(path, kind, binding):
-    path = Path(path).absolute()
+    path = _absolute(path)
     _no_links(path)
     resolved = path.resolve(strict=True)
     _no_links(resolved)
@@ -117,30 +131,78 @@ def _verify_file(path, binding):
 class VerifiedInventory:
     """One acceptance-session verification of each unique content asset."""
     def __init__(self, records):
-        self.records = records
+        self.records = [(Path(path), dict(binding), kind) for path, binding, kind in records]
         self.states = []
-        self._verified = set()
+        self._verified = {}
 
-    def verify(self):
-        for path, binding, kind in self.records:
-            path = _artifact_path(path, kind, binding)
-            key = (path, binding['size'], binding['sha256'])
-            if key not in self._verified:
-                self.states.append((path, binding, kind, _verify_file(path, binding)))
-                self._verified.add(key)
+    def check(self):
+        for original, path, binding, kind, before in self.states:
+            require(_artifact_path(original, kind, binding) == path and
+                    _file_state(path) == before, 'inventory changed')
+
+    def verify(self, records=None):
+        self.check()
+        for original, binding, kind in self.records if records is None else records:
+            _binding(binding)
+            original, binding = Path(original), dict(binding)
+            path = _artifact_path(original, kind, binding)
+            pin = (binding['size'], binding['sha256'])
+            require(path not in self._verified or self._verified[path] == pin,
+                    'session file binding mismatch')
+            if path not in self._verified:
+                before = _verify_file(path, binding)
+                self._verified[path] = pin
+                self.states.append((original, path, binding, kind, before))
+            elif not any(item[0] == original and item[3] == kind for item in self.states):
+                self.states.append((original, path, binding, kind, _file_state(path)))
+        self.check()
         return self
 
     def __enter__(self):
         return self.verify()
 
     def __exit__(self, *_):
-        for path, binding, kind, before in self.states:
-            require(_artifact_path(path, kind, binding) == path and
-                    _file_state(path) == before, 'inventory changed')
+        self.check()
 
 
-def _inventory_guard(records):
-    return VerifiedInventory(records)
+class AcceptanceSession:
+    """Explicit, caller-owned asset verification cache; never a provenance cache.
+
+    Reuse for one immutable acceptance run. Each validation checks the entire known
+    inventory before and after use. Closing checks it once more and forbids reuse.
+    A new instance always hashes real bytes again; no process-global cache exists.
+    """
+    def __init__(self):
+        self._inventory = VerifiedInventory([])
+        self._closed = False
+
+    @contextmanager
+    def guard(self, records):
+        require(not self._closed, 'acceptance session closed')
+        self._inventory.verify(records)
+        try:
+            yield
+        finally:
+            self._inventory.check()
+
+    def close(self):
+        if not self._closed:
+            self._closed = True
+            self._inventory.check()
+
+    def __enter__(self):
+        require(not self._closed, 'acceptance session closed')
+        self._inventory.check()
+        return self
+
+    def __exit__(self, *_):
+        self.close()
+
+
+def _inventory_guard(records, session=None):
+    require(session is None or isinstance(session, AcceptanceSession),
+            'acceptance session required')
+    return (session if session is not None else AcceptanceSession()).guard(records)
 
 
 def _canonical(contract):
@@ -163,13 +225,41 @@ def _snapshot(contract):
     return _controlled_path(Path(ROOT) / name, ROOT), spec
 
 
+def _verify_existing_roles(records):
+    assets = json.loads((ROOT / 'configs/p4-current-assets.json').read_bytes())
+    export = _controlled_path(ROOT / assets['export_manifest']['path'], ROOT)
+    exported = json.loads(export.read_bytes())['files']
+    for path, record, role in records:
+        resolved = _artifact_path(path, role, record)
+        if role in ('index', 'mapping', 'corpus'):
+            expected = assets['existing_full_assets'][role]
+            expected_path = ROOT / expected['path']
+        elif role == 'tokenizer':
+            expected = next(r for r in assets['model']['obtained_inventory'] if r['path'] == 'tokenizer.json')
+            expected_path = ROOT / assets['model']['assetdirectory'] / 'tokenizer.json'
+        elif role in ('model', 'external_data'):
+            expected = next((r for r in exported if
+                             _controlled_path(export.parent / r['path'], ROOT) == resolved), None)
+            require(expected is not None, 'unknown existing export resource')
+            require((role == 'model') == (expected['path'] == 'model.onnx'), 'existing export role mismatch')
+            expected_path = export.parent / expected['path']
+        else:
+            require(role == 'ort_dll', 'unknown existing asset role')
+            expected = assets['ort_dll']
+            expected_path = Path(expected['path'])
+        pin = {key: expected[key] for key in ('path', 'size', 'sha256')}
+        require(resolved == _artifact_path(expected_path, role, pin) and
+                (record['size'], record['sha256']) == (expected['size'], expected['sha256']),
+                'existing product role binding mismatch')
+
+
 def _verify_inventory(artifacts, pack_root, *, expected_dll):
     """Bindings are relative to the pack, but containment authority is Knowledge ROOT."""
     require(isinstance(artifacts, dict) and set(artifacts) == ARTIFACTS,
             'exact FULL artifact inventory required (no sidecar)')
     external = artifacts['external_data']
     require(isinstance(external, list) and external, 'nonempty external_data required')
-    root = Path(pack_root).absolute()
+    root = _absolute(pack_root)
     _no_links(root)
     require(root.resolve(strict=True).is_relative_to(Path(ROOT).resolve(strict=True)) and
             root.is_dir(), 'controlled pack root required')
@@ -183,17 +273,18 @@ def _verify_inventory(artifacts, pack_root, *, expected_dll):
         path = _artifact_path(root / name, kind, binding)
         require(path not in seen, 'duplicate inventory path')
         seen.add(path)
-        records.append((path, binding, kind))
+        # Keep traversed components for subsequent session safety checks.
+        records.append((root / name, binding, kind))
     dll = artifacts['ort_dll']
     require((dll['size'], dll['sha256']) == expected_dll, 'unpinned ORT DLL')
     return records
 
 
-def validate_full_manifest(manifest, contract, *, pack_root):
-    """Complete inventory verification, including actual approved snapshot bytes.
+def validate_full_manifest(manifest, contract, *, pack_root, session=None):
+    """Verify actual FULL inventory; optionally reuse a caller-owned session.
 
-    This is intentionally expensive for FULL. Synthetic tests patch authorities,
-    not the product facts, and must not be reported as actual FULL acceptance.
+    Synthetic tests patch authorities, not product facts, and are not actual FULL
+    acceptance. Standalone callers get fresh content verification on every call.
     """
     declaration, canonical, canonical_binding = _canonical(contract)
     require(manifest.get('canonical_contract') == {'schema': contract['schema'],
@@ -205,8 +296,8 @@ def validate_full_manifest(manifest, contract, *, pack_root):
     ref = manifest.get('snapshot', {})
     require(ref.get('identity') == spec['path'] and ref.get('size') == spec['size'] and
             ref.get('sha256') == spec['sha256'], 'snapshot binding mismatch')
-    require(isinstance(ref.get('path'), str) and
-            _controlled_path(Path(pack_root) / ref['path'], ROOT) == snapshot,
+    _safe_name(ref.get('path'))
+    require(_controlled_path(Path(pack_root) / ref['path'], ROOT) == snapshot,
             'controlled snapshot path mismatch')
     rows = manifest.get('full_chunk_count')
     require(type(rows) is int and 0 < rows <= 2**63-1, 'dynamic full_chunk_count required')
@@ -216,8 +307,10 @@ def validate_full_manifest(manifest, contract, *, pack_root):
     approved_dll = approved_full_dll()
     records = _verify_inventory(manifest.get('artifacts'), pack_root,
                                 expected_dll=(approved_dll['size'], approved_dll['sha256']))
+    if manifest.get('pack_version') == 'p4-full-existing-assets-v1':
+        _verify_existing_roles(records)
     with _inventory_guard([(canonical, canonical_binding, 'canonical'),
-                           (snapshot, spec, 'snapshot'), *records]):
+                           (snapshot, spec, 'snapshot'), *records], session):
         return rows
 
 
@@ -354,8 +447,8 @@ def _verify_response_snapshot(response, conn):
             len(response['trusted_pins']) == len(active_pins), 'inactive/duplicate proof collection')
 
 
-def validate_response(response, *, snapshot_conn=None):
-    """Complete response check. Caller owns the connection; it is never closed here."""
+def validate_response(response, *, snapshot_conn=None, session=None):
+    """Validate every response's provenance; caller owns session and connection."""
     count = validate_response_structure(response)
     require(snapshot_conn is not None, 'controlled readonly snapshot connection required')
     contract = json.loads(Path(CONFIG).read_bytes())
@@ -370,6 +463,6 @@ def validate_response(response, *, snapshot_conn=None):
     require(ref.get('identity') == spec['path'] and ref.get('size') == spec['size'] and
             ref.get('sha256') == spec['sha256'], 'response snapshot binding mismatch')
     with _inventory_guard([(canonical, canonical_binding, 'canonical'),
-                           (snapshot, spec, 'snapshot')]):
+                           (snapshot, spec, 'snapshot')], session):
         _verify_response_snapshot(response, snapshot_conn)
     return count

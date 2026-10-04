@@ -214,8 +214,12 @@ def reserve(output, report):
     require(not lock.exists(), 'attempt already reserved')
     output.parent.mkdir(parents=True, exist_ok=True)
     with lock.open('xb') as stream:
-        report.update(attempts=1, attempt_number=1, attempt_reserved=True, attempt_lock=str(lock))
-        stream.write(full.chunks.canonical({'executor_origin': EXECUTOR_ORIGIN}) + b'\n')
+        import uuid
+        info = os.fstat(stream.fileno())
+        report['lock_token'] = uuid.uuid4().hex
+        report.update(attempts=1, attempt_number=1, attempt_reserved=True, attempt_lock=str(lock),
+                      lock_identity=[info.st_dev, info.st_ino])
+        stream.write(full.chunks.canonical({'executor_origin': EXECUTOR_ORIGIN, 'token': report['lock_token']}) + b'\n')
         stream.flush(); os.fsync(stream.fileno())
     output.mkdir(exist_ok=False)
 
@@ -619,29 +623,38 @@ def lifecycle(output, report, work, *, snapshot=None, finalize=lambda: None, att
         failed(report, error)
         raise  # Finally persists accounting for every BaseException subtype.
     finally:
-        if report.get('attempt_reserved', report['attempts'] == 1):
-            try:
-                terminal(report, output, snapshot)
-            except BaseException as terminal_error:
-                failed(report, terminal_error, terminal_error=True)
-                # Accounting survives failure of the receipt channel.
+        terminal_failure = None
+        try:
+            if report.get('attempt_reserved', report['attempts'] == 1):
                 try:
-                    print(json.dumps(report, sort_keys=True), file=__import__('sys').stderr)
-                except BaseException as stderr_error:  # noqa: BLE001 - broken stderr must not mask original
-                    failed(report, stderr_error, terminal_error=True)
-                if original is not None:
-                    raise original from terminal_error
-                raise
-        if report.get('attempt_reserved'):
-            lock = report.get('attempt_lock')
-            try:
-                if lock:
-                    Path(lock).unlink(missing_ok=True)
-                    report['lock_released'] = True
-            except OSError as cleanup_error:
-                if original is None:
-                    raise
-                original.add_note(f'lock cleanup failed: {cleanup_error!r}')
+                    terminal(report, output, snapshot)
+                except BaseException as terminal_error:  # noqa: BLE001 - release owned lock even on cancellation
+                    terminal_failure = terminal_error
+                    failed(report, terminal_error, terminal_error=True)
+                    try:
+                        print(json.dumps(report, sort_keys=True), file=__import__('sys').stderr)
+                    except BaseException as stderr_error:  # noqa: BLE001 - broken stderr must not mask first error
+                        failed(report, stderr_error, terminal_error=True)
+        finally:
+            if report.get('attempt_reserved'):
+                lock = report.get('attempt_lock')
+                try:
+                    if lock:
+                        path = Path(lock)
+                        info = path.lstat()
+                        require([info.st_dev, info.st_ino] == report['lock_identity'] and
+                                read_json(path).get('token') == report['lock_token'], 'build lock ownership changed')
+                        path.unlink()
+                        report['lock_released'] = True
+                except (OSError, ValueError) as cleanup_error:
+                    primary = original or terminal_failure
+                    if primary is None:
+                        raise
+                    primary.add_note(f'lock cleanup failed: {cleanup_error!r}')
+        if terminal_failure is not None:
+            if original is not None:
+                raise original from terminal_failure
+            raise terminal_failure
     if original is not None:
         raise original
     return report
@@ -674,6 +687,7 @@ def execute(*, output=None):
     snapshot_ref = binding(snapshot, ROOT)
     require(all(snapshot_ref[k] == config['snapshot'][k] for k in ('path', 'size', 'sha256')),
             'snapshot content mismatch')
+    report['activation'] = {'snapshot': dict(snapshot_ref)}
     raw, _ = full.exact.frozen_tokenizers(full.contained(verified['model']['asset_directory']))
     with full.readonly(snapshot) as conn:
         count = full.census_and_chunk_count(conn, raw, verified['manifest']['tokenizer_inventory_sha256'], config)
@@ -805,13 +819,115 @@ def synthetic_run(root, output=None):
         return lifecycle(output, report, work)
 
 
+def existing_assets(*, output, session=None):
+    """Publish a small candidate referencing pinned immutable products; never rebuild."""
+    config = read_json(full.FULL_CONTRACT)
+    declaration = full.validate_contract(config)
+    spec = full.current_asset_spec(ROOT)
+    pins = spec['existing_full_assets']
+    require(set(pins) == {'rows', 'documents', 'index', 'mapping', 'corpus', 'vectors'},
+            'exact existing FULL product roles required')
+    require(type(pins['rows']) is int and pins['rows'] > 0 and
+            pins['documents'] == declaration['corpus']['documents'], 'existing FULL census mismatch')
+    target = full.controlled_path(ROOT / output, ROOT, strict=False)
+    full.check_components(target)
+    require(not target.exists(), 'candidate output already exists')
+    target.parent.mkdir(parents=True, exist_ok=True)
+    # The final destination is the relative-reference base even while staging.
+    def relative(record):
+        path = full.contained(record['path'], ROOT)
+        return {'path': Path(os.path.relpath(path, target)).as_posix(),
+                'size': record['size'], 'sha256': record['sha256']}
+    export = full.contained(spec['export_manifest']['path'], ROOT)
+    exported = read_json(export)['files']
+    require(len({r['path'] for r in exported}) == len(exported), 'duplicate export paths')
+    records = []
+    model = spec['model']
+    native = read_json(full.contained(model['contract']['path'], ROOT))
+    require(full.chunks.canonical(native) == full.chunks.canonical(model['contract']['reviewed']),
+            'current model contract mismatch')
+    full.encoder_contract(model, native)
+    for rec in model['obtained_inventory']:
+        raw = Path(rec['path'])
+        require(not raw.is_absolute() and '..' not in raw.parts, 'model asset path escape')
+        ref = {'path': model['assetdirectory'] + '/' + raw.as_posix(),
+               'size': rec['size'], 'sha256': rec['sha256']}
+        records.append((full.contained(ref['path'], ROOT), ref, 'input'))
+    model_contract = full.contained(model['contract']['path'], ROOT)
+    records.append((model_contract, {'path': model['contract']['path'], 'size': model_contract.stat().st_size,
+                                   'sha256': model['contract']['file_sha256']}, 'input'))
+    artifacts = {}
+    for record in exported:
+        raw = Path(record['path'])
+        require(not raw.is_absolute() and '..' not in raw.parts, 'export path escape')
+        path = full.controlled_path(export.parent / raw, ROOT)
+        rec = {**record, 'path': path.relative_to(ROOT).as_posix()}
+        records.append((path, rec, 'input'))
+        if raw.as_posix() == 'model.onnx':
+            artifacts['model'] = relative(rec)
+        elif raw.as_posix() != 'passage-sample.json':
+            artifacts.setdefault('external_data', []).append(relative(rec))
+    require(artifacts.get('model') and artifacts.get('external_data'), 'complete ONNX resources required')
+    for role in ('index', 'mapping', 'corpus', 'vectors'):
+        rec = pins[role]
+        require(rec['path'] == 'build/p4-full-semantic-v1-retry1/' +
+                {'index': 'vectors.usearch', 'mapping': 'chunks.sqlite', 'corpus': 'corpus.jsonl',
+                 'vectors': 'vectors.npy'}[role], 'existing product role/path mismatch')
+        records.append((full.contained(rec['path'], ROOT), rec, role))
+        if role != 'vectors':
+            artifacts[role] = relative(rec)
+    tokenizer = next(r for r in spec['model']['obtained_inventory'] if r['path'] == 'tokenizer.json')
+    tokenizer = {'path': spec['model']['assetdirectory'] + '/tokenizer.json',
+                 'size': tokenizer['size'], 'sha256': tokenizer['sha256']}
+    artifacts['tokenizer'] = relative(tokenizer)
+    artifacts['ort_dll'] = dict(spec['ort_dll'])
+    records.extend([(export, spec['export_manifest'], 'input'),
+                    (full.contained(tokenizer['path'], ROOT), tokenizer, 'tokenizer')])
+    snapshot = config['snapshot']
+    canonical = binding(full.FULL_CONTRACT, ROOT)
+    value = {'schema': acceptance.PACK_SCHEMA, 'object_type': 'runtime_pack',
+        'pack_version': 'p4-full-existing-assets-v1', 'full_chunk_count': pins['rows'],
+        'canonical_contract': {'schema': config['schema'], **canonical},
+        'declarative_contract': declaration, 'contract': acceptance.runtime_contract(declaration, pins['rows']),
+        'snapshot': {'identity': snapshot['path'], **relative(snapshot)}, 'artifacts': artifacts}
+    owned = session is None
+    session = session or acceptance.AcceptanceSession()
+    stage = None
+    try:
+        with session.guard(records):
+            with full.readonly(full.contained(pins['mapping']['path'], ROOT)) as db:
+                require(db.execute('SELECT count(*) FROM chunks').fetchone()[0] == pins['rows'],
+                        'mapping row census mismatch')
+            stage = Path(tempfile.mkdtemp(prefix=target.name + '.staging-', dir=target.parent))
+            # Staging is a sibling: controlled ../ references resolve identically.
+            save_new(stage / 'manifest.json', value)
+            acceptance.validate_full_manifest(value, config, pack_root=stage, session=session)
+            require(not target.exists(), 'candidate output already exists')
+            stage.rename(target)
+            stage = None
+        return value
+    finally:
+        if stage is not None:
+            import shutil
+            shutil.rmtree(stage)
+        if owned:
+            session.close()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', help='readiness receipt destination (default: stdout)')
     parser.add_argument('--execute', action='store_true', help='run the supported ordinary builder lifecycle')
     parser.add_argument('--synthetic', action='store_true', help='run the supported synthetic lifecycle')
+    parser.add_argument('--existing-assets', action='store_true', help='validate and reference existing FULL assets without rebuilding')
     args = parser.parse_args()
-    if args.execute:
+    if sum((args.execute, args.synthetic, args.existing_assets)) > 1:
+        parser.error('execution modes are mutually exclusive')
+    if args.existing_assets:
+        if not args.output:
+            parser.error('--existing-assets requires a new --output directory')
+        result = existing_assets(output=args.output)
+    elif args.execute:
         result = execute(output=args.output)
     elif args.synthetic:
         with tempfile.TemporaryDirectory(prefix='p4-full-synthetic-') as directory:
@@ -823,7 +939,7 @@ def main():
                   'executor_origin': EXECUTOR_ORIGIN,
                   'source_sha256': full.exact.sha(Path(__file__)),
                   'config_sha256': full.exact.sha(full.CONFIG)}
-    if args.output and not args.execute:
+    if args.output and not (args.execute or args.existing_assets):
         save_new(args.output, result)
     print(json.dumps(result, sort_keys=True))
 

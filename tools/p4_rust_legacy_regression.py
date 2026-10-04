@@ -7,8 +7,10 @@ import sys
 import time
 from pathlib import Path
 
-import p4_approved_baseline as approved
-import p4_legacy_baseline as legacy
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from tools import p4_approved_baseline as approved
+from tools import p4_legacy_baseline as legacy
 
 ROOT = approved.ROOT
 sys.path.insert(0, str(ROOT))
@@ -225,7 +227,7 @@ def execute(context):
                 gold['nonresolved'], report['wrong_resolved']) != (151, 135, 16, 55, 39, 16, 0):
             raise ValueError('required final counts differ')
         report['status'] = 'PASS'
-    except Exception as exc:  # noqa: BLE001 - Preserve evidence; never retry.
+    except Exception as exc:  # noqa: BLE001
         report['failure'] = {'type': type(exc).__name__, 'message': str(exc)}
     finally:
         try:
@@ -251,13 +253,121 @@ def execute(context):
     return 0 if report['status'] == 'PASS' else 1
 
 
+def existing_binary(*, binary, results_dir, knowledge=approved.DB, verified_session=None):
+    """Compare all frozen cases without coupling output ownership to Cargo cache."""
+    from contextlib import nullcontext
+
+    from tools import p4_full_acceptance as acceptance
+    binary = fullpreflight.controlled_path(binary, ROOT)
+    knowledge = fullpreflight.controlled_path(knowledge, ROOT)
+    if knowledge != approved.DB:
+        raise ValueError('approved Knowledge snapshot required')
+    output = fullpreflight.controlled_path(results_dir, ROOT, strict=False)
+    if os.path.lexists(output):
+        raise FileExistsError('results already exists')
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.mkdir()
+    report = {'status': 'FAIL', 'counts': {suite: {'executed': 0, 'passed': 0, 'expected': count}
+              for suite, count in (('P2', 151), ('gold', 55))}, 'cases': [],
+              'binary': str(binary), 'failures': [], 'commands': []}
+
+    def capture(argv, name, deadline):
+        start = time.perf_counter()
+        rec = {'argv': argv, 'cwd': str(ROOT), 'deadline_s': deadline, 'timeout': False,
+               'attempted': 1, 'retries': 0}
+        try:
+            proc = subprocess.run(argv, cwd=ROOT, capture_output=True, timeout=deadline, check=False)
+            out, err, code = proc.stdout, proc.stderr, proc.returncode
+        except subprocess.TimeoutExpired as exc:
+            out, err, code = exc.stdout or b'', exc.stderr or b'', None
+            rec['timeout'] = True
+        except Exception as exc:  # noqa: BLE001
+            out, err, code = getattr(exc, 'stdout', None) or b'', getattr(exc, 'stderr', None) or b'', None
+            rec['exception'] = {'type': type(exc).__name__, 'message': str(exc)}
+        rec.update(exit=code, duration_seconds=time.perf_counter() - start)
+        report['commands'].append(rec)
+        for stream, data in (('stdout', out), ('stderr', err)):
+            if isinstance(data, str):
+                data = data.encode('utf-8')
+            path = fullpreflight.controlled_path(output / (name + '.' + stream), ROOT, strict=False)
+            if path.parent != output:
+                raise ValueError('raw output path escape')
+            with path.open('xb') as dest:
+                dest.write(data)
+            rec[stream] = {'path': path.relative_to(ROOT).as_posix(), **legacy.binding(data)}
+            if stream == 'stdout':
+                out = data
+            else:
+                err = data
+        return rec, out, err
+
+    def run(argv):
+        rec, out, _err = capture(argv, f'command-{len(report["commands"]):04d}', 30)
+        if rec['exit'] != 0 or rec['timeout'] or rec.get('exception'):
+            raise ValueError('baseline command failed: ' + repr(argv))
+        return out
+
+    try:
+        if verified_session is not None and not isinstance(verified_session, acceptance.AcceptanceSession):
+            raise ValueError('acceptance session required')
+        binding = approved.file_binding(binary)
+        report['binary_binding'] = {'path': binary.relative_to(ROOT).as_posix(),
+                                    'size': binding['bytes'], 'sha256': binding['sha256']}
+        snapshot = json.loads(fullpreflight.FULL_CONTRACT.read_bytes())['snapshot']
+        report['snapshot_binding'] = snapshot
+        with (nullcontext(verified_session) if verified_session is not None else acceptance.AcceptanceSession()) as session:  # noqa: SIM117
+            with session.guard([(knowledge, snapshot, 'snapshot'),
+                                (binary, report['binary_binding'], 'binary')]):
+                try:
+                    baseline, cases = load_baseline(run)
+                    report['baseline'] = baseline['baseline_corpus_manifest']
+                    for suite, row, entry, expected in cases:
+                        name = suite + '-' + row['case_id']
+                        rec, out, err = capture([str(binary), *entry['process']['argv'][1:]], name, 15)
+                        value, problems = compare(suite, row, rec, out, err, expected)
+                        report['cases'].append({'suite': suite, 'case_id': row['case_id'], 'process': rec,
+                                                'actual_json': value, 'passed': not problems, 'problems': problems})
+                        count = report['counts'][suite]
+                        count['executed'] += 1
+                        count['passed'] += int(not problems)
+                        if problems:
+                            report['failures'].append(name)
+                    if any(c['executed'] != c['expected'] or c['passed'] != c['expected']
+                           for c in report['counts'].values()):
+                        report['failures'].append('required final counts differ')
+                    report['status'] = 'PASS' if not report['failures'] else 'FAIL'
+                except Exception as exc:
+                    report['failure'] = {'type': type(exc).__name__, 'message': str(exc)}
+                    raise
+    except Exception as exc:  # noqa: BLE001
+        report['status'] = 'FAIL'
+        failure = {'type': type(exc).__name__, 'message': str(exc)}
+        if 'failure' not in report:
+            report['failure'] = failure
+        elif report['failure'] != failure:
+            report['end_failure'] = failure
+    finally:
+        path = fullpreflight.controlled_path(output / 'evaluation.json', ROOT, strict=False)
+        approved.save(path, report)
+        print(json.dumps(report, ensure_ascii=False))
+    return 0 if report['status'] == 'PASS' else 1
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--execute', required=True, action='store_true')
-    parser.add_argument('--run-id', required=True)
-    parser.add_argument('--target-dir', required=True)
+    parser.add_argument('--execute', action='store_true')
+    parser.add_argument('--run-id')
+    parser.add_argument('--target-dir')
+    parser.add_argument('--binary')
+    parser.add_argument('--results-dir')
     parser.add_argument('--knowledge', type=Path, default=approved.DB)
     args = parser.parse_args()
+    if args.binary:
+        if not args.results_dir:
+            parser.error('--binary requires --results-dir')
+        return existing_binary(binary=args.binary, results_dir=args.results_dir, knowledge=args.knowledge)
+    if not (args.execute and args.run_id and args.target_dir):
+        parser.error('--execute requires --run-id and --target-dir')
     return execute(RunContext(args.run_id, args.target_dir, args.knowledge))
 
 

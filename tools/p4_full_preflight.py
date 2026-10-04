@@ -20,7 +20,9 @@ from tools import p4_exact_pilot as exact
 from tools import p4_rust_pilot as pilot
 
 ROOT = Path(os.path.abspath(__file__)).parents[1]
-CONFIG = ROOT / 'configs/p4-current-assets.json'
+FULL_CONTRACT = ROOT / 'configs/p4-full-semantic-v1.json'
+CURRENT_ASSETS = ROOT / 'configs/p4-current-assets.json'
+CONFIG = FULL_CONTRACT
 AUDIT_CAP_BYTES = 1024 ** 3
 DOCUMENT_CAP_BYTES = 16 * 1024 ** 2
 AUDIT_BATCH_SIZE = 1024

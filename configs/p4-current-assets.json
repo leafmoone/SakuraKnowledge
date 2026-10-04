@@ -128,6 +128,14 @@
     "size": 31437,
     "sha256": "b981d9c2b8f02691a200b9b88da8c778abcbaaaa3d49d0376f88590c89fbbb03"
   },
+  "existing_full_assets": {
+    "rows": 1366520,
+    "documents": 1295638,
+    "index": {"path": "build/p4-full-semantic-v1-retry1/vectors.usearch", "size": 5800312336, "sha256": "7a1f9da2983fb3e92aae336f64967f116b917ec8c4d91526eaf6f99498b09b10"},
+    "mapping": {"path": "build/p4-full-semantic-v1-retry1/chunks.sqlite", "size": 3675488256, "sha256": "67471db26e04420a905e0726d4582531e2270eb2d3ed528b79b0e3f8fcfcbe2c"},
+    "corpus": {"path": "build/p4-full-semantic-v1-retry1/corpus.jsonl", "size": 1316930137, "sha256": "6097c0c93eb75f624d549ff062d37b70cc0dbb069fae812194ba7f2a8acf301f"},
+    "vectors": {"path": "build/p4-full-semantic-v1-retry1/vectors.npy", "size": 5597266048, "sha256": "b81cdaf057a41c8882f52cfbe322adcc0f93c88103e2f141bf9cd942724ec78a"}
+  },
   "optional_pilot_artifacts": {
     "index": {"path": "build/p4/ann-v1-retry1/M16-Eadd256.usearch", "size": 223537008, "sha256": "0d3d019cc3a401d1297bf5b6cff1dd725bb1cfddb229471da87b30e30134bcf0"},
     "mapping": {"path": "build/p4/continuation-dense-b-v1/mapping.sqlite", "size": 19673088, "sha256": "8027c11f61ffcfb1a6d7cefbaff65e5ab3a0b2bd3b0c40b82517a4e434b4f2b2"},

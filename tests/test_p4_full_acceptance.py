@@ -457,3 +457,111 @@ def test_truncated_pin_still_requires_snapshot_closure(response_fixture, fault):
         pin['match'] = 'invented'
     with pytest.raises(ValueError):
         acceptance.validate_response(response, snapshot_conn=conn)
+
+
+def test_reused_session_hashes_unique_assets_once(fixture_pack, response_fixture, monkeypatch):
+    _, config, snapshot, pack, contract, manifest = fixture_pack
+    response, conn = response_fixture
+    calls = []
+    real_sha = acceptance.pilot.sha
+
+    def counted_sha(path):
+        calls.append(path)
+        return real_sha(path)
+
+    monkeypatch.setattr(acceptance.pilot, 'sha', counted_sha)
+    with acceptance.AcceptanceSession() as session:
+        assert acceptance.validate_full_manifest(manifest, contract, pack_root=pack, session=session) == 7
+        for _ in range(3):
+            assert acceptance.validate_response(response, snapshot_conn=conn, session=session) == 2
+        assert acceptance.validate_full_manifest(manifest, contract, pack_root=pack, session=session) == 7
+    expected = {config.resolve(), snapshot.resolve(), *(path.resolve() for path in pack.iterdir())}
+    assert set(calls) == expected
+    assert len(calls) == len(expected)
+    with acceptance.AcceptanceSession() as fresh:
+        assert acceptance.validate_response(response, snapshot_conn=conn, session=fresh) == 2
+    assert calls.count(snapshot.resolve()) == calls.count(config.resolve()) == 2
+    with pytest.raises(ValueError, match='session closed'):
+        acceptance.validate_response(response, snapshot_conn=conn, session=session)
+
+
+@pytest.mark.parametrize('fault, message', [
+    ('entity', 'typed identity mismatch'),
+    ('document', 'snapshot document missing'),
+    ('source', 'snapshot source mismatch'),
+    ('evidence', 'document evidence mismatch'),
+    ('closure', 'document/evidence/citation closure mismatch'),
+    ('promotion', 'identity promotion forbidden'),
+    ('snapshot', 'response snapshot binding mismatch'),
+    ('connection', 'controlled readonly snapshot connection required'),
+])
+def test_reused_session_preserves_response_binding_errors(response_fixture, fault, message):
+    response, conn = response_fixture
+    add_document(response)
+    with acceptance.AcceptanceSession() as session:
+        assert acceptance.validate_response(response, snapshot_conn=conn, session=session) == 2
+        bad = copy.deepcopy(response)
+        if fault == 'entity':
+            bad['candidates'][0]['typed_identity']['entry_id'] = '2'
+        elif fault == 'document':
+            bad['candidates'][0]['provenance'][0]['hit']['document_id'] = '2'
+        elif fault == 'source':
+            bad['sources'][0]['metadata'] = {}
+        elif fault == 'evidence':
+            bad['candidates'][0]['provenance'][0]['hit']['evidence_id'] = 'invented'
+        elif fault == 'closure':
+            bad['citations'] = []
+        elif fault == 'promotion':
+            bad['promoted_identities'] = ['same']
+        elif fault == 'snapshot':
+            bad['snapshot']['sha256'] = '0' * 64
+        else:
+            conn.execute('PRAGMA query_only=OFF')
+        with pytest.raises(ValueError, match=message):
+            acceptance.validate_response(bad, snapshot_conn=conn, session=session)
+
+
+def test_explicit_fresh_session_rehashes_same_size_tamper(fixture_pack, monkeypatch):
+    _, _, _, pack, contract, manifest = fixture_pack
+    calls = []
+    real_sha = acceptance.pilot.sha
+
+    def counted_sha(path):
+        calls.append(path)
+        return real_sha(path)
+
+    monkeypatch.setattr(acceptance.pilot, 'sha', counted_sha)
+    with acceptance.AcceptanceSession() as session:
+        acceptance.validate_full_manifest(manifest, contract, pack_root=pack, session=session)
+    model = pack / 'model'
+    before = model.stat()
+    original = model.read_bytes()
+    model.write_bytes(bytes([original[0] ^ 1]) + original[1:])
+    os.utime(model, ns=(before.st_atime_ns, before.st_mtime_ns))
+    with acceptance.AcceptanceSession() as fresh, pytest.raises(ValueError, match='actual file binding mismatch'):
+        acceptance.validate_full_manifest(manifest, contract, pack_root=pack, session=fresh)
+    assert calls.count(model.resolve()) == 2
+
+
+@pytest.mark.parametrize('target', ['model', 'snapshot'])
+def test_reused_session_detects_mutation_before_next_response(fixture_pack, response_fixture, target):
+    _, _, snapshot, pack, contract, manifest = fixture_pack
+    response, conn = response_fixture
+    session = acceptance.AcceptanceSession()
+    acceptance.validate_full_manifest(manifest, contract, pack_root=pack, session=session)
+    acceptance.validate_response(response, snapshot_conn=conn, session=session)
+    path = pack / 'model' if target == 'model' else snapshot
+    original = path.read_bytes()
+    path.write_bytes(bytes([original[0] ^ 1]) + original[1:])
+    with pytest.raises(ValueError, match='inventory changed'):
+        acceptance.validate_response(response, snapshot_conn=conn, session=session)
+    with pytest.raises(ValueError, match='inventory changed'):
+        session.close()
+
+
+@pytest.mark.parametrize('name', ['C:relative', 'model:stream', 'model\x00'])
+def test_unsafe_binding_name_rejected(fixture_pack, name):
+    _, _, _, pack, contract, manifest = fixture_pack
+    manifest['artifacts']['model']['path'] = name
+    with pytest.raises(ValueError, match='path forbidden|path required'):
+        acceptance.validate_full_manifest(manifest, contract, pack_root=pack)

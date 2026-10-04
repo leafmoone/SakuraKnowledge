@@ -331,6 +331,18 @@ fn full_paths(
     } else {
         proof
     };
+    if manifest["pack_version"] == "p4-full-existing-assets-v1" {
+        let assets: Value = serde_json::from_str(CURRENT_ASSETS)?;
+        for role in ["index", "mapping", "corpus"] {
+            let expected = &assets["existing_full_assets"][role];
+            validate_binding(expected)?;
+            let actual = &artifacts[role];
+            require(actual["size"] == expected["size"] && actual["sha256"] == expected["sha256"] &&
+                controlled_path(repository, &root.join(text(actual, "path")?))? ==
+                controlled_path(repository, &repository.join(text(expected, "path")?))?,
+                "existing FULL product role mismatch")?;
+        }
+    }
     let mut seen = BTreeSet::new();
     let mut paths = BTreeMap::new();
     let snapshot = full_artifact(repository, root, "snapshot", &manifest["snapshot"], proof)?;
@@ -916,13 +928,14 @@ impl SemanticEngine {
             &matches.distances,
             self.rows,
             self.mode,
-        )?;
+        ).map_err(|e| format!("dense_mapping: {e}; tokenize_ms={tokenize_ms}; ort_ms={ort_ms}; total_ms={}", ms(total)))?;
         let ann_ms = ms(start);
         let start = Instant::now();
         let (lexical, pins) = if self.mode == Mode::Pilot {
             lexical_hits(&self.lexical, query, &compiled)?
         } else {
-            full_lexical_hits(&self.lexical, query, &compiled)?
+            full_lexical_hits(&self.lexical, query, &compiled).map_err(|e|
+                format!("full_lexical: {e}; tokenize_ms={tokenize_ms}; ort_ms={ort_ms}; ann_ms={ann_ms}; lexical_ms={}; total_ms={}", ms(start), ms(total)))?
         };
         let bm25_ms = ms(start);
         let start = Instant::now();
@@ -1137,12 +1150,12 @@ fn read_lexical(stmt: &mut rusqlite::Statement<'_>, q: &str) -> Result<Vec<Value
 }
 fn lexical_hits(c: &Connection, q: &str, compiled: &str) -> Result<(Vec<Value>, Vec<Value>)> {
     let mut stmt=c.prepare_cached("SELECT DISTINCT kind,namespace,value,match,source_id,evidence_id FROM pins WHERE text=? ORDER BY kind,namespace,value,match,source_id,evidence_id")?;
-    let pins = read_pins(&mut stmt, q)?;
+    let pins = read_pins(&mut stmt, q).map_err(|e| format!("pins SQL: {e}"))?;
     let hits = if compiled.is_empty() {
         Vec::new()
     } else {
         let mut stmt=c.prepare_cached("SELECT d.kind,d.namespace,d.value,bm25(search_fts) AS score,d.document_id,d.source_id,d.evidence_id FROM search_fts JOIN documents d ON d.document_id=search_fts.document_id WHERE search_fts MATCH ? ORDER BY score,d.kind,d.namespace,d.value,d.document_id LIMIT 100")?;
-        read_lexical(&mut stmt, compiled)?
+        read_lexical(&mut stmt, compiled).map_err(|e| format!("BM25 SQL: {e}"))?
     };
     Ok((hits, pins))
 }
@@ -1162,13 +1175,13 @@ fn full_lexical_hits(c: &Connection, q: &str, compiled: &str) -> Result<(Vec<Val
     let eligible=format!("e.conflicted=0 AND e.kind!='episode' AND EXISTS(SELECT 1 FROM documents d WHERE d.entry_id=e.id AND {FULL_DOCUMENT_TRUST} AND EXISTS(SELECT 1 FROM search_fts f WHERE f.document_id=d.id AND f.entry_id=e.id AND f.text=d.search_text))");
     let sql=format!("SELECT DISTINCT e.kind AS kind,e.namespace AS namespace,e.value AS value,'exact' AS match,v.source_id AS source_id,v.evidence_id AS evidence_id FROM entries e JOIN entry_evidence v ON v.entry_id=e.id JOIN sources s ON s.source_id=v.source_id WHERE e.value=?1 AND v.status='source_backed' AND length(trim(v.evidence_id))>0 AND {eligible} UNION SELECT DISTINCT e.kind,e.namespace,e.value,'alias',a.source_id,a.evidence_id FROM entries e JOIN aliases a ON a.entry_id=e.id JOIN sources s ON s.source_id=a.source_id WHERE a.text=?1 AND a.status='source_backed' AND length(trim(a.evidence_id))>0 AND {eligible} ORDER BY kind,namespace,value,match,source_id,evidence_id");
     let mut stmt = c.prepare_cached(&sql)?;
-    let pins = read_pins(&mut stmt, q)?;
+    let pins = read_pins(&mut stmt, q).map_err(|e| format!("pins SQL: {e}"))?;
     let hits = if compiled.is_empty() {
         Vec::new()
     } else {
         let sql=format!("SELECT e.kind,e.namespace,e.value,bm25(search_fts) AS score,d.id,d.source_id,d.evidence_id FROM search_fts JOIN documents d ON d.id=search_fts.document_id JOIN entries e ON e.id=d.entry_id WHERE search_fts MATCH ? AND search_fts.entry_id=e.id AND search_fts.text=d.search_text AND {FULL_DOCUMENT_TRUST} ORDER BY score,e.kind,e.namespace,e.value,d.id LIMIT 100");
         let mut stmt = c.prepare_cached(&sql)?;
-        read_lexical(&mut stmt, compiled)?
+        read_lexical(&mut stmt, compiled).map_err(|e| format!("BM25 SQL: {e}"))?
     };
     Ok((hits, pins))
 }
