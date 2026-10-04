@@ -1,6 +1,28 @@
 # Current stage status
 
-## Current round: NATIVE_SINGLE_AND_RESIDENT_ENTRY_DELIVERED
+## Current round: RESIDENT_REQUEST_VALIDATION_REGRESSION_FIXED
+
+Baseline `fb473ac4037c13876717d83c3eb29b2ab25ac11c`; compared directly with
+`git show a78943e5af87c25baf7d4375d08f9089778ef7c8:rust/src/bin/semantic_pilot.rs`.
+Only resident request parsing restored: case_id must be nonempty string (no trim/
+format/uniqueness rule); kind/namespace absent or null=>None, strings verbatim Some
+including empty/whitespace, other JSON types rejected. Limit uses checked
+usize::try_from(as_u64), default/range enforcement remain engine responsibilities.
+Shared sender1MiB/defaultpack/ranking/identity/error protocol unchanged.
+
+Asset-free parser tests **3PASS** (case_id missing/empty/types/verbatim whitespace;
+all filter bad types rejected instead of silently unfiltered success; limit checked
+conversion/default/invalid types), shared sender boundary **1PASS** in0.12s.
+Default release semantic_pilot rebuilt exit0 in4.73s. One actual resident process:
+legal `{"case_id":" legal ","query":"初音ミク","limit":1,"kind":null,"namespace":null}`
+returned full158377byte JSON with exact case/query (retrieval206.2539ms), followed
+by `{"case_id":"bad","query":"q","kind":false}` rejected explicitly:
+exit1, stderr `Error: "filter must be text"`, stdout only opened+legal response,
+**no unfiltered response for the invalid request**. Same current default manifest,
+no asset rebuild/hash/P4-110/full120/probes. Previous runtime120PASS/QUALITY_FAIL
+remain retained evidence, not upgraded or invalidated by this parser fix.
+
+## Previous round: NATIVE_SINGLE_AND_RESIDENT_ENTRY_DELIVERED
 
 Baseline `a78943e5af87c25baf7d4375d08f9089778ef7c8`. Single `sknow-rs retrieve`
 and resident `semantic_pilot` now call shared `semantic_jsonl::send_response`:
