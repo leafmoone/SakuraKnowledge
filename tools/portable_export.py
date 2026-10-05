@@ -32,7 +32,7 @@ def projection(expression, fields):
 
 
 def document_payload(expression):
-    return f"CASE WHEN {expression} IS NULL THEN NULL ELSE {projection(expression, ('search_text_truncated',))} END"
+    return f"CASE WHEN {expression} IS NULL THEN NULL ELSE {projection(expression, ('search_text_truncated', 'text_provenance'))} END"
 
 
 def evidence_payload(expression):

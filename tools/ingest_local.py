@@ -85,7 +85,7 @@ def materialize(root, cache, audit):
             "mapping": cache / "mapping-frozen", "danbooru": target, "tag_wiki": db}
 
 
-def read_entries(group, paths, sample):
+def read_entries(group, paths, sample, danbooru_snapshot=None):
     if group == "bangumi":
         return (value for _, value in iter_bangumi(paths[group], sample=sample))
     if group == "moegirl":
@@ -97,7 +97,7 @@ def read_entries(group, paths, sample):
         links = iter_danbooru_links(paths[group] / "danbooru_wiki_links.parquet", sample=sample)
         from itertools import chain
         return chain(pages, links)
-    return iter_tag_wiki(paths[group], sample=sample)
+    return iter_tag_wiki(paths[group], sample=sample, danbooru_snapshot=danbooru_snapshot)
 
 
 def sample_dependencies(output, paths, links, keys, counts):
@@ -239,6 +239,7 @@ def main():
     parser.add_argument("--cache", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--sample", type=int)
+    parser.add_argument('--tag-text-danbooru-snapshot', type=Path, help='Explicit readonly source-backed Danbooru snapshot for reconstructed tag text proofs')
     args = parser.parse_args()
     root = args.source.resolve()
     cache = args.cache.resolve()
@@ -285,7 +286,7 @@ def main():
         file = output / f"{group}.jsonl"
         stats = Counter()
         with file.open("x", encoding="utf-8", newline="\n") as stream:
-            for record in read_entries(group, paths, args.sample):
+            for record in read_entries(group, paths, args.sample, args.tag_text_danbooru_snapshot):
                 if args.sample is not None and record.get("record_type") in {"link", "unresolved"}:
                     if record["record_type"] == "link":
                         sample_links.append((group, record))

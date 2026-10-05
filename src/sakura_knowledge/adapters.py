@@ -250,7 +250,7 @@ def tag_group_record(group, row):
         item["tag_key"], "tag_key")], occurrences=occurrences, raw_group=group, raw_tag=item)
 
 
-def iter_tag_wiki(path, *, sample=None):
+def iter_tag_wiki(path, *, sample=None, danbooru_snapshot=None):
     # `path` MUST be a byte-frozen backup, not the live source's active WAL.
     conn = sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro&immutable=1", uri=True)
     conn.row_factory = sqlite3.Row
@@ -296,5 +296,20 @@ def iter_tag_wiki(path, *, sample=None):
                               raw_annotation_source=table,
                               raw_annotation={k: v for k, v in item.items()
                                               if k != text_field})
+        if danbooru_snapshot is not None:
+            from .tag_wiki_provenance import Auditor, records
+            checker = Auditor(path, danbooru_snapshot)
+            try:
+                for record in records(checker.tag):
+                    result = checker.prove(record)
+                    if result:
+                        text, proof = result
+                        yield _entity(_key('tag', 'local.tag_aggregate', record['tag_key']),
+                                      status='generated_from_evidence',
+                                      documents=[_document(record['tag_key'], text,
+                                                           status='generated_from_evidence',
+                                                           text_provenance=proof)])
+            finally:
+                checker.close()
     finally:
         conn.close()

@@ -1,112 +1,85 @@
 # Current delivery status
 
-## Selectable source packs: corrected global semantic fusion
+## Frozen Wiki-backed tag text candidate
 
-Current change baseline: `a7e0922e7929dc94506a65a9bad4617f280e1e33` on `dev`.
-Core + optional Danbooru/Bangumi/Moegirl/tag-wiki packs + one shared BGE-M3 model
-remain independently copyable from `build/modular-components/`. Only Core binaries
-changed: no source DB, FTS, membership, mapping, model, embedding, ANN graph or
-ANN parameters changed. Mother/FP32/old monolithic I8 and old modular receipts
-are preserved. Frozen local audit is not live refresh. Rights NOT_CLEARED; no
-large upload, Pi/Pool integration, archives, RSS measurement or model training.
+Baseline `b1799c84b341e8f42ee92a44005fa83cecf34d8a`, ordinary dev delivery.
+New Core/tag candidate: `build/modular-components-next/`; old components preserved.
+Actual combined root `build/tag-provenance-runtime-next/` uses readonly same-volume
+hardlinks to unchanged Danbooru/Bangumi/Moegirl/model assets, relative config, no
+symlink/development-path dependency. Only new tag DB/FTS/membership and Core change.
+No ANN/embedding/model rebuild, identity/resolve promotion or fusion weight changes.
 
-### Ranking behavior
+### Full source facts and proof
 
-For multiple compatible semantic packs, one shared encoding feeds bounded raw
-ANN chunk hits. Actual Cos distances are globally sorted, tied by complete typed
-identity then document/chunk, deduplicated into best-hit entries (all selected
-proofs retained), with global semantic entry depth 100. This contributes **one**
-semantic RRF60 branch. Each source contributes its own lexical branch using
-original raw document rank, never cross-source BM25 values. Trusted exact/alias
-pins precede scores; distinct trusted identities remain unresolved. Contracts
-must agree on exact model revision, query/encoder semantics, dimension1024,
-Cos/I8 distance representation; missing/nonfinite distances fail closed.
+674889 raw records audited (not sampled): full cache no_reference601512,
+source_backed69825, ai_annotated3342; annotations draft173/verified37.
+66979 records prove a field, producing **66979 new generated_from_evidence
+ documents/FTS rows**, duplicate projections0. All proved methods whitespace_prefix.
+Failures: no_tag_evidence578105/deleted4946/empty20093/short1452/
+not_derivable3314. No missing/multiple/parse cases observed; those remain fixtures.
+Original source statuses/documents are not upgraded. Six identity/source tables
+exactly compare both ways; all old documents retained byte-for-value unchanged.
+Candidate links remain candidate and local tags remain local.tag_aggregate.
 
-Single-semantic-source retrieval retains the original local path and ordering.
-Structured merge/resolve are unchanged. New candidate `global_semantic_rank`,
-`best_distance`, and source-qualified `backend_ranks` are diagnostic ranking
-fields, not verified identity assertions. Raw ANN pools are internal; public
-`dense_hits`/`lexical_hits` for multi-pack retrieval are intentionally empty,
-not complete rankings. Candidate provenance/citations/documents carry actual
-selected evidence; local numeric IDs are never cross-pack identity.
+Proof requires actual candidate → one distinct non-deleted nonempty frozen Wiki
+page → same raw body in existing trusted Danbooru document → independently
+provable text field, minimum24chars4word runs, not status/AI/confidence. Hashes and
+locators persist in compact text_provenance. Historical producer revision unknown;
+proofs are reconstructed frozen bytes. Detailed contract/CLI:
+`docs/tag-wiki-provenance.md`. Audit receipts `build/tag-provenance-audit-v1.json`
+and proofs JSONL outside runtime pack. Independently checked all66979 actual
+body/text hashes, prefix/candidate/tag binding in3.58246s, without calling prover.
 
-### Three-version frozen gold comparison
+### Validation
 
-A = saved monolithic I8; B = old modular a7e0922; C = corrected global distance.
-Values are Recall@10 / MRR@10 / nDCG@10. Gold unchanged; no tuned weights.
+Source gold50 frozen before any retrieval:25 successful projections +5 each
+actual no-evidence/deleted/empty/short/nonderivable record. Negative unit is raw
+record locator, not whole tag (another record may prove text). All50 stored
+projection/hash checks PASS. All25 positive FTS queries find intended local tag
+using actual tag-only selection with model directory removed, encoding0.
+Actual tag-only smoke exit0, lexical_hits100,898.1038ms,356294bytes. Model/ANN
+not required; ordinary FTS never supplies exact/alias pins.
 
-| Group | A | B | C |
-|---|---|---|---|
-| lexical (30) | 1/.97778/.98333 | 1/.97333/.97956 | 1/.97778/.98333 |
-| semantic (40) | .975/.90833/.92559 | .975/.61458/.70667 | .975/.89375/.91463 |
-| crosslingual (30) | .53333/.29976/.35667 | .56667/.26306/.33587 | .53333/.25889/.32641 |
-| ambiguous-positive (10, accepted targets nonempty) | .65/.41444/.41915 | .4/.34333/.28076 | .6/.37/.38776 |
+Final full Python suite **1251 PASS/18 Win1314 symlink skips/55 subtests**,65.85s,
+explicit final binary/DLL PATH/D temporary directories. New proof tests24 plus
+additional hash/method tamper tests; Rust library52PASS/releasebuild passed.
+Lookup/ask blue_hair and lookup brown_eyes retain identity result fields; resolve
+blue_hair full JSON identical. Structural merge/resolve algorithms unchanged.
+New snapshot integrity/FK and exact identity/old-doc comparisons PASS. Actual
+membership66979 bound to new DB hash, no old0-row membership reused.
 
-Semantic: **20 former monolithic rank-1 cases restored from B**, no new rank-1
-regression vs B, no additional R10 losses vs A or B. One rank-1 regression vs A
-remains: P4-066 (A1/B3/C2); target is global dense1 but Danbooru lexical12,
-so lexical competition still wins. Crosslingual **P4-095 loses R10 versus B**
-(A nohit/B2/C19): target global dense8, no lexical contribution, displaced by
-lexically supported candidates. C has no new crosslingual R10 loss vs A, but
-crosslingual quality remains limited. Ambiguous-positive losses vs A are
-P4-103/P4-110; none additional vs B. Negative ten have no accepted targets,
-are not included in positive metrics; identity promotion remains prohibited.
+`build/tag-provenance-all120-final-retry1.json`: fresh120 engineering PASS,
+one shared model session and encoding each, <=5s complete response including
+serialization, <=1MiB UTF-8 including newline, independent source/document/
+evidence/typed closure and tag provenance text hashes. EOFexit0 readerjoined,
+no active kill. First startup attempt failed before any queries because the test
+root model directory was nested incorrectly; stderr retained, not PASS. Fixed
+relative layout, no source/model bytes changed. Earlier build verify URI/C-temp
+failures retained; completed new DB reused and D-temp exact comparisons passed.
 
-**Engineering PASS is not overall quality PASS or lossless monolithic equivalence.**
-Full per-case A/B/C and actual distance/rank/provenance diagnostics:
-`build/federation-three-version-comparison.json` (42 changed cases). Unrecorded
-local history is NOT_RECORDED, not inferred from global order. Split ANN graph
-and per-source FTS remain different from monolithic assets.
+| Group | b179 R10/MRR10/nDCG10 | New tag text |
+|---|---|---|
+| lexical | 1/.97778/.98333 | unchanged |
+| semantic | .975/.89375/.91463 | unchanged |
+| crosslingual | .53333/.25889/.32641 | .53333/.25810/.32564 |
+| ambiguous-positive | .6/.37/.38776 | unchanged |
 
-### Actual runtime evidence and checks
+No group gains/loses R10. Changed metric cases P4-077/P4-083/P4-101/P4-102
+reflect added tag lexical competition, not new semantic tuning. Crosslingual
+ranking slightly decreases; no overall quality PASS claim. Saved per-case receipt
+`build/tag-provenance-quality-comparison.json`; prior monolithic quality gaps remain.
 
-`python -m tools.modular_semantic_validate --root 'D:/Sakura 模块化 测试/Core 可选 来源 G' --output build/federation-all120-final`
-completed exit0, **120 engineering PASS**, one model session, one encoding each
-(cumulative120), actual independent typed entry/document/source/evidence closure,
-request-to-complete-line <=5s, <=1048576 UTF-8 bytes including newline. Startup
-11752.561ms; E2E p50/p95/max 667.07855/2296.0959/2555.9523ms versus B
-740.47995/2232.8282/2571.4677ms. Response p95/max 383583/635848 bytes versus B
-495869/752147. Independent checker time 3.08473s total, excluded from runtime
-performance. EOF exit0, reader joined, no active termination. PK/indexed readonly
-checker retained; no per-proof full scans. Final binary subsequently added only
-multiple-trusted-identities warning, no rank changes; tests/rebuild passed. Final
-binary targeted P4-001 retains three distinct trusted keys with warning, no
-identity promotion, independent closure PASS, one encoding, 328642 bytes,
-natural EOF0; P4-103 no pins/no warning also PASS (306524 bytes). Receipts:
-`build/federation-final-multipin.json`, `build/federation-final-warning.json`.
+Startup13596.6008ms vs b17911752.561; E2Ep50/p95/max829.1093/1960.0565/
+4275.4629ms vs667.07855/2296.0959/2555.9523. Added lexical/provenance work raises
+worst-case latency; all remain below5s. Bytesp95/max591273/863741 (before383583/
+635848). Validator time separately recorded, not retrieval performance. RSS not
+measured; finite gold not generalization evidence.
 
-Small real P4-032/034/035 changed old rank2 → new1 with actual global dense1
-(distances .32763952/.37481487/.34285116), closure PASS, natural EOF0:
-`build/federation-small.json`. Actual wrong source/document/typed key/cross-pack
-closure tampering rejected. Single Danbooru and Bangumi eight saved queries each
-compare **whole business JSON equal**, excluding only `timings_ms` and
-`pack_timings_ms`, exit0: `build/federation-singlepack-equality.json`.
+### Sizes and limits
 
-Rust library **52 tests PASS** (42 existing +10 new pure fusion tests), release
-build passed. Tests cover global distance over local ranks, pack-order-independent
-ties, same-key best distance/all proofs, raw BM25 scale immunity, trusted pins,
-lexical-only branches, depth100, malformed distance and incompatible contracts;
-existing source-selection/shared encoding behavior and real 120 provide additional
-coverage. Affected Python/native tests **60 PASS**, Ruff src/tests/tools PASS,
-`git diff --check` PASS. Earlier modular full suite remains 1227 PASS/18 Win1314
-symlink skips/55 subtests, not rerun or relabeled for this focused change.
-
-### Components and boundaries
-
-Final Core actual runtime bytes: **65,356,781**. Other component bytes unchanged:
-model 2,284,443,838; Danbooru 1,894,324,211; Bangumi 10,723,650,815;
-Moegirl 181,699,717; tag-wiki 1,718,178,889. Counts include licenses; build-only
-positions.u64le is not copied. Final binaries synchronized into Core and actual
-external roots; model/source manifests unchanged. Source IDs/counts remain in
-`docs/source-groups.json`. Model revision
-`5617a9f61b028005a4858fdac845db406aefb181`.
-
-Moegirl/tag-wiki remain exact/alias lexical only, trusted FTS documents0.
-Tag-wiki 601512 no_reference /73377 unverified_draft are not upgraded; local tag
-aggregate is not native danbooru.tag. Earlier 151 structured evidence remains
-134 strict equal +16 independently source-proof-checked search rank differences
-+1 physical SQLite page/freelist difference, **not 151 JSON-identical**.
-This task does not restore tag text provenance or change trust/FTS. No subsequent
-text-trust investigation/implementation is authorized by this delivery. README
-copy/assembly/selection commands remain unchanged; public quality limits above
-must accompany candidate use.
+Old tag pack1718178889bytes → new1952638242bytes; DB1951559680,
+membership1077248,manifest1314. New Core64885516bytes; other components unchanged.
+No mapping/vectors/ANN in tag pack. Old mother/FP32/valid packs preserved.
+Public rights NOT_CLEARED; no large upload/Pi/Pool/live refresh/full human review.
+This task adds narrow source-backed text support, not native identities, verified
+mappings or safety labels. No next-stage generic pipeline/source expansion started.

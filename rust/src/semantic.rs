@@ -1347,8 +1347,21 @@ pub fn lexical_retrieve(db: impl AsRef<Path>, query: &str, options: &RetrieveOpt
     let mut candidates=response["candidates"].as_array().cloned().unwrap_or_default();
     for candidate in &mut candidates {candidate["entry"]=candidate["entry_key"].clone();}
     let pins:Vec<_>=candidates.iter().filter(|c|c["matched_by"]=="exact"||c["matched_by"]=="alias").cloned().collect();
+    let conn=readonly(db.as_ref())?;let compiled=crate::match_query(query).map_err(|e|e.to_string())?;
+    let mut hits=Vec::new();let mut documents=Vec::new();let mut sources=BTreeMap::new();let mut evidence=Vec::new();
+    if !compiled.is_empty() {
+        let mut stmt=conn.prepare("SELECT e.kind,e.namespace,e.value,d.id,d.entry_id,d.title,d.original,d.source_id,d.evidence_id,d.status,d.payload,bm25(search_fts) FROM search_fts JOIN documents d ON d.id=search_fts.document_id JOIN entries e ON e.id=d.entry_id WHERE search_fts MATCH ? AND e.conflicted=0 AND d.status IN ('source_backed','generated_from_evidence') AND EXISTS(SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id AND v.status='source_backed') ORDER BY bm25(search_fts),e.kind,e.namespace,e.value,d.id LIMIT 100")?;
+        let mut cursor=stmt.query([compiled])?;
+        while let Some(r)=cursor.next()? {
+            let key=json!({"kind":r.get::<_,String>(0)?,"namespace":r.get::<_,String>(1)?,"value":r.get::<_,String>(2)?});let did=r.get::<_,i64>(3)?.to_string();let eid=r.get::<_,i64>(4)?.to_string();let sid=r.get::<_,String>(7)?;let refid=r.get::<_,String>(8)?;let payload:Value=serde_json::from_str(&r.get::<_,String>(10)?)?;
+            let hit=json!({"entry":key,"document_id":did,"source_id":sid,"evidence_id":refid,"rank":hits.len()+1,"score":r.get::<_,f64>(11)?});hits.push(hit);
+            documents.push(json!({"entry_key":key,"entry_id":eid,"document_id":did,"title":r.get::<_,String>(5)?,"original":r.get::<_,String>(6)?,"source_id":sid,"evidence_id":refid,"status":r.get::<_,String>(9)?,"text_provenance":payload["text_provenance"]}));
+            evidence.push(json!({"entry_id":eid,"document_id":did,"source_id":sid,"evidence_id":refid}));add_source(&conn,&mut sources,&sid)?;
+        }
+    }
     candidates.truncate(options.limit);
-    Ok(json!({"status":"PASS","query":query,"response_version":"sakura-lexical-evidence-v1","identity_status":"not_asserted","candidates":candidates,"trusted_pins":pins,"dense_hits":[],"lexical_hits":[],"hybrid":[],"documents":[],"sources":[],"evidence":[],"citations":response["citations"],"promoted_identities":[],"canonical":null,"entity_tag":null,"timings_ms":{},"lexical_mode":"exact_alias_only"}))
+    let citations:Vec<_>=documents.iter().map(|d|json!({"document_id":d["document_id"],"source_id":d["source_id"],"evidence_id":d["evidence_id"]})).collect();
+    Ok(json!({"status":"PASS","query":query,"response_version":"sakura-lexical-evidence-v1","identity_status":"not_asserted","candidates":candidates,"trusted_pins":pins,"dense_hits":[],"lexical_hits":hits,"hybrid":[],"documents":documents,"sources":sources.into_values().collect::<Vec<_>>(),"evidence":evidence,"citations":citations,"promoted_identities":[],"canonical":null,"entity_tag":null,"timings_ms":{},"lexical_mode":"trusted_documents_and_identity"}))
 }
 pub fn lexical_only_retrieve(db: impl AsRef<Path>, query: &str, options: &RetrieveOptions) -> Result<Value> {
     lexical_retrieve(db, query, options)

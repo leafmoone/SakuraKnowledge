@@ -16,8 +16,11 @@ Discovery uses `packs/*/manifest.json`, so removing a source directory takes eff
 | Moegirl | structured, exact/alias lexical | no |
 | tag-wiki | structured, exact/alias lexical | no |
 
-Moegirl has no source documents in the frozen mother DB. tag-wiki has zero trusted indexed
-source documents: its `no_reference`/`unverified_draft` text remains untrusted. Neither pack
+Moegirl has no source documents in the frozen mother DB. The new tag-wiki text candidate
+adds 66,979 independently Wiki-backed generated text documents to lexical FTS; old
+`no_reference`/`unverified_draft` documents remain unchanged and untrusted. This proves
+text provenance, not native tag identity or verified tag/page mappings. See
+[`docs/tag-wiki-provenance.md`](docs/tag-wiki-provenance.md). Neither pack
 creates an ANN or needs a model. These inherited trust rules are not changed by packaging.
 Source membership and actual per-source counts are in [`docs/source-groups.json`](docs/source-groups.json).
 

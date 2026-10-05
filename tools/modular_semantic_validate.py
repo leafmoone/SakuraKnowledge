@@ -1,5 +1,6 @@
 """Run the frozen120 once against modular resident; preserve raw response streams."""
 import argparse
+import hashlib
 import json
 import os
 import sqlite3
@@ -37,6 +38,11 @@ def closure(response, connections):
                 if did is not None:
                     row=c.execute('SELECT d.source_id,d.evidence_id,d.status,e.kind,e.namespace,e.value FROM documents d JOIN entries e ON e.id=d.entry_id WHERE d.id=?',(int(did),)).fetchone()
                     k=record.get('entry_key',record.get('entry'))
+                    if row and row[2]=='generated_from_evidence' and n=='tag-wiki':
+                        original,payload=c.execute('SELECT original,payload FROM documents WHERE id=?',(int(did),)).fetchone()
+                        proof=json.loads(payload).get('text_provenance')
+                        if not isinstance(proof,dict) or proof.get('trusted_text_sha256')!=hashlib.sha256(original.encode('utf-8')).hexdigest() or proof.get('tag_source_id')!=sid or proof.get('tag_evidence_id')!=eid:
+                            raise ValueError('tag text provenance/hash closure missing')
                     valid = bool(row and row[0]==sid and row[1]==eid and row[2] in ('source_backed','generated_from_evidence') and (not k or tuple(row[3:])==(k['kind'],k['namespace'],k['value'])))
                 else:
                     k=record.get('entry_key',record.get('entry'))
