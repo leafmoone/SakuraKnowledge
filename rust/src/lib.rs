@@ -8,6 +8,7 @@ use rusqlite::{params, Connection, OpenFlags, OptionalExtension};
 use serde_json::{json, Value};
 use std::path::Path;
 use std::time::{Duration, Instant};
+pub mod modular;
 mod resolver;
 mod response;
 #[cfg(feature = "semantic")]
@@ -55,6 +56,7 @@ impl std::fmt::Display for Error {
     }
 }
 
+impl std::error::Error for Error {}
 pub type Result<T> = std::result::Result<T, Error>;
 
 // ---------------------------------------------------------------- tokenizer
@@ -132,6 +134,7 @@ pub struct Runtime {
     operation_depth: usize,
     deadline: Instant,
     pub last_search_profile: Value,
+    external_deadline: Option<Instant>,
 }
 
 fn base(query: &Value, snapshot: &str, status: &str) -> Value {
@@ -267,6 +270,7 @@ impl Runtime {
             operation_depth: 0,
             deadline: Instant::now() + Duration::from_secs(5),
             last_search_profile: json!({}),
+            external_deadline:None,
         })
     }
 
@@ -286,7 +290,7 @@ impl Runtime {
 
     fn operation(&mut self, call: impl FnOnce(&mut Self) -> Result<Value>) -> Result<Value> {
         if self.operation_depth == 0 {
-            self.deadline = Instant::now() + Duration::from_secs(5);
+            self.deadline = self.external_deadline.unwrap_or_else(||Instant::now() + Duration::from_secs(5));
             let deadline = self.deadline;
             self.conn
                 .progress_handler(1000, Some(move || Instant::now() > deadline));
@@ -302,6 +306,7 @@ impl Runtime {
         }
     }
 
+    pub fn set_deadline(&mut self, deadline:Instant) { self.external_deadline=Some(deadline); }
     pub fn inspect(&mut self) -> Result<Value> {
         self.operation(|s| s.inspect_inner())
     }

@@ -3,8 +3,10 @@ use ort::{ep, session::Session, value::Tensor};
 use rusqlite::{params, Connection, OpenFlags};
 use serde_json::{json, Value};
 use std::{
+    cell::RefCell,
     collections::{BTreeMap, BTreeSet},
     path::{Path, PathBuf},
+    rc::Rc,
     time::Instant,
 };
 use tokenizers::Tokenizer;
@@ -860,10 +862,84 @@ fn validate_mapping(c: &Connection, n: usize) -> Result<()> {
         "mapping row identity mismatch",
     )
 }
-pub struct SemanticEngine {
+pub struct SharedEncoder {
     tokenizer: Tokenizer,
     session: Session,
-    index: Index,
+    model_manifest: Option<PathBuf>,
+    last_tokens: usize,
+    pub query_encodings: usize,
+}
+impl SharedEncoder {
+    fn from_paths(paths: &BTreeMap<String, PathBuf>) -> Result<Self> {
+        let tokenizer = Tokenizer::from_file(&paths["tokenizer"]).map_err(|e| e.to_string())?;
+        let environment = ort::init_from(&paths["ort_dll"])?;
+        require(runtime_version(&paths["ort_dll"])? == "1.24.1", "ORT runtime version mismatch")?;
+        require(environment.with_execution_providers([ep::CPU::default().build()]).commit(),
+            "ORT already initialized; explicit runtime ownership required")?;
+        let session = Session::builder()?
+            .with_execution_providers([ep::CPU::default().build().error_on_failure()])?
+            .with_intra_threads(8)?.with_inter_threads(1)?
+            .with_parallel_execution(false)?.commit_from_file(&paths["model"])?;
+        require(session.inputs().len() == 2 && session.inputs()[0].name() == "input_ids"
+            && session.inputs()[1].name() == "attention_mask" && session.outputs().len() == 1
+            && session.outputs()[0].name() == "embeddings", "unexpected ONNX graph interface")?;
+        Ok(Self { tokenizer, session, model_manifest: None, last_tokens: 0, query_encodings:0 })
+    }
+    pub fn open_model(model_manifest: impl AsRef<Path>, bin_dir: impl AsRef<Path>) -> Result<Self> {
+        let p = model_manifest.as_ref();
+        let manifest = read_package_manifest(p, "sakura-shared-model-v1")?;
+        require(manifest["model_id"] == "bge-m3", "unsupported shared model")?;
+        require(manifest["revision"]=="5617a9f61b028005a4858fdac845db406aefb181","shared model revision mismatch")?;
+        let contract=&manifest["contract"];
+        for field in ["dimension","pooling","normalize","query_prefix","dtype","output","provider","ort_version","intra_threads","inter_threads","sequential","revision"]{require(contract[field]==fixed_contract()[field],"shared encoder contract mismatch")?;}
+        let root = p.parent().ok_or("manifest has no parent")?;
+        let mut paths = BTreeMap::new();
+        for name in ["model", "tokenizer"] {
+            paths.insert(name.into(), portable_artifact(root, &manifest["artifacts"][name])?);
+        }
+        let tensors = manifest["artifacts"]["external_data"].as_array().ok_or("missing external_data")?;
+        require(!tensors.is_empty(), "missing external tensors")?;
+        for binding in tensors { portable_artifact(root, binding)?; }
+        require(manifest["ort_dll"].get("path").is_none(), "ort_dll must not supply a path")?;
+        let mut dll = manifest["ort_dll"].clone();
+        dll["path"] = json!("onnxruntime.dll");
+        paths.insert("ort_dll".into(), portable_artifact(bin_dir.as_ref(), &dll)?);
+        let mut encoder = Self::from_paths(&paths)?;
+        encoder.model_manifest = Some(std::fs::canonicalize(p)?);
+        Ok(encoder)
+    }
+    pub fn encode(&mut self, query: &str) -> Result<Vec<f32>> {
+        validate_query(query)?;
+        let encoded = self.tokenizer.encode(query, true).map_err(|e| e.to_string())?;
+        let ids: Vec<i64> = encoded.get_ids().iter().map(|&v| i64::from(v)).collect();
+        let mask: Vec<i64> = encoded.get_attention_mask().iter().map(|&v| i64::from(v)).collect();
+        require(!ids.is_empty() && ids.len() == mask.len() && ids.len() <= 512, "invalid token shape")?;
+        let tokens = ids.len();
+        self.last_tokens = tokens;
+        self.query_encodings+=1;
+        let output = self.session.run(ort::inputs!["input_ids"=>Tensor::from_array(([1usize,tokens],ids))?,"attention_mask"=>Tensor::from_array(([1usize,tokens],mask))?])?;
+        let (shape, values) = output["embeddings"].try_extract_tensor::<f32>()?;
+        require(shape.as_ref() == [1_i64, 1024], "unexpected embeddings shape")?;
+        validate_vector(values)?;
+        Ok(values.to_vec())
+    }
+}
+pub fn open_model(model_manifest: impl AsRef<Path>, bin_dir: impl AsRef<Path>) -> Result<SharedEncoder> {
+    SharedEncoder::open_model(model_manifest, bin_dir)
+}
+fn read_package_manifest(path: &Path, schema: &str) -> Result<Value> {
+    reject_path_links(path)?;
+    require(std::fs::metadata(path)?.len() <= 1_000_000, "manifest too large")?;
+    let manifest: Value = serde_json::from_slice(&std::fs::read(path)?)?;
+    require(manifest["schema"] == schema, "unsupported package schema")?;
+    Ok(manifest)
+}
+fn validate_query(query: &str) -> Result<()> {
+    require(!query.is_empty() && query.chars().count() <= 4096, "query must contain 1..4096 characters")
+}
+pub struct SemanticEngine {
+    encoder: Option<Rc<RefCell<SharedEncoder>>>,
+    index: Option<Index>,
     mapping: Connection,
     lexical: Connection,
     base: Connection,
@@ -875,6 +951,46 @@ pub struct SemanticEngine {
     pub open_timings_ms: Value,
 }
 impl SemanticEngine {
+    pub fn open_source(base_db: impl AsRef<Path>, source_manifest: impl AsRef<Path>, model_manifest: impl AsRef<Path>, encoder: Rc<RefCell<SharedEncoder>>) -> Result<Self> {
+        require(encoder.borrow().model_manifest.as_ref() == Some(&std::fs::canonicalize(model_manifest.as_ref())?), "shared model manifest mismatch")?;
+        let p = source_manifest.as_ref();
+        let source = read_package_manifest(p, "sakura-source-pack-v1")?;
+        validate_source_manifest(&source)?;
+        let root = p.parent().ok_or("manifest has no parent")?;
+        let mut paths = BTreeMap::new();
+        for name in ["snapshot", "mapping", "index", "lexical_membership"] {
+            paths.insert(name, portable_artifact(root, &source["artifacts"][name])?);
+        }
+        require(std::fs::canonicalize(base_db.as_ref())? == paths["snapshot"], "snapshot path mismatch")?;
+        require(paths["snapshot"].ends_with("knowledge.sqlite"), "snapshot identity mismatch")?;
+        let rows = source["semantic"]["rows"].as_u64().ok_or("missing semantic rows")? as usize;
+        let mut contract = portable_contract(rows)?;
+        contract["ann"]["expansion_search"] = json!(2048);
+        contract["ann"]["chunk_depth"] = source["semantic"]["chunk_depth"].clone();
+        let manifest = json!({"pack_version":"portable-cpu-i8-v1","pack_id":source["pack_id"],"snapshot":source["artifacts"]["snapshot"],"artifacts":source["artifacts"],"lexical_membership":source["lexical_membership"],"contract":contract});
+        let base = readonly(&paths["snapshot"])?;
+        validate_snapshot_policy(&base, Mode::Full)?;
+        let actual_sources: BTreeSet<String> = base.prepare("SELECT source_id FROM sources")?.query_map([], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
+        let declared: BTreeSet<String> = source["source_ids"].as_array().ok_or("missing source_ids")?.iter().map(|s| s.as_str().map(str::to_owned).ok_or("invalid source_id")).collect::<std::result::Result<_,_>>()?;
+        require(actual_sources == declared, "source_ids mismatch")?;
+        let fts_members = load_prepared_members(&paths["lexical_membership"], &manifest)?;
+        // Prepared membership is digest-bound to this exact snapshot; relationships
+        // were checked during export. Never rebuild/scan snapshot FTS at startup.
+        require(source["lexical_membership"]["rows"].as_u64()==Some(fts_members.len() as u64), "membership row count mismatch")?;
+        let mut full_members: Vec<_> = fts_members.iter().map(|&(_,e,d)| (e,d)).collect();
+        full_members.sort_unstable(); full_members.dedup();
+        let mapping = readonly(&paths["mapping"])?;
+        validate_mapping(&mapping, rows)?;
+        mapping.prepare("SELECT position,original_position,chunk_id,document_id,kind,namespace,value,source_id,evidence_id FROM chunks LIMIT 0")?;
+        let ip = paths["index"].to_str().ok_or("non UTF-8 index path")?;
+        let metadata = Index::metadata(ip)?;
+        require(metadata.dimensions == 1024 && metadata.metric == MetricKind::Cos, "index metadata mismatch")?;
+        let index = Index::new(&metadata.into())?;
+        index.view(ip)?;
+        require(index.size() == rows && index.dimensions() == 1024 && index.metric_kind() == MetricKind::Cos && index.scalar_kind() == ScalarKind::I8 && index.connectivity() == 16, "index contract mismatch")?;
+        configure_search_expansion(&index, &manifest["contract"])?;
+        Ok(Self { encoder: Some(encoder), index: Some(index), mapping, lexical: readonly(&paths["snapshot"] )?, base, manifest, mode: Mode::Full, rows, full_members, fts_members, open_timings_ms: json!({}) })
+    }
     pub fn open(base_db: impl AsRef<Path>, manifest_path: impl AsRef<Path>) -> Result<Self> {
         let total = Instant::now();
         let p = manifest_path.as_ref();
@@ -1022,9 +1138,8 @@ impl SemanticEngine {
             "membership_payload_bytes":full_members.len() * std::mem::size_of::<(i64,i64)>(),
             "membership_allocation_bytes":full_members.capacity() * std::mem::size_of::<(i64,i64)>()});
         Ok(Self {
-            tokenizer,
-            session,
-            index,
+            encoder: Some(Rc::new(RefCell::new(SharedEncoder { tokenizer, session, model_manifest: None, last_tokens: 0, query_encodings:0 }))),
+            index: Some(index),
             mapping,
             lexical,
             base,
@@ -1038,8 +1153,22 @@ impl SemanticEngine {
     }
     /// Branch depths precede filters, without backfill. All ambiguous pins remain.
     pub fn retrieve(&mut self, query: &str, options: &RetrieveOptions) -> Result<Value> {
+        options.validate()?;
+        let start = Instant::now();
+        let vector = self.encoder.as_ref().ok_or("no shared encoder")?.borrow_mut().encode(query)?;
+        let tokens = self.encoder.as_ref().ok_or("no shared encoder")?.borrow().last_tokens;
+        let encoding_ms = ms(start);
+        let mut result = self.retrieve_encoded(query, options, &vector)?;
+        result["actual_tokens"] = json!(tokens);
+        result["timings_ms"]["ort"] = json!(encoding_ms);
+        result["timings_ms"]["total"] = json!(ms(start));
+        require(ms(start) <= 5000.0, "query_budget_exceeded")?;
+        Ok(result)
+    }
+    pub fn retrieve_encoded(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32]) -> Result<Value> {
         let total = Instant::now();
         options.validate()?;
+        if self.index.is_some() { validate_vector(vector)?; }
         require(
             !query.is_empty() && query.chars().count() <= 4096,
             "query must contain 1..4096 characters",
@@ -1049,50 +1178,25 @@ impl SemanticEngine {
         }
         let start = Instant::now();
         let compiled = crate::match_query(query).map_err(|e| e.to_string())?;
-        let encoded = self
-            .tokenizer
-            .encode(query, true)
-            .map_err(|e| e.to_string())?;
-        let ids: Vec<i64> = encoded.get_ids().iter().map(|&v| i64::from(v)).collect();
-        let mask: Vec<i64> = encoded
-            .get_attention_mask()
-            .iter()
-            .map(|&v| i64::from(v))
-            .collect();
-        require(
-            !ids.is_empty() && ids.len() == mask.len() && ids.len() <= 512,
-            "invalid token shape",
-        )?;
-        let tokens = ids.len();
+        let tokens = 0usize;
         let tokenize_ms = ms(start);
-        let start = Instant::now();
-        let output=self.session.run(ort::inputs!["input_ids"=>Tensor::from_array(([1usize,tokens],ids))?,"attention_mask"=>Tensor::from_array(([1usize,tokens],mask))?])?;
-        let (shape, values) = output["embeddings"].try_extract_tensor::<f32>()?;
-        require(
-            shape.as_ref() == [1_i64, 1024],
-            "unexpected embeddings shape",
-        )?;
-        validate_vector(values)?;
-        // Exported graph performs CLS/L2; do not renormalize its f32 output.
-        let vector = values.to_vec();
-        drop(output);
-        let ort_ms = ms(start);
+        let ort_ms = 0.0;
         let start = Instant::now();
         let depth = if self.mode == Mode::Full {
-            self.rows.min(512)
+            self.rows.min(self.manifest["contract"]["ann"]["chunk_depth"].as_u64().unwrap_or(512) as usize)
         } else {
             512
         };
-        let matches = self.index.search(&vector, depth)?;
+        let matches = self.index.as_ref().map(|index| index.search(vector, depth)).transpose()?;
         let index_search_ms = ms(start);
         let mapping_start = Instant::now();
-        let dense = dense_hits_for(
+        let dense = if let Some(matches) = matches { dense_hits_for(
             &self.mapping,
             &matches.keys,
             &matches.distances,
             self.rows,
             self.mode,
-        ).map_err(|e| format!("dense_mapping: {e}; tokenize_ms={tokenize_ms}; ort_ms={ort_ms}; total_ms={}", ms(total)))?;
+        ).map_err(|e| format!("dense_mapping: {e}; tokenize_ms={tokenize_ms}; ort_ms={ort_ms}; total_ms={}", ms(total)))? } else { Vec::new() };
         let dense_mapping_ms = ms(mapping_start);
         let ann_ms = ms(start);
         let start = Instant::now();
@@ -1186,6 +1290,30 @@ impl SemanticEngine {
         result["lexical_work"] = json!({"cursor_rows":lexical_work.0,"eligible_rows":lexical_work.1,"boundary_ties":lexical_work.2});
         Ok(result)
     }
+}
+fn validate_source_manifest(source: &Value) -> Result<()> {
+    require(source["schema"] == "sakura-source-pack-v1" && source["requires_model"] == "bge-m3", "unsupported source model/schema")?;
+    text(source, "pack_id")?;
+    require(source["capabilities"].as_array().is_some_and(|v| v.iter().any(|s| s == "semantic")), "semantic capability required")?;
+    let s = &source["semantic"];
+    require(s["rows"].as_u64().is_some_and(|n| n > 0 && n <= i64::MAX as u64) && s["dimension"] == 1024 && s["metric"] == "cos" && s["dtype"] == "i8" && s["connectivity"] == 16 && s["expansion_add"] == 256 && s["expansion_search"] == 2048 && s["chunk_depth"].as_u64().is_some_and(|n| (512..=65536).contains(&n)), "invalid source semantic contract")?;
+    require(source["artifacts"]["snapshot"]["identity"] == "knowledge.sqlite", "source snapshot identity must be knowledge.sqlite")?;
+    Ok(())
+}
+/// FULL lexical retrieval with the same trust proofs and evidence closure, without ORT/ANN.
+pub fn lexical_retrieve(db: impl AsRef<Path>, query: &str, options: &RetrieveOptions) -> Result<Value> {
+    options.validate()?;
+    validate_query(query)?;
+    let mut runtime=crate::Runtime::open(db.as_ref())?;
+    let response=runtime.search(query,100,options.kind.as_deref(),options.namespace.as_deref())?;
+    let mut candidates=response["candidates"].as_array().cloned().unwrap_or_default();
+    for candidate in &mut candidates {candidate["entry"]=candidate["entry_key"].clone();}
+    let pins:Vec<_>=candidates.iter().filter(|c|c["matched_by"]=="exact"||c["matched_by"]=="alias").cloned().collect();
+    candidates.truncate(options.limit);
+    Ok(json!({"status":"PASS","query":query,"response_version":"sakura-lexical-evidence-v1","identity_status":"not_asserted","candidates":candidates,"trusted_pins":pins,"dense_hits":[],"lexical_hits":[],"hybrid":[],"documents":[],"sources":[],"evidence":[],"citations":response["citations"],"promoted_identities":[],"canonical":null,"entity_tag":null,"timings_ms":{},"lexical_mode":"exact_alias_only"}))
+}
+pub fn lexical_only_retrieve(db: impl AsRef<Path>, query: &str, options: &RetrieveOptions) -> Result<Value> {
+    lexical_retrieve(db, query, options)
 }
 fn configure_search_expansion(index: &usearch::Index, contract: &Value) -> Result<()> {
     let width = contract["ann"]["expansion_search"].as_u64().ok_or("positive integer ef_search required")?;
@@ -1390,6 +1518,7 @@ fn load_prepared_members(path: &Path, manifest: &Value) -> Result<Vec<(i64,i64,i
     while let Some(row) = cursor.next()? {
         let item: (i64,i64,i64) = (row.get(0)?,row.get(1)?,row.get(2)?);
         require(members.last().is_none_or(|&(id,_,_)| id < item.0), "membership duplicate/order: run explicit prepare-lexical")?;
+        require(item.0>0 && item.1>0 && item.2>0,"membership IDs must be positive")?;
         members.push(item);
     }
     require(members.len() as u64 == rows, "membership row count mismatch: run explicit prepare-lexical")?;
@@ -2342,6 +2471,30 @@ mod tests {
         for invalid in [json!(true),json!(0),json!(-1),json!(1.5),json!(65537)] {
             assert!(configure_search_expansion(&index,&json!({"ann":{"expansion_search":invalid}})).is_err());
         }
+    }
+    #[test]
+    fn modular_source_contract_has_local_rows_and_strict_projection() {
+        let mut source = json!({"schema":"sakura-source-pack-v1","pack_id":"tiny","capabilities":["semantic","lexical"],"source_ids":["s"],"requires_model":"bge-m3","artifacts":{"snapshot":{"identity":"knowledge.sqlite"}},"semantic":{"rows":2,"dimension":1024,"metric":"cos","dtype":"i8","connectivity":16,"expansion_add":256,"expansion_search":2048,"chunk_depth":512}});
+        validate_source_manifest(&source).unwrap();
+        source["semantic"]["rows"] = json!(0);
+        assert!(validate_source_manifest(&source).is_err());
+        source["semantic"]["rows"] = json!(2);
+        source["semantic"]["expansion_search"] = json!(128);
+        assert!(validate_source_manifest(&source).is_err());
+    }
+    #[test]
+    fn lexical_source_rejects_incomplete_structured_schema_without_encoder() {
+        let path = std::env::temp_dir().join(format!("sakura-modular-lexical-{}.sqlite",std::process::id()));
+        let _ = std::fs::remove_file(&path);
+        let c = Connection::open(&path).unwrap();
+        native_fixture(&c).unwrap();
+        drop(c);
+        // FULL-only fixtures intentionally omit structured public payload/schema fields.
+        // Use the repository's actual structured fixture for this no-model adapter test.
+        let result = lexical_retrieve(&path,"Shared",&RetrieveOptions::default());
+        assert!(result.is_err()); // Malformed structured snapshot must fail closed.
+        std::fs::remove_file(&path).unwrap();
+
     }
     #[test]
     fn prepared_role_passes_formal_manifest_entry_and_requires_local_binding() {

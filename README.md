@@ -2,7 +2,60 @@
 
 Independent offline knowledge core: Python 3.11+ and a read-only Rust CLI. Basic structured queries need no model/GPU/service/Pool. Optional semantic retrieval uses the locally prepared CPU model and evidence-preserving hybrid pack. Current dev delivery: **runtime120 PASS / quality FAIL** (semantic Recall@10 .975 < original target1); usable with that known limitation, not independently generalized.
 
-## Portable Windows x64 CPU candidate
+## Modular Windows x64 local candidate
+
+The modular layout separates **Core + optional source packs + one optional shared model**.
+Core contains the launcher, native binaries and shared runtime DLLs, but no knowledge data
+or model. Copy source directories into `packs/`; copy the shared model into `model/bge-m3/`.
+Discovery uses `packs/*/manifest.json`, so removing a source directory takes effect on restart.
+
+| Component | Capabilities | Shared model required |
+|---|---|---|
+| Danbooru | structured, lexical, semantic | BGE-M3 for retrieve only |
+| Bangumi | structured, lexical, semantic | BGE-M3 for retrieve only |
+| Moegirl | structured, exact/alias lexical | no |
+| tag-wiki | structured, exact/alias lexical | no |
+
+Moegirl has no source documents in the frozen mother DB. tag-wiki has zero trusted indexed
+source documents: its `no_reference`/`unverified_draft` text remains untrusted. Neither pack
+creates an ANN or needs a model. These inherited trust rules are not changed by packaging.
+Source membership and actual per-source counts are in [`docs/source-groups.json`](docs/source-groups.json).
+
+```powershell
+./sknow.ps1 packs
+./sknow.ps1 lookup '初音未来' --key --kind character --namespace moegirl.character --source moegirl
+./sknow.ps1 search 'blue_hair' --source tag-wiki
+./sknow.ps1 retrieve 'blue hair' --source danbooru,bangumi --topk 10
+```
+
+`--source` accepts repeated arguments or comma-separated IDs. Omission selects all installed
+packs. Basic queries never open the model; selecting semantic retrieval without the model
+reports `semantic_model_missing`, without download or substitution. Both semantic packs share
+one tokenizer/model session and one query embedding per resident request.
+
+Local assembly commands (new outputs only, no archive or asset upload):
+
+```powershell
+python -m tools.source_pack list-sources --mother build/p3-full-authorized-retry1/knowledge.sqlite
+python -m tools.source_pack build --source danbooru --mother build/p3-full-authorized-retry1/knowledge.sqlite --mapping build/p4-full-semantic-v1-retry1/chunks.sqlite --output NEW_DANBOORU
+# Build the native I8 graph from the existing FP32 NPY and NEW_DANBOORU/positions.u64le,
+# then finalize the source manifest; no embedding encoding or new vectors.npy.
+# Semantic build leaves prepared assets unpublished until the graph is present.
+python -m tools.source_pack finalize --source danbooru --output NEW_DANBOORU --index-prepared
+python -m tools.modular_components assemble-root --core CORE --model MODEL --pack DANBOORU --pack BANGUMI --output NEW_ROOT
+```
+
+Local components are in `build/modular-components/`; the all-source relocated root is
+`D:/Sakura 模块化 测试/Core 可选 来源 G`. The frozen 120 runtime/source-closure/byte/deadline
+checks passed. **Ranking is not equivalent to the monolithic candidate:** semantic Recall@10
+remains .975, but MRR@10 falls from .90833 to .61458 under fixed equal source-rank fusion;
+crosslingual Recall@10 rises .53333 → .56667 while MRR falls .29976 → .26306. This is a
+known-degradation local candidate, not a quality-PASS replacement or generalization result.
+Exact results, commands and limitations are consolidated in `docs/STAGE_STATUS.md`. Public redistribution
+rights remain **NOT_CLEARED**. The previous monolithic candidate below is retained unchanged
+as the saved-response comparison baseline.
+
+## Previous portable Windows x64 CPU candidate
 
 Current assembled local directory: `D:/Sakura 发行/知识 CPU 可移动 包`.
 It is a directory package (no installer/ZIP/public upload), with its own `sknow-config.json`,

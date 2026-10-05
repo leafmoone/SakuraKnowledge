@@ -1,0 +1,139 @@
+{
+  "schema": "sakura-source-groups-v1",
+  "mother": "build/p3-full-authorized-retry1/knowledge.sqlite",
+  "sources": [
+    {
+      "source_id": "bangumi-complete-6a75aefb769a",
+      "family": "bangumi",
+      "metadata": {
+        "provider": "bangumi",
+        "dataset_role": "normalized_engine_input",
+        "repo": "https://github.com/bangumi/Archive/releases/tag/archive",
+        "adapter": "contract-jsonl-v1"
+      },
+      "table_counts": {
+        "sources": 1,
+        "entry_evidence": 2712814,
+        "aliases": 2651959,
+        "documents": 2712814,
+        "links": 3967075,
+        "tag_resolutions": 0
+      },
+      "document_status_counts": {
+        "source_backed": 2712814
+      },
+      "trusted_fts_documents": 1014366
+    },
+    {
+      "source_id": "danbooru-complete-a26a3829dd42",
+      "family": "danbooru",
+      "metadata": {
+        "provider": "danbooru",
+        "dataset_role": "normalized_engine_input",
+        "repo": "https://huggingface.co/datasets/leafmoone/danbooru_wiki",
+        "adapter": "contract-jsonl-v1"
+      },
+      "table_counts": {
+        "sources": 1,
+        "entry_evidence": 295497,
+        "aliases": 539005,
+        "documents": 281272,
+        "links": 997840,
+        "tag_resolutions": 0
+      },
+      "document_status_counts": {
+        "source_backed": 281272
+      },
+      "trusted_fts_documents": 281272
+    },
+    {
+      "source_id": "danbooru-native-scoped-4ccce02e466f",
+      "family": "danbooru",
+      "metadata": {
+        "provider": "danbooru",
+        "dataset_role": "scoped_native_tags_aliases_verified_wiki_projection",
+        "repo": "https://danbooru.donmai.us",
+        "adapter": "contract-jsonl-v1"
+      },
+      "table_counts": {
+        "sources": 1,
+        "entry_evidence": 30,
+        "aliases": 0,
+        "documents": 0,
+        "links": 28,
+        "tag_resolutions": 352
+      },
+      "document_status_counts": {},
+      "trusted_fts_documents": 0
+    },
+    {
+      "source_id": "mapping-complete-c8263a535096",
+      "family": "moegirl",
+      "metadata": {
+        "provider": "mapping",
+        "dataset_role": "normalized_engine_input",
+        "repo": "https://github.com/Zzzzzzyt/moegirl-dataset",
+        "adapter": "contract-jsonl-v1"
+      },
+      "table_counts": {
+        "sources": 1,
+        "entry_evidence": 0,
+        "aliases": 0,
+        "documents": 0,
+        "links": 97270,
+        "tag_resolutions": 0
+      },
+      "document_status_counts": {},
+      "trusted_fts_documents": 0
+    },
+    {
+      "source_id": "moegirl-complete-5072f7cf3e3e",
+      "family": "moegirl",
+      "metadata": {
+        "provider": "moegirl",
+        "dataset_role": "normalized_engine_input",
+        "repo": "https://github.com/Zzzzzzyt/moegirl-dataset",
+        "adapter": "contract-jsonl-v1"
+      },
+      "table_counts": {
+        "sources": 1,
+        "entry_evidence": 51557,
+        "aliases": 129455,
+        "documents": 0,
+        "links": 0,
+        "tag_resolutions": 0
+      },
+      "document_status_counts": {},
+      "trusted_fts_documents": 0
+    },
+    {
+      "source_id": "tag_wiki-complete-a2eb055c578d",
+      "family": "tag-wiki",
+      "metadata": {
+        "provider": "tag_wiki",
+        "dataset_role": "normalized_engine_input",
+        "repo": "local://derived/tag_wiki.sqlite",
+        "adapter": "contract-jsonl-v1"
+      },
+      "table_counts": {
+        "sources": 1,
+        "entry_evidence": 1349568,
+        "aliases": 674679,
+        "documents": 674889,
+        "links": 96747,
+        "tag_resolutions": 0
+      },
+      "document_status_counts": {
+        "no_reference": 601512,
+        "unverified_draft": 73377
+      },
+      "trusted_fts_documents": 0
+    }
+  ],
+  "unassigned": [],
+  "classification": "metadata.provider; mapping produced by moegirl-dataset remains moegirl candidate crosslinks, not Bangumi trusted evidence",
+  "lexical_notes": {
+    "moegirl": "Mother has no documents; exact/alias lexical only.",
+    "tag-wiki": "Mother has zero indexed documents; no_reference/unverified_draft preserved untrusted; exact/alias lexical only."
+  }
+}

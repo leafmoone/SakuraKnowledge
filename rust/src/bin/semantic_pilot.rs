@@ -27,6 +27,7 @@ fn main() -> sakura_knowledge_runtime::semantic::Result<()> {
     use std::io::{BufRead, Write};
     let args: Vec<_> = std::env::args_os().skip(1).collect();
     if args.len() != 2 { return Err("Usage: semantic_pilot BASE_DB PACK_MANIFEST (resident JSONL stdin)".into()); }
+    if args[0]=="--config" { return modular_resident(std::path::Path::new(&args[1])); }
     let mut engine = SemanticEngine::open(&args[0], &args[1])?;
     let mut output = std::io::stdout().lock();
     writeln!(output,"{}",json!({"event":"opened","open_timings_ms":engine.open_timings_ms,"retries":0}))?;
@@ -42,6 +43,15 @@ fn main() -> sakura_knowledge_runtime::semantic::Result<()> {
     }
     Ok(())
 }
+#[cfg(feature="semantic")]
+fn modular_resident(config:&std::path::Path)->sakura_knowledge_runtime::semantic::Result<()> {
+ use std::io::{BufRead,Write};use serde_json::{json,Value};use sakura_knowledge_runtime::semantic_jsonl::send_response;
+ let mut engine=sakura_knowledge_runtime::modular::ModularSemantic::open(config,&[])?;
+ let mut output=std::io::stdout().lock();writeln!(output,"{}",json!({"event":"opened","open_timings_ms":engine.open_timings_ms,"retries":0}))?;output.flush()?;
+ for line in std::io::stdin().lock().lines(){let request:Value=serde_json::from_str(&line?)?;let (query,id,options)=parse_request(&request)?;let sources:Vec<String>=match request.get("source"){None|Some(Value::Null)=>vec![],Some(Value::String(s))=>vec![s.clone()],Some(Value::Array(values))=>values.iter().map(|v|v.as_str().map(str::to_owned).ok_or("source must be text")).collect::<Result<_,_>>()?,_=>return Err("source must be text or list".into())};let start=std::time::Instant::now();match engine.retrieve(query,&options,&sources){Ok(mut result)=>{result["case_id"]=json!(id);send_response(&mut output,&result,id,start.elapsed().as_secs_f64()*1000.)?;},Err(error)=>{send_response(&mut output,&json!({"case_id":id,"status":"FAIL","error":error.to_string()}),id,start.elapsed().as_secs_f64()*1000.)?;return Err(error);}}}
+ Ok(())
+}
+
 #[cfg(all(test, feature = "semantic"))]
 mod tests {
     use super::parse_request;
