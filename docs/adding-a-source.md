@@ -1,7 +1,9 @@
 # Adding a source without changing Core
 
 1. Freeze lawful raw inputs, record digest/cut/revision and rights limitations.
-2. Implement explicit SourceAdapter inspect/iter_records/source_metadata methods.
+2. Implement explicit SourceAdapter input_inventory/inspect/iter_records/source_metadata methods.
+   Declare every regular input dependency; directory inputs do not trigger automatic
+   recursive scanning. Only declared files may be read by official adapters.
    Return existing contract records, full typed keys and stable evidence/locators.
    Source-backed identity is independent from generated text; candidate links remain
    candidate, not verified native relationships. Do not guess identities from names.
@@ -37,12 +39,34 @@ native character_of and one candidate. It is a fixture, not real-source validati
 Example module is not a production known-source list. Third-party modules work with
 no Rust changes. Core structured/lexical operation needs no installed model.
 
+## Directory-input example
+
+```powershell
+python -m tools.normalized_source normalize --input examples/source_pack/raw_multi --adapter examples.source_pack.multi_adapter:MultiAdapter --pack-id demo-multi --output NEW_MULTI_BUNDLE
+python -m tools.normalized_source build-normalized --input NEW_MULTI_BUNDLE --output NEW_MULTI_PACK
+python -m tools.normalized_source validate --input NEW_MULTI_PACK
+```
+
+The adapter explicitly declares subjects.json, characters.json, relations.json and
+metadata.json. All four byte bindings are captured before and after every adapter
+read. Original raw files may be removed after normalization; bundle build is offline.
+Each source's metadata retains the full declared inventory (shared-all-inputs scope).
+Adjacent OUTPUT-import-input holds builder receipts, not distribution dependencies.
+The three-file lexical pack can be moved and validated without raw files or those receipts.
+
 ## Optional semantic command
 
 ```powershell
-python -m tools.generic_semantic --pack NEW_PACK --model FROZEN_BGE_MODEL --output NEW_SEMANTIC_PACK --index-builder /path/to/build_i8.exe --index-inspector /path/to/inspect_i8.exe
+python -m tools.generic_semantic --pack NEW_PACK --model FROZEN_BGE_MODEL --output NEW_SEMANTIC_PACK --workspace NEW_SEMANTIC_WORK --keep-workspace --index-builder /path/to/build_i8.exe --index-inspector /path/to/inspect_i8.exe
 python -m tools.normalized_source validate --input NEW_SEMANTIC_PACK --index-inspector /path/to/inspect_i8.exe
 ```
+
+After a failed publication, reuse the same verified workspace with
+`--workspace NEW_SEMANTIC_WORK --resume-workspace`; prepared vectors/mapping/index
+are verified and no re-encoding is performed. Existing final outputs are never
+overwritten. Without --keep-workspace, success removes workspace. FP32 vectors and
+intermediates never belong to runtime distribution: lexical has3 files and semantic
+has5 files (manifest/snapshot/membership/mapping/I8). Extra files fail new-pack validation.
 
 Native helpers are explicit prebuilt assets; building them is an offline developer
 step (`cargo build --release --features semantic --example build_i8 --example inspect_i8`),

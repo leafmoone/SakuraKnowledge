@@ -7,6 +7,9 @@ class DemoAdapter:
     adapter_id = 'example-demo-json'
     adapter_version = '1'
 
+    def input_inventory(self, path):
+        return [{'path': Path(path).name, 'role': 'raw_facts'}]
+
     def inspect(self, path):
         return {'namespaces': ['demo.subject', 'demo.character'], 'rows': len(json.loads(Path(path).read_bytes())['items'])}
 

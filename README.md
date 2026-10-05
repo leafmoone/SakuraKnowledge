@@ -8,8 +8,11 @@ Core discovers valid installed pack manifests, not four source names. Future ada
 can build standalone normalized packs without importing the mother DB or rebuilding
 other sources. See [adding a source](docs/adding-a-source.md),
 [pack contract](docs/source-pack-contract.md), and [copyable example](examples/source_pack/README.md).
-Generic semantic preparation is implemented; this stage validates synthetic tiny
-native fixtures, not a new real source or production BGE embedding run.
+Adapters declare every file through an authoritative input inventory; directory
+inputs and transferable bundles are supported. Semantic preparation keeps FP32 assets
+in a verified resumable workspace and publishes only the runtime artifact closed set.
+Validation uses synthetic tiny native fixtures, not a new real source or production
+BGE embedding run.
 
 ## Modular Windows x64 local candidate
 

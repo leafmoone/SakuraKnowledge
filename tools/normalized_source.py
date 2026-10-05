@@ -3,12 +3,14 @@ import argparse
 import importlib
 import json
 import re
+import shutil
 import sqlite3
 import subprocess
 from contextlib import closing
 from pathlib import Path
 
 from sakura_knowledge import storage
+from tools.source_inventory import capture, validate_inventory
 from tools.source_pack import binding, build_membership
 
 
@@ -23,21 +25,22 @@ def normalize(raw, adapter_name, output, pack_id):
     output.mkdir(parents=True, exist_ok=False)
     module, symbol = adapter_name.split(':', 1)
     adapter = getattr(importlib.import_module(module), symbol)()
-    input_binding = binding(raw)
+    inventory = capture(adapter, raw)
     source = adapter.source_metadata(raw)
+    observation = adapter.inspect(raw)
     records = output / 'records.jsonl'
     count = 0
     with records.open('x', encoding='utf-8') as stream:
         for record in adapter.iter_records(raw):
             stream.write(json.dumps(record, ensure_ascii=False) + '\n')
             count += 1
-    if binding(raw) != input_binding:
-        raise ValueError('raw input changed')
+    if capture(adapter, raw) != inventory:
+        raise ValueError('raw input inventory changed')
     manifest = {'schema': 'sakura-normalized-source-v1', 'pack_id': safe_id(pack_id),
                 'display_name': pack_id, 'version': '1', 'capabilities': ['structured', 'lexical'],
-                'requires_model': None, 'sources': [source], 'namespaces': adapter.inspect(raw)['namespaces'],
+                'requires_model': None, 'sources': [source], 'namespaces': observation['namespaces'],
                 'adapter': {'id': adapter.adapter_id, 'version': adapter.adapter_version},
-                'input_digests': [input_binding], 'records': {**binding(records), 'count': count},
+                'input_inventory': inventory, 'input_digests': inventory, 'inventory_scope': 'all_declared_inputs_shared_by_each_source', 'records': {**binding(records), 'count': count},
                 'trust_declarations': 'source-backed identities; generated text never identity; candidate links not verified'}
     (output / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
     return manifest
@@ -49,7 +52,15 @@ def build_normalized(bundle, output):
     if manifest['schema'] != 'sakura-normalized-source-v1':
         raise ValueError('normalized schema')
     safe_id(manifest['pack_id'])
+    inventory = validate_inventory(manifest.get('input_inventory', manifest.get('input_digests')))
+    if 'input_digests' in manifest and validate_inventory(manifest['input_digests']) != inventory:
+        raise ValueError('conflicting input inventory')
+    declared_ns = manifest['namespaces']
+    if not declared_ns or len(declared_ns) != len(set(declared_ns)) or any(not isinstance(n, str) or not n or len(n) > 256 or any(ord(c) < 32 for c in n) for n in declared_ns):
+        raise ValueError('normalized namespace declaration')
     artifact = manifest['records']
+    if not isinstance(artifact.get('count'), int) or isinstance(artifact['count'], bool) or artifact['count'] < 0:
+        raise ValueError('normalized record count')
     if artifact['path'] != 'records.jsonl' or binding(bundle / artifact['path']) != {k: artifact[k] for k in ('path', 'sha256', 'size')}:
         raise ValueError('normalized digest mismatch')
     with (bundle / 'records.jsonl').open('rb') as stream:
@@ -72,7 +83,7 @@ def build_normalized(bundle, output):
         source.update({'path': str((bundle / 'records.jsonl').resolve()), 'adapter': 'contract-jsonl-v1',
                        'local_sha256': artifact['sha256'], 'repo': meta.get('repo', 'local://normalized'),
                        'provider': meta.get('provider', manifest['pack_id']), 'schema_version': 'contract-v2',
-                       'counts': {'records': artifact['count']}, 'input_file_inventory': manifest['input_digests'],
+                       'counts': {'records': artifact['count']}, 'input_file_inventory': inventory,
                        'source_references': [], 'refresh_status': 'frozen_normalized'})
         if len(manifest['sources']) > 1:
             local_records = work / f'source-{index}.jsonl'
@@ -94,11 +105,18 @@ def build_normalized(bundle, output):
     with closing(sqlite3.connect(snapshot)) as conn:
         conn.execute("DELETE FROM search_fts WHERE NOT EXISTS(SELECT 1 FROM entry_evidence v WHERE v.entry_id=search_fts.entry_id AND v.status='source_backed') OR EXISTS(SELECT 1 FROM entries e WHERE e.id=search_fts.entry_id AND e.conflicted!=0)")
         conn.commit()
+        conn.execute('PRAGMA wal_checkpoint(TRUNCATE)')
+        conn.execute('PRAGMA journal_mode=DELETE')
+    for name in ['build_report.json', 'sources.lock.json']:
+        if (output / name).exists():
+            shutil.move(str(output / name), str(work / name))
+    for name in ['knowledge.sqlite-wal', 'knowledge.sqlite-shm']:
+        (output / name).unlink(missing_ok=True)
     membership = build_membership(snapshot, output / 'lexical-membership.sqlite')
     with closing(sqlite3.connect(snapshot.resolve().as_uri() + '?mode=ro', uri=True)) as conn:
         namespaces = [r[0] for r in conn.execute('SELECT DISTINCT namespace FROM entries ORDER BY namespace')]
         fts = conn.execute('SELECT count(*) FROM search_fts').fetchone()[0]
-    pack = {'schema': 'sakura-source-pack-v1', 'pack_id': manifest['pack_id'],
+    pack = {'schema': 'sakura-source-pack-v1', 'distribution_closed_set': True, 'pack_id': manifest['pack_id'],
             'display_name': manifest['display_name'], 'version': manifest['version'],
             'capabilities': ['structured', 'lexical'], 'requires_model': None,
             'source_ids': [s['source_id'] for s in sources], 'namespaces': namespaces,
@@ -124,6 +142,11 @@ def validate(pack, index_inspector=None):
     pack = Path(pack)
     manifest = json.loads((pack / 'manifest.json').read_bytes())
     safe_id(manifest['pack_id'])
+    if manifest.get('distribution_closed_set'):
+        expected_files = {'manifest.json'} | {item['path'] for item in manifest['artifacts'].values()}
+        actual_files = {p.relative_to(pack).as_posix() for p in pack.rglob('*') if p.is_file()}
+        if actual_files != expected_files or any(p.is_symlink() for p in pack.rglob('*')):
+            raise ValueError('runtime distribution file closed set')
     if manifest.get('schema') != 'sakura-source-pack-v1':
         raise ValueError('source pack schema')
     caps = manifest.get('capabilities', [])

@@ -1,63 +1,72 @@
 # Current delivery status
 
-## Generic source-pack extension
+## Local hardening: input inventory and semantic publication
 
-Baseline c84e5d6643736f8d6ddb2ff9b0dc7e3d8714d2c7. Core now discovers actual
-installed v1 manifests without four-name whitelist or fixed missing-source catalog.
-Unknown safe installation IDs/namespaces work, directory !=pack_id works, duplicate
-IDs/capabilities and invalid capability/model/artifact combinations fail closed.
-Identity/resolve/tag provenance and semantic fusion weights are unchanged.
+Baseline46e63856ca58d47fa0938b400096f51ab678730b. Only Python adapter freeze,
+normalized distribution, semantic workspace/publication, fixtures/docs changed.
+No Rust/ranking/fusion/RRF/model contract/tag proof/identity/resolve changes.
+No mother/oldpack/ANN/model writes, large export/embedding/download or120 rerun.
 
-Generic raw adapter → normalized bundle → standalone builder reuses storage importer,
-not mother DB. Explicit module:class requires no Rust registration. Actual demo:
-2subject/2character,4aliases/4documents (one generated text under backed identity),
-1verified native relation/1candidate,6normalized records,4trusted FTS. Multisource
-ownership is tested with two sources; generated-only identities/stubs do not gain
-trust or FTS. New snapshot retains original documents/evidence, only indexing
-excludes missing backed identity. Full contract: docs/source-pack-contract.md;
-copyable commands/template: docs/adding-a-source.md and examples/source_pack/.
+### A: complete declared input boundary
 
-### Actual evidence
+SourceAdapter input_inventory explicitly plans all dependent regular files.
+File and directory roots work; no default recursive scan. Tools reject unsafe,
+duplicate, symlink/reparse/escaping paths, recompute actual sizes/SHA256 before
+metadata→inspect→complete records consume, then replan/hash all files afterward.
+Same-size mutation, deletion, newly declared file or change during any read phase
+fails with no normalized manifest. Portable inventory has relative POSIX paths,
+no absolute paths/mtime. Legacy single-file plans/bundles remain compatible.
+A third-party adapter privately reading undeclared files is outside reproducibility
+proof; no sandbox claim. Official multi adapter read wrapper observed exact declared
+four-file set. Build-normalized checks inventory/count/digest/ownership offline;
+raw inputs were actually deleted before successful fixture build. Each source
+stores complete inventory with explicit shared-all-inputs scope.
 
-- Generic Python35PASS (2.38s): raw conversion, no-mother SQLite path allowlist,
-  digest/count/source checks, two-owner closure, rehashed orphan FTS/membership
-  rejection, generated-only/stub identity boundary and tiny semantic native closure.
-- Final full Python **1290PASS/18Win1314 symlink skips/55subtests**,59.44s,
-  explicit SKNOW_RS_TEST_BIN, DLLPATH and D temp. Earlier wrong env run1158/150
-  preserved as incomplete coverage. Rust **62PASS**,0.59s; Ruff and diffcheckPASS.
-- Unicode/space external root D:/Sakura 通用 来源 示例, directory not-the-pack-id
-  holds demo-wiki. Actual packs/lookup/search/related/retrieve exit0, no model,
-  retrieve query/process encodings0 (7.567ms). Move demo out and restart: only
-  second-wiki installed, lookup still works. Restore supports both independently.
-- Current old4 manifests load unchanged: Dan lookup, actual Moegirl alias lookup
-  found typed key, new tag-provenance search. Dan single retrieve200081bytes/
-  207.6064ms and Dan+Bangumi40104bytes/334.9596ms each one shared query encoding.
-  An attempted nonexistent Moegirl title returned not_found, not successful evidence.
-- Synthetic semantic4rows: only encoder/tokenizer mocked, actual trusted projection
- 384/64 → mapping/FP32 NPY → native Cos/I8/M16/add256/search2048 → manifest/native
-  inspect PASS. Real two unknown-pack ANN view/search/reload → existing federation
-  compatible/proof merge/order invariance PASS. Not a full ONNX loader mock claim.
-- NPY wrongdimension/f64/Fortran/truncated inputs all native exit1. Native I8 builder
-  reads actual N now, no1366520 row hardcode. Existing ANN graphs remain untouched.
-- Standalone semantic validate outside Git cwd with supplied native inspect executable
-  PASS,4rows228127bytes. Missing native inspector explicitly errors, never PASS.
+Actual example raw_multi input bindings total809bytes: characters231/metadata223/
+relations112/subjects243; six records1986bytes. build/hardening-multi-bundle and
+build/hardening-multi-pack actual build/inspect/validatePASS. Pack156772bytes:
+manifest.json, knowledge.sqlite, lexical-membership.sqlite only. Four entries,
+four documents (backed identity with one generated text), fourFTS, two links with
+verified/candidate distinction preserved. Original builder receipts are moved to
+adjacent import-input workspace, not deleted or bundled as runtime data.
+Core build/hardening-portable-root no model: packs/lookup/search/related/retrieve
+all exit0, retrieve9919bytes2.6266ms query/process encoding0. Single-file demo
+remains covered by existing generic pipeline tests.
 
-### Assets and limitations
+### B: workspace and manifest-last publication
 
-Create-new Core: build/generic-components/SakuraKnowledge-core-win-x64,
-83261548bytes/17files, receipt build/generic-core-inventory.json. It includes generic
-query binaries plus explicit offline build_i8/inspect_i8 tools; old Core preserved.
-No model or source asset copied into Core. Original packs/model/mother/vectors/ANN
-remain unchanged. Runtime pack requires compact manifests/DB/membership and optional
-mapping/index, not audit/proofs/gold raw receipts. New semantic FP32 preparation
-output preserved separately by builder, not used by query as required ANN asset.
+--workspace defaults OUTPUT.semantic-work, create-new; --resume-workspace explicit.
+Bound inputs: actual pack manifest/artifacts, model manifest/tokenizer, fixed build
+parameters and synthetic-vs-production mode. Verified mapping/vectors/I8 size/hash,
+FP32shape/norm and native index plus full mapping/document/identity closure before
+publication. New runtime staging validates independently, then same-volume directory
+rename publishes complete manifest-last output. Existing outputs and nested/colliding
+input/output/workspace paths fail before encoding. Failures preserve workspace path;
+success cleanup defaults, --keep-workspace explicit. Original inputs untouched.
 
-Production new-source BGE embedding NOT_RUN; no new real source/data/download,
-120 ranking rerun (fusion unchanged), Pi/Pool/upload/compression or main merge.
-Existing runtime120 PASS / quality FAIL remains historical, not upgraded by fixtures.
-Rights NOT_CLEARED and RSS unmeasured. Frozen tag proof66979 remains baseline.
-A delegated build mistakenly attempted target
-D:/SakuraTool/SakuraPool-P4-work/rust-target; GNU missing g++/dlltool and MSVC Git
-linker failures were reported. Actual external build-artifact write is UNKNOWN,
-not asserted absent; no external cleanup/restoration performed. Subsequent successful
-builds used explicit in-repository D target. No next real-source stage started.
+Actual synthetic4row native I8 completed before injected publication failure;
+workspace retained vectors.npy. Resume mockencoder calls **0**, I8 bytes identical,
+final exact file set manifest.json/knowledge.sqlite/lexical-membership.sqlite/
+mapping.sqlite/vectors.i8.usearch, no NPY. Changed model bytes reject before encode;
+fresh existing workspace/old output reject. Default successful cleanup also tested.
+New distribution_closed_set recursively rejects extra NPY/hidden/temp/symlink files;
+legacy old4 unflagged v1 packs are not forced to rewrite. Runtime inspect excludes
+workspace size; prepare reports workspace_bytes separately. Native helpers are explicit.
+
+### Verification and limits
+
+Final full Python **1309PASS/19Win1314 symlink skips/55subtests**,64.20s,
+SKNOW_RS_TEST_BIN final binary, runtime DLLPATH and D temp. Related subset54PASS/
+1skip,2.61s (not added to full total). Rust62PASS0.64s with explicit in-repository
+target; Ruff/diffcheckPASS. Subsequent receipt relocation only retested scoped checks.
+Existing four-pack discovery/source filters/Dan+Moe structured/current tag FTS pass.
+Dan semantic single200095bytes217.3563ms and Dan+Bangumi40113bytes335.535ms,
+each shared query encoding1. Core binaries and old pack manifests/assets unchanged.
+
+Production new-source BGE embedding NOT_RUN. Only tiny encoder/tokenizer mocked,
+actual native mapping/I8/inspect exercised; not new semantic quality validation.
+No120 (retrieval unchanged), Pi/Pool/compression/upload/main merge/next real source.
+Historical runtime120PASS/qualityFAIL, rightsNOT_CLEARED and RSS unmeasured persist.
+Prior external-target attempt's actual write remains UNKNOWN; this stage neither
+accessed/investigated/cleaned that path. All current outputs/tests/targets repository
+contained. Contract/docs: source-pack-contract.md, adding-a-source.md, example README.

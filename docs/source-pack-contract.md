@@ -34,6 +34,22 @@ source_id; single-source ownership may be implicit but a foreign explicit owner 
 `src/sakura_knowledge/source_adapter.py` is a small explicit interface, not registry,
 plugin discovery or workflow framework. Third parties supply module:class explicitly.
 
+`input_inventory(path)` is the authoritative complete dependency plan. File roots
+use parent-relative basename; directory roots use declared POSIX relative paths,
+not implicit recursive scanning. Each file is regular, root-contained, non-symlink/
+non-reparse; names are unique, no absolute/backslash/empty/dot/dotdot components.
+Tool hashes every declared byte before source_metadata/inspect/iter_records, then
+replans and rehashes after complete consumption. Paths/size/SHA must all match;
+same-size mutation, removal or newly declared input fails before manifest publication.
+Inventory itself declares paths only; official adapters read only declared files.
+No Python sandbox is promised: private undeclared third-party reads are not proven
+reproducible. Limits1million files/1PiB total guard accidental scans, not small fixtures.
+Portable input_inventory has no absolute paths or mtimes. Legacy input_digests may
+mirror it but conflicts fail; single-file legacy adapters/bundles remain supported.
+Build-normalized verifies recorded inventory/count/digest/ownership without original
+raw inputs: the bundle is transferable/offline. Each source receives the complete
+frozen inventory with explicit shared-all-inputs scope, not guessed per-source subsets.
+
 Generic builder never opens the mother or other packs. It reuses `storage.build`
 for source-account, frozen-input import, schema/FTS/FK/ledger checks, then excludes
 FTS under generated-only/conflicted identities in its owned new snapshot. Generated
@@ -55,7 +71,19 @@ use installed Python tooling and supplied native executable. inspect is readonly
 `tools/generic_semantic.py` validates input pack; freezes/verifies explicit local
 shared-model artifact bindings, reuses `p4_chunks.project_document`384tokens/64overlap,
 encodes trusted documents under source-backed identities, writes local mapping and
-FP32 NPY, invokes native I8 builder and validates published manifest/native index.
+FP32 NPY in an explicit create-new workspace, invokes native I8 builder and validates
+candidate runtime staging/native index before same-volume directory publication.
+`--workspace` defaults to OUTPUT.semantic-work; `--resume-workspace` explicitly verifies
+input pack/model/parameters and intermediate size/SHA bindings, shape/norm, native
+index and mapping closure, then reuses prepared assets without encoding. Failures
+retain the workspace and report its path. Success cleans it unless --keep-workspace.
+Input/output/workspace nesting or existing final outputs fail before expensive work.
+
+New packs declare distribution_closed_set=true. Final runtime is manifest.json plus
+snapshot, membership and (semantic only) mapping/I8; no vectors.npy/chunks/temp/log.
+Validate recursively rejects extra files, including hidden or NPY, and symlinks.
+Legacy v1 packs without strict flag retain their legal older distribution extras.
+Runtime inspect actual_bytes excludes workspace; build reports workspace_bytes separately.
 No query ever builds/downloads assets. Existing vectors/ANN/model are not modified.
 Production encoding requires numpy/tokenizers/onnxruntime and the frozen local BGE-M3
 ONNX assets. This stage executed synthetic four-row fixtures with only expensive
