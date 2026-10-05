@@ -1,5 +1,34 @@
 # Current delivery status
 
+## Local pack assembly safety fix
+
+Baseline `492f36d212efca7b654c48fd8b61fcf4a4b9792d`. Assembly now preflights
+all required resources/destination collisions before expensive preparation, copies supplied
+I8 without consuming its source (cross-volume safe), uses exclusive owned staging and
+validates closed files/content bindings/membership before publication. Inventory publishes
+before manifest; manifest is last atomic create-new marker. Copy/publication failure rolls
+back only newly owned files/stage, preserving reusable DB/mapping and source I8. Existing
+valid package refused; no overwrite/auto rebuild on retry. Same-volume hard-link support
+is required for create-new publication. Validation is strict Python file/manifest checking,
+not a new native model/index open. Tiny assembly/export tests24PASS in1.29s; no full prepare,
+export, ANN build, content scan, parameters or120 rerun this round; current16.57GB pack unchanged.
+
+Reusable commands after explicit native build (paths examples; NEW contains completed DB/mapping):
+
+```powershell
+python -m tools.portable_pack --repository . --output NEW --index EXISTING_I8.usearch --native-root C:/msys64/ucrt64
+# Only for genuinely new preparation; refuses existing output/index before heavy work:
+python -m tools.portable_pack --prepare --repository . --output NEW_EXCLUSIVE --index D:/NEW_I8.usearch --native-root C:/msys64/ucrt64
+```
+
+G42 one new directed serial pair using same current release binary and frozen input:
+query `初音未来`, kind character, namespace moegirl.character, exact true. Mother exit0,
+stdout800/stderr0, wall624.06999996ms; runtime exit0, stdout800/stderr0,
+wall280.03639996ms. Complete parsed JSON equal: entity_found_tag_unmapped.
+Exclusive evidence `build/portable-g42-492f36d/` retains each stdout/stderr and command JSON.
+This successful new pair does not reconstruct the unretained historical timeout side,
+nor establish a general speedup; no query/runtime contract changed.
+
 ## Portable Windows x64 CPU: usable I8 candidate, QUALITY_FAIL retained
 
 Baseline `2e80df373f3ef036dff2c7dac83069922b69405e`. Local assembled directory:
