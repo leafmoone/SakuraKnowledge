@@ -2,6 +2,15 @@
 
 Independent offline knowledge core: Python 3.11+ and a read-only Rust CLI. Basic structured queries need no model/GPU/service/Pool. Optional semantic retrieval uses the locally prepared CPU model and evidence-preserving hybrid pack. Current dev delivery: **runtime120 PASS / quality FAIL** (semantic Recall@10 .975 < original target1); usable with that known limitation, not independently generalized.
 
+## Adding a source
+
+Core discovers valid installed pack manifests, not four source names. Future adapters
+can build standalone normalized packs without importing the mother DB or rebuilding
+other sources. See [adding a source](docs/adding-a-source.md),
+[pack contract](docs/source-pack-contract.md), and [copyable example](examples/source_pack/README.md).
+Generic semantic preparation is implemented; this stage validates synthetic tiny
+native fixtures, not a new real source or production BGE embedding run.
+
 ## Modular Windows x64 local candidate
 
 The modular layout separates **Core + optional source packs + one optional shared model**.

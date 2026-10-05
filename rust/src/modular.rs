@@ -15,11 +15,11 @@ impl PackRuntime {
   let root=config.parent().ok_or("config parent")?.to_path_buf();let cfg:Value=serde_json::from_slice(&std::fs::read(config)?)?;
   let relative=|name:&str|->Result<PathBuf>{let p=Path::new(cfg[name].as_str().ok_or("config directory required")?);if p.is_absolute()||p.components().any(|c|!matches!(c,std::path::Component::Normal(_))) {return Err("config directories must be relative".into());}Ok(root.join(p))};
   let packdir=relative("packs_directory")?;let model_directory=relative("model_directory")?;let bin_directory=relative("bin_directory")?;let mut packs=Vec::new();
-  if packdir.exists(){for entry in std::fs::read_dir(&packdir)? {let path=entry?.path();let file=path.join("manifest.json");if !file.exists(){continue;}let manifest:Value=serde_json::from_slice(&std::fs::read(file)?)?;if manifest["schema"]!="sakura-source-pack-v1"{return Err("unsupported source manifest".into());}let id=manifest["pack_id"].as_str().ok_or("pack_id required")?.to_owned();if !["danbooru","bangumi","moegirl","tag-wiki"].contains(&id.as_str()){return Err("unsupported source pack_id".into());}let capabilities=manifest["capabilities"].as_array().ok_or("capabilities required")?;if !capabilities.iter().any(|v|v=="structured")||!capabilities.iter().any(|v|v=="lexical"){return Err("unsupported source capabilities".into());}if ["moegirl","tag-wiki"].contains(&id.as_str())&&(!manifest["requires_model"].is_null()||capabilities.iter().any(|v|v=="semantic")){return Err("lexical source must not require semantic model".into());}for item in manifest["artifacts"].as_object().ok_or("source artifacts required")?.values(){let artifact=Path::new(item["path"].as_str().ok_or("artifact path required")?);if artifact.is_absolute()||artifact.components().count()!=1||artifact.components().any(|c|!matches!(c,std::path::Component::Normal(_))){return Err("unsafe source artifact path".into());}if !path.join(artifact).is_file(){return Err("source_asset_missing".into());}}if packs.iter().any(|p:&SourcePack|p.id==id){return Err("duplicate pack_id".into());}packs.push(SourcePack{id,manifest,root:path});}}
+  if packdir.exists(){for entry in std::fs::read_dir(&packdir)? {let path=entry?.path();let file=path.join("manifest.json");if !file.exists(){continue;}let manifest:Value=serde_json::from_slice(&std::fs::read(file)?)?;if manifest["schema"]!="sakura-source-pack-v1"{return Err("unsupported source manifest".into());}let id=manifest["pack_id"].as_str().ok_or("pack_id required")?.to_owned();if id.is_empty()||id.len()>128||id=="."||id==".."||!id.bytes().all(|b|b.is_ascii_alphanumeric()||b"-_.".contains(&b)){return Err("unsafe source pack_id".into());}let capabilities=manifest["capabilities"].as_array().ok_or("capabilities required")?;if !capabilities.iter().any(|v|v=="structured")||!capabilities.iter().any(|v|v=="lexical"){return Err("unsupported source capabilities".into());}let unique:BTreeSet<_>=capabilities.iter().filter_map(Value::as_str).collect();if unique.len()!=capabilities.len(){return Err("duplicate source capabilities".into());}let sem=capabilities.iter().any(|v|v=="semantic");let artifacts=manifest["artifacts"].as_object().ok_or("source artifacts required")?;let expected:BTreeSet<&str>=if sem{["snapshot","lexical_membership","mapping","index"].into_iter().collect()}else{["snapshot","lexical_membership"].into_iter().collect()};if artifacts.keys().map(String::as_str).collect::<BTreeSet<_>>()!=expected||(!sem&&!manifest["semantic"].is_null()){return Err("artifact capability contradiction".into());}let mut artifact_paths=BTreeSet::new();for item in artifacts.values(){if !artifact_paths.insert(item["path"].as_str().ok_or("artifact path required")?){return Err("duplicate artifact path".into());}}if capabilities.iter().any(|v|!matches!(v.as_str(),Some("structured"|"lexical"|"semantic"))){return Err("unsupported source capability".into());}if sem {if manifest["requires_model"]!="bge-m3"{return Err("unsupported_model_contract".into());}}else if !manifest["requires_model"].is_null(){return Err("lexical source must not require semantic model".into());}for field in ["source_ids","namespaces"]{let values=manifest[field].as_array().ok_or("source_ids/namespaces required")?;let mut seen=BTreeSet::new();if values.is_empty(){return Err("empty source_ids/namespaces".into());}for value in values{let s=value.as_str().ok_or("invalid source namespace/id")?;if s.is_empty()||s.len()>256||s.chars().any(char::is_control)||!seen.insert(s){return Err("unsafe/duplicate source namespace/id".into());}}}for item in manifest["artifacts"].as_object().ok_or("source artifacts required")?.values(){let artifact=Path::new(item["path"].as_str().ok_or("artifact path required")?);if artifact.is_absolute()||artifact.components().count()!=1||artifact.components().any(|c|!matches!(c,std::path::Component::Normal(_))){return Err("unsafe source artifact path".into());}if !path.join(artifact).is_file(){return Err("source_asset_missing".into());}}if packs.iter().any(|p:&SourcePack|p.id==id){return Err("duplicate pack_id".into());}packs.push(SourcePack{id,manifest,root:path});}}
   packs.sort_by(|a,b|a.id.cmp(&b.id));Ok(Self{root,packs,model_directory,bin_directory})
  }
  pub fn selected(&self,sources:&[String])->Result<Vec<&SourcePack>> {if sources.is_empty(){return Ok(self.packs.iter().collect());}let wanted:BTreeSet<_>=sources.iter().flat_map(|s|s.split(',')).filter(|s|!s.is_empty()).collect();for s in &wanted {if !self.packs.iter().any(|p|p.id==*s){return Err(format!("source_pack_missing: {s}").into());}}Ok(self.packs.iter().filter(|p|wanted.contains(p.id.as_str())).collect())}
- pub fn list(&self)->Value {let installed:Vec<_>=self.packs.iter().map(|p|json!({"pack_id":p.id,"version":p.manifest["version"],"capabilities":p.manifest["capabilities"],"requires_model":p.manifest["requires_model"],"lexical_mode":p.manifest.get("lexical_mode").cloned().unwrap_or(json!("trusted_documents_and_identity")),"trusted_fts_documents":p.manifest["trusted_fts_documents"],"model_present":self.model_directory.join("bge-m3/manifest.json").is_file(),"status":if p.manifest["version"].is_string() && p.root.join("knowledge.sqlite").is_file(){"installed"}else{"invalid"}})).collect();let missing:Vec<_>=["danbooru","bangumi","moegirl","tag-wiki"].iter().filter(|id|!self.packs.iter().any(|p|p.id==**id)).collect();json!({"installed_packs":installed,"not_installed":missing,"model":{"id":"bge-m3","installed":self.model_directory.join("bge-m3/manifest.json").is_file()}})}
+ pub fn list(&self)->Value {let installed:Vec<_>=self.packs.iter().map(|p|json!({"pack_id":p.id,"version":p.manifest["version"],"capabilities":p.manifest["capabilities"],"requires_model":p.manifest["requires_model"],"lexical_mode":p.manifest.get("lexical_mode").cloned().unwrap_or(json!("trusted_documents_and_identity")),"trusted_fts_documents":p.manifest["trusted_fts_documents"],"model_present":self.model_directory.join("bge-m3/manifest.json").is_file(),"status":if p.manifest["version"].is_string() && p.root.join("knowledge.sqlite").is_file(){"installed"}else{"invalid"}})).collect();let missing:Vec<String>=Vec::new();json!({"installed_packs":installed,"not_installed":missing,"model":{"id":"bge-m3","installed":self.model_directory.join("bge-m3/manifest.json").is_file()}})}
  pub fn structured(&self,command:&str,query:&str,args:&[String],sources:&[String])->Result<Value>{
   let selected=self.selected(sources)?;let start=std::time::Instant::now();let mut parts=Vec::new();
   let option=|name:&str|args.windows(2).find(|p|p[0]==name).map(|p|p[1].as_str());let kind=option("--kind");let ns=option("--namespace");let limit=option("--limit").or_else(||option("--topk")).map(str::parse::<u32>).transpose()?.unwrap_or(10);
@@ -107,3 +107,167 @@ pub fn merge(command:&str,_query:&str,parts:Vec<(String,Value)>,installed:Vec<St
 #[test]fn source_rank_never_compares_bm25_and_exact_before_limit(){let p=vec![("a".into(),json!({"candidates":[{"entry_key":{"kind":"page","namespace":"a","value":"first"},"score":-10000,"matched_by":"fts"}]})),("b".into(),json!({"candidates":[{"entry_key":{"kind":"page","namespace":"b","value":"second"},"score":-1,"matched_by":"fts"},{"entry_key":{"kind":"page","namespace":"b","value":"exact"},"matched_by":"exact"}]}))];let out=merge("search","q",p,vec![],1);assert_eq!(out["candidates"][0]["entry_key"]["value"],"exact");}
 #[test]fn merged_same_key_keeps_both_citations(){let k=json!({"kind":"character","namespace":"x","value":"a"});let p=vec![("a".into(),json!({"candidates":[{"entry_key":k,"citations":[{"source_id":"one","evidence_id":"1"}]}]})),("b".into(),json!({"candidates":[{"entry_key":k,"citations":[{"source_id":"two","evidence_id":"2"}]}]}))];let v=merge("lookup","a",p,vec![],10);assert_eq!(v["status"],"found");assert_eq!(v["candidates"][0]["citations"].as_array().unwrap().len(),2);}
 #[test]fn identical_typed_keys_are_not_ambiguity(){let row=json!({"entry_key":{"kind":"character","namespace":"x","value":"a"}});let out=merge("lookup","a",vec![("one".into(),json!({"candidates":[row.clone()]})),("two".into(),json!({"candidates":[row]}))],vec![],10);assert_eq!(out["candidates"].as_array().unwrap().len(),1);assert_eq!(out["status"],"found");}#[test]fn different_keys_keep_ambiguity(){let rows=vec![("one".into(),json!({"candidates":[{"entry_key":{"kind":"character","namespace":"x","value":"a"}}]})),("two".into(),json!({"candidates":[{"entry_key":{"kind":"character","namespace":"y","value":"a"}}]}))];assert_eq!(merge("lookup","a",rows,vec![],10)["status"],"ambiguous");}}
+
+#[cfg(test)]
+mod generic_discovery_tests {
+    use super::*;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    struct Fixture { root: PathBuf }
+    impl Fixture {
+        fn new() -> Self {
+            static NEXT: AtomicUsize = AtomicUsize::new(0);
+            let root = std::env::temp_dir().join(format!("sakura-discovery-{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
+            std::fs::create_dir(&root).unwrap();
+            std::fs::create_dir(root.join("packs")).unwrap();
+            std::fs::write(root.join("config.json"), serde_json::to_vec(&json!({"packs_directory":"packs","model_directory":"models","bin_directory":"bin"})).unwrap()).unwrap();
+            Self { root }
+        }
+        fn pack(&self, directory: &str, manifest: &Value) -> PathBuf {
+            let root = self.root.join("packs").join(directory);
+            std::fs::create_dir_all(&root).unwrap();
+            // Discovery checks presence, not artifact contents or snapshot schema.
+            for name in ["knowledge.sqlite", "lexical-membership.sqlite", "mapping.sqlite", "index.usearch"] {
+                std::fs::write(root.join(name), b"placeholder").unwrap();
+            }
+            std::fs::write(root.join("manifest.json"), serde_json::to_vec(manifest).unwrap()).unwrap();
+            root
+        }
+        fn discover(&self) -> Result<PackRuntime> { PackRuntime::discover(&self.root.join("config.json")) }
+    }
+    impl Drop for Fixture {
+        fn drop(&mut self) { std::fs::remove_dir_all(&self.root).unwrap(); }
+    }
+    fn manifest(id: &str, semantic: bool) -> Value {
+        let mut v = json!({"schema":"sakura-source-pack-v1","pack_id":id,"version":"tiny-v1","capabilities":["structured","lexical"],"requires_model":null,"source_ids":["independent-provider"],"namespaces":["future:custom/namespace"],"trusted_fts_documents":1,"artifacts":{"snapshot":{"path":"knowledge.sqlite"},"lexical_membership":{"path":"lexical-membership.sqlite"}}});
+        if semantic {
+            v["capabilities"] = json!(["structured","lexical","semantic"]);
+            v["requires_model"] = json!("bge-m3");
+            v["semantic"] = json!({"rows":1,"dimension":1024});
+            v["artifacts"]["mapping"] = json!({"path":"mapping.sqlite"});
+            v["artifacts"]["index"] = json!({"path":"index.usearch"});
+        }
+        v
+    }
+    fn rejected(v: Value, expected: &str) {
+        let f = Fixture::new();
+        f.pack("unrelated-directory", &v);
+        let error = f.discover().err().expect("accepted invalid manifest").to_string();
+        assert!(error.contains(expected), "expected {expected}, got {error}");
+    }
+    #[test]
+    fn unknown_ids_and_nonwhitelisted_namespaces_use_manifest_not_directory() {
+        let f = Fixture::new();
+        let z = f.pack("first-directory", &manifest("z-future.pack", true));
+        let a = f.pack("second-directory", &manifest("A_custom-1", false));
+        let r = f.discover().unwrap();
+        assert_eq!(r.packs.iter().map(|p|p.id.as_str()).collect::<Vec<_>>(), ["A_custom-1", "z-future.pack"]);
+        assert_eq!(r.packs[0].root, a);
+        assert_eq!(r.packs[1].root, z);
+        assert_eq!(r.selected(&["z-future.pack,A_custom-1".into(), "z-future.pack".into()]).unwrap().len(), 2);
+        assert_eq!(r.list()["not_installed"], json!([]));
+        assert_eq!(r.list()["installed_packs"][0]["status"], "installed");
+    }
+    #[test]
+    fn duplicate_manifest_ids_in_different_directories_are_rejected() {
+        let f = Fixture::new();
+        f.pack("one", &manifest("future", false));
+        f.pack("two", &manifest("future", true));
+        assert_eq!(f.discover().err().unwrap().to_string(), "duplicate pack_id");
+    }
+    #[test]
+    fn unsafe_pack_ids_are_rejected() {
+        for id in ["", ".", "..", "../escape", "a/b", "a\\b", "a b", "中文", &"x".repeat(129)] {
+            rejected(manifest(id, false), "unsafe source pack_id");
+        }
+    }
+    #[test]
+    fn duplicate_capabilities_are_rejected() {
+        let mut v = manifest("future", false);
+        v["capabilities"] = json!(["structured","lexical","lexical"]);
+        rejected(v, "duplicate source capabilities");
+    }
+    #[test]
+    fn unsupported_semantic_model_is_rejected() {
+        for model in [json!("future-model"), Value::Null] {
+            let mut v = manifest("future", true);
+            v["requires_model"] = model;
+            rejected(v, "unsupported_model_contract");
+        }
+    }
+    #[test]
+    fn lexical_semantic_capability_contradictions_are_rejected() {
+        let mut v = manifest("future", false);
+        v["semantic"] = json!({"rows":1});
+        rejected(v, "artifact capability contradiction");
+        let mut v = manifest("future", false);
+        v["artifacts"]["index"] = json!({"path":"index.usearch"});
+        rejected(v, "artifact capability contradiction");
+        let mut v = manifest("future", true);
+        v["artifacts"].as_object_mut().unwrap().remove("mapping");
+        rejected(v, "artifact capability contradiction");
+        let mut v = manifest("future", false);
+        v["requires_model"] = json!("bge-m3");
+        rejected(v, "lexical source must not require semantic model");
+    }
+    #[test]
+    fn unsafe_artifact_paths_and_duplicate_paths_are_rejected() {
+        for path in ["../knowledge.sqlite", "sub/knowledge.sqlite", "/knowledge.sqlite", ".", ".."] {
+            let mut v = manifest("future", false);
+            v["artifacts"]["snapshot"]["path"] = json!(path);
+            rejected(v, "unsafe source artifact path");
+        }
+        let mut v = manifest("future", false);
+        v["artifacts"]["snapshot"]["path"] = json!("lexical-membership.sqlite");
+        rejected(v, "duplicate artifact path");
+    }
+    #[test]
+    fn unsafe_or_duplicate_namespace_and_source_metadata_is_rejected() {
+        for field in ["namespaces", "source_ids"] {
+            for values in [json!([]), json!([""]), json!(["bad\u{0000}name"]), json!(["bad\nname"]), json!(["x","x"]), json!(["x".repeat(257)])] {
+                let mut v = manifest("future", false);
+                let empty = values.as_array().unwrap().is_empty();
+                v[field] = values;
+                rejected(v, if empty { "empty source_ids/namespaces" } else { "unsafe/duplicate source namespace/id" });
+            }
+        }
+    }
+    #[test]
+    fn lexical_unknown_pack_is_discovered_without_model_assets() {
+        let f = Fixture::new();
+        f.pack("lexical-only", &manifest("future-lexical", false));
+        let r = f.discover().unwrap();
+        assert!(!r.model_directory.exists());
+        assert_eq!(r.list()["model"]["installed"], false);
+        assert_eq!(r.list()["installed_packs"][0]["requires_model"], Value::Null);
+        #[cfg(feature="semantic")]
+        {
+            let runtime = ModularSemantic::open(&f.root.join("config.json"), &[]).unwrap();
+            assert_eq!(runtime.open_timings_ms["model_sessions"], 0);
+            assert!(runtime.encoder.is_none());
+            assert!(runtime.handles.is_empty());
+        }
+    }
+    #[cfg(feature="semantic")]
+    #[test]
+    fn unknown_pack_federation_contracts_and_provenance() {
+        let f = Fixture::new();
+        f.pack("one", &manifest("future-one", true));
+        f.pack("two", &manifest("future-two", true));
+        let r = f.discover().unwrap();
+        let contract = json!({"revision":"tiny","dimension":1024,"pooling":"cls","normalize":true,"query_prefix":"","dtype":"float32","output":"embeddings","ann":{"metric":"cos","dtype":"i8"}});
+        semantic_federation::compatible(&[contract.clone(),contract.clone()]).unwrap();
+        for (field, value) in [("revision", json!("different")), ("dimension", json!(768)), ("pooling", json!("mean")), ("normalize", json!(false)), ("query_prefix", json!("query: ")), ("dtype", json!("float16")), ("output", json!("other")), ("ann", json!({"metric":"l2sq","dtype":"i8"})), ("ann", json!({"metric":"cos","dtype":"f32"}))] {
+            let mut other = contract.clone(); other[field] = value;
+            assert!(semantic_federation::compatible(&[contract.clone(),other]).is_err(), "accepted incompatible {field}");
+        }
+        let entry = json!({"kind":"subject","namespace":"future:custom/namespace","value":"same"});
+        let parts = r.packs.iter().enumerate().map(|(i,p)| (p.id.clone(), json!({"dense_hits":[{"entry":entry,"distance":0.1+i as f64*0.1,"document_id":i,"chunk_id":i,"source_id":"independent-provider","evidence_id":i}],"lexical_hits":[],"trusted_pins":[],"candidates":[]}))).collect::<Vec<_>>();
+        let fused = semantic_federation::fuse(&parts, 10).unwrap();
+        assert_eq!(fused.len(), 1);
+        assert_eq!(fused[0]["source_packs"], json!(["future-one","future-two"]));
+        assert_eq!(fused[0]["provenance"].as_array().unwrap().len(), 2);
+        assert_eq!(fused[0]["best_distance"], 0.1);
+        let mut reversed = parts.clone(); reversed.reverse();
+        assert_eq!(fused, semantic_federation::fuse(&reversed, 10).unwrap());
+    }
+}

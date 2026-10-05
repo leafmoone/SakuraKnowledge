@@ -10,11 +10,14 @@ fn main()->Result<(),Box<dyn std::error::Error>> {
  if &prefix[..6]!=b"\x93NUMPY" {return Err("NPY magic".into());}
  let len=match prefix[6] {1=>{let mut b=[0;2];file.read_exact(&mut b)?;u16::from_le_bytes(b) as usize},2=>{let mut b=[0;4];file.read_exact(&mut b)?;u32::from_le_bytes(b) as usize},_=>return Err("NPY version".into())};
  let mut header=vec![0;len];file.read_exact(&mut header)?;let text=std::str::from_utf8(&header)?;
- if !text.contains("'<f4'") || !text.contains("False") || !text.contains("1366520, 1024") {return Err("NPY shape/dtype/order".into());}
+ if !text.contains("'<f4'") || !text.contains("False") {return Err("NPY dtype/order".into());}
+ let shape=text.split("'shape':").nth(1).ok_or("NPY shape")?.split('(').nth(1).ok_or("NPY shape")?.split(')').next().ok_or("NPY shape")?;
+ let dims:Vec<usize>=shape.split(',').filter(|s|!s.trim().is_empty()).map(|s|s.trim().parse()).collect::<Result<_,_>>()?;
+ if dims.len()!=2||dims[0]==0||dims[1]!=1024{return Err("NPY shape".into());}let original_rows=dims[0] as u64;
  let offset=file.stream_position()?;
- if file.metadata()?.len()!=offset+1366520u64*4096 {return Err("NPY length".into());}
- let positions:Vec<u64>=if args.len()==4 {let bytes=std::fs::read(&args[3])?;if bytes.len()%8!=0{return Err("position bytes".into());}bytes.chunks_exact(8).map(|b|u64::from_le_bytes(b.try_into().unwrap())).collect()}else{(0..1366520u64).collect()};
- if positions.is_empty()||positions.iter().any(|&p|p>=1366520)||positions.windows(2).any(|p|p[0]>=p[1]){return Err("positions must be nonempty unique ordered original keys".into());}
+ if file.metadata()?.len()!=offset+original_rows*4096 {return Err("NPY length".into());}
+ let positions:Vec<u64>=if args.len()==4 {let bytes=std::fs::read(&args[3])?;if bytes.len()%8!=0{return Err("position bytes".into());}bytes.chunks_exact(8).map(|b|u64::from_le_bytes(b.try_into().unwrap())).collect()}else{(0..original_rows).collect()};
+ if positions.is_empty()||positions.iter().any(|&p|p>=original_rows)||positions.windows(2).any(|p|p[0]>=p[1]){return Err("positions must be nonempty unique ordered original keys".into());}
  let rows=positions.len();
  OpenOptions::new().write(true).create_new(true).open(&args[2])?;
  let index=Index::new(&options(1024))?;index.reserve(rows)?;
