@@ -1165,7 +1165,10 @@ impl SemanticEngine {
         require(ms(start) <= 5000.0, "query_budget_exceeded")?;
         Ok(result)
     }
-    pub fn retrieve_encoded(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32]) -> Result<Value> {
+    pub fn federation_contract(&self) -> Value { self.manifest["contract"].clone() }
+    pub fn retrieve_branches_encoded(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32]) -> Result<Value> { self.retrieve_internal(query, options, vector, true) }
+    pub fn retrieve_encoded(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32]) -> Result<Value> { self.retrieve_internal(query, options, vector, false) }
+    fn retrieve_internal(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32], branches_only: bool) -> Result<Value> {
         let total = Instant::now();
         options.validate()?;
         if self.index.is_some() { validate_vector(vector)?; }
@@ -1196,6 +1199,7 @@ impl SemanticEngine {
             &matches.distances,
             self.rows,
             self.mode,
+            branches_only,
         ).map_err(|e| format!("dense_mapping: {e}; tokenize_ms={tokenize_ms}; ort_ms={ort_ms}; total_ms={}", ms(total)))? } else { Vec::new() };
         let dense_mapping_ms = ms(mapping_start);
         let ann_ms = ms(start);
@@ -1212,6 +1216,10 @@ impl SemanticEngine {
         let start = Instant::now();
         for pin in &pins {
             validate_pin(&self.base, query, pin)?;
+        }
+        if branches_only {
+            for hit in &dense { require(hit["distance"].as_f64().is_some_and(f64::is_finite), "nonfinite ANN distance")?; }
+            return Ok(json!({"contract":self.manifest["contract"],"snapshot":self.manifest["snapshot"],"dense_hits":dense,"lexical_hits":lexical,"trusted_pins":pins,"candidates":[],"timings_ms":{"ann":ann_ms,"bm25":bm25_ms,"total":ms(total)}}));
         }
         let fused = fuse(&lexical, &dense, &pins)?;
         let mut candidates = Vec::new();
@@ -1290,6 +1298,36 @@ impl SemanticEngine {
         result["lexical_work"] = json!({"cursor_rows":lexical_work.0,"eligible_rows":lexical_work.1,"boundary_ties":lexical_work.2});
         Ok(result)
     }
+    pub fn materialize_candidates(&mut self, query: &str, options: &RetrieveOptions, candidates: &[Value], deadline: Instant) -> Result<Value> {
+        require(candidates.len() <= 100, "global materialization limit")?;
+        self.base.progress_handler(1000, Some(move || Instant::now() > deadline));
+        let mut accepted=Vec::new(); let mut documents=BTreeMap::new();let mut sources=BTreeMap::new();let mut evidence=BTreeMap::new();
+        for candidate in candidates {
+            require(Instant::now() <= deadline, "query_budget_exceeded")?;
+            let key=EntryKey::parse(&candidate["entry"])?;
+            if !options.accepts(&key) {continue;}
+            require(key.kind != "episode", "FULL episode excluded")?;
+            let eid=trusted_entry(&self.base,&key)?;
+            for p in candidate["provenance"].as_array().ok_or("invalid provenance")? {
+                let hit=&p["hit"];
+                require(EntryKey::parse(&hit["entry"])? == key, "hit typed identity mismatch")?;
+                let did=text(hit,"document_id")?;
+                let doc=self.base.query_row("SELECT title,original,status,source_id,evidence_id FROM documents WHERE id=? AND entry_id=? AND status IN ('source_backed','generated_from_evidence')",params![did,eid],|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?,r.get::<_,String>(2)?,r.get::<_,String>(3)?,r.get::<_,String>(4)?)))?;
+                require(hit["source_id"]==doc.3 && hit["evidence_id"]==doc.4,"document evidence mismatch")?;
+                validate_full_document_cached(&self.base,did,eid,&self.full_members)?;
+                add_source(&self.base,&mut sources,&doc.3)?;
+                evidence.insert((doc.3.clone(),doc.4.clone(),did.to_owned()),json!({"document_id":did,"entry_id":eid.to_string(),"source_id":doc.3,"evidence_id":doc.4,"status":doc.2}));
+                documents.insert(did.to_owned(),json!({"document_id":did,"entry_id":eid.to_string(),"entry_key":key.json(),"title":doc.0,"original":doc.1,"status":doc.2,"source_id":doc.3,"evidence_id":doc.4}));
+            }
+            for pin in candidate["trusted_pins"].as_array().ok_or("invalid pins")? {
+                require(EntryKey::parse(&pin["entry"])? == key,"pin typed identity mismatch")?;
+                validate_pin(&self.base,query,pin)?;add_source(&self.base,&mut sources,text(pin,"source_id")?)?;
+            }
+            accepted.push(candidate.clone());
+        }
+        let citations:Vec<_>=documents.values().map(|d|json!({"document_id":d["document_id"],"source_id":d["source_id"],"evidence_id":d["evidence_id"]})).collect();
+        Ok(json!({"candidates":accepted,"documents":documents.into_values().collect::<Vec<_>>(),"sources":sources.into_values().collect::<Vec<_>>(),"evidence":evidence.into_values().collect::<Vec<_>>(),"citations":citations}))
+    }
 }
 fn validate_source_manifest(source: &Value) -> Result<()> {
     require(source["schema"] == "sakura-source-pack-v1" && source["requires_model"] == "bge-m3", "unsupported source model/schema")?;
@@ -1367,7 +1405,7 @@ fn field_string(v: &Value, n: &str) -> Result<String> {
 }
 #[cfg(test)]
 fn dense_hits(c: &Connection, k: &[u64], d: &[f32]) -> Result<Vec<Value>> {
-    dense_hits_for(c, k, d, ROWS, Mode::Pilot)
+    dense_hits_for(c, k, d, ROWS, Mode::Pilot, false)
 }
 fn dense_hits_for(
     c: &Connection,
@@ -1375,6 +1413,7 @@ fn dense_hits_for(
     distances: &[f32],
     rows: usize,
     m: Mode,
+    raw_chunks: bool,
 ) -> Result<Vec<Value>> {
     let depth = if m == Mode::Full { rows.min(512) } else { 512 };
     require(
@@ -1404,8 +1443,10 @@ fn dense_hits_for(
             m != Mode::Full || k.kind != "episode",
             "FULL episode excluded",
         )?;
-        if seen.insert(k.clone()) && hits.len() < 100 {
-            hits.push(json!({"entry":k.json(),"rank":hits.len()+1,"score":1.0-f64::from(d),"document_id":field_string(&row,"document_id")?,"chunk_id":field_string(&row,"chunk_id")?,"source_id":text(&row,"source_id")?,"evidence_id":text(&row,"evidence_id")?}));
+        if raw_chunks || (seen.insert(k.clone()) && hits.len() < 100) {
+            let mut hit=json!({"entry":k.json(),"rank":hits.len()+1,"score":1.0-f64::from(d),"document_id":field_string(&row,"document_id")?,"chunk_id":field_string(&row,"chunk_id")?,"source_id":text(&row,"source_id")?,"evidence_id":text(&row,"evidence_id")?});
+            if raw_chunks { hit["distance"]=json!(d);hit["local_position"]=json!(p); }
+            hits.push(hit);
         }
     }
     if m == Mode::Pilot {
@@ -1851,7 +1892,7 @@ mod tests {
             assert_eq!(serde_json::from_str::<Value>(&raw).unwrap(), *row);
             let mut selected = keys.clone();
             selected.rotate_left(position);
-            let hits = dense_hits_for(&c, &selected, &distances, n, Mode::Full).unwrap();
+            let hits = dense_hits_for(&c, &selected, &distances, n, Mode::Full, false).unwrap();
             let first = &hits[0];
             assert_eq!(
                 EntryKey::parse(&first["entry"]).unwrap(),
@@ -1904,7 +1945,7 @@ mod tests {
                 let bad = readonly(&corrupt).unwrap();
                 assert!(
                     validate_mapping(&bad, n).is_err()
-                        || dense_hits_for(&bad, &keys, &distances, n, Mode::Full).is_err()
+                        || dense_hits_for(&bad, &keys, &distances, n, Mode::Full, false).is_err()
                 );
             }
             std::fs::remove_file(corrupt).unwrap();
@@ -1927,7 +1968,7 @@ mod tests {
                 let bad = readonly(&corrupt).unwrap();
                 // Nonempty wrong provenance is readable, but fixture corpus closure
                 // MUST fail: the runtime reader does not authenticate these joins.
-                let hits = dense_hits_for(&bad, &keys, &distances, n, Mode::Full).unwrap();
+                let hits = dense_hits_for(&bad, &keys, &distances, n, Mode::Full, false).unwrap();
                 assert_ne!(hits[0][field], rows[0][field]);
                 assert!(!docs
                     .iter()
@@ -2380,12 +2421,12 @@ mod tests {
         validate_mapping(&c, 7).unwrap();
         assert!(validate_mapping(&c, ROWS).is_err());
         assert_eq!(
-            dense_hits_for(&c, &[0, 1, 2, 3, 4, 5, 6], &[0.0; 7], 7, Mode::Full)
+            dense_hits_for(&c, &[0, 1, 2, 3, 4, 5, 6], &[0.0; 7], 7, Mode::Full, false)
                 .unwrap()
                 .len(),
             1
         );
-        assert!(dense_hits_for(&c, &[0, 1, 2, 3, 4, 5, 7], &[0.0; 7], 7, Mode::Full).is_err());
+        assert!(dense_hits_for(&c, &[0, 1, 2, 3, 4, 5, 7], &[0.0; 7], 7, Mode::Full, false).is_err());
     }
     #[test]
     fn rrf_uses_first_raw_document_rank_and_source_key_ties() {

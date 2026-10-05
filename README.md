@@ -48,9 +48,15 @@ python -m tools.modular_components assemble-root --core CORE --model MODEL --pac
 Local components are in `build/modular-components/`; the all-source relocated root is
 `D:/Sakura 模块化 测试/Core 可选 来源 G`. The frozen 120 runtime/source-closure/byte/deadline
 checks passed. **Ranking is not equivalent to the monolithic candidate:** semantic Recall@10
-remains .975, but MRR@10 falls from .90833 to .61458 under fixed equal source-rank fusion;
-crosslingual Recall@10 rises .53333 → .56667 while MRR falls .29976 → .26306. This is a
-known-degradation local candidate, not a quality-PASS replacement or generalization result.
+remains .975; corrected global cosine-distance fusion restores MRR@10 from the old
+modular .61458 to .89375 (monolithic .90833). Compatible semantic packs contribute
+one global dense branch, while each source retains an independent lexical rank branch
+under RRF60; raw BM25 values are never compared across sources. Single-source ordering
+is unchanged. Crosslingual R10/MRR10 remain .53333/.25889 (monolithic .53333/.29976).
+This is not a quality-PASS replacement or generalization result. Candidate
+`global_semantic_rank`, `best_distance` and source-qualified `backend_ranks` are bounded
+ranking diagnostics, not identity verification; public evidence/typed identities retain
+their existing trust boundary. ANN raw pools are internal, not complete public rankings.
 Exact results, commands and limitations are consolidated in `docs/STAGE_STATUS.md`. Public redistribution
 rights remain **NOT_CLEARED**. The previous monolithic candidate below is retained unchanged
 as the saved-response comparison baseline.

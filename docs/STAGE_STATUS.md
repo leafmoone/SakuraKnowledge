@@ -1,129 +1,112 @@
 # Current delivery status
 
-## Modular offline Windows x64 local candidate
+## Selectable source packs: corrected global semantic fusion
 
-Baseline: `e5a2d6e8a776425afffa20c199dc6aeadafceecd`, ordinary `dev` delivery.
-Six independently copyable components live in `build/modular-components/`: Core,
-one shared BGE-M3 model and Danbooru, Bangumi, Moegirl, tag-wiki packs. No large
-assets are uploaded. Mother snapshot, FP32 vectors and old monolithic I8 package
-are preserved. This audited frozen cut is **not a live upstream refresh**.
+Current change baseline: `a7e0922e7929dc94506a65a9bad4617f280e1e33` on `dev`.
+Core + optional Danbooru/Bangumi/Moegirl/tag-wiki packs + one shared BGE-M3 model
+remain independently copyable from `build/modular-components/`. Only Core binaries
+changed: no source DB, FTS, membership, mapping, model, embedding, ANN graph or
+ANN parameters changed. Mother/FP32/old monolithic I8 and old modular receipts
+are preserved. Frozen local audit is not live refresh. Rights NOT_CLEARED; no
+large upload, Pi/Pool integration, archives, RSS measurement or model training.
 
-**Engineering validation passed; quality is degraded, not quality PASS.** Fixed
-source-level equal RRF60 with full typed-key ties does not reproduce monolithic
-ranking. Do not treat this candidate as a lossless replacement.
+### Ranking behavior
 
-### Exact local component bytes
+For multiple compatible semantic packs, one shared encoding feeds bounded raw
+ANN chunk hits. Actual Cos distances are globally sorted, tied by complete typed
+identity then document/chunk, deduplicated into best-hit entries (all selected
+proofs retained), with global semantic entry depth 100. This contributes **one**
+semantic RRF60 branch. Each source contributes its own lexical branch using
+original raw document rank, never cross-source BM25 values. Trusted exact/alias
+pins precede scores; distinct trusted identities remain unresolved. Contracts
+must agree on exact model revision, query/encoder semantics, dimension1024,
+Cos/I8 distance representation; missing/nonfinite distances fail closed.
 
-Includes actual runtime files and licenses, excludes build-only `positions.u64le`
-(which assembly does not copy). No compression/archive/download was performed.
+Single-semantic-source retrieval retains the original local path and ordering.
+Structured merge/resolve are unchanged. New candidate `global_semantic_rank`,
+`best_distance`, and source-qualified `backend_ranks` are diagnostic ranking
+fields, not verified identity assertions. Raw ANN pools are internal; public
+`dense_hits`/`lexical_hits` for multi-pack retrieval are intentionally empty,
+not complete rankings. Candidate provenance/citations/documents carry actual
+selected evidence; local numeric IDs are never cross-pack identity.
 
-| Component | Bytes |
-|---|---:|
-| Core | 60,465,441 |
-| Shared BGE-M3 | 2,284,443,838 |
-| Danbooru | 1,894,324,211 |
-| Bangumi | 10,723,650,815 |
-| Moegirl | 181,699,717 |
-| tag-wiki | 1,718,178,889 |
+### Three-version frozen gold comparison
 
-| Combination | Bytes |
-|---|---:|
-| Core only | 60,465,441 |
-| Core + Danbooru (structured, no model) | 1,954,789,652 |
-| Core + Danbooru + model | 4,239,233,490 |
-| Core + Bangumi + model | 13,068,560,094 |
-| Core + Moegirl | 242,165,158 |
-| Core + tag-wiki | 1,778,644,330 |
-| Core + all packs + model | 16,862,762,911 |
+A = saved monolithic I8; B = old modular a7e0922; C = corrected global distance.
+Values are Recall@10 / MRR@10 / nDCG@10. Gold unchanged; no tuned weights.
 
-The old monolithic package remains 16,565,060,877 bytes: all components together
-are not a size reduction; independently selected combinations are the benefit.
-
-### Runtime and structured evidence
-
-Actual Unicode/space-path installations A/B/C (core-only, Moegirl/tag without
-model), D/E/F/G (Dan/Bangumi/both/all with model) were opened and queried. Source
-selection, comma lists/deduplication, unknown-source errors and remove/restart
-were exercised. Final PowerShell launcher sync was checked in external G with
-`packs` and `lookup blue_hair --source tag-wiki --limit 1` (exit 0, only tag-wiki
-participates). Root config uses relative directories; no development path links
-are needed. Query-time builds/downloads are prohibited.
-
-`build/modular-structured-final/summary.json`: **134/151 strict normalized business
-JSON equal**; 16 search differences independently checked against actual pack
-DB rows (`build/modular-search-business-checks.json`): all candidates have trusted
-source/typed-entry proof, all common-key payloads equal except score, differences
-are ranking/top-k membership/local FTS score. E18 differs only in physical SQLite
-page/freelist counts. Do not call this 151 JSON-identical.
-
-Actual new I8 graphs: Danbooru 302,482 positions, 296.3635394s; Bangumi 1,064,038
-positions, 1830.2298934s. Native save/view/reload local keys validated, original
-readonly FP32 NPY reused, no re-embedding/full new NPY. Local mapping retains
-original position for diagnostics; identity is `(kind, namespace, value)`, never
-cross-DB numeric IDs. Shared model revision
-`5617a9f61b028005a4858fdac845db406aefb181`; FP32 encoder distinct from I8 ANN.
-
-`python -m tools.modular_semantic_validate --root 'D:/Sakura 模块化 测试/Core 可选 来源 G' --output build/modular-all120-final`
-completed exit 0: **120/120 engineering checks**, independent actual source,
-evidence, typed-document closure, one encoding each (cumulative 120), one model
-session, 5-second request-to-complete-line bound and 1 MiB UTF-8 response ceiling.
-EOF shutdown exit 0, reader joined, no active termination. Startup 11,937.9312ms;
-E2E p50/p95/max 740.47995/2232.8282/2571.4677ms; bytes p95/max 495,869/752,147.
-Validator time is separately recorded, total 4.8129s, not retrieval performance.
-First attempt was interrupted after four saved responses when independent proof
-SQL caused full scans; `modular-all120-first` is **partial, not 120 PASS**. EXPLAIN
-showed three full-table scans per proof. PK/typed-entry indexed checks fixed it
-without altering asset indexes; saved-four replay 0.110066s and wrong evidence
-rejected. Final 120 is a fresh complete run, not concatenated partials.
-
-### Quality versus saved monolithic I8
-
-| Gold subset | R10 old → modular | MRR10 old → modular | nDCG10 old → modular |
+| Group | A | B | C |
 |---|---|---|---|
-| lexical | 1 → 1 | .97778 → .97333 | .98333 → .97956 |
-| semantic | .975 → .975 | .90833 → .61458 | .92559 → .70667 |
-| crosslingual | .53333 → .56667 | .29976 → .26306 | .35667 → .33587 |
+| lexical (30) | 1/.97778/.98333 | 1/.97333/.97956 | 1/.97778/.98333 |
+| semantic (40) | .975/.90833/.92559 | .975/.61458/.70667 | .975/.89375/.91463 |
+| crosslingual (30) | .53333/.29976/.35667 | .56667/.26306/.33587 | .53333/.25889/.32641 |
+| ambiguous-positive (10, accepted targets nonempty) | .65/.41444/.41915 | .4/.34333/.28076 | .6/.37/.38776 |
 
-**Semantic first-result effectiveness drops materially.** Saved response diagnosis
-(`build/modular-semantic-rank-diagnostic.json`) found 26 changed semantic MRR
-cases, zero additional semantic R10 losses. Equal per-pack rank 1 shares score
-1/61; typed ties/interleaving move many original rank-1 results to global rank 2.
-No gold-tuned weights or model changes were made. This is a fixed-fusion ranking
-cost, not evidence that quality is unchanged. Unrecorded local hybrid ranks are
-NOT_RECORDED; do not infer actual local rank by counting global candidates.
-Source-only selection can avoid irrelevant packs, but no source-only 120 quality
-claim is made. Crosslingual gold quality remains limited.
+Semantic: **20 former monolithic rank-1 cases restored from B**, no new rank-1
+regression vs B, no additional R10 losses vs A or B. One rank-1 regression vs A
+remains: P4-066 (A1/B3/C2); target is global dense1 but Danbooru lexical12,
+so lexical competition still wins. Crosslingual **P4-095 loses R10 versus B**
+(A nohit/B2/C19): target global dense8, no lexical contribution, displaced by
+lexically supported candidates. C has no new crosslingual R10 loss vs A, but
+crosslingual quality remains limited. Ambiguous-positive losses vs A are
+P4-103/P4-110; none additional vs B. Negative ten have no accepted targets,
+are not included in positive metrics; identity promotion remains prohibited.
 
-`build/modular-source-perf.json`: eight resident queries each, exit 0, one session,
-one encoding per request (cumulative 8). Backend p50/p95/max Danbooru
-264.2697/1504.0129/1504.0129ms; Bangumi 213.7028/300.4936/300.4936ms. These are
-finite eight-query observations, not all120 distributions or independent E2E.
-RSS is **NOT_MEASURED**. First D/E/F/G single-query smokes are not p50/p95 evidence.
+**Engineering PASS is not overall quality PASS or lossless monolithic equivalence.**
+Full per-case A/B/C and actual distance/rank/provenance diagnostics:
+`build/federation-three-version-comparison.json` (42 changed cases). Unrecorded
+local history is NOT_RECORDED, not inferred from global order. Split ANN graph
+and per-source FTS remain different from monolithic assets.
 
-### Checks and limitations
+### Actual runtime evidence and checks
 
-Final full Python suite with `SKNOW_RS_TEST_BIN` pointing to final release,
-external G/bin DLL PATH and process-local D temporary directories:
-**1227 passed, 18 skipped (Windows symlink privilege WinError 1314), 55 subtests
-passed, 63.20s, exit 0**. Receipts: `build/modular-pytest-integration-dll.log`.
-Earlier 150 skips included 132 missing Rust-integration environment cases;
-setting only the binary then failed 127 native loads (3221225781), corrected by
-explicit DLL PATH. Earlier default C temp failed 21 disk-reservation checks;
-these failures remain evidence, not interpreted PASS. Final D-temp run resolves
-those prerequisites. Full `python -m ruff check src tests tools` and
-`git diff --check` passed. Rust semantic/library suite: 42 passed; release build
-passed. Launcher one-item-array concatenation bug was fixed and actual tests
-passed. Final 120 uses the same retrieval binaries/DB/model/index as delivery;
-subsequent changes are launcher/doc/validator checks, not retrieval tuning.
+`python -m tools.modular_semantic_validate --root 'D:/Sakura 模块化 测试/Core 可选 来源 G' --output build/federation-all120-final`
+completed exit0, **120 engineering PASS**, one model session, one encoding each
+(cumulative120), actual independent typed entry/document/source/evidence closure,
+request-to-complete-line <=5s, <=1048576 UTF-8 bytes including newline. Startup
+11752.561ms; E2E p50/p95/max 667.07855/2296.0959/2555.9523ms versus B
+740.47995/2232.8282/2571.4677ms. Response p95/max 383583/635848 bytes versus B
+495869/752147. Independent checker time 3.08473s total, excluded from runtime
+performance. EOF exit0, reader joined, no active termination. PK/indexed readonly
+checker retained; no per-proof full scans. Final binary subsequently added only
+multiple-trusted-identities warning, no rank changes; tests/rebuild passed. Final
+binary targeted P4-001 retains three distinct trusted keys with warning, no
+identity promotion, independent closure PASS, one encoding, 328642 bytes,
+natural EOF0; P4-103 no pins/no warning also PASS (306524 bytes). Receipts:
+`build/federation-final-multipin.json`, `build/federation-final-warning.json`.
 
-Moegirl and tag-wiki are **exact/alias lexical only**, trusted FTS documents = 0.
-Tag-wiki keeps 601,512 `no_reference` and 73,377 `unverified_draft` documents out
-of trusted FTS. Local tags are not native `danbooru.tag` identities. Drafts were
-not upgraded and cross-source candidates were not silently verified. Source IDs
-and counts: `docs/source-groups.json`.
+Small real P4-032/034/035 changed old rank2 → new1 with actual global dense1
+(distances .32763952/.37481487/.34285116), closure PASS, natural EOF0:
+`build/federation-small.json`. Actual wrong source/document/typed key/cross-pack
+closure tampering rejected. Single Danbooru and Bangumi eight saved queries each
+compare **whole business JSON equal**, excluding only `timings_ms` and
+`pack_timings_ms`, exit0: `build/federation-singlepack-equality.json`.
 
-Public redistribution rights **NOT_CLEARED**. Pi/Pool integration, human source
-fact review, live refresh, wheel build and RSS are NOT_RUN/NOT_MEASURED. No GPU,
-services or query-time downloads. User-requested tag-wiki upstream status
-investigation is a **separate post-delivery readonly task**, not a trust change
-in this candidate. See README for build/finalize/assembly/copy/query commands.
+Rust library **52 tests PASS** (42 existing +10 new pure fusion tests), release
+build passed. Tests cover global distance over local ranks, pack-order-independent
+ties, same-key best distance/all proofs, raw BM25 scale immunity, trusted pins,
+lexical-only branches, depth100, malformed distance and incompatible contracts;
+existing source-selection/shared encoding behavior and real 120 provide additional
+coverage. Affected Python/native tests **60 PASS**, Ruff src/tests/tools PASS,
+`git diff --check` PASS. Earlier modular full suite remains 1227 PASS/18 Win1314
+symlink skips/55 subtests, not rerun or relabeled for this focused change.
+
+### Components and boundaries
+
+Final Core actual runtime bytes: **65,356,781**. Other component bytes unchanged:
+model 2,284,443,838; Danbooru 1,894,324,211; Bangumi 10,723,650,815;
+Moegirl 181,699,717; tag-wiki 1,718,178,889. Counts include licenses; build-only
+positions.u64le is not copied. Final binaries synchronized into Core and actual
+external roots; model/source manifests unchanged. Source IDs/counts remain in
+`docs/source-groups.json`. Model revision
+`5617a9f61b028005a4858fdac845db406aefb181`.
+
+Moegirl/tag-wiki remain exact/alias lexical only, trusted FTS documents0.
+Tag-wiki 601512 no_reference /73377 unverified_draft are not upgraded; local tag
+aggregate is not native danbooru.tag. Earlier 151 structured evidence remains
+134 strict equal +16 independently source-proof-checked search rank differences
++1 physical SQLite page/freelist difference, **not 151 JSON-identical**.
+This task does not restore tag text provenance or change trust/FTS. No subsequent
+text-trust investigation/implementation is authorized by this delivery. README
+copy/assembly/selection commands remain unchanged; public quality limits above
+must accompany candidate use.
