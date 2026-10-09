@@ -148,7 +148,9 @@ stdout write/flush failures remain fatal nonzero exits; timeouts are not assumed
 for continuation. An absolute five-second deadline covers parsing through successful
 write/flush after a complete input line (cold open and line waiting are excluded).
 A blocked output or unsafe deadline expires the current native process with exit124;
-no watchdog thread emits a second JSON/diagnostic. Discard incomplete frames and do
+no watchdog thread emits a second JSON/diagnostic. Earlier runtime fatal failures
+exit1 without a second unguarded stderr print or cleanup; startup errors retain
+separate diagnostics outside the request budget. Discard incomplete frames and do
 not mistake a frame preceding a fatal/uncompleted flush for completed delivery.
 These rules apply to monolithic and `--config` residents alike and to semantic
 single-query output, which excludes cold open but debits argument-validation time.

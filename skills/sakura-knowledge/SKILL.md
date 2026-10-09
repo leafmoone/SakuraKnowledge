@@ -39,7 +39,9 @@ exits; do not silently retry/restart or claim an undelivered response. The absol
 five-second deadline begins after a complete input line and before JSON parsing;
 it includes validation/retrieval/serialization/write/flush, excluding cold opening
 and input-line waiting. Native unsafe timeout or blocked output terminates only that
-process with exit124, without a concurrent FAIL or diagnostic. Incomplete frames
+process with exit124, without a concurrent FAIL or diagnostic. Earlier runtime
+fatal errors exit1 without a second unguarded stderr print/cleanup; startup errors
+retain separate initialization diagnostics. Incomplete frames
 are not delivered responses; even a full frame followed by an uncompleted flush/
 session fatal is not evidence of a successfully completed request. Generic embedded
 loops check time but require the native watchdog to interrupt arbitrary blocked I/O.

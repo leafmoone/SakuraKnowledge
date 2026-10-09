@@ -210,9 +210,14 @@ impl Drop for DeadlineGuard {
     }
 }
 
+/// Deadline exit remains distinct from an earlier fatal engine/transport error.
+pub fn terminate_current_process() -> ! {
+    terminate_current_process_with_code(DEADLINE_EXIT_CODE)
+}
+
 /// No Rust/C stdio flushing, destructors, other PID, or external dependency.
 #[cfg(windows)]
-pub fn terminate_current_process() -> ! {
+pub fn terminate_current_process_with_code(code: i32) -> ! {
     #[link(name = "kernel32")]
     extern "system" {
         fn GetCurrentProcess() -> *mut std::ffi::c_void;
@@ -220,19 +225,19 @@ pub fn terminate_current_process() -> ! {
     }
     // SAFETY: GetCurrentProcess returns a pseudo-handle to this process only.
     // TerminateProcess does not run cleanup or wait on the blocked stdout lock.
-    unsafe { TerminateProcess(GetCurrentProcess(), DEADLINE_EXIT_CODE as u32); }
+    unsafe { TerminateProcess(GetCurrentProcess(), code as u32); }
     std::process::abort() // Defensive fallback only if the OS rejects termination.
 }
 
 #[cfg(unix)]
-pub fn terminate_current_process() -> ! {
+pub fn terminate_current_process_with_code(code: i32) -> ! {
     extern "C" { fn _exit(code: i32) -> !; }
     // SAFETY: _exit terminates only the calling process without stdio cleanup.
-    unsafe { _exit(DEADLINE_EXIT_CODE) }
+    unsafe { _exit(code) }
 }
 
 #[cfg(not(any(windows, unix)))]
-pub fn terminate_current_process() -> ! { std::process::exit(DEADLINE_EXIT_CODE) }
+pub fn terminate_current_process_with_code(code: i32) -> ! { std::process::exit(code) }
 
 #[cfg(test)]
 mod tests {

@@ -172,7 +172,11 @@ exclude cold opening, then retain the same absolute deadline through output.
 
 One process-local watchdog thread uses a condition variable and request generations,
 not one sleeping thread per request. Expiration hard-terminates only the current
-native process with code124, without stdio/destructor cleanup. It never emits a
+native process with code124, without stdio/destructor cleanup. Earlier runtime fatal
+failures exit1 without a secondary unguarded diagnostic or cleanup. The pilot
+uses explicit `ExitCode`, not Rust's default `Result` error printing after the
+watchdog lifetime. Cold initialization diagnostics remain outside request timing.
+It never emits a
 concurrent timeout FAIL, changes/reloads assets, or treats an unknown engine timeout
 as recoverable. Generic embedding `run_resident`/checked sender APIs check elapsed
 time but cannot interrupt arbitrary blocked host I/O; the native entry paths use

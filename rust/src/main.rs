@@ -81,12 +81,26 @@ fn native_semantic_command<E>(
     retrieve: impl FnOnce(&mut E) -> sakura_knowledge_runtime::semantic::Result<serde_json::Value>,
 ) -> ExitCode {
     use sakura_knowledge_runtime::request_deadline::{DeadlineWatchdog, RequestDeadline, REQUEST_BUDGET};
+    // Initialization has its own diagnostics outside the request budget. Once
+    // armed, never print again after dropping the controller: stderr can block.
+    let watchdog = match DeadlineWatchdog::start() {
+        Ok(watchdog) => watchdog,
+        Err(error) => {
+            eprintln!("{}",serde_json::json!({"error":"SemanticError","message":error.to_string()}));
+            return ExitCode::from(1);
+        }
+    };
+    let mut engine = match open() {
+        Ok(engine) => engine,
+        Err(error) => {
+            eprintln!("{}",serde_json::json!({"error":"SemanticError","message":error.to_string()}));
+            return ExitCode::from(1);
+        }
+    };
     let run = || -> sakura_knowledge_runtime::semantic::Result<bool> {
         if parsing_elapsed >= REQUEST_BUDGET {
-            return Err(sakura_knowledge_runtime::request_deadline::DeadlineExceeded.into());
+            sakura_knowledge_runtime::request_deadline::terminate_current_process();
         }
-        let watchdog = DeadlineWatchdog::start()?;
-        let mut engine = open()?;
         let deadline = RequestDeadline::from_start(Instant::now() - parsing_elapsed, REQUEST_BUDGET);
         let guard = watchdog.arm(deadline)?;
         let retrieved = retrieve(&mut engine);
@@ -102,9 +116,9 @@ fn native_semantic_command<E>(
     match run() {
         Ok(false) => ExitCode::SUCCESS,
         Ok(true) => ExitCode::from(1),
-        Err(error) => {
-            eprintln!("{}",serde_json::json!({"error":"SemanticError","message":error.to_string()}));
-            ExitCode::from(1)
+        Err(_) => {
+            // No unguarded secondary diagnostic or cleanup after runtime FAIL.
+            sakura_knowledge_runtime::request_deadline::terminate_current_process_with_code(1)
         }
     }
 }

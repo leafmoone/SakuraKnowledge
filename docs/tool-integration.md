@@ -11,7 +11,70 @@ and failed commands remain below and in `tool-integration-receipt.json`.
 The ordinary append deadline repair uses its own receipt; independent review binds
 the actual pushed SHA, not a guessed self-referential SHA.
 
-## Absolute deadline repair (append submission)
+## Fatal-diagnostic lifetime repair (latest append candidate)
+
+Fixed `d356945dc4c267b016d72fba583b90788bfeec69` received
+**CHANGES_REQUIRED** for one remaining P1: after the request controller dropped,
+CLI outer `eprintln!` or Rust's default `Result`-returning pilot could print to a
+full stderr without a deadline. Its successful-path evidence below remains valid
+for that fixed SHA; it is not retroactively called approved.
+
+The narrow follow-up keeps cold startup/open-error diagnostics separate. Once in
+runtime, fatal errors terminate only the current process with exit1 without an
+unguarded secondary diagnostic or stdio/destructor cleanup. The pilot uses an
+explicit `ExitCode` entry point. Deadline expiry remains124; guarded sender
+profiling that blocks on stderr remains covered by the watchdog. Read-only
+assets cannot have a runtime write transaction interrupted by this exit.
+
+New create-only candidate4:
+`build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate4/`;
+19 files, **83,521,781 bytes**; manifest SHA256
+`c606f1d6a9701dceac47ae9ff51376edcc83f4016e00ffc68f518d70ac16b361`.
+Earlier candidates and the old Core remain unchanged. New actual native tests
+query the OS pipe capacity, prefill stderr before triggering fatal errors and do
+not consume it until child exit. Cases include invalid UTF-8 stdin I/O, fixture DB
+corruption, single-query fast engine failure and broken stdout; these are fixture
+transport/lifecycle tests, not source/model qualification. Rust115 +release/helper
+build **exit0**; native interface/deadline/helper/budget **74 passed,25.51s,exit0**.
+A separate raw capture confirms the actual filled capacity is4096 bytes in each
+scenario, with stderr containing only that parent filler after child termination:
+
+| Native full-stderr scenario | Exit | Observed seconds | Delivery interpretation |
+|---|---:|---:|---|
+| Resident invalid UTF-8 stdin | 1 | .00343 | Only opened event; no business response |
+| Resident fixture DB corruption | 124 | 5.01436 | Full runtime_error frame precedes blocked profiling; not completed delivery |
+| Single fast engine query failure | 1 | .03779 | No stdout response; no unguarded secondary diagnostic |
+| Single broken stdout | 124 | 5.04049 | No readable business response; no claimed FAIL delivery |
+
+Raw files and summary: `fatal-stderr-candidate4-receipt/`. Capture attempts1/2 failed
+before native execution due to helper import/base-directory prerequisites; their
+stderr/exit1 records remain, not counted as runtime PASS.
+
+Candidate4 real TopK10 passes with scope failures0, DB pack-qualified proof checks
+PASS and every ordered typed key/rank field unchanged from the frozen baseline.
+Internal lexical/ANN depths, RRF and ranking were not changed. One key need not
+have just one document: Moegirl top1 legitimately retains9 same-key source-backed
+documents. All-installed top1 retains1 document and7,821 JSONL bytes (921.43ms);
+this is output closure, not a universal latency improvement claim.
+
+Real modular resident:18 responses, opened1/session1, q1/q2/q3 PASS/FAIL/PASS,
+encodings1/0/1, EOF0. Candidate4 monolithic first process instead exited124 with
+zero complete business responses; without a stage profile its slow phase is
+unknown. A separate explicit same-input manual process accepted16 responses,
+opened1/session1, q1/q2/q3 PASS/FAIL/PASS, encodings1/0/1, EOF0. Its three valid
+queries took646.55/2907.67/4680.73ms: near-five-second headroom is a real limitation.
+No internal automatic retry, reload, budget relaxation or first-FAIL reclassification.
+The final changed-code normal complete Python run is **1426 passed,19 skipped,
+55 passing subtests,127.68s,exit0**, with empty stderr. All19 skips are unavailable
+Windows symlink/privilege fixtures, not converted to PASS. Candidate4 and its
+separate test-only text_probe prerequisite clone are byte-bound to the runtime
+under test. The d356945 matrix below remains bound to its own earlier code.
+[Final fatal-lifetime append receipt](tool-integration-fatal-receipt.json) records
+commands/exits/JUnit/code/Core/checks/real native/capture and retained failures.
+The ordinary appended implementation SHA still requires fixed-SHA independent
+review before approved baseline status.
+
+## Absolute deadline repair (prior append submission, candidate3)
 
 `request_deadline.rs` adds one absolute monotonic deadline and one reusable
 process-local watchdog. Resident timing begins after a complete line has been

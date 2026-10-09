@@ -192,7 +192,7 @@ impl ResidentEngine for crate::modular::ModularSemantic {
 /// Generic embedding/test loop: absolute checks, without killing its host.
 /// An arbitrary blocking Write needs the native watchdog for a hard stop.
 pub fn run_resident(
-    engine: &mut impl ResidentEngine,
+    engine: &mut (impl ResidentEngine + ?Sized),
     input: impl BufRead,
     output: &mut impl Write,
 ) -> Result<()> {
@@ -201,7 +201,7 @@ pub fn run_resident(
 
 /// Native process boundary: one watchdog, shared by every completed input line.
 pub fn run_native_resident(
-    engine: &mut impl ResidentEngine,
+    engine: &mut (impl ResidentEngine + ?Sized),
     input: impl BufRead,
     output: &mut impl Write,
 ) -> Result<()> {
@@ -210,7 +210,7 @@ pub fn run_native_resident(
 }
 
 fn run_resident_with_budget(
-    engine: &mut impl ResidentEngine,
+    engine: &mut (impl ResidentEngine + ?Sized),
     input: impl BufRead,
     output: &mut impl Write,
     budget: Duration,

@@ -11,12 +11,27 @@ PASS / invalid_limit FAIL / PASS with one opened event/session and EOF0.
 
 This submission is **not yet an approved Tool integration baseline**: independent
 review identified that the five-second engine budget did not cover parsing,
-serialization or blocked output. The append repair now uses an absolute request
-deadline and one generation-safe native watchdog. Rust115 tests and native70
+serialization or blocked output. First append `d356945dc4c267b016d72fba583b90788bfeec69`
+uses an absolute request deadline and one generation-safe native watchdog, but its
+independent review remains **CHANGES_REQUIRED**: fatal paths printed to stderr
+after dropping the controller. Cold errors are separate; latest candidate4 runtime
+fatal exits1 without a secondary unguarded print/cleanup, with explicit pilot
+ExitCode. Deadline expiry remains124. Actual filled-stderr native tests pass4
+cases (capacity4096), native interface regression74 PASS; newCorecandidate4 is
+create-only,19files/83,521,781bytes, manifestc606f1d6... . Final normal Python for
+this changed version:1426 passed,19 Windows symlink-privilege skipped,
+55 passing subtests,127.68s,exit0,stderr empty. Candidate4 TopK10 scope
+PASS/ranking unchanged and modular18/monolithic16 accepted manual sequences have
+opened1/session1/EOF0/encodings1-0-1. Its first monolithic process exited124 with
+zero business responses; this FAIL remains separate. Near-five-second query
+headroom remains a limitation. Ordinary new append/push/fixed-SHA approval remain
+required before approved baseline status.
+
+Prior candidate3 Rust115 tests and native70
 interface tests pass; actual non-drained resident/single output pipes terminate
 with exit124 in about5s without fabricated delivered FAIL. Candidate3's final real
-TopK10 and modular18/monolithic16 accepted sequences pass. Normal-environment final
-Python:1422 passed,19 skipped (Windows symlink privilege),55 passing subtests,exit0.
+TopK10 and modular18/monolithic16 accepted sequences pass. Normal-environment
+Python bound to d356945:1422 passed,19 skipped (Windows symlink privilege),55 passing subtests,exit0.
 The first candidate3 monolithic process instead exited124 with zero complete
 responses; that FAIL is retained separately, not reclassified by the manually
 invoked accepted process. Ordinary append push and fixed-SHA independent approval
@@ -25,7 +40,8 @@ The initial whole-Python command remains FAIL (four missing test-only helper
 prerequisites); the exact four-case helper repair is separate PASS, not a retroactive
 full-suite PASS. Detailed retained evidence and limitations:
 [interface receipt](tool-integration.md), [original machine receipt](tool-integration-receipt.json),
-[deadline append receipt](tool-integration-deadline-receipt.json).
+[deadline append receipt](tool-integration-deadline-receipt.json),
+[latest fatal-lifetime receipt](tool-integration-fatal-receipt.json).
 Original Core, four source packs, mother DB, model, ANN, gold, ranking/RRF and
 identity/provenance remain unchanged. QUALITY_FAIL and rights NOT_CLEARED persist.
 No live Pi/Tool integration or further Knowledge restructuring is started.

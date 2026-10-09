@@ -5,6 +5,7 @@ binaries or access production packs. A timeout may leave an incomplete frame;
 nonzero process exit is fatal, not a claim that a FAIL envelope was delivered.
 """
 
+import contextlib
 import json
 import os
 import subprocess
@@ -19,6 +20,7 @@ from test_tool_runtime_integration import (
     _opened,
     _request,
     _resident,
+    _small_install,
     _start_pilot,
     _stop,
 )
@@ -140,3 +142,117 @@ def test_native_single_config_deadline_stops_blocked_stdout(deadline_install):
         pytest.fail('single config retrieval remained blocked beyond its deadline')
     finally:
         _stop(process)
+
+
+@contextlib.contextmanager
+def _filled_stderr_pipe():
+    """Fill the actual OS-reported capacity, never assume a pipe buffer size."""
+    reader, writer = os.pipe()
+    try:
+        if os.name == 'nt':
+            import ctypes
+            import msvcrt
+            from ctypes import wintypes
+            kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+            kernel.GetNamedPipeInfo.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD),
+                                               ctypes.POINTER(wintypes.DWORD),
+                                               ctypes.POINTER(wintypes.DWORD),
+                                               ctypes.POINTER(wintypes.DWORD)]
+            kernel.GetNamedPipeInfo.restype = wintypes.BOOL
+            capacity = wintypes.DWORD()
+            if not kernel.GetNamedPipeInfo(msvcrt.get_osfhandle(reader), None,
+                                           ctypes.byref(capacity), None, None):
+                raise ctypes.WinError(ctypes.get_last_error())
+            size = capacity.value
+        else:
+            import fcntl
+            size = fcntl.fcntl(writer, fcntl.F_GETPIPE_SZ)
+        assert 0 < size <= 1024 * 1024, size
+        filler = b'P' * size
+        assert os.write(writer, filler) == size
+        yield reader, writer, filler
+    finally:
+        os.close(reader)
+        os.close(writer)
+
+
+@pytest.mark.parametrize('failure', ['stdin_utf8', 'corrupt_db'])
+def test_native_resident_fatal_with_already_full_stderr(
+    deadline_binary, tmp_path, failure,
+):
+    config, pack = _small_install(tmp_path)
+    with _filled_stderr_pipe() as (reader, writer, filler):
+        process = subprocess.Popen(
+            [str(deadline_binary), '--config', str(config)],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=writer,
+            env={**os.environ, 'PYTHONUTF8': '1', 'PYTHONIOENCODING': 'utf-8'},
+        )
+        try:
+            _opened(process)
+            started = time.monotonic()
+            if failure == 'stdin_utf8':
+                # BufRead::lines fails before a request guard. Result-returning
+                # main must not print to the already full stderr after teardown.
+                payload = b'\xff\n'
+            else:
+                (pack / 'knowledge.sqlite').write_bytes(b'corrupt new fixture only')
+                payload = _input([_request('fatal-q1'), _request('must-not-run')])
+            process.stdin.write(payload)
+            process.stdin.flush()
+            process.stdin.close()
+            exit_code = process.wait(timeout=9)
+            elapsed = time.monotonic() - started
+            assert exit_code == (1 if failure == 'stdin_utf8' else 124), exit_code
+            assert elapsed < (2.5 if failure == 'stdin_utf8' else 7), elapsed
+            output = process.stdout.read()
+            # Parent has not drained stderr until the child actually terminated.
+            assert os.read(reader, len(filler)) == filler
+            assert b'must-not-run' not in output
+            if failure == 'stdin_utf8':
+                assert output == b''
+            else:
+                rows = [json.loads(row.decode('utf-8')) for row in output.splitlines()]
+                assert len(rows) == 1 and rows[0]['status'] == 'FAIL'
+                assert rows[0]['error'] == 'runtime_error'
+                # The full frame preceding blocked profiling is not completion.
+                assert rows[0]['case_id'] == 'fatal-q1'
+        except subprocess.TimeoutExpired:
+            pytest.fail('fatal resident tried an unguarded diagnostic on full stderr')
+        finally:
+            _stop(process)
+
+
+@pytest.mark.parametrize('failure', ['invalid_query', 'broken_stdout'])
+def test_native_single_runtime_fatal_with_already_full_stderr(
+    deadline_install, failure,
+):
+    binary = _binary('SKNOW_RS_TEST_BIN')
+    config, _, _ = deadline_install
+    with _filled_stderr_pipe() as (reader, writer, filler):
+        output_reader, output_writer = os.pipe()
+        if failure == 'broken_stdout':
+            os.close(output_reader)
+            output_reader = None
+        query = 'x' * 4097 if failure == 'invalid_query' else 'tinysolo'
+        started = time.monotonic()
+        process = subprocess.Popen(
+            [str(binary), '--config', str(config), 'retrieve', query,
+             '--source', 'fixture-deadline', '--limit', '1'],
+            stdout=output_writer, stderr=writer,
+            env={**os.environ, 'PYTHONUTF8': '1', 'PYTHONIOENCODING': 'utf-8'},
+        )
+        os.close(output_writer)
+        try:
+            exit_code = process.wait(timeout=9)
+            elapsed = time.monotonic() - started
+            assert exit_code == (1 if failure == 'invalid_query' else 124), exit_code
+            assert elapsed < (2.5 if failure == 'invalid_query' else 7), elapsed
+            assert os.read(reader, len(filler)) == filler
+            if output_reader is not None:
+                assert os.read(output_reader, MAX_BYTES) == b''
+        except subprocess.TimeoutExpired:
+            pytest.fail('fatal single query tried an unguarded diagnostic on full stderr')
+        finally:
+            _stop(process)
+            if output_reader is not None:
+                os.close(output_reader)
