@@ -1,5 +1,55 @@
 # Current delivery status
 
+## Bangumi storage trial (independent, not a production replacement)
+
+Baseline `4583fe94e8eba40b31a062412eef76b70d0bb86a`. New experimental tool/fixtures
+and actual frozen sample only; production schema/runtime/Core/source packs/model/
+ANN and the prior Moegirl delivery/qualityFAIL below remain unchanged.
+[Scope/results](bangumi-storage-experiment.md) and
+[receipt index](bangumi-storage-experiment-receipt.json).
+
+Read-only sealed Bangumi snapshot:9081126912bytes, declared SHA
+`0802c08392ef9971d54a09ef96e59b2d0259e5ed3acee36cb1432f7954a24e0a`;
+manifest/stat verified,9GBhash/mother/raw Archive/ANN/model not reread. Covering
+index pass7.8009127s confirms2712814 keys; frozen stratified/body-length/alias sample
+plus512 native-link seeks/endpoints gives1741 entries/docs/evidence,2132 aliases,
+512links. Full FTS metadata-only pass1014366rows11.7508503s preserves all selected
+occurrences1562; actual physical IO bytes UNKNOWN. No whole-source payload/dbstat
+scan or全量 compact output. Sourcepack lacks unresolved_records; actual sample
+status/source records are unchanged, not invented to provide negative coverage.
+
+Corrected premise: sealed runtime export projects Bangumi evidence/document raw
+payloads; it does not preserve full raw summary/infobox redundantly. All1741 sample
+evidence raw objects are{}, cross-payload body substitution count0 (fixture-only
+support, not actual gain). CAS stores exact UTF8body/payload once with SHA/codec/
+length metadata; zlib6 only if smaller. FTS searchable text/config/IDs/multiplicity
+remain persisted;1562 exact uniquely closed doc search strings reference FTS,
+179 non-FTS episode search strings use CAS. NULL/empty/unknown JSON are preserved.
+
+Same-sample whole-file bytes (all original indices, FTS and CAS/recipe overhead):
+**9179136 baseline →8687616 CAS-only(-5.354752%) →8118272 CAS+zlib(-11.557340%)**.
+Both variants exact typed/UTF8 roundtrip7873 ordinary rows and1562FTSoccurrences;
+48 same-sample token queries preserve BM25 scores/key/doc ordering/fulltext/citations.
+This is not a full-library ranking/model/identity validation. Selection is strongly
+biased by long/short/empty strata, non-FTS episode underweight and link closure;
+no full9GB/whole-pack saving is extrapolated or claimed.
+
+Actual uncached decoded-content Python prototype costs more: warm full-row median
+21.4224→191.5297ms;48queries/262hits+full materialization4.35505→23.84025ms.
+First connection/pass is not OS-cold cache. Not attributable to zlib alone; includes
+ref lookup/decoding/hash/schema lookup. Experimental format is NOT production Core
+compatible and is not recommended for adoption from this trial. Full compact DB,
+newCore/Rustbuild/all120/embeddings/ANN/Pi/Pool/migration/archive/upload NOT_RUN.
+Rights NOT_CLEARED; sample bodies/selection/assets not committed.
+
+Actual final sample output `build/bangumi-compact-v1/sample-v2/` PASS. Initial
+sample-v1 remains FAIL (optional dbstat absent after successful validation).
+SQLite3.50.4 dbstat explicitly NOT_AVAILABLE, not fabricated per-table pages.
+New19fixturesPASS0.59s; full **1352PASS/19Win1314 symlinkSKIP/55subtests105.55s**
+(scoped tests included, not added). Existing owned Rust dev binary/helper used,
+no Rust code/compiler changes. Ruff/diffcheckPASS, repository-contained workspace/
+temp, unrelated untracked files and previous failure receipts preserved.
+
 ## Actual local Moegirl refresh candidate
 
 Baseline `d572b03e6dbd6690498dde95b848c74f7ac01060`, ordinary `dev` delivery.
