@@ -1,0 +1,80 @@
+{
+  "schema": "sakura-tool-interface-independent-approval-record-v1",
+  "status": "APPROVED_INTERFACE_BASELINE_INTEGRATION_NOT_EXECUTED",
+  "reviewed_implementation_commit": "a081d0eb2b6f9f458b2f9ce5cfc08c89117dffc6",
+  "original_base": "62886224b3dd0743ac0269cc28fc9bbbe399b20b",
+  "reviewer": "reviewer_2",
+  "decision": "APPROVED",
+  "blocking_findings": [],
+  "review_source": {
+    "path": "build/tool-integration-v1/review-a081d0e.json",
+    "size": 2936,
+    "sha256": "be8176ac8a2c45d1becd620395d9b5f6706172cf6d6bb4179b41cafa2fcea907",
+    "record_kind": "Retrospective session review summary, not raw command capture"
+  },
+  "closed_finding": "Runtime fatal diagnostics escaped watchdog lifetime. Single runtime Err now terminates only its own process without a second print/cleanup; pilot explicit ExitCode removes Result default diagnostics. Earlier fatal exit1 and deadline exit124 remain distinct. Cold initialization remains separately excluded.",
+  "independent_git_gate": {
+    "command": "git rev-parse HEAD; git ls-remote origin refs/heads/dev",
+    "HEAD_equals_live_origin_dev": true,
+    "exit": 0
+  },
+  "independently_executed_checks": [
+    {
+      "command": "SKNOW_RS_TEST_BIN=D:/SakuraTool/SakuraKnowledge/build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate4/bin/sknow-rs.exe SKNOW_PILOT_TEST_BIN=D:/SakuraTool/SakuraKnowledge/build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate4/bin/semantic_pilot.exe PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m pytest -q tests/test_resident_deadline.py",
+      "passed": 7,
+      "seconds": 20.89,
+      "exit": 0,
+      "scope": "Actual tiny native fixtures: blocked stdout and filled stderr fatal paths, not production/model query qualification"
+    },
+    {"command": "git diff --check", "exit": 0}
+  ],
+  "independently_verified_saved_evidence": {
+    "small_receipt_bindings": {"count": 31, "mismatches": 0, "individual_size_limit": 1000000},
+    "final_full_python_junit": {
+      "tests": 1500,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 19,
+      "reported_console_passed": 1426,
+      "reported_subtests_passed": 55,
+      "executor_exit": 0,
+      "independently_rerun": false
+    },
+    "saved_real_reports": [
+      "topk-after-candidate4:PASS",
+      "resident-modular-candidate4:PASS",
+      "resident-monolithic-candidate4-attempt2:PASS",
+      "fatal-stderr-candidate4-receipt:PASS"
+    ],
+    "real_model_queries_independently_rerun": false,
+    "large_DB_model_ANN_read_or_hash": false
+  },
+  "approved_core": {
+    "path": "build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate4",
+    "files": 19,
+    "bytes": 83521781,
+    "manifest_sha256": "c606f1d6a9701dceac47ae9ff51376edcc83f4016e00ffc68f518d70ac16b361",
+    "acceptance_scope": "This Windows native Tool-facing interface baseline only; old Core/assets not overwritten"
+  },
+  "executor_evidence": [
+    "docs/tool-integration-receipt.json",
+    "docs/tool-integration-deadline-receipt.json",
+    "docs/tool-integration-fatal-receipt.json"
+  ],
+  "historical_decisions_retained": {
+    "4a19414aa45537533072d1a42be29bb537cb8948": "CHANGES_REQUIRED: end-to-end deadline gap",
+    "d356945dc4c267b016d72fba583b90788bfeec69": "CHANGES_REQUIRED: secondary fatal stderr after watchdog teardown"
+  },
+  "limitations": [
+    "Approval covers this runtime interface/evidence/deadline repair, not retrieval quality, human source-fact review or live Tool/Pi/Pool integration.",
+    "Cold open/opened event/input waiting are outside completed-line request timing; generic embedded APIs cannot interrupt arbitrary blocking host writers without the native watchdog.",
+    "OS scheduling is not hard real time. Fatal exit124 does not guarantee a complete response; a full frame before fatal termination is not completed successful delivery.",
+    "Earlier failed commands and first monolithic timeout remain FAIL; explicit manual second-process acceptance is not an automatic retry or reclassification.",
+    "Near-five-second headroom remains a limitation; no budget, RRF, ranking, gold, typed-identity trust, provenance, source pack, model or ANN change.",
+    "QUALITY_FAIL, rights NOT_CLEARED and the historical mother not being the latest four-pack merge remain.",
+    "No full Python rerun or real model/source queries by reviewer; executor's final-version complete matrix and saved real evidence were independently verified.",
+    "This docs-only closure commit must be normally pushed and live-SHA checked; its code identity to the approved implementation is checked separately without rebuilding assets or repeating model queries."
+  ],
+  "main_must_remain": "269e34eeeac920c29f2d684cfe37c93a95c73057",
+  "completion_scope": "Report this round and stop. No next Knowledge restructuring or SakuraTool development starts automatically. Independent previously authorized private-source upload is not claimed complete by this approval."
+}

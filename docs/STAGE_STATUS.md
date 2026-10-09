@@ -1,6 +1,6 @@
 # Current delivery status
 
-## Tool interface repair (independent review in progress)
+## Tool interface repair (approved baseline; live integration not executed)
 
 The first ordinary submission `4a19414aa45537533072d1a42be29bb537cb8948` was
 pushed to `dev` with live remote SHA equality and unchanged `main`. It fixes public
@@ -9,7 +9,7 @@ resident request recovery. Ten fixed real queries retain all candidate ranking
 fields and pass pack-local DB proof checks; both real resident modes return
 PASS / invalid_limit FAIL / PASS with one opened event/session and EOF0.
 
-This submission is **not yet an approved Tool integration baseline**: independent
+That original submission remains **CHANGES_REQUIRED**: independent
 review identified that the five-second engine budget did not cover parsing,
 serialization or blocked output. First append `d356945dc4c267b016d72fba583b90788bfeec69`
 uses an absolute request deadline and one generation-safe native watchdog, but its
@@ -24,8 +24,13 @@ this changed version:1426 passed,19 Windows symlink-privilege skipped,
 PASS/ranking unchanged and modular18/monolithic16 accepted manual sequences have
 opened1/session1/EOF0/encodings1-0-1. Its first monolithic process exited124 with
 zero business responses; this FAIL remains separate. Near-five-second query
-headroom remains a limitation. Ordinary new append/push/fixed-SHA approval remain
-required before approved baseline status.
+headroom remains a limitation. Fixed implementation
+`a081d0eb2b6f9f458b2f9ce5cfc08c89117dffc6` was ordinarily pushed with live SHA
+equality and independently **APPROVED**: reviewer7 actual native tests PASS,
+31 small bindings match, final JUnit1500/0failure/0error/19skip verified, no new
+blocking findings. [Durable approval](tool-integration-review.json) records the
+fixed SHA and approval scope; doc-only closure does not rebuild or change runtime.
+Full Pi/Tool/Pool integration and human source-fact acceptance remain NOT_RUN.
 
 Prior candidate3 Rust115 tests and native70
 interface tests pass; actual non-drained resident/single output pipes terminate
@@ -34,14 +39,15 @@ TopK10 and modular18/monolithic16 accepted sequences pass. Normal-environment
 Python bound to d356945:1422 passed,19 skipped (Windows symlink privilege),55 passing subtests,exit0.
 The first candidate3 monolithic process instead exited124 with zero complete
 responses; that FAIL is retained separately, not reclassified by the manually
-invoked accepted process. Ordinary append push and fixed-SHA independent approval
-remain required; unknown/timeouts remain fatal.
+invoked accepted process. Its remaining fatal diagnostic defect was closed only
+by a081d0e, not by rewriting that prior evidence; unknown/timeouts remain fatal.
 The initial whole-Python command remains FAIL (four missing test-only helper
 prerequisites); the exact four-case helper repair is separate PASS, not a retroactive
 full-suite PASS. Detailed retained evidence and limitations:
 [interface receipt](tool-integration.md), [original machine receipt](tool-integration-receipt.json),
 [deadline append receipt](tool-integration-deadline-receipt.json),
-[latest fatal-lifetime receipt](tool-integration-fatal-receipt.json).
+[latest fatal-lifetime receipt](tool-integration-fatal-receipt.json),
+[independent fixed-SHA approval](tool-integration-review.json).
 Original Core, four source packs, mother DB, model, ANN, gold, ranking/RRF and
 identity/provenance remain unchanged. QUALITY_FAIL and rights NOT_CLEARED persist.
 No live Pi/Tool integration or further Knowledge restructuring is started.

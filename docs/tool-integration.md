@@ -11,7 +11,7 @@ and failed commands remain below and in `tool-integration-receipt.json`.
 The ordinary append deadline repair uses its own receipt; independent review binds
 the actual pushed SHA, not a guessed self-referential SHA.
 
-## Fatal-diagnostic lifetime repair (latest append candidate)
+## Approved interface baseline (candidate4, integration not executed)
 
 Fixed `d356945dc4c267b016d72fba583b90788bfeec69` received
 **CHANGES_REQUIRED** for one remaining P1: after the request controller dropped,
@@ -71,8 +71,39 @@ separate test-only text_probe prerequisite clone are byte-bound to the runtime
 under test. The d356945 matrix below remains bound to its own earlier code.
 [Final fatal-lifetime append receipt](tool-integration-fatal-receipt.json) records
 commands/exits/JUnit/code/Core/checks/real native/capture and retained failures.
-The ordinary appended implementation SHA still requires fixed-SHA independent
-review before approved baseline status.
+Independent review **APPROVED** fixed implementation
+`a081d0eb2b6f9f458b2f9ce5cfc08c89117dffc6`, after its ordinary push and separate
+live remote SHA equality gate. No blocking findings remain for this interface
+round. Reviewer actual native deadline tests: **7 passed,20.89s,exit0**;
+`git diff --check` exit0;31 small size/SHA bindings match; final JUnit1500 tests,
+0 failures/0 errors/19 skips verified. Saved real evidence was checked, not rerun.
+[Durable independent approval record](tool-integration-review.json) preserves the
+2,936-byte retrospective reviewer artifact and its SHA
+`be8176ac8a2c45d1becd620395d9b5f6706172cf6d6bb4179b41cafa2fcea907`.
+The implementation receipts' historical review-pending statuses are left intact;
+this separate fixed-SHA record is the approval authority. Document-only closure
+adds no runtime changes or new integration acceptance.
+
+### Candidate4 before/after evidence table
+
+Same frozen inputs, five source combinations, top1/top5; all ordered finalized
+candidate typed keys/rank fields unchanged and all final pack-local proof checks
+PASS. JSONL bytes include newline and protocol metadata. Timing observations do
+not establish a performance guarantee; some responses grow when the original
+scope was already narrow.
+
+| Source/limit | Documents before -> after | JSONL bytes before -> after | Query ms before -> after |
+|---|---:|---:|---:|
+| tag-wiki /1 | 100 ->1 | 279908 ->51774 | 189.65 ->262.49 |
+| tag-wiki /5 | 100 ->5 | 296458 ->88967 | 57.71 ->67.88 |
+| Moegirl /1 | 100 ->9 | 339035 ->174665 | 205.73 ->362.40 |
+| Moegirl /5 | 100 ->9 | 386333 ->237137 | 62.85 ->78.94 |
+| Danbooru /1 | 100 ->1 | 180513 ->83582 | 250.90 ->241.89 |
+| Danbooru /5 | 100 ->5 | 189859 ->99780 | 246.66 ->228.26 |
+| Danbooru+Bangumi /1 | 1 ->1 | 7044 ->7706 | 459.95 ->361.34 |
+| Danbooru+Bangumi /5 | 5 ->5 | 25105 ->27986 | 359.70 ->329.98 |
+| all-installed /1 | 201 ->1 | 486681 ->7821 | 768.96 ->921.43 |
+| all-installed /5 | 205 ->5 | 504764 ->28081 | 750.80 ->989.89 |
 
 ## Absolute deadline repair (prior append submission, candidate3)
 
