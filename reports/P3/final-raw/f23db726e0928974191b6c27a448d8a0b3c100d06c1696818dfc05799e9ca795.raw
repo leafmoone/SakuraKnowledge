@@ -1,1 +1,0 @@
-{"status": "PASS", "argv": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked"], "exit": 0, "elapsed_s": 22.009192099998472}

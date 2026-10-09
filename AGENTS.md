@@ -1,38 +1,34 @@
 # AGENTS.md
 
-## Project Rules
+## Git 内容与工作规则
 
-- SakuraKnowledge is an independent offline knowledge core. Do not modify SakuraPool, SakuraTool global configuration, or unrelated repositories.
-- Work on the current branch with ordinary commits only. Do not amend, rebase, reset, force-push, or modify/create `main` without explicit authorization.
-- Before review, push the intended `dev` commit normally and verify `git ls-remote origin refs/heads/dev` equals the local HEAD. A failed push or SHA mismatch blocks review.
-- Preserve user or other-agent work in the working tree. Inspect existing changes before editing and stage only named intended files.
+- Git 仅保留最终项目本体所需的代码、资源、配置及正式文件；build 产物、开发需求、任务说明、设计草稿、验证测试、日志、报告、上下文记录、中间产物以及 Agent 或用户在开发过程中产生的其他工作痕迹，均应删除或加入 `.gitignore`，不要纳入版本控制。已被跟踪的工作痕迹必须移出 Git 索引，仅加入 `.gitignore` 不足以清理。
+- 本文件是用户明确要求保留的正式仓库规则文件，不用于记录任务进度或上下文。
+- 严禁过度保护、冗余测试、过度哈希校验等严重拖慢开发速度的行为。只执行与本次变更直接相关的必要、轻量检查；不要机械重跑完整矩阵、重复扫描大资产或堆积验证报告。
+- 使用的训练机器可能是任何配置。代码中不允许、也严禁使用硬编码机器路径、盘符、用户目录或编译机器目录；确需默认目录时，只允许项目目录下的相对目录。可移动包配置必须使用包内相对路径，不得依赖某一台机器的安装位置。
+- 使用普通提交与正常 push。未经用户明确授权，不修改 `main`，不 amend、rebase、reset 或 force-push。用户明确要求合并时，先正常合并，再执行其指定清理。
+- 提交前检查现有改动，只 stage 明确属于本次任务的文件。不要清理无关用户文件、其他 Agent 的工作区或正在使用的本地工件。
+- push 后核对目标分支远端 SHA 与本地提交一致。规则作用于当前版本文件树；不擅自重写历史提交。
+- SakuraKnowledge 是独立离线知识核心，不修改 SakuraPool、SakuraTool 全局配置或无关仓库。
 
-## Entry Points
+## 正式项目入口
 
-- Package metadata and CLI entry point: `pyproject.toml`, `sknow` -> `sakura_knowledge.cli:main`.
-- Source modules: `src/sakura_knowledge/`.
-- Tests: `tests/`; normal checks are `python -m pytest -q`, `python -m ruff check src tests tools`, and `git diff --check`.
-- Design and contract: `docs/architecture.md`, `docs/data-contract.md`, and `docs/source-adapters.md`.
-- Current delivery status: `docs/STAGE_STATUS.md`; portable export/assembly: `tools/portable_export.py`, `tools/portable_pack.py`. Keep gold/reference evidence; do not replace receipts with claims.
+- Python 包与 CLI：`pyproject.toml`、`src/sakura_knowledge/`；`sknow` → `sakura_knowledge.cli:main`。
+- Rust 运行时：`rust/`；启动脚本：`scripts/sknow.ps1`；可移动包配置示例：`configs/sknow-config.example.json`。
+- 数据、运行时及来源包合同：`docs/data-contract.md`、`docs/runtime-contract.md`、`docs/source-pack-contract.md`。
+- 仅保留实际产品所需工具及其依赖；测试、开发审计和临时脚本在忽略的本地工作目录中运行，不提交。
 
-## Evidence Boundaries
+## 数据与身份边界
 
-- Inputs are read-only. Freeze and hash source bytes before ingestion; do not mutate upstream datasets in place.
-- Publish snapshots atomically only after integrity, foreign-key, FTS, ledger, input-digest, and source-account checks. Never overwrite an existing output snapshot.
-- Keep real-source observations, normalized records, fixtures, candidates, verified links, and human review distinct. Fixture success is not real-source validation.
-- `kind`, `namespace`, and `value` are a typed identity boundary. A spelling, title, confidence score, candidate link, or cross-namespace similarity does not establish identity.
-- Identity trust is source-backed only. Generated evidence may support text/FTS under a source-backed identity, but must not create an identity or verified mapping alone.
-- Local aggregate tags are not native `danbooru.tag` identities. Candidate mappings are never silently promoted; report `unknown`, `ambiguous`, or `target_unmapped` when evidence is insufficient.
-- Preserve source/evidence IDs, raw payloads, locators, and unresolved reasons. Do not infer `character_of`, Bangumi person joins, or tag membership from raw names alone.
+- 上游输入只读。不得在原数据上修改；发布新输出，不覆盖已有输入或正式包。保留实际产品必需的完整性与来源约束，但不要为开发流程重复读取、哈希同一批大型资产。
+- `kind`、`namespace`、`value` 是类型化身份边界。标题、拼写、置信度、候选链接、跨命名空间相似度不能证明身份。
+- 身份信任必须有来源支撑。生成文本可以支持已有可信身份下的文本检索，不能单独创建身份或 verified 映射。
+- 本地聚合标签不是原生 `danbooru.tag` 身份；证据不足应返回 `unknown`、`ambiguous` 或 `target_unmapped`。不从原始名字推断 `character_of`、人物关联或标签成员关系。
+- 保留知识数据自身的来源 ID、证据 ID、原始载荷、定位与未解决原因；它们是产品数据，不是 Agent 开发报告。
+- 基础查询无需模型、GPU、服务或 Pool；可选语义查询只使用显式准备的本地资产，查询不能自动构建或下载。
 
-## Integration Boundaries
+## 事实报告
 
-- Basic core has no models/GPU/services/ORM/Pool. Optional CPU semantic runtime uses explicit frozen local model/index assets; queries never build/download. Runtime exports/I8 builds create new outputs only; preserve mother DB, original mapping, FP32 vectors/index and valid older packs.
-- Pi Skill runtime integration, SakuraPool integration, and full human source-fact review require explicit execution and evidence; do not mark them complete from static files or unit tests.
-- Do not claim a live upstream refresh when only a frozen local cut was audited and built.
-
-## Reporting
-
-- State exact commit, snapshot, manifest, wheel, command, exit code, and limitation where relevant.
-- Keep `NOT_RUN`, `BLOCKED`, and knowledge gaps explicit. Never convert an ambiguous or failed command into PASS by interpretation.
-- For Windows CLI JSON with non-ASCII text, use an explicitly verified UTF-8 environment and retain stderr/exit-code evidence.
+- 简明报告实际提交、执行结果及必要限制，不创建或提交开发过程回执、日志或上下文记录。
+- `NOT_RUN`、`BLOCKED`、知识缺口、失败与不确定结果必须如实保留，不转述为 PASS。
+- 未执行的 Pi／SakuraTool／Pool 集成或人工事实审查不能宣称完成；冻结本地数据不能冒称 live upstream refresh。

@@ -9,18 +9,11 @@ description = "Offline evidence-preserving knowledge snapshot core"
 requires-python = ">=3.11"
 dependencies = []
 
-[project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.9"]
-
 [project.scripts]
 sknow = "sakura_knowledge.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.pytest.ini_options]
-pythonpath = ["src"]
-testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100

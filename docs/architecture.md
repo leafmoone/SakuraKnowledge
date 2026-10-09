@@ -1,4 +1,4 @@
-# Architecture / implemented boundary
+# Architecture
 
 `model.py`: frozen keys, evidence statuses, fixed image groups and version-2 NFKC/casefold tokenization (Latin words, overlapping CJK bigrams, without 256-token truncation on documents). `storage.py`: normalized JSONL importer from private SHA-checked frozen byte copies, SQLite foreign keys, per-record savepoints, bounded disk-based duplicate tracking, order-independent link staging, and no-replace publication. `api.py`: shared offline read-only query layer with bounded deterministic ask templates. `cli.py`: JSON command boundary and opt-in latest metadata fetch. `safety.py`: digest-checked ZIP extraction into a new directory. `mapping.py`: candidate cardinality/missing/reverse-consistency audit only.
 
@@ -6,8 +6,8 @@ SQLite tables: sources, entries, entry_evidence, aliases, documents, occurrences
 
 ## Local source boundary
 
-Bangumi Archive, Moegirl, Danbooru Wiki, and tag-wiki are `LOCAL_AUDITED_AND_BUILT` for the fixed local cuts recorded in the audit and build receipts. This is not a live-refresh guarantee or full human fact review. The cut has no native `danbooru.tag` identities and zero verified `entity_tag` links; candidate mappings and shared spellings remain non-verified.
+Bangumi Archive, Moegirl, Danbooru Wiki, tag-wiki and native tag metadata have distinct roles and typed namespaces. A Wiki page or local aggregate tag is not a native `danbooru.tag` identity. Candidate mappings and shared spellings remain non-verified. Frozen source assets do not imply a live refresh or full human fact review.
 
 Trust boundaries are explicit: `IDENTITY_TRUSTED={source_backed}` gates exact identity, aliases, search/related visibility, and ask targets. `TEXT_TRUSTED={source_backed,generated_from_evidence}` permits generated text to be described or indexed only beneath a source-backed identity. Moegirl raw attributes, subject categories, CV names, and gender are retained as payload fields; they do not automatically create tags, `character_of` links, or Bangumi person links.
 
-Remaining gaps: full human source-fact review and Pi runtime integration are `NOT_RUN`. Rejections are recorded in a bounded sibling receipt (first 100), and any rejected/unresolved input blocks publication. Query search scans at most 10,001 ranked documents after SQLite work is bounded by the progress handler; LIMIT alone does not bound BM25 sorting effort. Verification checks FTS coverage/content row alignment, not a read-only FTS5 internal token-index audit; the write-side build executes FTS5 integrity-check. This is a local audited build, not final P1 acceptance.
+Remaining gaps: full human source-fact review and Pi runtime integration are `NOT_RUN`. Rejections are recorded in a bounded sibling receipt (first 100), and any rejected/unresolved input blocks publication. Query search scans at most 10,001 ranked documents after SQLite work is bounded by the progress handler; LIMIT alone does not bound BM25 sorting effort. Verification checks FTS coverage/content row alignment, not a read-only FTS5 internal token-index audit; the write-side build executes FTS5 integrity-check. Publishing a valid snapshot is not a quality, rights or live-integration acceptance claim.

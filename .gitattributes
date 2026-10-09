@@ -1,22 +1,16 @@
-# Raw evidence must be byte-verbatim: no EOL normalization, no diff text.
-reports/P2/raw/** -text -diff
-# Preserved source observations and review decisions retain their original bytes.
-reports/P3/*decisions*.jsonl -text
-reports/P3/*candidates*.jsonl -text
-reports/P3/close-raw/** -text -diff
-# Final A-I raw streams retain exact bytes, including UTF-8 and CRLF.
-reports/P3/final-raw/** -text -diff
-# Frozen retrieval labels and immutable product inputs retain original bytes.
-reports/P4/retrieval-gold.json -text
-reports/P4/continuation-*.json -text whitespace=cr-at-eol
-configs/p4-trusted-text-v1.json -text whitespace=cr-at-eol
-configs/p4-chunk-model-*.json -text whitespace=cr-at-eol
-configs/p4-pilot-job-*.json -text whitespace=cr-at-eol
-configs/p4-onnx-representation-v3.json -text whitespace=cr-at-eol
-reports/P4/onnx-quality-v3*.json -text whitespace=cr-at-eol
-# Exact upstream/evidence paths retain existing trailing blanks; style exception only.
-# No text/EOL/filter changes and no SHA/authentication exemption.
-vendor/usearch-2.26.2/README.md whitespace=-blank-at-eol
-vendor/usearch-2.26.2/rust/README.md whitespace=-blank-at-eol
-vendor/usearch-2.26.2/Cargo.toml.orig whitespace=-blank-at-eol
-reports/P4/usearch-windows-native-fix/native.patch whitespace=-blank-at-eol
+# Source text remains portable; never normalize binary resource bytes.
+* text=auto
+*.py text eol=lf
+*.rs text eol=lf
+*.cpp text eol=lf
+*.hpp text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.ps1 text eol=lf
+*.dll -text
+*.exe -text
+*.sqlite -text
+*.onnx -text
+*.npy -text
+*.usearch -text

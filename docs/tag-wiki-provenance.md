@@ -2,7 +2,7 @@
 
 `tag-wiki-text-proof-v1` supports text only. It never verifies tag/page identity,
 creates native danbooru.tag, promotes candidate links or changes resolve rules.
-Inputs are frozen `build/source-cache-v2/tag_wiki-frozen.sqlite` and the existing
+Inputs are an explicitly supplied frozen tag-wiki SQLite file and a
 source-backed Danbooru pack. Current upstream scripts are not authenticated
 historical revisions; all proofs explicitly say reconstructed_from_frozen_bytes.
 
@@ -22,8 +22,8 @@ Unicode `re` whitespace runs to ASCII space and strip endpoints; do not normaliz
 case, punctuation, NFKC, spelling or fuzzy distance. Text must be a prefix or
 contiguous excerpt of the independently loaded normalized body. Conservative
 minimum 24 characters/four Unicode word runs was selected before retrieval, not
-learned from gold. Accepted length min/median/max 24/257/1000, words4/39/227.
-This is an information floor, not a claim that every excerpt is uniquely identifying.
+learned from runtime outputs. This is an information floor, not a claim that every
+excerpt is uniquely identifying.
 
 SHA256 is over UTF-8 raw Wiki body and final trusted text separately. Envelope
 contains proof version/method/field, raw table/cache-key locator/status, local
@@ -32,13 +32,10 @@ document ID, candidate IDs and hashes. No full body or producer JSON is embedded
 Same tag and text hash deduplicate; distinct independently supported projections
 remain distinct. Current full audit found no duplicate accepted projection.
 
-## Full observed audit
+## Projection behavior
 
-674889 records: cache no_reference601512/source_backed69825/ai_annotated3342;
-annotations unverified_draft173/verified37. Accepted66979, all whitespace prefixes.
-Rejected no_tag_evidence578105/deleted4946/empty20093/too_short1452/
-text_not_derivable3314. Missing/multiple/JSON parse/contiguous-excerpt categories
-not observed in this cut; fixtures cover them, not invented real-source samples.
+Reject rows without tag evidence, deleted/empty Wiki text, ambiguous Wiki IDs,
+insufficient text or text not independently derivable from the frozen body.
 The raw no_reference label does not mean absence of all knowledge on the Internet.
 AI/status neither automatically grants nor denies a provable independent field.
 
@@ -55,7 +52,7 @@ Create-new outputs, input connections readonly; manifest published after checks.
 Adapter uses the same Auditor with explicit iter_tag_wiki(danbooru_snapshot=...);
 full ingest opt-in is `--tag-text-danbooru-snapshot`. Default legacy import remains
 unchanged. No online/LLM/embedding calls. Portable payload retains text_provenance
-and search_text_truncated. Audit/proofs/gold receipts remain outside runtime pack.
+and search_text_truncated. Working audit outputs remain outside the runtime pack and source Git.
 
 Tag-only retrieval needs neither model nor Danbooru installed: export established
 proofs, compact lineage remains in documents. Export/independent validation uses

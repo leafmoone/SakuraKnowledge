@@ -1,6 +1,6 @@
 # Documentation only: no fabricated real source paths or schema.
 # Prefer JSON manifests to represent unknown metadata explicitly as null.
-# See docs/data-contract.md and tests/test_core.py for complete fixture-only generation.
+# See docs/data-contract.md for required source metadata and record fields.
 index_episodes = false
 sources = []
 # Empty sources intentionally fails build; populate only after real schema inspection.

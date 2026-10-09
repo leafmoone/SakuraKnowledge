@@ -1,218 +1,97 @@
 # SakuraKnowledge
 
-Independent offline knowledge core: Python 3.11+ and a read-only Rust CLI. Basic structured queries need no model/GPU/service/Pool. Optional semantic retrieval uses the locally prepared CPU model and evidence-preserving hybrid pack. Current local Moegirl refresh candidate: **runtime120 PASS / quality FAIL** (semantic Recall@10 .975 < original target1; crosslingual .50, down from .5333 in the saved baseline). New source-only text smoke passes, but does not establish generalized retrieval quality. See [the refresh scope and exact delivery](docs/moegirl-local-refresh.md).
+独立离线知识核心，提供 Python 3.11+ API／CLI 与只读 Rust 运行时。基础结构化和词法查询不需要模型、GPU、服务、ORM 或 SakuraPool。可选语义检索使用显式准备的本地 CPU 模型与来源包；查询不会自动下载、编译或构建索引。
 
-## Adding a source
+## 仓库内容
 
-Core discovers valid installed pack manifests, not four source names. Future adapters
-can build standalone normalized packs without importing the mother DB or rebuilding
-other sources. See [adding a source](docs/adding-a-source.md),
-[pack contract](docs/source-pack-contract.md), and [copyable example](examples/source_pack/README.md).
-Adapters declare every file through an authoritative input inventory; directory
-inputs and transferable bundles are supported. Semantic preparation keeps FP32 assets
-in a verified resumable workspace and publishes only the runtime artifact closed set.
-Generic semantic-builder validation uses synthetic tiny native fixtures, not a
-production BGE embedding run. The separately audited local Moegirl refresh adds
-real frozen template text to lexical retrieval; no new embeddings/ANN are built.
+- `src/sakura_knowledge/`：Python 数据构建、查询、来源与身份逻辑。
+- `rust/`：Rust CLI、模块化来源发现、语义与 resident 运行时。
+- `scripts/sknow.ps1`：Windows 原生启动器。
+- `configs/`：正式配置示例与运行时兼容合同。
+- `tools/`：产品所需的来源包构建、文本投影与组件组装工具。
+- `docs/`：正式数据、运行时和来源包文档及第三方许可证。
+- `skills/sakura-knowledge/`：离线查询 Skill。
+- `vendor/usearch-2.26.2/`：原生运行时所需的 vendored USearch 源码和许可证。
 
-## Modular Windows x64 local candidate
+构建产物、知识库、模型、索引、开发测试、报告、日志和任务上下文不纳入 Git。规则见 `AGENTS.md`。
 
-The modular layout separates **Core + optional source packs + one optional shared model**.
-Core contains the launcher, native binaries and shared runtime DLLs, but no knowledge data
-or model. Copy source directories into `packs/`; copy the shared model into `model/bge-m3/`.
-Discovery uses `packs/*/manifest.json`, so removing a source directory takes effect on restart.
-
-| Component | Capabilities | Shared model required |
-|---|---|---|
-| Danbooru | structured, lexical, semantic | BGE-M3 for retrieve only |
-| Bangumi | structured, lexical, semantic | BGE-M3 for retrieve only |
-| Moegirl | structured, exact/alias and frozen-template lexical | no |
-| tag-wiki | structured, exact/alias and proven Wiki-text lexical | no |
-
-The frozen mother DB had no Moegirl source documents; the standalone refreshed
-Moegirl pack adds **47,589 exact partial-template documents**, not full articles.
-Historical identities/aliases/mapping candidates are preserved. Current category
-paths are stored raw observations, not new CLI relations/filters. The tag-wiki pack
-retains 66,979 independently Wiki-backed generated text documents in lexical FTS; old
-`no_reference`/`unverified_draft` documents remain unchanged and untrusted. This proves
-text provenance, not native tag identity or verified tag/page mappings. See
-[`docs/tag-wiki-provenance.md`](docs/tag-wiki-provenance.md). Neither pack
-creates an ANN or needs a model. These inherited trust rules are not changed by packaging.
-Historical mother source membership/counts remain in [`docs/source-groups.json`](docs/source-groups.json);
-current Moegirl pack counts/bindings are in [the local refresh report](docs/moegirl-local-refresh.md).
-
-```powershell
-./sknow.ps1 packs
-./sknow.ps1 lookup '初音未来' --key --kind character --namespace moegirl.character --source moegirl
-./sknow.ps1 search 'blue_hair' --source tag-wiki
-./sknow.ps1 retrieve 'blue hair' --source danbooru,bangumi --topk 10
-```
-
-`--source` accepts repeated arguments or comma-separated IDs. Omission selects all installed
-packs; explicit empty sources/list members are errors. Modular commands reject unknown,
-missing-value and inapplicable options rather than silently ignoring them. `related`
-supports `--direction out` (default) and `--direction in`. `resolve-tag` accepts both
-`--target-namespace` and `--target-tag-namespace`; conflicting values are usage errors.
-Basic queries never open the model; selecting semantic retrieval without the model
-reports `semantic_model_missing`, without download or substitution. Both semantic packs share
-one tokenizer/model session and one query embedding per resident request.
-
-Local assembly commands (new outputs only, no archive or asset upload):
-
-```powershell
-python -m tools.source_pack list-sources --mother build/p3-full-authorized-retry1/knowledge.sqlite
-python -m tools.source_pack build --source danbooru --mother build/p3-full-authorized-retry1/knowledge.sqlite --mapping build/p4-full-semantic-v1-retry1/chunks.sqlite --output NEW_DANBOORU
-# Build the native I8 graph from the existing FP32 NPY and NEW_DANBOORU/positions.u64le,
-# then finalize the source manifest; no embedding encoding or new vectors.npy.
-# Semantic build leaves prepared assets unpublished until the graph is present.
-python -m tools.source_pack finalize --source danbooru --output NEW_DANBOORU --index-prepared
-python -m tools.modular_components assemble-root --core CORE --model MODEL --pack DANBOORU --pack BANGUMI --output NEW_ROOT
-```
-
-Local components are in `build/modular-components/`; the all-source relocated root is
-`D:/Sakura 模块化 测试/Core 可选 来源 G`. The frozen 120 runtime/source-closure/byte/deadline
-checks passed. **Ranking is not equivalent to the monolithic candidate:** semantic Recall@10
-remains .975; corrected global cosine-distance fusion restores MRR@10 from the old
-modular .61458 to .89375 (monolithic .90833). Compatible semantic packs contribute
-one global dense branch, while each source retains an independent lexical rank branch
-under RRF60; raw BM25 values are never compared across sources. Single-source ordering
-is unchanged. Crosslingual R10/MRR10 remain .53333/.25889 (monolithic .53333/.29976).
-This is not a quality-PASS replacement or generalization result. Candidate
-`global_semantic_rank`, `best_distance` and source-qualified `backend_ranks` are bounded
-ranking diagnostics, not identity verification; public evidence/typed identities retain
-their existing trust boundary. ANN raw pools are internal, not complete public rankings.
-Exact results, commands and limitations are consolidated in `docs/STAGE_STATUS.md`. Public redistribution
-rights remain **NOT_CLEARED**. The previous monolithic candidate below is retained unchanged
-as the saved-response comparison baseline.
-
-## Previous portable Windows x64 CPU candidate
-
-Current assembled local directory: `D:/Sakura 发行/知识 CPU 可移动 包`.
-It is a directory package (no installer/ZIP/public upload), with its own `sknow-config.json`,
-`bin`, runtime DB/mapping/membership/I8 ANN and ONNX model assets. No Python/toolchain is
-needed to query it. From that directory:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ./sknow.ps1 lookup hatsune_miku
-powershell -NoProfile -ExecutionPolicy Bypass -File ./sknow.ps1 retrieve 'blue hair' --limit 5
-'{"case_id":"one","query":"miku","limit":5}' | powershell -NoProfile -File ./sknow.ps1 serve
-```
-
-Package I8 is explicit (encoder still FP32):1024/Cos/M16/add256/search2048. Its120-case
-source/identity/runtime validation passed; quality remains FAIL semanticR10 .975<1.
-Crosslingual Recall@10 is .5333 vs saved FP32 .6000: additional2/30 loss, not a claim that
-quantization preserves every result. Repo default stays FP32; smaller portable is a known-
-limits candidate. Model assets/licenses/DLLs are local; queries never fetch/build anything.
-Actual Chinese/spaces directory relocation worked with PATH only Windows system directories;
-this is **same-machine relocation**, not a fresh-machine test. RSS/Pi integration NOT_RUN.
-Export/build commands and exact sizes are in `docs/STAGE_STATUS.md`; original mother DB,
-FP32 vectors/index/mapping remain protected and absent from the package.
-
-## Repository Windows local entry (PowerShell 5.1+)
-
-From this repository (not a portable standalone distribution):
-
-```powershell
-$env:PATH='C:/msys64/ucrt64/bin;'+$env:PATH
-$env:CARGO_TARGET_DIR='build/p4-usearch-native-fix/rust-target'
-cargo build --release --manifest-path rust/Cargo.toml --features semantic --bin sknow-rs --bin semantic_pilot
-./scripts/sknow.ps1 --help
-./scripts/sknow.ps1 lookup '初音ミク'
-./scripts/sknow.ps1 search '中文 日本語' --limit 5
-./scripts/sknow.ps1 resolve-tag '初音ミク' --target-namespace danbooru.tag
-./scripts/sknow.ps1 retrieve 'blue hair character' --limit 5
-./scripts/sknow.ps1 retrieve '中文 日本語 "quoted words"' --limit 5
-```
-
-Launcher defaults are explicit in `scripts/sknow.ps1`: DB
-`build/p3-full-authorized-retry1/knowledge.sqlite`, pack
-`build/p4-dev-2048-1mib-3ee34e2-v1/manifest.json`, release executables in the Cargo target above.
-It resolves paths relative to itself and forwards native arguments, UTF-8 and exit codes;
-queries **never** compile/download/build indexes. Basic commands need only the executable
-and frozen DB; `retrieve`/`serve` additionally require the manifest-bound BGE-M3 CPU model,
-tokenizer, ONNX Runtime DLL, frozen mapping/ANN and prepared membership. These local assets
-are not shipped by git. See `python -m tools.p4_full_build --help` for explicit create-new
-preparation commands; source/model preparation is a separate operation, not automatic.
-The build needs the existing Rust/native toolchain (including local UCRT64 tools); no
-installer or global environment changes are performed. Missing paths produce explicit errors.
-For custom paths use the native CLI directly: `sknow-rs retrieve DB MANIFEST QUERY`.
-
-Resident mode amortizes model/index opening, accepts one JSON object per line, emits an
-`opened` event once, then at most one final result per request, and exits naturally on stdin EOF.
-A recoverable request error emits `status=FAIL` with a stable error code, message and
-`retries=0`, flushes, and continues in the same loaded session. Valid `case_id` values
-are echoed verbatim; invalid JSON or a missing/invalid ID uses `case_id=null`.
-Invalid requests do not trigger embedding encoding. EOF exits 0 after recoverable
-failures. Initialization, unsafe/unknown internal engine failures, stdin I/O, and
-stdout write/flush failures remain fatal nonzero exits; timeouts are not assumed safe
-for continuation. An absolute five-second deadline covers parsing through successful
-write/flush after a complete input line (cold open and line waiting are excluded).
-A blocked output or unsafe deadline expires the current native process with exit124;
-no watchdog thread emits a second JSON/diagnostic. Earlier runtime fatal failures
-exit1 without a second unguarded stderr print or cleanup; startup errors retain
-separate diagnostics outside the request budget. Discard incomplete frames and do
-not mistake a frame preceding a fatal/uncompleted flush for completed delivery.
-These rules apply to monolithic and `--config` residents alike and to semantic
-single-query output, which excludes cold open but debits argument-validation time.
-See [the exact runtime/error contract](docs/runtime-contract.md) and
-[the Tool-interface acceptance receipt](docs/tool-integration.md), including the
-retained cold-query timeout and limits of this integration baseline.
-
-
-```powershell
-# UTF-8 input stream (ASCII JSON escapes also preserve Japanese on older shells).
-'{"case_id":"one","query":"\u521d\u97f3\u30df\u30af","limit":5}' |
-  powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/sknow.ps1 serve
-```
-
-For interactive/multiple requests start `powershell -NoProfile -File ./scripts/sknow.ps1 serve`
-and send JSONL on stdin. `lookup/search/related/ask/resolve-tag` are structured exact/alias/
-FTS/template operations, not arbitrary semantic QA; descriptive prompts belong to `retrieve`.
-Results retain source/evidence IDs and typed keys: candidates are not verified tag mappings.
-Semantic single and resident responses share **2MiB serialized UTF-8 including newline**;
-clients must match this budget. The current local Moegirl template refresh needs the
-updated Core/reader; old Core components retain their historical1MiB limit.
-Oversize returns explicit FAIL, never a truncated success. Full text is not truncated
-to fit the wire budget. Public documents and their source/evidence/citation closure are
-restricted to the selected Top-K candidates and independent trusted-pin proofs. Multiple
-documents and multiple source proofs for a typed key are retained; numeric document IDs
-are scoped to their owning pack. Internal bounded hits, RRF and final candidate ordering
-are unchanged. This is response evidence scoping, not retrieval-quality retuning.
-See [local Moegirl refresh](docs/moegirl-local-refresh.md) for exact scope and assets.
-Single-query startup cost is additional to retrieval; resident5s evidence does not claim a
-cold single process finishes under5s. Default ef2048/wanted512/entity100, no reranker.
-Pi integration is **NOT_RUN**. Portable packaging is separately validated above.
-
-## Local audited sources
-
-The fixed local Bangumi Archive, Moegirl, Danbooru Wiki, and tag-wiki inputs were audited, normalized, and built into the frozen snapshot. These are `LOCAL_AUDITED_AND_BUILT` claims for the recorded local cuts, not claims of a live refresh or complete upstream truth.
-
-The audited cut contains no native `danbooru.tag` identities and zero verified `entity_tag` links. Local aggregate tags, wiki titles, exact spellings, and candidate links therefore never become Danbooru tags. `ask` reports `target_unmapped` or `entity_ambiguous` rather than guessing. Pi runtime integration and full human fact review are **NOT_RUN**.
-
-## Installation and CLI
+## Python 安装与使用
 
 ```text
 python -m pip install .
-sknow inspect manifest.json
-sknow sources check --output metadata/bangumi-latest.json
-sknow build manifest.json new-snapshot-directory
-sknow verify new-snapshot-directory/knowledge.sqlite
-sknow lookup snapshot/knowledge.sqlite 1 --key --kind character --namespace bangumi.character
-sknow search snapshot/knowledge.sqlite 中文 --limit 20 --kind character
-sknow related snapshot/knowledge.sqlite 1 --kind character --namespace bangumi.character --relation character_of --limit 20
-sknow ask snapshot/knowledge.sqlite "孤独摇滚 的 Danbooru tag 是什么"
+sknow inspect data/manifest.json
+sknow build data/manifest.json data/new-snapshot
+sknow verify data/new-snapshot/knowledge.sqlite
+sknow lookup data/knowledge.sqlite 初音未来 --kind character --namespace moegirl.character
+sknow search data/knowledge.sqlite 中文 --limit 20
+sknow related data/knowledge.sqlite 1 --kind character --namespace bangumi.character --relation character_of --limit 20
+sknow ask data/knowledge.sqlite "孤独摇滚 的 Danbooru tag 是什么"
 ```
 
-Only `sources check` performs network I/O. All query commands are read-only and offline. JSON results go to stdout; operation errors go to stderr and exit 2. Failed metadata checks and verification exit 1. Business `not_found` and `ambiguous` results exit 0. Set `PYTHONIOENCODING=utf-8` on Windows when stdout must preserve non-ASCII JSON.
+查询只读、离线。`sources check` 是明确选择的网络元数据操作，不等于下载或刷新知识库。Windows 重定向非 ASCII JSON 时使用 UTF-8 环境，例如设置 `PYTHONIOENCODING=utf-8`。
 
-`lookup` accepts exact values or reliable aliases, with optional kind/namespace; `--key` requires both filters. `search` uses exact-first, FTS BM25, deterministic ties, and limit 1..100. `related` is an outgoing one-hop query, default 20 and max 100. `ask` supports bounded deterministic templates (`X 的 Danbooru tag 是什么`, `X 的标签是什么`, `介绍一下 X`) as well as direct entity names. The Danbooru template selects the `danbooru.tag` target but does not bypass source ambiguity. Missing mappings remain null and are never inferred from names, titles, candidates, or a model.
+## Rust 原生运行时
 
-## Verification
+使用本机已有 Rust 和原生 C/C++ 工具链，不假定工具链安装在哪个盘符或用户目录：
 
 ```text
-python -m pytest -q
-python -m ruff check src tests tools
-git diff --check
+cargo build --release --manifest-path rust/Cargo.toml
+cargo build --release --manifest-path rust/Cargo.toml --features semantic --bin sknow-rs --bin semantic_pilot
 ```
 
-See `docs/source-adapters.md`, `docs/data-contract.md`, `docs/architecture.md`, and `reports/P1/P1_REPORT.md` for the frozen-source evidence, trust boundaries, unresolved knowledge gaps, and remaining NOT_RUN items. The normalized JSONL files are an internal audited ingestion boundary for this local build, not a substitute for source inspection or human fact review.
+从源码构建的程序在 `rust/target/release/`，可通过 Cargo 配置相对 target 目录。部署时把程序及所需运行时 DLL 放入 `bin/`。语义功能另需匹配的本地 BGE-M3／ONNX Runtime、mapping 和 ANN 资产，Git 不包含这些二进制文件。程序与资产必须一起按配置部署，不能依赖编译机器目录。
+
+## 模块化布局
+
+```text
+project/
+  sknow-config.json
+  bin/
+  packs/
+    source-a/manifest.json
+    source-b/manifest.json
+  model/bge-m3/manifest.json
+```
+
+复制 `configs/sknow-config.example.json` 到项目根目录的 `sknow-config.json`，放入预先准备好的 Core、来源包和可选共享模型。启动脚本在仓库内使用 `scripts/sknow.ps1`；在已组装可移动包内使用根目录 `sknow.ps1`。
+
+```powershell
+./scripts/sknow.ps1 packs
+./scripts/sknow.ps1 lookup '初音未来' --key --kind character --namespace moegirl.character --source moegirl
+./scripts/sknow.ps1 search 'blue_hair' --source tag-wiki
+./scripts/sknow.ps1 related '初音未来' --kind character --namespace moegirl.character --direction in
+./scripts/sknow.ps1 resolve-tag '初音未来' --target-namespace danbooru.tag
+./scripts/sknow.ps1 retrieve 'blue hair' --source danbooru,bangumi --limit 5
+'{"case_id":"one","query":"blue hair","limit":5}' | powershell -NoProfile -File ./scripts/sknow.ps1 serve
+```
+
+`packs/*/manifest.json` 决定安装来源；删除来源目录后重启即可卸载。`--source` 支持重复参数或逗号分隔，省略时选择全部已安装来源，空成员及未知来源报错。`related` 支持 `in/out`，`resolve-tag` 支持 `--target-namespace`／`--target-tag-namespace`，冲突值与不适用参数均拒绝。基础查询不打开模型；缺少语义资产时明确失败，不自动下载或替代。
+
+单体配置使用 `bin`、`database`、`manifest` 三个包内相对路径；未配置时启动器默认读取 `bin/`、`data/knowledge.sqlite` 和 `data/manifest.json`。旧 full-pack 合同保留历史相对路径身份以兼容 manifest，但不使用编译时机器位置；旧包若引用外部机器 DLL，须重新配置为项目内相对资源。已生成的外部发行目录不会被源码更新自动重打包。
+
+## 响应与身份边界
+
+- `(kind, namespace, value)` 是完整身份；相同拼写、标题、分数或候选映射不证明身份。
+- 身份信任来自 `source_backed`。生成文本只能支持已有可信身份下的文本检索，不能创建身份或 verified 映射。
+- 本地聚合标签不是原生 `danbooru.tag`。证据不足时返回 `unknown`、`ambiguous` 或 `target_unmapped`，不猜测标签、人物关联或 `character_of`。
+- 公开文本与来源／证据／引用闭包只保留最终 Top-K 及独立 trusted-pin 所需证明。同一身份可保留多文档，数字文档 ID 以 pack 为界；内部候选池、RRF 与最终排序不因输出裁剪改变。
+- JSONL 响应上限为 **2 MiB UTF-8，包含 newline**。超限返回明确 FAIL，不截断 PASS。
+- Resident 每次加载一个模型 session，完成一行输入后执行同一五秒 absolute deadline，覆盖解析、检索、序列化、write、flush 和 profiling。冷启动、opened event 与等待／传输输入行不计入请求预算。
+- 显式可恢复请求错误返回一条完整 FAIL 后继续，合法 `case_id` 原样回传，不可靠 ID 为 `null`，不自动 retry 或重载。内部不安全状态和 I/O 失败 fatal；运行期 fatal 退出1，deadline／阻塞输出退出124，无无保护的二次打印或 stdio 清理。
+- OS 调度不是硬实时保证。fatal 不保证完整响应交付；完整 frame 后发生 fatal 也不能当作完成交付。
+
+检索相关性不等于身份验证。现有已准备资产的 **QUALITY_FAIL** 和再分发权利 **NOT_CLEARED** 不因代码整理改变。母库是历史快照，不会自动同步独立包更新；真实 Pi／SakuraTool／Pool 集成与完整人工事实审查未执行时不得宣称完成。
+
+## 来源包工具与正式文档
+
+新增来源使用显式 `SourceAdapter`，不要求修改 Core 或母库。通用工具：`tools.normalized_source`、`tools.generic_semantic`、`tools.source_pack`、`tools.modular_components`。准备工作与查询分离，输出使用新目录。
+
+- [数据合同](docs/data-contract.md)
+- [运行时合同](docs/runtime-contract.md)
+- [来源包合同](docs/source-pack-contract.md)
+- [新增来源](docs/adding-a-source.md)
+- [来源适配边界](docs/source-adapters.md)
+- [tag-wiki 文本来源证明](docs/tag-wiki-provenance.md)
+- [架构](docs/architecture.md)
+
+只做与当前变更直接相关的轻量检查，不机械重跑完整矩阵或重复哈希大型资产。开发过程测试与日志放在被忽略的本地工作目录，不提交到产品仓库。

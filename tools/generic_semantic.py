@@ -8,7 +8,7 @@ import tempfile
 from contextlib import closing
 from pathlib import Path
 
-from tools import p4_chunks
+from tools import semantic_chunks
 from tools.normalized_source import validate
 from tools.source_pack import binding
 
@@ -56,7 +56,7 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
     tokenizer_path = model / contract.get('artifacts', {}).get('tokenizer', {}).get('path', 'tokenizer.json')
     if index_inspector is None:
         index_inspector = Path(index_builder).with_name('inspect_i8' + Path(index_builder).suffix)
-    params = {'version': p4_chunks.VERSION, 'max_tokens': 384, 'overlap_tokens': 64,
+    params = {'version': semantic_chunks.VERSION, 'max_tokens': 384, 'overlap_tokens': 64,
               'passage_prefix': '', 'dimension': 1024, 'metric': 'cos', 'dtype': 'i8',
               'connectivity': 16, 'expansion_add': 256, 'expansion_search': 2048,
               'chunk_depth': 512, 'entry_depth': 100}
@@ -85,7 +85,7 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
             with closing(sqlite3.connect((pack / 'knowledge.sqlite').as_uri() + '?mode=ro', uri=True)) as conn:
                 for row in conn.execute("SELECT d.id,d.entry_id,d.title,d.original,e.kind,e.namespace,e.value,d.source_id,d.evidence_id FROM documents d JOIN entries e ON e.id=d.entry_id WHERE e.conflicted=0 AND e.kind!='episode' AND d.status IN ('source_backed','generated_from_evidence') AND EXISTS(SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id AND v.status='source_backed') ORDER BY d.id"):
                     doc = {'document_id': row[0], 'entry_id': row[1], 'title': row[2], 'original': row[3], 'entry_key': dict(zip(['kind', 'namespace', 'value'], row[4:7])), 'source_id': row[7], 'evidence_id': row[8]}
-                    chunks.extend(p4_chunks.project_document(doc, tokenizer, base_snapshot_sha256=manifest['artifacts']['snapshot']['sha256'], tokenizer_inventory_sha256=inputs['tokenizer']['sha256'], passage_prefix='', max_sequence_tokens=512))
+                    chunks.extend(semantic_chunks.project_document(doc, tokenizer, base_snapshot_sha256=manifest['artifacts']['snapshot']['sha256'], tokenizer_inventory_sha256=inputs['tokenizer']['sha256'], passage_prefix='', max_sequence_tokens=512))
             if not chunks:
                 raise ValueError('empty trusted semantic corpus')
             with closing(sqlite3.connect(workspace / 'mapping.sqlite')) as conn:

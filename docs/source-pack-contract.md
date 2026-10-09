@@ -69,7 +69,7 @@ use installed Python tooling and supplied native executable. inspect is readonly
 ## Create-new semantic preparation
 
 `tools/generic_semantic.py` validates input pack; freezes/verifies explicit local
-shared-model artifact bindings, reuses `p4_chunks.project_document`384tokens/64overlap,
+shared-model artifact bindings, reuses `semantic_chunks.project_document`384tokens/64overlap,
 encodes trusted documents under source-backed identities, writes local mapping and
 FP32 NPY in an explicit create-new workspace, invokes native I8 builder and validates
 candidate runtime staging/native index before same-volume directory publication.
@@ -86,5 +86,5 @@ Legacy v1 packs without strict flag retain their legal older distribution extras
 Runtime inspect actual_bytes excludes workspace; build reports workspace_bytes separately.
 No query ever builds/downloads assets. Existing vectors/ANN/model are not modified.
 Production encoding requires numpy/tokenizers/onnxruntime and the frozen local BGE-M3
-ONNX assets. This stage executed synthetic four-row fixtures with only expensive
-encoder/tokenizer mocked; production new-pack BGE encoding remains NOT_RUN.
+ONNX assets. Pack construction does not imply retrieval quality or human identity
+verification. Only claim a production encoding or integration run when executed.

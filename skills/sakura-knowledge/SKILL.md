@@ -12,16 +12,16 @@ Descriptive prompts (not exact identity/tag resolution):
 `./scripts/sknow.ps1 retrieve 'blue hair character' --limit 5`.
 Resident JSONL: `powershell -NoProfile -File ./scripts/sknow.ps1 serve`;
 send `{"case_id":"q1","query":"初音ミク","limit":5}` then EOF to close.
-The launcher supplies the default DB/ef2048 pack documented in README, never builds or
-downloads during a query. Model/tokenizer/ORT/ANN/membership must already exist locally.
+The launcher reads package-relative paths from sknow-config.json (or bin/data defaults),
+never builds or downloads during a query. Model/tokenizer/ORT/ANN/membership must already exist locally.
 Single and resident semantic outputs have the same **2MiB (2,097,152 bytes)** bound,
 including serialized UTF-8 and the final newline. An explicit `response_too_large`
 FAIL is never a truncated success. Public documents and their source/evidence/citation
 closure belong only to the selected Top-K candidates or independently retained trusted
 pins; multiple documents and source-qualified proofs may support one typed key.
 Candidates with cited evidence are retrieval results, **not automatic tags or verified
-identities**. Original quality gate remains
-FAIL (semantic R10 .975<1);120 is a development regression set, not held-out quality.
+identities**. Existing asset quality limitations remain; interface success is not
+retrieval-quality or human fact acceptance.
 Use lookup/ask/resolve-tag for exact aliases and source-backed tag mapping, not
 semantic similarity as a substitute.
 
@@ -45,9 +45,9 @@ retain separate initialization diagnostics. Incomplete frames
 are not delivered responses; even a full frame followed by an uncompleted flush/
 session fatal is not evidence of a successfully completed request. Generic embedded
 loops check time but require the native watchdog to interrupt arbitrary blocked I/O.
-Timeout recovery is not assumed safe. A cold monolithic
-query actually timed out in this round; the failed attempt is retained in
-[the acceptance receipt](../../docs/tool-integration.md), not marked PASS.
+Timeout recovery is not assumed safe. Near-budget queries may terminate even when
+other queries succeed; do not relax the deadline or silently retry. See
+[the runtime contract](../../docs/runtime-contract.md).
 
 Modular CLI rejects unknown, missing-value and command-inapplicable options.
 `--source` supports repeated options/commas but not empty values/list members.

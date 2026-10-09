@@ -31,8 +31,6 @@ published snapshot. Both CLIs print JSON only on stdout.
 - Both runtimes open the snapshot **read-only**
   (Python `sqlite3` `mode=ro`; Rust `rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY`).
 - Any write attempt must fail (`attempt to write a readonly database`).
-  Evidence: `reports/P2/snapshot-compatibility-20bf5b3.json`,
-  `tests/test_evidence.py::test_readonly_open_blocks_writes`.
 
 ## Commands (identical argv surface)
 
@@ -100,11 +98,9 @@ candidate, generated text or candidate mapping is promoted to a verified identit
   `query must contain 1..4096 characters`, `query_budget_exceeded`,
   `topk must be 1..100`, `limit must be 1..100`,
   `target_tag_namespace must contain 1..256 characters`.
-- Budget: every public operation enforces 5 s wall time; a breach is a
-  runtime error `ValueError: query_budget_exceeded` (never a silent
-  timeout, never a partial result). A breach is a **failure** in all
-  evidence receipts — see `tools/check_parity.py`
-  (`RUST_BUDGET_EXCEEDED`, overall FAIL).
+- Structured query operations enforce a five-second query budget. A breach is
+  `query_budget_exceeded`, not a silent successful partial result. Native semantic
+  request and transport deadlines follow the resident/single-query rules below.
 
 ## Output values
 
@@ -156,7 +152,7 @@ Example recoverable response (not automatically retried):
 | Response exceeds the 2MiB wire limit | One complete FAIL, flush, continue; no retry or re-encoding |
 | Initialization/asset validation failure | Nonzero exit; no falsely successful opened lifecycle |
 | Corrupt model/index/database, unknown internal engine error, or query error without proof that state remains safe | Fatal nonzero exit, never catch-all continuation |
-| stdin I/O error or stdout write/flush error | Fatal nonzero exit; diagnostics only on stderr when possible |
+| stdin I/O error or stdout write/flush error | Fatal nonzero exit; no unguarded secondary diagnostic after request-controller teardown |
 | Absolute request deadline expires, including blocked write/flush | Native fatal exit124; watchdog does not emit or flush any JSON or diagnostic; incomplete frame is not delivered FAIL/PASS |
 
 Classification uses explicit request/error types, not substring guesses from SQLite,
@@ -188,8 +184,8 @@ may have received a full frame before a later flush/profiling timeout kills the
 process: that nonzero/session failure is fatal, not a successfully completed
 request or permission to continue. Discard incomplete frames and do not infer
 successful delivery merely from a prefix or from a hard-exit code. Desktop OS
-scheduling is not a hard real-time guarantee; slow-pipe tests verify bounded fatal
-termination rather than claiming mathematical nanosecond precision.
+scheduling is not a hard real-time guarantee; bounded fatal termination is not a
+mathematical nanosecond precision guarantee.
 
 Invalid requests are rejected before encoding; a subsequent valid request uses the
 same loaded model/session and ANN handles. stdout contains JSONL protocol messages
@@ -216,18 +212,8 @@ then terminates nonzero. A broken output channel may preclude any complete respo
 invalid input leaves the encoder counter unchanged. A lexical-only modular runtime
 has zero model sessions and zero encodings, not a synthetic model session.
 
-Acceptance and remaining limitations: [Tool interface receipt](tool-integration.md).
-
 ## Encoding
 
-- stdout/stderr are reconfigured to UTF-8 at CLI entry (Python); Rust
-  emits UTF-8 bytes natively. Output must be byte-identical across console
-  code pages (GBK sample: `p2-wheel-cli-20bf5b3.json`
-  `gbk_env_lookup`).
-
-## Parity evidence
-
-- Locked expected values: `tools/parity_cases.py` (151 cases, v2 table).
-- Harness: `tools/check_parity.py` (value + error + cli modes, budget
-  handling, attempt trails).
-- Latest receipt: `reports/P2/rust-parity-20bf5b3-v6.json`.
+- Python reconfigures stdout/stderr to UTF-8 at CLI entry; Rust emits UTF-8 bytes
+  natively. Console code pages must not change the JSON text. When redirecting on
+  Windows, use an explicitly UTF-8 environment.

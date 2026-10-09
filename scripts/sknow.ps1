@@ -2,10 +2,10 @@
 $ErrorActionPreference = 'Stop'
 $root = if (Test-Path (Join-Path $PSScriptRoot 'sknow-config.json')) { $PSScriptRoot } else { Split-Path -Parent $PSScriptRoot }
 $utf8 = [System.Text.UTF8Encoding]::new($false)
-$target = Join-Path $root 'build/p4-usearch-native-fix/rust-target/release'
-$db = Join-Path $root 'build/p3-full-authorized-retry1/knowledge.sqlite'
-$pack = Join-Path $root 'build/p4-dev-2048-1mib-3ee34e2-v1/manifest.json'
-$childPath = 'C:/msys64/ucrt64/bin;' + $env:PATH
+$target = Join-Path $root 'bin'
+$db = Join-Path $root 'data/knowledge.sqlite'
+$pack = Join-Path $root 'data/manifest.json'
+$childPath = $target + ';' + $env:PATH
 $modular = $false
 $configPath = Join-Path $root 'sknow-config.json'
 if (Test-Path -LiteralPath $configPath) {
@@ -28,14 +28,14 @@ $tail = @($args | Select-Object -Skip 1)
 $exe = Join-Path $target $(if ($command -eq 'serve') { 'semantic_pilot.exe' } else { 'sknow-rs.exe' })
 foreach ($path in @($exe)) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-        [Console]::Error.WriteLine("Missing program: $path. Build from repo root: `$env:CARGO_TARGET_DIR='build/p4-usearch-native-fix/rust-target'; cargo build --release --manifest-path rust/Cargo.toml --features semantic --bins")
+        [Console]::Error.WriteLine("Missing program: $path. Prepare bin/ or set package-relative paths in sknow-config.json. Queries never build programs.")
         exit 1
     }
 }
 if (-not $modular -and $command -notin @('--help','-h','runtime')) {
     foreach ($path in @($db) + $(if ($command -in @('retrieve','serve')) { @($pack) } else { @() })) {
         if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-            [Console]::Error.WriteLine("Missing prepared asset: $path. See README semantic prerequisites; use the existing tools.p4_full_build preparation CLI with explicit create-new paths. Queries never build assets.")
+            [Console]::Error.WriteLine("Missing prepared asset: $path. Configure prepared local assets in sknow-config.json. Queries never build or download assets.")
             exit 1
         }
     }

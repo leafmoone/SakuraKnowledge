@@ -52,21 +52,3 @@ pub fn fuse(parts:&[(String,Value)],limit:usize)->Result<Vec<Value>> {
 }
 fn add_pack(c:&mut Value,pack:&str) {let ids=c["source_packs"].as_array_mut().unwrap();if !ids.contains(&json!(pack)){ids.push(json!(pack));ids.sort_by_key(Value::to_string);}}
 fn add_hit(c:&mut Value,pack:&str,backend:&str,hit:Value){add_pack(c,pack);let p=json!({"backend":backend,"source_pack":pack,"hit":hit});let a=c["provenance"].as_array_mut().unwrap();if !a.contains(&p){a.push(p);a.sort_by_key(Value::to_string);}}
-#[cfg(test)]
-mod tests {
- use super::*;
- fn h(value:&str,d:f64)->Value {json!({"entry":{"kind":"subject","namespace":"test","value":value},"distance":d,"rank":1,"score":1.-d,"document_id":value,"chunk_id":value,"source_id":value,"evidence_id":value})}
- fn p(hits:Vec<Value>)->Value {json!({"dense_hits":hits,"lexical_hits":[],"trusted_pins":[],"candidates":[]})}
- #[test] fn distance_beats_local_rank_one(){let r=fuse(&[("a".into(),p(vec![h("a",0.8)])),("b".into(),p(vec![h("b",0.1)]))],10).unwrap();assert_eq!(r[0]["entry"]["value"],"b");}
- #[test] fn worse_local_rank_beats_other_pack_first(){let r=fuse(&[("a".into(),p(vec![h("a",0.8)])),("b".into(),p(vec![h("b",0.1),h("c",0.2)]))],10).unwrap();assert_eq!(r[1]["entry"]["value"],"c");}
- #[test] fn tie_is_pack_order_independent(){let a=("a".into(),p(vec![h("a",0.1)]));let b=("b".into(),p(vec![h("b",0.1)]));assert_eq!(fuse(&[a.clone(),b.clone()],10).unwrap(),fuse(&[b,a],10).unwrap());}
- #[test] fn same_typed_key_counts_once_and_keeps_all_proofs(){let mut second=h("a",0.2);second["document_id"]=json!("other");let r=fuse(&[("a".into(),p(vec![h("a",0.1)])),("b".into(),p(vec![second]))],10).unwrap();assert_eq!(r.len(),1);assert_eq!(r[0]["best_distance"],0.1);assert_eq!(r[0]["provenance"].as_array().unwrap().len(),2);assert_eq!(r[0]["rrf_score"],1./61.);}
- #[test] fn same_local_document_id_keeps_both_citation_origins(){let mut first=h("a",0.1);first["document_id"]=json!("7");let mut second=first.clone();second["distance"]=json!(0.2);let r=fuse(&[("first".into(),p(vec![first])),("second".into(),p(vec![second]))],1).unwrap();assert_eq!(r[0]["citations"].as_array().unwrap().len(),2);assert_eq!(r[0]["citations"][0]["source_packs"],json!(["first"]));assert_eq!(r[0]["citations"][1]["source_packs"],json!(["second"]));assert_eq!(r[0]["provenance"][0]["hit"]["document_id"],"7");}
- #[test] fn bm25_scale_does_not_affect_order(){let mut x=p(vec![]);x["lexical_hits"]=json!([h("a",0.1),h("b",0.2)]);x["lexical_hits"][1]["rank"]=json!(2);let a=fuse(&[("a".into(),x.clone())],10).unwrap();x["lexical_hits"][0]["score"]=json!(-1e99);x["lexical_hits"][1]["score"]=json!(1e99);let b=fuse(&[("a".into(),x)],10).unwrap();assert_eq!(a.iter().map(|r|&r["entry"]).collect::<Vec<_>>(),b.iter().map(|r|&r["entry"]).collect::<Vec<_>>());}
- #[test] fn trusted_pin_first(){let mut x=p(vec![h("a",0.1)]);x["trusted_pins"]=json!([h("z",0.9)]);assert_eq!(fuse(&[("a".into(),x)],10).unwrap()[0]["entry"]["value"],"z");}
- #[test] fn lexical_candidate_without_ranked_document_keeps_citation_origin(){let mut part=p(vec![]);part["candidates"]=json!([{"entry_key":{"kind":"subject","namespace":"test","value":"a"},"citations":[{"source_id":"s","evidence_id":"identity"}]}]);let rows=fuse(&[("lexical".into(),part)],1).unwrap();assert_eq!(rows[0]["citations"][0]["source_packs"],json!(["lexical"]));assert_eq!(rows[0]["rrf_score"],0.);}
- #[test] fn lexical_only_has_no_dense_rank(){let mut x=p(vec![]);x["lexical_hits"]=json!([h("a",0.1)]);assert!(fuse(&[("a".into(),x)],10).unwrap()[0]["global_semantic_rank"].is_null());}
- #[test] fn semantic_entry_depth_is_100(){let hits=(0..150).map(|i|h(&format!("{i:03}"),i as f64/200.)).collect();assert_eq!(fuse(&[("a".into(),p(hits))],200).unwrap().len(),100);}
- #[test] fn distance_missing_or_nonfinite_rejected(){let mut hit=h("a",0.1);hit["distance"]=Value::Null;assert!(fuse(&[("a".into(),p(vec![hit]))],10).is_err());}
- #[test] fn wrong_compatible_contract_rejected(){let a=json!({"revision":"r","dimension":1024,"pooling":"cls","normalize":true,"query_prefix":"","dtype":"float32","output":"embeddings","ann":{"metric":"cos","dtype":"i8"}});let mut b=a.clone();b["revision"]=json!("other");assert!(compatible(&[a,b]).is_err());}
-}

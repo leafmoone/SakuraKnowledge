@@ -4,6 +4,8 @@ version = "0.2.0"
 edition = "2021"
 license = "MIT"
 description = "Read-only Rust runtime for SakuraKnowledge snapshot queries"
+autobins = false
+autoexamples = false
 
 [lib]
 name = "sakura_knowledge_runtime"
@@ -14,13 +16,18 @@ name = "sknow-rs"
 path = "src/main.rs"
 
 [[bin]]
-name = "semantic-dependency-probe"
-path = "src/bin/semantic_dependency_probe.rs"
-required-features = ["semantic"]
-
-[[bin]]
 name = "semantic_pilot"
 path = "src/bin/semantic_pilot.rs"
+required-features = ["semantic"]
+
+[[example]]
+name = "build_i8"
+path = "examples/build_i8.rs"
+required-features = ["semantic"]
+
+[[example]]
+name = "inspect_i8"
+path = "examples/inspect_i8.rs"
 required-features = ["semantic"]
 
 [features]

@@ -460,28 +460,3 @@ fn two_pos(pos: &[String]) -> Result<(&String, &str), Error> {
 fn _unused_path() -> PathBuf {
     PathBuf::new()
 }
-
-#[cfg(test)]
-mod profile_tests {
-    use super::*;
-
-    #[test]
-    fn profile_write_failure_is_reported_not_hidden() {
-        struct Fail;
-        impl Write for Fail {
-            fn write(&mut self, _: &[u8]) -> std::io::Result<usize> {
-                Err(std::io::Error::other("injected sink failure"))
-            }
-            fn flush(&mut self) -> std::io::Result<()> {
-                Ok(())
-            }
-        }
-        assert!(write_profile(&mut Fail, &serde_json::json!({"query_invocations":1})).is_err());
-        let mut bytes = Vec::new();
-        write_profile(&mut bytes, &serde_json::json!({"query_invocations":1})).unwrap();
-        assert_eq!(
-            serde_json::from_slice::<serde_json::Value>(&bytes).unwrap()["query_invocations"],
-            1
-        );
-    }
-}

@@ -4,7 +4,13 @@ import json
 import shutil
 from pathlib import Path
 
-from tools.portable_pack import binding
+from tools.source_pack import binding as file_binding
+
+
+def binding(path, root):
+    value = file_binding(path)
+    value['path'] = Path(path).relative_to(root).as_posix()
+    return value
 
 
 def copy_tree(source, output):
