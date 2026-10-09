@@ -124,8 +124,10 @@ candidate, generated text or candidate mapping is promoted to a verified identit
 
 Both `semantic_pilot DATABASE MANIFEST` and `semantic_pilot --config CONFIG` use
 the same request/error semantics. Initialization opens assets and the model once,
-emits one `opened` event, then reads one request per line. Every read request line
-has one final complete business response while the output channel remains usable.
+emits one `opened` event, then reads one request per line. Each read request line
+has at most one final complete business response. Recoverable requests have exactly
+one while the output is usable and the deadline permits completion. Fatal timeout
+or broken output can prevent a complete response; neither permits a second frame.
 Recoverable failure is not EOF, a retry, or permission to restart the engine.
 Natural stdin EOF exits 0 even if earlier requests had recoverable failures.
 
@@ -154,14 +156,40 @@ Example recoverable response (not automatically retried):
 | Response exceeds the 2MiB wire limit | One complete FAIL, flush, continue; no retry or re-encoding |
 | Initialization/asset validation failure | Nonzero exit; no falsely successful opened lifecycle |
 | Corrupt model/index/database, unknown internal engine error, or query error without proof that state remains safe | Fatal nonzero exit, never catch-all continuation |
-| stdin I/O error or stdout write/flush error | Fatal nonzero exit; diagnostics only on stderr |
+| stdin I/O error or stdout write/flush error | Fatal nonzero exit; diagnostics only on stderr when possible |
+| Absolute request deadline expires, including blocked write/flush | Native fatal exit124; watchdog does not emit or flush any JSON or diagnostic; incomplete frame is not delivered FAIL/PASS |
 
 Classification uses explicit request/error types, not substring guesses from SQLite,
 ORT or USearch error messages. A query timeout is not automatically recoverable:
 without demonstrated statement cleanup and intact engine state, it remains fatal.
-The existing five-second query budget is unchanged. Invalid requests are rejected
-before encoding; a subsequent valid request uses the same loaded model/session and
-ANN handles. stdout contains JSONL protocol messages only; diagnostics use stderr.
+The engine's existing budget is unchanged, but the native driver also enforces one
+**absolute five-second request deadline** starting immediately after a complete
+input line has been received, **before JSON parsing**. It covers validation,
+retrieval, bounded serialization, write and successful flush (and synchronous
+profiling). Cold asset/model opening, the opened event and input-line waiting are
+not part of a request. CLI semantic single queries debit argument-validation time,
+exclude cold opening, then retain the same absolute deadline through output.
+
+One process-local watchdog thread uses a condition variable and request generations,
+not one sleeping thread per request. Expiration hard-terminates only the current
+native process with code124, without stdio/destructor cleanup. It never emits a
+concurrent timeout FAIL, changes/reloads assets, or treats an unknown engine timeout
+as recoverable. Generic embedding `run_resident`/checked sender APIs check elapsed
+time but cannot interrupt arbitrary blocked host I/O; the native entry paths use
+`run_native_resident`/the armed watchdog for that boundary. The unchecked legacy
+sender wrapper is not used by these native request paths.
+
+Native write/flush completion is checked before disarming the generation. A reader
+may have received a full frame before a later flush/profiling timeout kills the
+process: that nonzero/session failure is fatal, not a successfully completed
+request or permission to continue. Discard incomplete frames and do not infer
+successful delivery merely from a prefix or from a hard-exit code. Desktop OS
+scheduling is not a hard real-time guarantee; slow-pipe tests verify bounded fatal
+termination rather than claiming mathematical nanosecond precision.
+
+Invalid requests are rejected before encoding; a subsequent valid request uses the
+same loaded model/session and ANN handles. stdout contains JSONL protocol messages
+only; diagnostics use stderr while possible.
 
 Supported request fields are `case_id`, `query`, `limit`, `kind`, `namespace`,
 `include_vector` and (modular mode only) `source`. Limit is an integer in 1..100;

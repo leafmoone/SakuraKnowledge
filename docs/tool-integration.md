@@ -3,8 +3,94 @@
 Implementation starts from the actual `dev` / `origin/dev` base
 `62886224b3dd0743ac0269cc28fc9bbbe399b20b`. This is an interface acceptance round,
 not a source refresh, retrieval-quality retuning, or live Tool/Pi integration.
-The final ordinary implementation commit is the commit containing this receipt;
-independent review binds the actual pushed SHA, not a guessed self-referential SHA.
+The first ordinary implementation submission is
+`4a19414aa45537533072d1a42be29bb537cb8948`. Its independent decision is
+**CHANGES_REQUIRED**, solely for the request deadline missing parsing/serialization/
+blocked output; Top-K/CLI had no additional blocking finding. Its original evidence
+and failed commands remain below and in `tool-integration-receipt.json`.
+The ordinary append deadline repair uses its own receipt; independent review binds
+the actual pushed SHA, not a guessed self-referential SHA.
+
+## Absolute deadline repair (append submission)
+
+`request_deadline.rs` adds one absolute monotonic deadline and one reusable
+process-local watchdog. Resident timing begins after a complete line has been
+read and before JSON parsing. JSON validation, retrieval, serialization, write,
+flush and profiling use that deadline; cold opening and input-line waiting are
+excluded. Both semantic single-query entry modes use the same checked sender and
+watchdog, debiting argument-validation time but not cold opening.
+
+The watchdog never writes stdout/stderr or emits a competing failure frame.
+Unsafe timeout or blocked output hard-terminates only the current native process
+with exit124; no cleanup or asset write is performed. Recoverable errors retain
+one complete FAIL and continuation if it can be completed before the deadline.
+Unknown/late engine results remain fatal; generic host APIs cannot interrupt an
+arbitrary blocking host writer without the native watchdog. Successful flush and
+absolute-time checks precede generation disarm; old generations cannot cancel or
+expire later requests. A frame read before an uncompleted flush/session fatal is
+not proof of completed delivery. Desktop scheduling is not hard real time.
+
+Final-version Rust relevant tests: **114 library +1 CLI =115 PASS, exit0**;
+release +test-helper build: **exit0**. Final native deadline/interface/helper/budget
+fixtures: **70 passed, 14.59s, exit0**. This includes actual non-drained stdout pipes
+for resident and modular single retrieval, alongside fast-drained PASS/FAIL/PASS.
+Separately retained native blocked-pipe receipts observe resident exit124 at
+**5.008s** after the completed request and single CLI exit124 at **5.385s** including
+cold fixture opening. Neither emitted a complete business frame or a claimed
+failure; stderr was empty. Raw receipts: `blocked-resident-candidate3/` and
+`blocked-single-candidate3/`. Sender unit tests separately cover late engine PASS,
+serialization deadline chunks, slow partial writes and slow flush, not just a
+sleeping engine. Precise case-ID escape sizing replaces the initial conservative
+control-character estimate; nine character families test exact wire thresholds.
+
+New create-only candidate:
+`build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate3/`;
+19 files, **83,527,978 bytes**; manifest SHA256
+`793d89035e11cb4b01d9c3f178b64baaed29a48f86f03d874a3a1ddbcf8f4e52`.
+Candidate2 and old Core are unchanged. A separate test-only binary copy is verified
+byte-for-byte against candidate3 and contains `examples/text_probe.exe` before the
+final normal-environment Python matrix. No helper is inserted into the Core.
+Final candidate3 real Top-K: all ten fixed cases **PASS**, scope failures0 and
+all candidate ranking fields unchanged. Final candidate3 measurements:
+
+| Packs / K | Before → final documents | Before → final JSONL bytes | Before → final query ms |
+|---|---:|---:|---:|
+| tag-wiki / 1 | 100 →1 | 279,908 →51,764 | 189.649 →217.382 |
+| tag-wiki / 5 | 100 →5 | 296,458 →88,967 | 57.714 →79.098 |
+| Moegirl / 1 | 100 →9 | 339,035 →174,655 | 205.726 →293.042 |
+| Moegirl / 5 | 100 →9 | 386,333 →237,149 | 62.845 →116.155 |
+| Danbooru / 1 | 100 →1 | 180,513 →83,589 | 250.900 →229.149 |
+| Danbooru / 5 | 100 →5 | 189,859 →99,792 | 246.663 →212.222 |
+| Danbooru + Bangumi / 1 | 1 →1 | 7,044 →7,714 | 459.948 →363.222 |
+| Danbooru + Bangumi / 5 | 5 →5 | 25,105 →27,954 | 359.699 →351.841 |
+| all four / 1 | 201 →1 | 486,681 →7,822 | 768.958 →853.234 |
+| all four / 5 | 205 →5 | 504,764 →28,080 | 750.800 →761.931 |
+
+Byte totals include timing fields, so tiny differences from candidate2 are expected.
+No uniform latency improvement is claimed. Moegirl's9 independently retained
+pins/documents are intentional, not permission to return the original Top100 pool.
+
+Modular real resident:18 responses, opened/session1, valid encodings1/1/1 and
+process totals1/2/3, EOFexit0.
+Its first monolithic validation instead terminated with **exit124**, opened1 and
+zero complete business responses; raw stderr was empty. The exact inner engine
+phase cannot be inferred without a delivered profile. This attempt remains FAIL,
+not a delivered FAIL envelope or successful sequence. A separately invoked manual
+acceptance is retained under its own path; no automatic retry or budget relaxation
+is introduced. Its separately invoked monolithic attempt2 **PASS**:16 responses,
+opened/session1, q1 PASS/q2 invalid_limit FAIL/q3 PASS, per-query encoder deltas1/0/1,
+Unicode tail PASS with process encoder total3, EOFexit0. Engine query times are
+532.996, 2629.747 and4312.339ms; final transmission remains within the absolute
+budget. Modular successful query times are917.064, 479.626 and503.522ms. The append
+receipt records both paths and the initial failed monolithic process. The final
+Python matrix for this changed deadline version is **1422 passed, 19 skipped,
+55 subtests passed, 102.73s, exit0**. The helper prerequisites were present before
+execution; all19 skips are Windows symlink-privilege fixtures, not converted PASS.
+Final raw command/JUnit/code/Core/model-sequence bindings are in
+[the append receipt](tool-integration-deadline-receipt.json). Earlier failed commands
+below remain historical FAIL. Ruff over `src tests tools` and `git diff --check`
+return0. The new ordinary pushed SHA still requires fixed-SHA independent review
+before this can be marked an approved Tool integration baseline.
 
 ## Changes and boundaries
 
@@ -32,7 +118,7 @@ business algorithms remain unchanged; only argument routing uses existing
 matrices were not rerun. Ten fixed real queries retain candidate keys/ranks/scores;
 this is not a new claim that the existing quality gate has passed.
 
-## Real Top-K before/after
+## First-submission real Top-K before/after (candidate2)
 
 Same queries and frozen four-pack installation; Top1 and Top5 for each combination.
 Every returned document is checked against its owning read-only DB for typed key,
@@ -63,7 +149,7 @@ numeric IDs in distinct packs, shared typed keys, and multiple documents per key
 Receipts: `build/tool-integration-v1/topk-before-v1/summary.json` and
 `topk-after-candidate2/summary.json`; raw stdout/stderr retained for every case.
 
-## Real resident acceptance
+## First-submission real resident acceptance (candidate2)
 
 Real native binary plus existing BGE-M3 and indexes, one process per sequence:
 
@@ -126,9 +212,9 @@ relabeled as a full-suite PASS.
 See the [machine-readable receipt](tool-integration-receipt.json) for the exact
 failed-case/delta-case binding. No success claim replaces a failed/missing run.
 
-## Candidate and limitations
+## First-submission candidate2 and ongoing limitations
 
-New candidate only:
+Historical create-only candidate:
 `build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate2/`.
 19 files, **83,481,693 bytes**; component manifest SHA256:
 `5aeb64b49f601cc7a5746a9f6a253fab6664a76a9dcd9a46b29b566c84497bba`.

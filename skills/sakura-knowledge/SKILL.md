@@ -26,7 +26,7 @@ Use lookup/ask/resolve-tag for exact aliases and source-backed tag mapping, not
 semantic similarity as a substitute.
 
 Resident lifecycle (monolithic and `--config`): expect one `opened` event and correlate
-one final response per input line using `case_id`. Recoverable input/filter/source/limit
+at most one final response per input line using `case_id`. Recoverable input/filter/source/limit
 errors emit complete FAIL with stable `error`, `message` and `retries=0`, then continue
 in the same process/session. An oversize response does the same; do not retry it
 automatically. Invalid JSON or missing/invalid case ID gives `case_id=null`: treat this
@@ -35,8 +35,15 @@ verbatim. IDs must be nonempty and their JSON-string encoding must fit the wire
 limit minus1024 reserved bytes; otherwise they are invalid protocol IDs (null),
 not truncated strings. Natural EOF exits0 even after recoverable FAILs. Asset/engine errors whose
 state is not known safe, stdin I/O and stdout write/flush failures are fatal nonzero
-exits; do not silently retry/restart or claim an undelivered response. The five-second
-query budget remains; timeout recovery is not assumed safe. A cold monolithic
+exits; do not silently retry/restart or claim an undelivered response. The absolute
+five-second deadline begins after a complete input line and before JSON parsing;
+it includes validation/retrieval/serialization/write/flush, excluding cold opening
+and input-line waiting. Native unsafe timeout or blocked output terminates only that
+process with exit124, without a concurrent FAIL or diagnostic. Incomplete frames
+are not delivered responses; even a full frame followed by an uncompleted flush/
+session fatal is not evidence of a successfully completed request. Generic embedded
+loops check time but require the native watchdog to interrupt arbitrary blocked I/O.
+Timeout recovery is not assumed safe. A cold monolithic
 query actually timed out in this round; the failed attempt is retained in
 [the acceptance receipt](../../docs/tool-integration.md), not marked PASS.
 

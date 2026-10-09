@@ -1,0 +1,2089 @@
+{
+  "schema": "sakura-tool-integration-deadline-repair-v1",
+  "status": "DEADLINE_REPAIR_ACCEPTANCE_PASS_INDEPENDENT_REVIEW_PENDING",
+  "first_submission": "4a19414aa45537533072d1a42be29bb537cb8948",
+  "original_runtime_base": "62886224b3dd0743ac0269cc28fc9bbbe399b20b",
+  "first_review": {
+    "decision": "CHANGES_REQUIRED: engine-only budget did not cover parse/serialization/write/flush",
+    "receipt": {
+      "path": "build/tool-integration-v1/review-4a19414.json",
+      "size": 4476,
+      "sha256": "2b64f74fe4e8108e4b219a7b41c0dc74af6ffbc610310366c261c38ae8d11495"
+    },
+    "review_record": {
+      "schema": "sakura-independent-review-v1",
+      "reviewed_commit": "4a19414aa45537533072d1a42be29bb537cb8948",
+      "base_commit": "62886224b3dd0743ac0269cc28fc9bbbe399b20b",
+      "decision": "CHANGES_REQUIRED",
+      "git_gate": {
+        "local_HEAD_and_live_origin_dev_equal": true,
+        "command": "git rev-parse HEAD; git ls-remote origin refs/heads/dev",
+        "exit": 0
+      },
+      "findings": [
+        {
+          "severity": "P1",
+          "blocking": true,
+          "title": "Five-second deadline does not cover parse/serialization/write/flush",
+          "paths": [
+            "rust/src/resident.rs:207-225",
+            "rust/src/semantic_jsonl.rs:25-60",
+            "rust/src/main.rs semantic single sender call sites"
+          ],
+          "evidence": "Resident elapsed time is recorded but not enforced across sender; sender has no absolute deadline and synchronous write_all/flush may block indefinitely. Engine-only checks do not enforce complete request-response deadline.",
+          "reproduction_design_not_executed": "Inject a Write/flush implementation sleeping beyond five seconds, or leave a native output pipe undrained. Existing code has no timeout termination in these stages.",
+          "required_fix": "Shared absolute request deadline and reliable fatal boundary for blocked transport; no second JSON after partial transmission; independently test single and resident paths."
+        }
+      ],
+      "nonblocking_notes": [
+        {
+          "path": "rust/src/resident.rs:64-72",
+          "note": "All control characters counted as six escaped bytes, although short JSON escapes occupy two. Implement exact accounting or document conservative bound. Subsequent working-tree fixes are not reviewed here."
+        }
+      ],
+      "executed_checks": [
+        {
+          "command": "SKNOW_RS_TEST_BIN=D:/SakuraTool/SakuraKnowledge/build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate2/bin/sknow-rs.exe SKNOW_PILOT_TEST_BIN=D:/SakuraTool/SakuraKnowledge/build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate2/bin/semantic_pilot.exe PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m pytest -q tests/test_tool_runtime_integration.py tests/test_tool_interface_harness.py tests/test_modular_jsonl_budget.py",
+          "exit": 0,
+          "passed": 67,
+          "seconds": 3.7
+        },
+        {
+          "command": "cargo test --manifest-path rust/Cargo.toml --offline --target-dir build/p4-usearch-native-fix/rust-target -j 1 --lib modular_cli",
+          "exit": 0,
+          "passed": 21,
+          "warnings": [
+            "unused_mut",
+            "dead_code"
+          ]
+        },
+        {
+          "command": "cargo test --manifest-path rust/Cargo.toml --features semantic --offline --target-dir build/p4-usearch-native-fix/rust-target -j 1 --lib resident::",
+          "exit": 0,
+          "passed": 9
+        }
+      ],
+      "small_evidence_checks": {
+        "method": "Read docs/tool-integration-receipt.json recursively; verify referenced path/size/SHA256 records <=1MB; parse original and targeted JUnit XML; inspect saved TopK comparison. No large asset reads.",
+        "matched_bindings": 39,
+        "mismatches": 0,
+        "topk_saved_cases": 10,
+        "all_saved_ranking_unchanged_and_scope_PASS": true,
+        "initial_failed_case_classname_name_set_equals_targeted_pass_set": true,
+        "exact_matched_cases": 4
+      },
+      "full_python_assessment": {
+        "original_command_exit": 1,
+        "passed": 1415,
+        "failed": 4,
+        "skipped": 19,
+        "subtests_passed": 55,
+        "targeted_repair_passed": 4,
+        "assessment": "Exact four missing-helper failures closed by targeted prerequisite repair; original whole-suite command remains FAIL, not relabeled PASS. No additional full run required solely for unchanged version."
+      },
+      "scope": "TopK source-qualified public evidence closure, strict modular CLI, resident typed recoverable/fatal lifecycle, bounded sender and deadline contract. No additional TopK/CLI blocking finding.",
+      "limitations": [
+        "No real model queries rerun",
+        "No full120 or full151 rerun",
+        "No mother/source DB/model/ANN large read or hash",
+        "Saved evidence validation is not independent rerun of original real queries",
+        "Existing QUALITY_FAIL, source rights NOT_CLEARED and cold first monolithic timeout retained",
+        "Does not approve subsequent uncommitted fixes or candidate3",
+        "Review record created retrospectively from this session actual tool results, not a contemporaneous raw command capture"
+      ],
+      "stop_state": "WAITING_FOR_NEW_ORDINARY_PUSH_AND_FORMAL_DELTA_REVIEW"
+    }
+  },
+  "commit_binding": "Ordinary append commit containing this receipt; independent review binds live pushed SHA.",
+  "original_evidence": {
+    "path": "docs/tool-integration-receipt.json",
+    "size": 66154,
+    "sha256": "848d4b0067a6488d4d4f0421315bb2e5a19f74853166eb072affc644de608e7b"
+  },
+  "original_failures_are_retained": true,
+  "final_version_initial_monolithic_failure": {
+    "receipt": {
+      "path": "build/tool-integration-v1/resident-monolithic-candidate3/summary.json",
+      "size": 1514,
+      "sha256": "c8313618f999d0c290a4f6e09650973f062cc8929408a2a111d3fcc065a4d8c2"
+    },
+    "report": {
+      "schema": "sakura-tool-resident-recovery-native-v1",
+      "status": "FAIL",
+      "mode": "monolithic",
+      "command": [
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\semantic_pilot.exe",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+        "D:\\SakuraTool\\SakuraKnowledge\\build\\p4-dev-2048-1mib-3ee34e2-v1\\manifest.json"
+      ],
+      "input_lines": 16,
+      "processes_started": 1,
+      "automatic_retries": 0,
+      "wire_limit_bytes": 2097152,
+      "cases": [],
+      "oversize_and_fatal_injection_scope": "separate small native/loop fixture evidence required",
+      "exit": 124,
+      "stdout_bytes": 410,
+      "stderr_bytes": 0,
+      "opened_events": 1,
+      "business_responses": 0,
+      "opened": [
+        {
+          "event": "opened",
+          "open_timings_ms": {
+            "ann": 267.5633,
+            "fts_membership_allocation_bytes": 50331648,
+            "fts_membership_count": 1295638,
+            "fts_membership_payload_bytes": 31095312,
+            "membership_allocation_bytes": 20730208,
+            "membership_count": 1295638,
+            "membership_load": 260.7953,
+            "membership_payload_bytes": 20730208,
+            "metadata": 1144.51,
+            "model_sessions": 1,
+            "ort": 3339.9874,
+            "tokenizer": 407.89799999999997,
+            "total": 5159.96
+          },
+          "retries": 0
+        }
+      ],
+      "wall_ms": 10380.345500074327,
+      "error": {
+        "type": "ValueError",
+        "message": "resident exited early/restarted/missed or duplicated responses"
+      }
+    },
+    "interpretation": "opened once, zero complete business responses, native exit124. Absolute deadline expired before first response. No inner-engine timing was delivered, so the exact stalled phase is not inferred. A separate manual acceptance invocation is not an automatic retry or relabeling this FAIL."
+  },
+  "implementation_bindings": [
+    {
+      "path": "rust/src/main.rs",
+      "size": 19415,
+      "sha256": "f8025aa5dcd2fccccfab749fdeeeb2ebafc16e45d82e32a3e1c8fb653861d6e3"
+    },
+    {
+      "path": "rust/src/lib.rs",
+      "size": 63777,
+      "sha256": "f9dfc7d02d85e38254ab20b389c81ea51932a51eedfafee99424255946400e2a"
+    },
+    {
+      "path": "rust/src/resident.rs",
+      "size": 27375,
+      "sha256": "043931b82eeea0fd52e18368b1690fa321f8401b3d8f4879905ba60ac6446dad"
+    },
+    {
+      "path": "rust/src/request_deadline.rs",
+      "size": 12700,
+      "sha256": "3a2270fd97a48e2865e2dbbad8acdab91abaad256731beb81d600bacb1e16b9f"
+    },
+    {
+      "path": "rust/src/semantic_jsonl.rs",
+      "size": 12289,
+      "sha256": "3034639b38d8af1fbea67b75afe485b977f388ebb2b1a45216c07aaab52028d1"
+    },
+    {
+      "path": "rust/src/bin/semantic_pilot.rs",
+      "size": 1121,
+      "sha256": "5b2fe0542beadf1abbdc3c388123ceac1b2d48d5bbd0a381dbc5cd0a427f0d81"
+    },
+    {
+      "path": "tests/test_resident_deadline.py",
+      "size": 6315,
+      "sha256": "fed31ef5eef16d564b5bebeaa1ffcc29defa15837c42841bfd2ae3b4fa8d0582"
+    }
+  ],
+  "test_environment_bindings": {
+    "path": "build/tool-integration-v1/prerequisite-test-bin-candidate3/bindings.json",
+    "size": 2907,
+    "sha256": "1d8d63e1c1db69a8d079f05f22d160d32f58794741a9b57da40a979a1eaed71f"
+  },
+  "full_python_runs": {
+    "initial_version": 1,
+    "final_deadline_changed_version": 1,
+    "reason": "New deadline implementation requires final normal-environment matrix, with helper prerequisites present before execution. No failed command is relabeled PASS."
+  },
+  "five_second_contract": {
+    "start": "After receiving a complete request line, before JSON parsing; cold asset opening and input-line waiting excluded.",
+    "end": "Complete serialized UTF-8 JSONL including newline has been written and successfully flushed.",
+    "policy": "One absolute monotonic deadline; fatal current-process termination for an unsafe timeout or blocked channel, no retry/engine reload/concurrent failure emitter.",
+    "expired_native_process_exit": 124,
+    "client_rule": "Discard incomplete frames; a received frame alone is not a claim that a failed/unflushed process/request completed successfully.",
+    "limitations": "Standard desktop OS scheduling is not a hard real-time guarantee. Fatal termination can preclude any complete FAIL and skips process destructors; source/runtime assets remain read-only."
+  },
+  "commands": [
+    {
+      "command": "cargo test --manifest-path rust/Cargo.toml --features semantic --offline --target-dir build/p4-usearch-native-fix/rust-target -j 1 --lib --bin sknow-rs --bin semantic_pilot",
+      "exit": 0,
+      "stdout": {
+        "path": "build/tool-integration-v1/rust-deadline-attempt1.stdout",
+        "size": 10083,
+        "sha256": "26be1bbc820806b35d747420cef1cdb3ad71e290766ea529bbb98903cbc713d4"
+      },
+      "stderr": {
+        "path": "build/tool-integration-v1/rust-deadline-attempt1.stderr",
+        "size": 545,
+        "sha256": "f4fd277cc8dc2199182e6cd97d9ca2c092223359cf7bba83b19dc3c0b6bc23cd"
+      }
+    },
+    {
+      "command": "cargo build --manifest-path rust/Cargo.toml --features semantic --release --offline --target-dir build/p4-usearch-native-fix/rust-target -j 1 --bin sknow-rs --bin semantic_pilot --example text_probe",
+      "exit": 0,
+      "stdout": {
+        "path": "build/tool-integration-v1/release-deadline-final.stdout",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "build/tool-integration-v1/release-deadline-final.stderr",
+        "size": 145,
+        "sha256": "c14bed0c7b984c0bc4d402f322c38dab0cf5a2da980586520fd33ccaaaa1090c"
+      }
+    },
+    {
+      "command": "python -m ruff check src tests tools",
+      "exit": 0,
+      "stdout": {
+        "path": "build/tool-integration-v1/ruff-deadline-final.stdout",
+        "size": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      "stderr": {
+        "path": "build/tool-integration-v1/ruff-deadline-final.stderr",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0,
+      "stdout": {
+        "path": "build/tool-integration-v1/diff-deadline-final.stdout",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "build/tool-integration-v1/diff-deadline-final.stderr",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "rust_related_tests": {
+    "lib": 114,
+    "main": 1,
+    "failed": 0,
+    "exit": 0
+  },
+  "full_python_final_version": {
+    "tests": 1496,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 19,
+    "command": "PYTHONUTF8=1 PYTHONIOENCODING=utf-8 SKNOW_RS_TEST_BIN=build/tool-integration-v1/prerequisite-test-bin-candidate3/bin/sknow-rs.exe SKNOW_PILOT_TEST_BIN=build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate3/bin/semantic_pilot.exe python -m pytest -q --junitxml=build/tool-integration-v1/python-final-deadline.xml --basetemp=build/tool-integration-v1/python-final-deadline",
+    "exit": 0,
+    "stdout": {
+      "path": "build/tool-integration-v1/python-final-deadline.stdout",
+      "size": 1703,
+      "sha256": "5810ae9716a3b21101ecc648a9bb345150ea0d415e347b5a331fa0674639299d"
+    },
+    "stderr": {
+      "path": "build/tool-integration-v1/python-final-deadline.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "junit": {
+      "path": "build/tool-integration-v1/python-final-deadline.xml",
+      "size": 195733,
+      "sha256": "71595320373d949f0ada5f53d06ae8eb5fbba4f26832dff575727dd626b4e0a9"
+    },
+    "console_summary": {
+      "passed": 1422,
+      "skipped": 19,
+      "subtests_passed": 55,
+      "seconds": 102.73,
+      "exit": 0
+    },
+    "skip_reason_scope": "All19 skips are platform-unavailable symlink fixtures (Windows1314/privilege); they are not PASS."
+  },
+  "native_deadline_and_regression": {
+    "tests": 70,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "command": "PYTHONUTF8=1 PYTHONIOENCODING=utf-8 SKNOW_RS_TEST_BIN=build/tool-integration-v1/prerequisite-test-bin-candidate3/bin/sknow-rs.exe SKNOW_PILOT_TEST_BIN=build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate3/bin/semantic_pilot.exe python -m pytest -q tests/test_resident_deadline.py tests/test_tool_runtime_integration.py tests/test_tool_interface_harness.py tests/test_modular_jsonl_budget.py --junitxml=build/tool-integration-v1/native-deadline-final.xml --basetemp=build/tool-integration-v1/native-deadline-final",
+    "exit": 0,
+    "stdout": {
+      "path": "build/tool-integration-v1/native-deadline-final.stdout",
+      "size": 102,
+      "sha256": "a6e4535eed6049433afeb665f2339426fd10569fcc07244d6b0003689b8b1baa"
+    },
+    "stderr": {
+      "path": "build/tool-integration-v1/native-deadline-final.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "junit": {
+      "path": "build/tool-integration-v1/native-deadline-final.xml",
+      "size": 10632,
+      "sha256": "6b8ca018781a13565a496c2847111a98a74c4f9b0dc0d6dbf0c9a3fe74123132"
+    },
+    "console_summary": {
+      "passed": 70,
+      "seconds": 14.59,
+      "exit": 0
+    }
+  },
+  "core_candidate": {
+    "directory": "build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate3",
+    "files": 19,
+    "size": 83527978,
+    "manifest": {
+      "path": "build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate3/component-manifest.json",
+      "size": 3345,
+      "sha256": "793d89035e11cb4b01d9c3f178b64baaed29a48f86f03d874a3a1ddbcf8f4e52"
+    }
+  },
+  "final_real_native": {
+    "resident-modular-candidate3": {
+      "binding": {
+        "path": "build/tool-integration-v1/resident-modular-candidate3/summary.json",
+        "size": 6288,
+        "sha256": "19a184853f4434d8cf51ede577d9cb8e5ca2627a167fe84840dd625783e88c5a"
+      },
+      "report": {
+        "schema": "sakura-tool-resident-recovery-native-v1",
+        "status": "PASS",
+        "mode": "modular",
+        "command": [
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\semantic_pilot.exe",
+          "--config",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json"
+        ],
+        "input_lines": 18,
+        "processes_started": 1,
+        "automatic_retries": 0,
+        "wire_limit_bytes": 2097152,
+        "cases": [
+          {
+            "expected_case_id": "q1",
+            "case_id": "q1",
+            "status": "PASS",
+            "expected_status": "PASS",
+            "error": null,
+            "retries": null,
+            "timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 917.0639
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "q2",
+            "case_id": "q2",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_limit",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 1
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "q3",
+            "case_id": "q3",
+            "status": "PASS",
+            "expected_status": "PASS",
+            "error": null,
+            "retries": null,
+            "timings_ms": {
+              "process_query_encodings": 2,
+              "query_encodings": 1,
+              "total": 479.6263
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": null,
+            "case_id": null,
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_json",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": null,
+            "case_id": null,
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_case_id",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": null,
+            "case_id": null,
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_case_id",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": null,
+            "case_id": null,
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_request",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "bad-query",
+            "case_id": "bad-query",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_query",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "long-query",
+            "case_id": "long-query",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_query",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "zero-limit",
+            "case_id": "zero-limit",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_limit",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "large-limit",
+            "case_id": "large-limit",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_limit",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "bad-kind",
+            "case_id": "bad-kind",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_kind",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "bad-namespace",
+            "case_id": "bad-namespace",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_namespace",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "unknown-option",
+            "case_id": "unknown-option",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "unsupported_option",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "empty-source",
+            "case_id": "empty-source",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_source",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "missing-pack",
+            "case_id": "missing-pack",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "source_pack_missing",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "bad-source-member",
+            "case_id": "bad-source-member",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_source",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": " 結尾-验证😀 ",
+            "case_id": " 結尾-验证😀 ",
+            "status": "PASS",
+            "expected_status": "PASS",
+            "error": null,
+            "retries": null,
+            "timings_ms": {
+              "process_query_encodings": 3,
+              "query_encodings": 1,
+              "total": 503.52180000000004
+            },
+            "PASS": true
+          }
+        ],
+        "oversize_and_fatal_injection_scope": "separate small native/loop fixture evidence required",
+        "exit": 0,
+        "stdout_bytes": 120907,
+        "stderr_bytes": 2938,
+        "opened_events": 1,
+        "business_responses": 18,
+        "opened": [
+          {
+            "event": "opened",
+            "open_timings_ms": {
+              "model_sessions": 1,
+              "total": 11925.998
+            },
+            "retries": 0
+          }
+        ],
+        "wall_ms": 14309.340299922042,
+        "encoding_evidence": {
+          "model_sessions": 1,
+          "valid_request_encodings": [
+            1,
+            1,
+            1
+          ],
+          "process_query_encodings": [
+            1,
+            2,
+            3
+          ]
+        },
+        "single_session_and_encoding_pass": true
+      }
+    },
+    "resident-monolithic-candidate3-attempt2": {
+      "binding": {
+        "path": "build/tool-integration-v1/resident-monolithic-candidate3-attempt2/summary.json",
+        "size": 7079,
+        "sha256": "8741488e51db17293adaebb091ba6b8734a4fbf23a739cef6f83b1496f194730"
+      },
+      "report": {
+        "schema": "sakura-tool-resident-recovery-native-v1",
+        "status": "PASS",
+        "mode": "monolithic",
+        "command": [
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\semantic_pilot.exe",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p3-full-authorized-retry1\\knowledge.sqlite",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\p4-dev-2048-1mib-3ee34e2-v1\\manifest.json"
+        ],
+        "input_lines": 16,
+        "processes_started": 1,
+        "automatic_retries": 0,
+        "wire_limit_bytes": 2097152,
+        "cases": [
+          {
+            "expected_case_id": "q1",
+            "case_id": "q1",
+            "status": "PASS",
+            "expected_status": "PASS",
+            "error": null,
+            "retries": null,
+            "timings_ms": {
+              "ann": 122.3089,
+              "bm25": 333.0012,
+              "bm25_sql": 332.7625,
+              "dense_mapping": 19.645599999999998,
+              "fusion_evidence": 11.6984,
+              "index_search": 102.66329999999999,
+              "ort": 65.62389999999999,
+              "pins_sql": 0.2376,
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "tokenize": 0.037,
+              "total": 532.9956999999999
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "q2",
+            "case_id": "q2",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_limit",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 1
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "q3",
+            "case_id": "q3",
+            "status": "PASS",
+            "expected_status": "PASS",
+            "error": null,
+            "retries": null,
+            "timings_ms": {
+              "ann": 2508.6216,
+              "bm25": 45.019999999999996,
+              "bm25_sql": 43.6224,
+              "dense_mapping": 94.81230000000001,
+              "fusion_evidence": 8.6773,
+              "index_search": 2413.8091,
+              "ort": 67.1926,
+              "pins_sql": 1.3966,
+              "process_query_encodings": 2,
+              "query_encodings": 1,
+              "tokenize": 0.0106,
+              "total": 2629.7465
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": null,
+            "case_id": null,
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_json",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": null,
+            "case_id": null,
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_case_id",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": null,
+            "case_id": null,
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_case_id",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": null,
+            "case_id": null,
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_request",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "bad-query",
+            "case_id": "bad-query",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_query",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "long-query",
+            "case_id": "long-query",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_query",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "zero-limit",
+            "case_id": "zero-limit",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_limit",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "large-limit",
+            "case_id": "large-limit",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_limit",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "bad-kind",
+            "case_id": "bad-kind",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_kind",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "bad-namespace",
+            "case_id": "bad-namespace",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_namespace",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "unknown-option",
+            "case_id": "unknown-option",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "unsupported_option",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": "empty-source",
+            "case_id": "empty-source",
+            "status": "FAIL",
+            "expected_status": "FAIL",
+            "error": "invalid_source",
+            "retries": 0,
+            "timings_ms": {
+              "process_query_encodings": 2
+            },
+            "PASS": true
+          },
+          {
+            "expected_case_id": " 結尾-验证😀 ",
+            "case_id": " 結尾-验证😀 ",
+            "status": "PASS",
+            "expected_status": "PASS",
+            "error": null,
+            "retries": null,
+            "timings_ms": {
+              "ann": 4098.5916,
+              "bm25": 133.64770000000001,
+              "bm25_sql": 125.84210000000002,
+              "dense_mapping": 106.1358,
+              "fusion_evidence": 10.1937,
+              "index_search": 3992.4557,
+              "ort": 69.5471,
+              "pins_sql": 7.8049,
+              "process_query_encodings": 3,
+              "query_encodings": 1,
+              "tokenize": 0.0161,
+              "total": 4312.3393
+            },
+            "PASS": true
+          }
+        ],
+        "oversize_and_fatal_injection_scope": "separate small native/loop fixture evidence required",
+        "exit": 0,
+        "stdout_bytes": 495195,
+        "stderr_bytes": 2645,
+        "opened_events": 1,
+        "business_responses": 16,
+        "opened": [
+          {
+            "event": "opened",
+            "open_timings_ms": {
+              "ann": 127.52640000000001,
+              "fts_membership_allocation_bytes": 50331648,
+              "fts_membership_count": 1295638,
+              "fts_membership_payload_bytes": 31095312,
+              "membership_allocation_bytes": 20730208,
+              "membership_count": 1295638,
+              "membership_load": 272.4862,
+              "membership_payload_bytes": 20730208,
+              "metadata": 444.8356,
+              "model_sessions": 1,
+              "ort": 1551.7593000000002,
+              "tokenizer": 395.9446,
+              "total": 2520.0669
+            },
+            "retries": 0
+          }
+        ],
+        "wall_ms": 10402.008399949409,
+        "encoding_evidence": {
+          "model_sessions": 1,
+          "valid_request_encodings": [
+            1,
+            1,
+            1
+          ],
+          "process_query_encodings": [
+            1,
+            2,
+            3
+          ]
+        },
+        "single_session_and_encoding_pass": true
+      }
+    },
+    "topk-after-candidate3": {
+      "binding": {
+        "path": "build/tool-integration-v1/topk-after-candidate3/summary.json",
+        "size": 27534,
+        "sha256": "eadc98b23d0b6e5eb8026fc3d2778d3238e4b12ea3abcb9bbf9bf7943868f073"
+      },
+      "report": {
+        "schema": "sakura-tool-topk-native-v1",
+        "phase": "after",
+        "status": "PASS",
+        "executable": "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+        "config": "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+        "cases": [
+          {
+            "case_id": "tag-wiki-top1",
+            "command": [
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+              "--config",
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+              "retrieve",
+              "blue_hair",
+              "--topk",
+              "1",
+              "--source",
+              "tag-wiki"
+            ],
+            "query": "blue_hair",
+            "topk": 1,
+            "exit": 0,
+            "cold_wall_ms": 274.09029996488243,
+            "stdout_bytes": 51764,
+            "stderr_bytes": 156,
+            "status": "PASS",
+            "response_status": "PASS",
+            "candidates": [
+              {
+                "entry": [
+                  "tag",
+                  "local.tag_aggregate",
+                  "blue_hair"
+                ],
+                "rank": 1,
+                "source_packs": [
+                  "tag-wiki"
+                ],
+                "ranking_fields": {}
+              }
+            ],
+            "document_count": 1,
+            "source_count": 1,
+            "evidence_count": 2,
+            "citation_count": 2,
+            "query_timings_ms": {
+              "process_query_encodings": 0,
+              "query_encodings": 0,
+              "total": 217.3818
+            },
+            "proof_scope": {
+              "status": "PASS",
+              "violations": [],
+              "source_qualified_documents": 1,
+              "allowed_typed_key_origins": 1
+            },
+            "runtime_pass": true,
+            "ranking_unchanged": true,
+            "before_document_count": 100,
+            "before_stdout_bytes": 279908,
+            "before_query_timings_ms": {
+              "process_query_encodings": 0,
+              "query_encodings": 0,
+              "total": 189.649
+            }
+          },
+          {
+            "case_id": "tag-wiki-top5",
+            "command": [
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+              "--config",
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+              "retrieve",
+              "blue_hair",
+              "--topk",
+              "5",
+              "--source",
+              "tag-wiki"
+            ],
+            "query": "blue_hair",
+            "topk": 5,
+            "exit": 0,
+            "cold_wall_ms": 123.78429993987083,
+            "stdout_bytes": 88967,
+            "stderr_bytes": 166,
+            "status": "PASS",
+            "response_status": "PASS",
+            "candidates": [
+              {
+                "entry": [
+                  "tag",
+                  "local.tag_aggregate",
+                  "blue_hair"
+                ],
+                "rank": 1,
+                "source_packs": [
+                  "tag-wiki"
+                ],
+                "ranking_fields": {}
+              },
+              {
+                "entry": [
+                  "tag",
+                  "local.tag_aggregate",
+                  "light_blue_hair"
+                ],
+                "rank": 2,
+                "source_packs": [
+                  "tag-wiki"
+                ],
+                "ranking_fields": {
+                  "score": -8.410100277253733
+                }
+              },
+              {
+                "entry": [
+                  "tag",
+                  "local.tag_aggregate",
+                  "dark_blue_hair"
+                ],
+                "rank": 3,
+                "source_packs": [
+                  "tag-wiki"
+                ],
+                "ranking_fields": {
+                  "score": -8.397599844304985
+                }
+              },
+              {
+                "entry": [
+                  "tag",
+                  "local.tag_aggregate",
+                  "nishina_rie"
+                ],
+                "rank": 4,
+                "source_packs": [
+                  "tag-wiki"
+                ],
+                "ranking_fields": {
+                  "score": -8.242143922578624
+                }
+              },
+              {
+                "entry": [
+                  "tag",
+                  "local.tag_aggregate",
+                  "iris_(drapri_guu-ta-life)"
+                ],
+                "rank": 5,
+                "source_packs": [
+                  "tag-wiki"
+                ],
+                "ranking_fields": {
+                  "score": -8.125965209885855
+                }
+              }
+            ],
+            "document_count": 5,
+            "source_count": 1,
+            "evidence_count": 10,
+            "citation_count": 10,
+            "query_timings_ms": {
+              "process_query_encodings": 0,
+              "query_encodings": 0,
+              "total": 79.09779999999999
+            },
+            "proof_scope": {
+              "status": "PASS",
+              "violations": [],
+              "source_qualified_documents": 5,
+              "allowed_typed_key_origins": 5
+            },
+            "runtime_pass": true,
+            "ranking_unchanged": true,
+            "before_document_count": 100,
+            "before_stdout_bytes": 296458,
+            "before_query_timings_ms": {
+              "process_query_encodings": 0,
+              "query_encodings": 0,
+              "total": 57.7142
+            }
+          },
+          {
+            "case_id": "moegirl-top1",
+            "command": [
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+              "--config",
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+              "retrieve",
+              "初音",
+              "--topk",
+              "1",
+              "--source",
+              "moegirl"
+            ],
+            "query": "初音",
+            "topk": 1,
+            "exit": 0,
+            "cold_wall_ms": 342.23850001581013,
+            "stdout_bytes": 174655,
+            "stderr_bytes": 159,
+            "status": "PASS",
+            "response_status": "PASS",
+            "candidates": [
+              {
+                "entry": [
+                  "character",
+                  "moegirl.character",
+                  "初音未来"
+                ],
+                "rank": 1,
+                "source_packs": [
+                  "moegirl"
+                ],
+                "ranking_fields": {}
+              }
+            ],
+            "document_count": 9,
+            "source_count": 2,
+            "evidence_count": 27,
+            "citation_count": 27,
+            "query_timings_ms": {
+              "process_query_encodings": 0,
+              "query_encodings": 0,
+              "total": 293.0415
+            },
+            "proof_scope": {
+              "status": "PASS",
+              "violations": [],
+              "source_qualified_documents": 9,
+              "allowed_typed_key_origins": 9
+            },
+            "runtime_pass": true,
+            "ranking_unchanged": true,
+            "before_document_count": 100,
+            "before_stdout_bytes": 339035,
+            "before_query_timings_ms": {
+              "process_query_encodings": 0,
+              "query_encodings": 0,
+              "total": 205.7258
+            }
+          },
+          {
+            "case_id": "moegirl-top5",
+            "command": [
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+              "--config",
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+              "retrieve",
+              "初音",
+              "--topk",
+              "5",
+              "--source",
+              "moegirl"
+            ],
+            "query": "初音",
+            "topk": 5,
+            "exit": 0,
+            "cold_wall_ms": 176.0287000797689,
+            "stdout_bytes": 237149,
+            "stderr_bytes": 169,
+            "status": "PASS",
+            "response_status": "PASS",
+            "candidates": [
+              {
+                "entry": [
+                  "character",
+                  "moegirl.character",
+                  "初音未来"
+                ],
+                "rank": 1,
+                "source_packs": [
+                  "moegirl"
+                ],
+                "ranking_fields": {}
+              },
+              {
+                "entry": [
+                  "character",
+                  "moegirl.character",
+                  "初音未来(偶像大师)"
+                ],
+                "rank": 2,
+                "source_packs": [
+                  "moegirl"
+                ],
+                "ranking_fields": {}
+              },
+              {
+                "entry": [
+                  "character",
+                  "moegirl.character",
+                  "初音未来(战斗天赋解析系统)"
+                ],
+                "rank": 3,
+                "source_packs": [
+                  "moegirl"
+                ],
+                "ranking_fields": {}
+              },
+              {
+                "entry": [
+                  "character",
+                  "moegirl.character",
+                  "初音未来(蔚蓝档案)"
+                ],
+                "rank": 4,
+                "source_packs": [
+                  "moegirl"
+                ],
+                "ranking_fields": {}
+              },
+              {
+                "entry": [
+                  "character",
+                  "moegirl.character",
+                  "战舰少女:关岛"
+                ],
+                "rank": 5,
+                "source_packs": [
+                  "moegirl"
+                ],
+                "ranking_fields": {}
+              }
+            ],
+            "document_count": 9,
+            "source_count": 2,
+            "evidence_count": 27,
+            "citation_count": 27,
+            "query_timings_ms": {
+              "process_query_encodings": 0,
+              "query_encodings": 0,
+              "total": 116.15549999999999
+            },
+            "proof_scope": {
+              "status": "PASS",
+              "violations": [],
+              "source_qualified_documents": 9,
+              "allowed_typed_key_origins": 9
+            },
+            "runtime_pass": true,
+            "ranking_unchanged": true,
+            "before_document_count": 100,
+            "before_stdout_bytes": 386333,
+            "before_query_timings_ms": {
+              "process_query_encodings": 0,
+              "query_encodings": 0,
+              "total": 62.845200000000006
+            }
+          },
+          {
+            "case_id": "danbooru-top1",
+            "command": [
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+              "--config",
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+              "retrieve",
+              "blue hair",
+              "--topk",
+              "1",
+              "--source",
+              "danbooru"
+            ],
+            "query": "blue hair",
+            "topk": 1,
+            "exit": 0,
+            "cold_wall_ms": 7077.127399970777,
+            "stdout_bytes": 83589,
+            "stderr_bytes": 167,
+            "status": "PASS",
+            "response_status": "PASS",
+            "candidates": [
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "231843"
+                ],
+                "rank": 1,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.03009207275993712,
+                  "backend_ranks": [
+                    [
+                      "bm25",
+                      1
+                    ],
+                    [
+                      "dense",
+                      13
+                    ]
+                  ]
+                }
+              }
+            ],
+            "document_count": 1,
+            "source_count": 1,
+            "evidence_count": 1,
+            "citation_count": 1,
+            "query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 229.1493
+            },
+            "proof_scope": {
+              "status": "PASS",
+              "violations": [],
+              "source_qualified_documents": 1,
+              "allowed_typed_key_origins": 1
+            },
+            "runtime_pass": true,
+            "ranking_unchanged": true,
+            "before_document_count": 100,
+            "before_stdout_bytes": 180513,
+            "before_query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 250.90030000000002
+            }
+          },
+          {
+            "case_id": "danbooru-top5",
+            "command": [
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+              "--config",
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+              "retrieve",
+              "blue hair",
+              "--topk",
+              "5",
+              "--source",
+              "danbooru"
+            ],
+            "query": "blue hair",
+            "topk": 5,
+            "exit": 0,
+            "cold_wall_ms": 5310.233199968934,
+            "stdout_bytes": 99792,
+            "stderr_bytes": 166,
+            "status": "PASS",
+            "response_status": "PASS",
+            "candidates": [
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "231843"
+                ],
+                "rank": 1,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.03009207275993712,
+                  "backend_ranks": [
+                    [
+                      "bm25",
+                      1
+                    ],
+                    [
+                      "dense",
+                      13
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "136282"
+                ],
+                "rank": 2,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.025525990099009903,
+                  "backend_ranks": [
+                    [
+                      "bm25",
+                      4
+                    ],
+                    [
+                      "dense",
+                      41
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "114850"
+                ],
+                "rank": 3,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.02393753200204813,
+                  "backend_ranks": [
+                    [
+                      "bm25",
+                      3
+                    ],
+                    [
+                      "dense",
+                      64
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "90365"
+                ],
+                "rank": 4,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.02284044165403767,
+                  "backend_ranks": [
+                    [
+                      "bm25",
+                      2
+                    ],
+                    [
+                      "dense",
+                      89
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "121482"
+                ],
+                "rank": 5,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.021530054644808744,
+                  "backend_ranks": [
+                    [
+                      "bm25",
+                      15
+                    ],
+                    [
+                      "dense",
+                      62
+                    ]
+                  ]
+                }
+              }
+            ],
+            "document_count": 5,
+            "source_count": 1,
+            "evidence_count": 5,
+            "citation_count": 5,
+            "query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 212.22199999999998
+            },
+            "proof_scope": {
+              "status": "PASS",
+              "violations": [],
+              "source_qualified_documents": 5,
+              "allowed_typed_key_origins": 5
+            },
+            "runtime_pass": true,
+            "ranking_unchanged": true,
+            "before_document_count": 100,
+            "before_stdout_bytes": 189859,
+            "before_query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 246.66299999999998
+            }
+          },
+          {
+            "case_id": "danbooru+bangumi-top1",
+            "command": [
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+              "--config",
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+              "retrieve",
+              "blue hair",
+              "--topk",
+              "1",
+              "--source",
+              "danbooru,bangumi"
+            ],
+            "query": "blue hair",
+            "topk": 1,
+            "exit": 0,
+            "cold_wall_ms": 12346.127199940383,
+            "stdout_bytes": 7714,
+            "stderr_bytes": 168,
+            "status": "PASS",
+            "response_status": "PASS",
+            "candidates": [
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "231843"
+                ],
+                "rank": 1,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.02738245361196181,
+                  "global_semantic_rank": 31,
+                  "best_distance": 0.3407251834869385,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      31
+                    ],
+                    [
+                      "bm25:danbooru",
+                      1
+                    ]
+                  ]
+                }
+              }
+            ],
+            "document_count": 1,
+            "source_count": 1,
+            "evidence_count": 1,
+            "citation_count": 1,
+            "query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 363.2223
+            },
+            "proof_scope": {
+              "status": "PASS",
+              "violations": [],
+              "source_qualified_documents": 1,
+              "allowed_typed_key_origins": 1
+            },
+            "runtime_pass": true,
+            "ranking_unchanged": true,
+            "before_document_count": 1,
+            "before_stdout_bytes": 7044,
+            "before_query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 459.9479
+            }
+          },
+          {
+            "case_id": "danbooru+bangumi-top5",
+            "command": [
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+              "--config",
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+              "retrieve",
+              "blue hair",
+              "--topk",
+              "5",
+              "--source",
+              "danbooru,bangumi"
+            ],
+            "query": "blue hair",
+            "topk": 5,
+            "exit": 0,
+            "cold_wall_ms": 12721.307500032708,
+            "stdout_bytes": 27954,
+            "stderr_bytes": 156,
+            "status": "PASS",
+            "response_status": "PASS",
+            "candidates": [
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "231843"
+                ],
+                "rank": 1,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.02738245361196181,
+                  "global_semantic_rank": 31,
+                  "best_distance": 0.3407251834869385,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      31
+                    ],
+                    [
+                      "bm25:danbooru",
+                      1
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "subject",
+                  "bangumi.subject",
+                  "35169"
+                ],
+                "rank": 2,
+                "source_packs": [
+                  "bangumi"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.024970794392523366,
+                  "global_semantic_rank": 4,
+                  "best_distance": 0.26590728759765625,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      4
+                    ],
+                    [
+                      "bm25:bangumi",
+                      47
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "136282"
+                ],
+                "rank": 3,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.022203947368421052,
+                  "global_semantic_rank": 92,
+                  "best_distance": 0.3783189654350281,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      92
+                    ],
+                    [
+                      "bm25:danbooru",
+                      4
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "person",
+                  "bangumi.person",
+                  "6499"
+                ],
+                "rank": 4,
+                "source_packs": [
+                  "bangumi"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.022161324913618493,
+                  "global_semantic_rank": 49,
+                  "best_distance": 0.3526685833930969,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      49
+                    ],
+                    [
+                      "bm25:bangumi",
+                      17
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "subject",
+                  "bangumi.subject",
+                  "184156"
+                ],
+                "rank": 5,
+                "source_packs": [
+                  "bangumi"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.01805465191932336,
+                  "global_semantic_rank": 56,
+                  "best_distance": 0.3559938669204712,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      56
+                    ],
+                    [
+                      "bm25:bangumi",
+                      46
+                    ]
+                  ]
+                }
+              }
+            ],
+            "document_count": 5,
+            "source_count": 2,
+            "evidence_count": 5,
+            "citation_count": 5,
+            "query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 351.8406
+            },
+            "proof_scope": {
+              "status": "PASS",
+              "violations": [],
+              "source_qualified_documents": 5,
+              "allowed_typed_key_origins": 5
+            },
+            "runtime_pass": true,
+            "ranking_unchanged": true,
+            "before_document_count": 5,
+            "before_stdout_bytes": 25105,
+            "before_query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 359.6991
+            }
+          },
+          {
+            "case_id": "all-top1",
+            "command": [
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+              "--config",
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+              "retrieve",
+              "blue hair",
+              "--topk",
+              "1"
+            ],
+            "query": "blue hair",
+            "topk": 1,
+            "exit": 0,
+            "cold_wall_ms": 13219.93639995344,
+            "stdout_bytes": 7822,
+            "stderr_bytes": 181,
+            "status": "PASS",
+            "response_status": "PASS",
+            "candidates": [
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "231843"
+                ],
+                "rank": 1,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.02738245361196181,
+                  "global_semantic_rank": 31,
+                  "best_distance": 0.3407251834869385,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      31
+                    ],
+                    [
+                      "bm25:danbooru",
+                      1
+                    ]
+                  ]
+                }
+              }
+            ],
+            "document_count": 1,
+            "source_count": 1,
+            "evidence_count": 1,
+            "citation_count": 1,
+            "query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 853.2341
+            },
+            "proof_scope": {
+              "status": "PASS",
+              "violations": [],
+              "source_qualified_documents": 1,
+              "allowed_typed_key_origins": 1
+            },
+            "runtime_pass": true,
+            "ranking_unchanged": true,
+            "before_document_count": 201,
+            "before_stdout_bytes": 486681,
+            "before_query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 768.9585
+            }
+          },
+          {
+            "case_id": "all-top5",
+            "command": [
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+              "--config",
+              "D:\\SakuraTool\\SakuraKnowledge\\build\\moegirl-refresh-v1\\runtime-all-linked\\sknow-config.json",
+              "retrieve",
+              "blue hair",
+              "--topk",
+              "5"
+            ],
+            "query": "blue hair",
+            "topk": 5,
+            "exit": 0,
+            "cold_wall_ms": 13305.53360003978,
+            "stdout_bytes": 28080,
+            "stderr_bytes": 157,
+            "status": "PASS",
+            "response_status": "PASS",
+            "candidates": [
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "231843"
+                ],
+                "rank": 1,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.02738245361196181,
+                  "global_semantic_rank": 31,
+                  "best_distance": 0.3407251834869385,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      31
+                    ],
+                    [
+                      "bm25:danbooru",
+                      1
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "subject",
+                  "bangumi.subject",
+                  "35169"
+                ],
+                "rank": 2,
+                "source_packs": [
+                  "bangumi"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.024970794392523366,
+                  "global_semantic_rank": 4,
+                  "best_distance": 0.26590728759765625,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      4
+                    ],
+                    [
+                      "bm25:bangumi",
+                      47
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "page",
+                  "danbooru.wiki",
+                  "136282"
+                ],
+                "rank": 3,
+                "source_packs": [
+                  "danbooru"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.022203947368421052,
+                  "global_semantic_rank": 92,
+                  "best_distance": 0.3783189654350281,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      92
+                    ],
+                    [
+                      "bm25:danbooru",
+                      4
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "person",
+                  "bangumi.person",
+                  "6499"
+                ],
+                "rank": 4,
+                "source_packs": [
+                  "bangumi"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.022161324913618493,
+                  "global_semantic_rank": 49,
+                  "best_distance": 0.3526685833930969,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      49
+                    ],
+                    [
+                      "bm25:bangumi",
+                      17
+                    ]
+                  ]
+                }
+              },
+              {
+                "entry": [
+                  "subject",
+                  "bangumi.subject",
+                  "184156"
+                ],
+                "rank": 5,
+                "source_packs": [
+                  "bangumi"
+                ],
+                "ranking_fields": {
+                  "rrf_score": 0.01805465191932336,
+                  "global_semantic_rank": 56,
+                  "best_distance": 0.3559938669204712,
+                  "backend_ranks": [
+                    [
+                      "dense",
+                      56
+                    ],
+                    [
+                      "bm25:bangumi",
+                      46
+                    ]
+                  ]
+                }
+              }
+            ],
+            "document_count": 5,
+            "source_count": 2,
+            "evidence_count": 5,
+            "citation_count": 5,
+            "query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 761.9307
+            },
+            "proof_scope": {
+              "status": "PASS",
+              "violations": [],
+              "source_qualified_documents": 5,
+              "allowed_typed_key_origins": 5
+            },
+            "runtime_pass": true,
+            "ranking_unchanged": true,
+            "before_document_count": 205,
+            "before_stdout_bytes": 504764,
+            "before_query_timings_ms": {
+              "process_query_encodings": 1,
+              "query_encodings": 1,
+              "total": 750.7996999999999
+            }
+          }
+        ],
+        "quality_scope": "NOT_RUN: interface smoke, not full120 or quality retuning",
+        "assets_rebuilt": false,
+        "wire_limit_bytes": 2097152
+      }
+    },
+    "blocked-resident-candidate3": {
+      "binding": {
+        "path": "build/tool-integration-v1/blocked-resident-candidate3/summary.json",
+        "size": 1001,
+        "sha256": "2057737c0b7d344c23e13aa292c682c092fd8441df9807252db2c44f5c47f0f1"
+      },
+      "report": {
+        "schema": "sakura-native-blocked-pipe-deadline-v1",
+        "scope": "Actual native lexical fixture; not real-source/model validation",
+        "status": "PASS",
+        "mode": "resident",
+        "command": [
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\semantic_pilot.exe",
+          "--config",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\native-deadline-final\\native-deadline0\\deadline runtime\\sknow-config.json"
+        ],
+        "exit": 124,
+        "observed_seconds": 5.008379600010812,
+        "opened_events": 1,
+        "partial_stdout_bytes": 0,
+        "stderr_bytes": 0,
+        "complete_business_frames": 0,
+        "delivered_failure_claimed": false,
+        "stdout_sha256": "3109b9afec731b0a27c2e451e8d3ad717e21d0ad1fda6336d3e98c6f07e3544e",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "client_rule": "Incomplete output is discarded. Hard process exit is fatal, not recoverable or a delivered FAIL."
+      }
+    },
+    "blocked-single-candidate3": {
+      "binding": {
+        "path": "build/tool-integration-v1/blocked-single-candidate3/summary.json",
+        "size": 1095,
+        "sha256": "1aa0d939d710d4ec344b12cba0e03a384b96733a9e6adc3a03416a22791ff304"
+      },
+      "report": {
+        "schema": "sakura-native-blocked-pipe-deadline-v1",
+        "scope": "Actual native lexical fixture; not real-source/model validation",
+        "status": "PASS",
+        "mode": "single",
+        "command": [
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate3\\bin\\sknow-rs.exe",
+          "--config",
+          "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\native-deadline-final\\native-deadline0\\deadline runtime\\sknow-config.json",
+          "retrieve",
+          "slowpipe",
+          "--source",
+          "fixture-deadline",
+          "--limit",
+          "1"
+        ],
+        "exit": 124,
+        "observed_seconds": 5.384703399962746,
+        "opened_events": 0,
+        "partial_stdout_bytes": 0,
+        "stderr_bytes": 0,
+        "complete_business_frames": 0,
+        "delivered_failure_claimed": false,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "client_rule": "Incomplete output is discarded. Hard process exit is fatal, not recoverable or a delivered FAIL."
+      }
+    }
+  },
+  "source_assets_rebuilt": false,
+  "ranking_rrf_gold_identity_trust_changed": false,
+  "main_must_remain": "269e34eeeac920c29f2d684cfe37c93a95c73057",
+  "limitations": [
+    "Original source rights NOT_CLEARED and QUALITY_FAIL remain.",
+    "New-machine, live Pi/SakuraTool/Pool and full human source-fact review NOT_RUN.",
+    "No source/model/ANN pack or wheel is rebuilt.",
+    "First-version full Python FAIL and cold monolithic query timeout are retained, not reclassified."
+  ]
+}

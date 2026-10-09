@@ -138,14 +138,20 @@ installer or global environment changes are performed. Missing paths produce exp
 For custom paths use the native CLI directly: `sknow-rs retrieve DB MANIFEST QUERY`.
 
 Resident mode amortizes model/index opening, accepts one JSON object per line, emits an
-`opened` event once, then one complete result per request, and exits naturally on stdin EOF.
+`opened` event once, then at most one final result per request, and exits naturally on stdin EOF.
 A recoverable request error emits `status=FAIL` with a stable error code, message and
 `retries=0`, flushes, and continues in the same loaded session. Valid `case_id` values
 are echoed verbatim; invalid JSON or a missing/invalid ID uses `case_id=null`.
 Invalid requests do not trigger embedding encoding. EOF exits 0 after recoverable
 failures. Initialization, unsafe/unknown internal engine failures, stdin I/O, and
 stdout write/flush failures remain fatal nonzero exits; timeouts are not assumed safe
-for continuation. These rules apply to monolithic and `--config` residents alike.
+for continuation. An absolute five-second deadline covers parsing through successful
+write/flush after a complete input line (cold open and line waiting are excluded).
+A blocked output or unsafe deadline expires the current native process with exit124;
+no watchdog thread emits a second JSON/diagnostic. Discard incomplete frames and do
+not mistake a frame preceding a fatal/uncompleted flush for completed delivery.
+These rules apply to monolithic and `--config` residents alike and to semantic
+single-query output, which excludes cold open but debits argument-validation time.
 See [the exact runtime/error contract](docs/runtime-contract.md) and
 [the Tool-interface acceptance receipt](docs/tool-integration.md), including the
 retained cold-query timeout and limits of this integration baseline.

@@ -1,10 +1,11 @@
 //! Shared resident lifecycle: only explicitly typed request errors allow continuation.
 use crate::semantic::{Result, RetrieveOptions};
-use crate::semantic_jsonl::{send_response_optional, MAX_RESPONSE_BYTES};
+use crate::semantic_jsonl::{send_response_before, MAX_RESPONSE_BYTES};
+use crate::request_deadline::{DeadlineWatchdog, RequestDeadline, REQUEST_BUDGET};
 use serde_json::{json, Value};
 use std::error::Error;
 use std::io::{BufRead, Write};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct RequestError {
@@ -64,7 +65,7 @@ pub fn request_case_id(value: &Value) -> Option<&str> {
     let mut bytes = 2usize;
     for character in id.chars() {
         bytes = bytes.checked_add(match character {
-            '"' | '\\' => 2,
+            '"' | '\\' | '\u{0008}' | '\u{000c}' | '\n' | '\r' | '\t' => 2,
             '\u{0000}'..='\u{001f}' => 6,
             _ => character.len_utf8(),
         })?;
@@ -188,10 +189,32 @@ impl ResidentEngine for crate::modular::ModularSemantic {
     }
 }
 
+/// Generic embedding/test loop: absolute checks, without killing its host.
+/// An arbitrary blocking Write needs the native watchdog for a hard stop.
 pub fn run_resident(
     engine: &mut impl ResidentEngine,
     input: impl BufRead,
     output: &mut impl Write,
+) -> Result<()> {
+    run_resident_with_budget(engine, input, output, REQUEST_BUDGET, None)
+}
+
+/// Native process boundary: one watchdog, shared by every completed input line.
+pub fn run_native_resident(
+    engine: &mut impl ResidentEngine,
+    input: impl BufRead,
+    output: &mut impl Write,
+) -> Result<()> {
+    let watchdog = DeadlineWatchdog::start()?;
+    run_resident_with_budget(engine, input, output, REQUEST_BUDGET, Some(&watchdog))
+}
+
+fn run_resident_with_budget(
+    engine: &mut impl ResidentEngine,
+    input: impl BufRead,
+    output: &mut impl Write,
+    budget: Duration,
+    watchdog: Option<&DeadlineWatchdog>,
 ) -> Result<()> {
     let installed = engine.installed_sources();
     let mut opened = serde_json::to_vec(&json!({"event":"opened",
@@ -204,25 +227,38 @@ pub fn run_resident(
     output.flush()?;
     for line in input.lines() {
         let line = line?;
-        let start = Instant::now();
+        // Input waiting and cold opening are excluded. Everything after this
+        // completed line, including decode/validation and output, shares one end.
+        let deadline = RequestDeadline::from_start(Instant::now(), budget);
+        let guard = match watchdog {
+            Some(watchdog) => watchdog.arm(deadline)?,
+            None => deadline.guard(),
+        };
         let decoded = serde_json::from_str::<Value>(&line);
+        deadline.check()?;
         let case_id = decoded.as_ref().ok().and_then(request_case_id);
         let result: Result<Value> = (|| {
             let value = decoded.as_ref().map_err(|error| {
                 RequestError::new("invalid_json", error.to_string())
             })?;
-            let request = parse_request(value, installed.as_deref())?;
-            let mut response = engine.retrieve_request(&request)?;
+            let parsed = parse_request(value, installed.as_deref());
+            deadline.check()?;
+            let request = parsed?;
+            let retrieved = engine.retrieve_request(&request);
+            deadline.check()?;
+            let mut response = retrieved?;
             if !response.is_object() {
                 return Err("engine response must be an object".into());
             }
             response["case_id"] = json!(request.case_id);
             Ok(response)
         })();
-        let elapsed_ms = start.elapsed().as_secs_f64() * 1000.0;
+        deadline.check()?;
+        let elapsed_ms = deadline.elapsed().as_secs_f64() * 1000.0;
         match result {
             Ok(response) => {
-                send_response_optional(output, &response, case_id, elapsed_ms)?;
+                send_response_before(output, &response, case_id, elapsed_ms, deadline)?;
+                guard.finish()?;
             }
             Err(error) => {
                 let (response, fatal) = match classify_error(error.as_ref()) {
@@ -235,7 +271,8 @@ pub fn run_resident(
                     ),
                 };
                 // A transmission failure takes precedence: no delivered FAIL is claimed.
-                send_response_optional(output, &response, case_id, elapsed_ms)?;
+                send_response_before(output, &response, case_id, elapsed_ms, deadline)?;
+                guard.finish()?;
                 if fatal {
                     return Err(error);
                 }
@@ -256,6 +293,7 @@ mod tests {
         encodings: usize,
         calls: Vec<String>,
         failure: Option<Box<dyn Error>>,
+        delay: Duration,
     }
 
     impl MockEngine {
@@ -266,6 +304,7 @@ mod tests {
                 encodings: 0,
                 calls: Vec::new(),
                 failure: None,
+                delay: Duration::ZERO,
             }
         }
     }
@@ -275,6 +314,7 @@ mod tests {
         fn installed_sources(&self) -> Option<Vec<String>> { self.installed.clone() }
         fn query_encodings(&self) -> usize { self.encodings }
         fn retrieve_request(&mut self, request: &Request<'_>) -> Result<Value> {
+            if !self.delay.is_zero() { std::thread::sleep(self.delay); }
             self.calls.push(request.query.to_owned());
             self.encodings += 1;
             if let Some(error) = self.failure.take() {
@@ -302,6 +342,26 @@ mod tests {
     }
 
     fn valid() -> Value { json!({"case_id":"id","query":"q"}) }
+
+    #[test]
+    fn expired_engine_pass_is_fatal_and_never_reaches_the_wire() {
+        use crate::request_deadline::DeadlineExceeded;
+        for modular in [false, true] {
+            let mut engine = MockEngine::new(modular);
+            engine.delay = Duration::from_millis(40);
+            let mut output = Vec::new();
+            let error = run_resident_with_budget(
+                &mut engine, Cursor::new(input(&[valid(), valid()])),
+                &mut output, Duration::from_millis(20), None,
+            ).unwrap_err();
+            assert!(error.downcast_ref::<DeadlineExceeded>().is_some());
+            assert!(matches!(classify_error(error.as_ref()), ErrorClass::Fatal));
+            assert_eq!(lines(&output).len(), 1);
+            assert_eq!(lines(&output)[0]["event"], "opened");
+            assert_eq!(engine.calls.len(), 1);
+            assert_eq!(engine.encodings, 1);
+        }
+    }
 
     #[test]
     fn q1_pass_q2_fail_q3_pass_same_engine_both_modes_eof_success() {
@@ -413,6 +473,21 @@ mod tests {
         request["case_id"] = json!("\n".repeat(MAX_RESPONSE_BYTES));
         assert!(request_case_id(&request).is_none());
         assert_eq!(parse_request(&request, None).unwrap_err().code, "invalid_case_id");
+    }
+
+    #[test]
+    fn case_id_wire_bound_counts_actual_json_escape_width() {
+        let limit=MAX_RESPONSE_BYTES-1024;
+        for character in ['x','日','"','\\','\n','\t','\u{0008}','\u{000c}','\u{0000}'] {
+            let width=serde_json::to_vec(&character.to_string()).unwrap().len()-2;
+            let id=character.to_string().repeat((limit-2)/width);
+            let request=json!({"case_id":id});
+            assert!(serde_json::to_vec(&request["case_id"]).unwrap().len()<=limit);
+            assert_eq!(request_case_id(&request),request["case_id"].as_str());
+            let request=json!({"case_id":format!("{}{}",id,character)});
+            assert!(serde_json::to_vec(&request["case_id"]).unwrap().len()>limit);
+            assert!(request_case_id(&request).is_none());
+        }
     }
 
     #[test]

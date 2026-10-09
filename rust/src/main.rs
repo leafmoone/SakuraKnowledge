@@ -45,6 +45,7 @@ fn usage_error(message: &str) -> ExitCode {
 #[cfg(feature = "semantic")]
 fn semantic_retrieve(args: &[String]) -> ExitCode {
     use sakura_knowledge_runtime::semantic::{RetrieveOptions, SemanticEngine};
+    let parsing_started = Instant::now();
     if args.len() < 3 {
         return usage_error("retrieve requires BASE_DB PACK QUERY");
     }
@@ -65,22 +66,44 @@ fn semantic_retrieve(args: &[String]) -> ExitCode {
         }
         i += 2;
     }
-    let started = Instant::now();
-    let result = SemanticEngine::open(&args[0], &args[1])
-        .and_then(|mut engine| engine.retrieve(&args[2], &options));
-    match result {
-        Ok(value) => {
-            match sakura_knowledge_runtime::semantic_jsonl::send_response(&mut std::io::stdout().lock(),&value,"single",started.elapsed().as_secs_f64()*1000.0) {
-                Ok(false) => ExitCode::SUCCESS,
-                Ok(true) => ExitCode::from(1),
-                Err(error) => { eprintln!("{}",serde_json::json!({"error":"SemanticError","message":error.to_string()})); ExitCode::from(1) }
-            }
+    if let Err(error) = options.validate() { return usage_error(&error.to_string()); }
+    native_semantic_command(parsing_started.elapsed(),
+        || SemanticEngine::open(&args[0], &args[1]),
+        |engine| engine.retrieve(&args[2], &options))
+}
+
+/// Debit argument validation, exclude cold opening, then retain one deadline and
+/// watchdog through retrieval/serialization/write/flush in either CLI entry mode.
+#[cfg(feature = "semantic")]
+fn native_semantic_command<E>(
+    parsing_elapsed: Duration,
+    open: impl FnOnce() -> sakura_knowledge_runtime::semantic::Result<E>,
+    retrieve: impl FnOnce(&mut E) -> sakura_knowledge_runtime::semantic::Result<serde_json::Value>,
+) -> ExitCode {
+    use sakura_knowledge_runtime::request_deadline::{DeadlineWatchdog, RequestDeadline, REQUEST_BUDGET};
+    let run = || -> sakura_knowledge_runtime::semantic::Result<bool> {
+        if parsing_elapsed >= REQUEST_BUDGET {
+            return Err(sakura_knowledge_runtime::request_deadline::DeadlineExceeded.into());
         }
+        let watchdog = DeadlineWatchdog::start()?;
+        let mut engine = open()?;
+        let deadline = RequestDeadline::from_start(Instant::now() - parsing_elapsed, REQUEST_BUDGET);
+        let guard = watchdog.arm(deadline)?;
+        let retrieved = retrieve(&mut engine);
+        deadline.check()?;
+        let value = retrieved?;
+        let oversized = sakura_knowledge_runtime::semantic_jsonl::send_response_before(
+            &mut std::io::stdout().lock(), &value, Some("single"),
+            deadline.elapsed().as_secs_f64() * 1000.0, deadline,
+        )?;
+        guard.finish()?;
+        Ok(oversized)
+    };
+    match run() {
+        Ok(false) => ExitCode::SUCCESS,
+        Ok(true) => ExitCode::from(1),
         Err(error) => {
-            eprintln!(
-                "{}",
-                serde_json::json!({"error":"SemanticError","message":error.to_string()})
-            );
+            eprintln!("{}",serde_json::json!({"error":"SemanticError","message":error.to_string()}));
             ExitCode::from(1)
         }
     }
@@ -91,15 +114,16 @@ fn modular_command(args:&[String])->ExitCode {
     let started=Instant::now();
     if args.len()<2||args[0].is_empty()||args[0].starts_with("--") {return usage_error("--config PATH COMMAND required");}
     let parsed=match sakura_knowledge_runtime::modular_cli::parse(&args[1],&args[2..]) {Ok(value)=>value,Err(error)=>return usage_error(&error.to_string())};
+    #[cfg(feature="semantic")]
+    if parsed.command=="retrieve" {
+        let options=sakura_knowledge_runtime::semantic::RetrieveOptions{kind:parsed.kind.clone(),namespace:parsed.namespace.clone(),limit:parsed.limit as usize,include_vector:false};
+        if let Err(error)=options.validate(){return usage_error(&error.to_string());}
+        return native_semantic_command(started.elapsed(),
+            || sakura_knowledge_runtime::modular::ModularSemantic::open(std::path::Path::new(&args[0]),&parsed.sources),
+            |engine| engine.retrieve(&parsed.positionals[0],&options,&parsed.sources));
+    }
     let run=||->sakura_knowledge_runtime::modular::Result<serde_json::Value>{
         let config=&args[0];let command=parsed.command.as_str();
-        #[cfg(feature="semantic")]
-        if command=="retrieve" {
-            let options=sakura_knowledge_runtime::semantic::RetrieveOptions{kind:parsed.kind.clone(),namespace:parsed.namespace.clone(),limit:parsed.limit as usize,include_vector:false};
-            options.validate().map_err(|error|sakura_knowledge_runtime::modular_cli::UsageError(error.to_string()))?;
-            let mut engine=sakura_knowledge_runtime::modular::ModularSemantic::open(std::path::Path::new(config),&parsed.sources)?;
-            return engine.retrieve(&parsed.positionals[0],&options,&parsed.sources);
-        }
         #[cfg(not(feature="semantic"))]
         if command=="retrieve" {return Err(sakura_knowledge_runtime::modular_cli::UsageError("retrieve requires --features semantic".into()).into());}
         let runtime=sakura_knowledge_runtime::modular::PackRuntime::discover(std::path::Path::new(config))?;
@@ -107,14 +131,6 @@ fn modular_command(args:&[String])->ExitCode {
         runtime.structured_parsed(&parsed)
     };
     match run(){Ok(value)=>{
-        #[cfg(feature="semantic")]
-        if args.get(1).is_some_and(|s|s=="retrieve") {
-            return match sakura_knowledge_runtime::semantic_jsonl::send_response(&mut std::io::stdout().lock(),&value,"single",started.elapsed().as_secs_f64()*1000.0) {
-                Ok(false)=>ExitCode::SUCCESS,
-                Ok(true)=>ExitCode::from(1),
-                Err(error)=>{eprintln!("{}",serde_json::json!({"error":"SemanticError","message":error.to_string()}));ExitCode::from(1)}
-            };
-        }
         println!("{value}");ExitCode::SUCCESS
     },Err(error)=>{let typ=if error.downcast_ref::<sakura_knowledge_runtime::modular_cli::UsageError>().is_some(){"UsageError"}else if error.downcast_ref::<Error>().is_some(){"ValueError"}else{"PackError"};eprintln!("{}",serde_json::json!({"error":typ,"message":error.to_string()}));ExitCode::from(2)}}
 }

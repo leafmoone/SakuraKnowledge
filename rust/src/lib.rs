@@ -18,6 +18,8 @@ pub mod semantic;
 pub mod semantic_jsonl;
 #[cfg(feature = "semantic")]
 pub mod resident;
+#[cfg(feature = "semantic")]
+pub mod request_deadline;
 pub use resolver::TagOptions;
 mod search;
 mod unicode16;

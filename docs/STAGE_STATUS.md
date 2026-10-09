@@ -1,5 +1,35 @@
 # Current delivery status
 
+## Tool interface repair (independent review in progress)
+
+The first ordinary submission `4a19414aa45537533072d1a42be29bb537cb8948` was
+pushed to `dev` with live remote SHA equality and unchanged `main`. It fixes public
+Top-K evidence scope, modular CLI argument routing/validation and shared typed
+resident request recovery. Ten fixed real queries retain all candidate ranking
+fields and pass pack-local DB proof checks; both real resident modes return
+PASS / invalid_limit FAIL / PASS with one opened event/session and EOF0.
+
+This submission is **not yet an approved Tool integration baseline**: independent
+review identified that the five-second engine budget did not cover parsing,
+serialization or blocked output. The append repair now uses an absolute request
+deadline and one generation-safe native watchdog. Rust115 tests and native70
+interface tests pass; actual non-drained resident/single output pipes terminate
+with exit124 in about5s without fabricated delivered FAIL. Candidate3's final real
+TopK10 and modular18/monolithic16 accepted sequences pass. Normal-environment final
+Python:1422 passed,19 skipped (Windows symlink privilege),55 passing subtests,exit0.
+The first candidate3 monolithic process instead exited124 with zero complete
+responses; that FAIL is retained separately, not reclassified by the manually
+invoked accepted process. Ordinary append push and fixed-SHA independent approval
+remain required; unknown/timeouts remain fatal.
+The initial whole-Python command remains FAIL (four missing test-only helper
+prerequisites); the exact four-case helper repair is separate PASS, not a retroactive
+full-suite PASS. Detailed retained evidence and limitations:
+[interface receipt](tool-integration.md), [original machine receipt](tool-integration-receipt.json),
+[deadline append receipt](tool-integration-deadline-receipt.json).
+Original Core, four source packs, mother DB, model, ANN, gold, ranking/RRF and
+identity/provenance remain unchanged. QUALITY_FAIL and rights NOT_CLEARED persist.
+No live Pi/Tool integration or further Knowledge restructuring is started.
+
 ## Bangumi storage trial (independent, not a production replacement)
 
 Baseline `4583fe94e8eba40b31a062412eef76b70d0bb86a`. New experimental tool/fixtures
