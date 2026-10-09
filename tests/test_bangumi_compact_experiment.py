@@ -180,3 +180,42 @@ def test_missing_optional_dbstat_is_explicit_not_fake_page_measurement():
             raise sqlite3.OperationalError('no such table: dbstat')
     result = compact.optional_dbstat(MissingDbstat())
     assert result['status'] == 'NOT_AVAILABLE' and 'pages' not in result
+
+
+@pytest.mark.parametrize('command', ['pool', 'selection'])
+def test_freeze_publication_race_preserves_other_actor_bytes(baseline, tmp_path, monkeypatch, command):
+    import shutil
+    pack = tmp_path / 'pack'
+    pack.mkdir()
+    shutil.copy2(baseline, pack / 'knowledge.sqlite')
+    manifest = {'pack_id': 'bangumi', 'source_ids': ['synthetic'],
+                'artifacts': {'snapshot': {'path': 'knowledge.sqlite',
+                                          'size': baseline.stat().st_size,
+                                          'sha256': compact.small_binding(baseline)['sha256']}}}
+    (pack / 'manifest.json').write_text(json.dumps(manifest), encoding='utf-8')
+    pool = tmp_path / 'pool.json'
+    if command == 'selection':
+        compact.freeze_pool(pack, pool)
+    target = pool if command == 'pool' else tmp_path / 'selection.json'
+    preserved = b'\x00other actor frozen receipt\xff\r\n'
+    real_readonly = compact.readonly
+    intervened = []
+
+    def racing_readonly(path, *args, **kwargs):
+        # Deterministic intervention after the initial exists check but before
+        # scanning/publication. No threads, actual source scan or timing races.
+        assert not target.exists()
+        with target.open('xb') as stream:
+            stream.write(preserved)
+        intervened.append(True)
+        return real_readonly(path, *args, **kwargs)
+
+    monkeypatch.setattr(compact, 'readonly', racing_readonly)
+    with pytest.raises(FileExistsError):
+        if command == 'pool':
+            compact.freeze_pool(pack, target)
+        else:
+            compact.freeze_selection(pack, pool, target)
+    assert intervened == [True]
+    assert target.read_bytes() == preserved
+    assert (pack / 'knowledge.sqlite').read_bytes() == baseline.read_bytes()

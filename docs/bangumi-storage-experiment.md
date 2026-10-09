@@ -185,6 +185,15 @@ Scoped19PASS0.59s; full **1352PASS /19 Windows symlink privilege SKIP /55subtest
 development binary/example helper and final3 DLL path; tests/temp are under this
 workspace. Rust compilation NOT_RUN because no Rust/production code changed.
 
+Publication hardening after initial commit `9f2339973d25d1ee99fe1e138204bbd36d43d3d2`:
+pool/selection final writers now use exclusive UTF-8 `open('x')`, not merely an
+initial existence check. Two deterministic synthetic races create another actor's
+receipt during the scan; both writers raise FileExistsError and preserve those
+bytes exactly. The full trial fixture file then passes **21 tests /0.61s**, with
+Ruff/diffcheck exit0. These two new cases are **not included in the earlier1352**;
+no full matrix, actual sample/source scan, Core build or asset regeneration was
+repeated. Original pool/selection/sample-v2 bytes and recorded results stay intact.
+
 No production migration/new Core, full9GB compact build, original raw-record
 re-ingestion, mother/ANN/model scan/rebuild, all120 replay, upstream refresh,
 GPU/service/ORM/Pool/Pi, compression archive/upload or main merge. Unknown unrelated

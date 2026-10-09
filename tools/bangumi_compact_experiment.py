@@ -267,7 +267,8 @@ def freeze_pool(pack, output):
               'source_manifest': small_binding(pack / 'manifest.json'), 'source_snapshot_declared': declared,
               'source_snapshot_hash_reread': False, 'physical_disk_bytes_read': 'UNKNOWN'}
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(report, ensure_ascii=True, indent=2) + '\n', encoding='utf-8')
+    with output.open('x', encoding='utf-8') as stream:
+        stream.write(json.dumps(report, ensure_ascii=True, indent=2) + '\n')
     return report
 
 
@@ -353,7 +354,8 @@ def freeze_selection(pack, pool, output):
                  'fts_metadata_rows_scanned': fts_scanned, 'fts_metadata_seconds': fts_metadata_seconds,
                  'unresolved_scope': 'sealed source pack has no unresolved_records table; no upstream raw records read'}
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(selection, ensure_ascii=True, indent=2) + '\n', encoding='utf-8')
+    with output.open('x', encoding='utf-8') as stream:
+        stream.write(json.dumps(selection, ensure_ascii=True, indent=2) + '\n')
     return selection
 
 
