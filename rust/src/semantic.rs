@@ -1,6 +1,6 @@
 //! Local-only semantic retrieval. Activation verifies current product bindings.
 use ort::{ep, session::Session, value::Tensor};
-use rusqlite::{params, Connection, OpenFlags};
+use rusqlite::{params, Connection, OpenFlags, OptionalExtension};
 use serde_json::{json, Value};
 use std::{
     cell::RefCell,
@@ -1340,28 +1340,59 @@ fn validate_source_manifest(source: &Value) -> Result<()> {
 }
 /// FULL lexical retrieval with the same trust proofs and evidence closure, without ORT/ANN.
 pub fn lexical_retrieve(db: impl AsRef<Path>, query: &str, options: &RetrieveOptions) -> Result<Value> {
+    lexical_retrieve_until(db, query, options, Instant::now()+std::time::Duration::from_secs(5))
+}
+pub(crate) fn lexical_retrieve_until(db: impl AsRef<Path>, query: &str, options: &RetrieveOptions, deadline: Instant) -> Result<Value> {
     options.validate()?;
     validate_query(query)?;
     let mut runtime=crate::Runtime::open(db.as_ref())?;
+    runtime.set_deadline(deadline);
     let response=runtime.search(query,100,options.kind.as_deref(),options.namespace.as_deref())?;
     let mut candidates=response["candidates"].as_array().cloned().unwrap_or_default();
     for candidate in &mut candidates {candidate["entry"]=candidate["entry_key"].clone();}
     let pins:Vec<_>=candidates.iter().filter(|c|c["matched_by"]=="exact"||c["matched_by"]=="alias").cloned().collect();
     let conn=readonly(db.as_ref())?;let compiled=crate::match_query(query).map_err(|e|e.to_string())?;
+    conn.progress_handler(1000,Some(move || Instant::now()>deadline));
     let mut hits=Vec::new();let mut documents=Vec::new();let mut sources=BTreeMap::new();let mut evidence=Vec::new();
     if !compiled.is_empty() {
-        let mut stmt=conn.prepare("SELECT e.kind,e.namespace,e.value,d.id,d.entry_id,d.title,d.original,d.source_id,d.evidence_id,d.status,d.payload,bm25(search_fts) FROM search_fts JOIN documents d ON d.id=search_fts.document_id JOIN entries e ON e.id=d.entry_id WHERE search_fts MATCH ? AND e.conflicted=0 AND d.status IN ('source_backed','generated_from_evidence') AND EXISTS(SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id AND v.status='source_backed') ORDER BY bm25(search_fts),e.kind,e.namespace,e.value,d.id LIMIT 100")?;
-        let mut cursor=stmt.query([compiled])?;
-        while let Some(r)=cursor.next()? {
-            let key=json!({"kind":r.get::<_,String>(0)?,"namespace":r.get::<_,String>(1)?,"value":r.get::<_,String>(2)?});let did=r.get::<_,i64>(3)?.to_string();let eid=r.get::<_,i64>(4)?.to_string();let sid=r.get::<_,String>(7)?;let refid=r.get::<_,String>(8)?;let payload:Value=serde_json::from_str(&r.get::<_,String>(10)?)?;
-            let hit=json!({"entry":key,"document_id":did,"source_id":sid,"evidence_id":refid,"rank":hits.len()+1,"score":r.get::<_,f64>(11)?});hits.push(hit);
-            documents.push(json!({"entry_key":key,"entry_id":eid,"document_id":did,"title":r.get::<_,String>(5)?,"original":r.get::<_,String>(6)?,"source_id":sid,"evidence_id":refid,"status":r.get::<_,String>(9)?,"text_provenance":payload["text_provenance"]}));
+        let selected=rank_lexical_documents(&conn,&compiled,deadline)?;
+        let mut stmt=conn.prepare("SELECT title,original,source_id,evidence_id,status,payload FROM documents WHERE id=? AND entry_id=?")?;
+        for (score,kind,namespace,value,did,eid) in selected {
+            require(Instant::now()<=deadline,"query_budget_exceeded lexical materialization")?;
+            let (title,original,sid,refid,status,payload):(String,String,String,String,String,String)=stmt.query_row(params![did,eid],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?,r.get(5)?)))?;
+            let payload:Value=serde_json::from_str(&payload)?;
+            let key=json!({"kind":kind,"namespace":namespace,"value":value});let did=did.to_string();let eid=eid.to_string();
+            let hit=json!({"entry":key,"document_id":did,"source_id":sid,"evidence_id":refid,"rank":hits.len()+1,"score":score});hits.push(hit);
+            documents.push(json!({"entry_key":key,"entry_id":eid,"document_id":did,"title":title,"original":original,"source_id":sid,"evidence_id":refid,"status":status,"text_provenance":payload["text_provenance"]}));
             evidence.push(json!({"entry_id":eid,"document_id":did,"source_id":sid,"evidence_id":refid}));add_source(&conn,&mut sources,&sid)?;
         }
     }
     candidates.truncate(options.limit);
     let citations:Vec<_>=documents.iter().map(|d|json!({"document_id":d["document_id"],"source_id":d["source_id"],"evidence_id":d["evidence_id"]})).collect();
     Ok(json!({"status":"PASS","query":query,"response_version":"sakura-lexical-evidence-v1","identity_status":"not_asserted","candidates":candidates,"trusted_pins":pins,"dense_hits":[],"lexical_hits":hits,"hybrid":[],"documents":documents,"sources":sources.into_values().collect::<Vec<_>>(),"evidence":evidence,"citations":citations,"promoted_identities":[],"canonical":null,"entity_tag":null,"timings_ms":{},"lexical_mode":"trusted_documents_and_identity"}))
+}
+type LexicalDocument = (f64,String,String,String,i64,i64);
+// Preserve the original proof SQL's document depth, eligibility, numeric scores and
+// complete boundary ties, without sorting every matched full body in SQLite TEMP.
+fn rank_lexical_documents(conn:&Connection, compiled:&str, deadline:Instant) -> Result<Vec<LexicalDocument>> {
+    let mut rank=conn.prepare("SELECT rowid,rank FROM search_fts WHERE search_fts MATCH ?1 AND rank MATCH 'bm25()' ORDER BY rank")?;
+    let mut cursor=rank.query([compiled])?;
+    let mut metadata=conn.prepare("SELECT e.kind,e.namespace,e.value,d.id,d.entry_id FROM search_fts f JOIN documents d ON d.id=f.document_id JOIN entries e ON e.id=d.entry_id WHERE f.rowid=? AND e.conflicted=0 AND d.status IN ('source_backed','generated_from_evidence') AND EXISTS(SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id AND v.status='source_backed')")?;
+    let mut selected:Vec<LexicalDocument>=Vec::new();
+    while let Some(row)=cursor.next()? {
+        require(Instant::now()<=deadline,"query_budget_exceeded lexical rank cursor")?;
+        let score:f64=row.get(1)?;require(score.is_finite(),"nonfinite lexical score")?;
+        if selected.len()==100 && score>selected[99].0 {break;}
+        let Some((kind,namespace,value,did,eid))=metadata.query_row([row.get::<_,i64>(0)?],|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?,r.get::<_,String>(2)?,r.get::<_,i64>(3)?,r.get::<_,i64>(4)?))).optional()? else {continue;};
+        let item=(score,kind,namespace,value,did,eid);
+        let pos=selected.partition_point(|other|lexical_document_order(other,&item).is_le());
+        selected.insert(pos,item);if selected.len()>100 {selected.pop();}
+    }
+    Ok(selected)
+}
+fn lexical_document_order(a:&LexicalDocument,b:&LexicalDocument)->std::cmp::Ordering {
+    // SQL numeric equality treats signed zero equally; nonfinite values fail above.
+    a.0.partial_cmp(&b.0).unwrap().then_with(||(&a.1,&a.2,&a.3,a.4).cmp(&(&b.1,&b.2,&b.3,b.4)))
 }
 pub fn lexical_only_retrieve(db: impl AsRef<Path>, query: &str, options: &RetrieveOptions) -> Result<Value> {
     lexical_retrieve(db, query, options)
@@ -2585,6 +2616,31 @@ mod tests {
         assert!(full_lexical_hits(&c,"","\"alpha\"").is_err());
         let plan: Vec<String> = c.prepare("EXPLAIN QUERY PLAN SELECT rowid,rank FROM search_fts WHERE search_fts MATCH ?1 AND rank MATCH 'bm25()' ORDER BY rank").unwrap().query_map(["\"alpha\""],|r| r.get(3)).unwrap().collect::<rusqlite::Result<_>>().unwrap();
         assert!(!plan.iter().any(|p|p.contains("TEMP B-TREE")),"{plan:?}");
+    }
+    #[test]
+    fn lexical_proof_rank_stream_matches_original_ties_duplicates_and_weights() {
+        let c=Connection::open_in_memory().unwrap();native_fixture(&c).unwrap();
+        c.execute_batch("UPDATE search_fts SET rowid=rowid+10000; INSERT INTO search_fts VALUES('alpha',106,1); INSERT INTO search_fts VALUES('alpha',106,2); INSERT INTO search_fts(search_fts,rank) VALUES('rank','bm25(8.0)');").unwrap();
+        // Complete boundary ties exceed100, include repeated same documents and
+        // mismatched FTS entry references: the old proof SQL anchors d.entry_id.
+        for id in 200..=700 {
+            let status=if id%7==0 {"no_reference"}else{"generated_from_evidence"};
+            let eid=if id%11==0 {5}else{2};
+            c.execute("INSERT INTO documents VALUES(?,?,'Other','alpha full original','alpha',?,'s','exact-proof')",params![id,eid,status]).unwrap();
+            c.execute("INSERT INTO search_fts VALUES('alpha',?,?)",params![id,eid]).unwrap();
+        }
+        let sql="SELECT bm25(search_fts),e.kind,e.namespace,e.value,d.id,d.entry_id FROM search_fts JOIN documents d ON d.id=search_fts.document_id JOIN entries e ON e.id=d.entry_id WHERE search_fts MATCH ? AND e.conflicted=0 AND d.status IN ('source_backed','generated_from_evidence') AND EXISTS(SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id AND v.status='source_backed') ORDER BY bm25(search_fts),e.kind,e.namespace,e.value,d.id LIMIT 100";
+        let original:Vec<LexicalDocument>=c.prepare(sql).unwrap().query_map(["\"alpha\""],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?,r.get(5)?))).unwrap().collect::<rusqlite::Result<_>>().unwrap();
+        let ranked=rank_lexical_documents(&c,"\"alpha\"",Instant::now()+std::time::Duration::from_secs(5)).unwrap();
+        assert_eq!(ranked,original);assert_eq!(ranked.len(),100);
+        assert_eq!(ranked.iter().filter(|r|r.4==106).count(),3); // multiplicity never deduplicates
+        let plan:Vec<String>=c.prepare("EXPLAIN QUERY PLAN SELECT rowid,rank FROM search_fts WHERE search_fts MATCH ?1 AND rank MATCH 'bm25()' ORDER BY rank").unwrap().query_map(["\"alpha\""],|r|r.get(3)).unwrap().collect::<rusqlite::Result<_>>().unwrap();
+        assert!(!plan.iter().any(|r|r.contains("TEMP B-TREE")));
+        let positive=(0.0,"a".into(),"n".into(),"v".into(),1,1);
+        let negative=(-0.0,"a".into(),"n".into(),"v".into(),1,1);
+        assert!(lexical_document_order(&positive,&negative).is_eq());
+        assert!(rank_lexical_documents(&c,"\"alpha\"",Instant::now()-std::time::Duration::from_secs(1)).is_err());
+        assert_eq!(rank_lexical_documents(&c,"\"alpha\"",Instant::now()+std::time::Duration::from_secs(5)).unwrap(),original);
     }
     #[test]
     fn full_members_match_original_sql_with_mismatched_rowids_and_sources() {

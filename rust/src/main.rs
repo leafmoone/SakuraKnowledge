@@ -87,6 +87,8 @@ fn semantic_retrieve(args: &[String]) -> ExitCode {
 }
 
 fn modular_command(args:&[String])->ExitCode {
+    #[cfg(feature="semantic")]
+    let started=Instant::now();
     if args.get(1).is_some_and(|s|!["packs","lookup","search","related","ask","inspect","retrieve","resolve-tag"].contains(&s.as_str())) {return usage_error(&format!("argument command: invalid choice: '{}' (choose from 'lookup', 'search', 'related', 'ask', 'inspect', 'runtime', 'resolve-tag')",args[1]));}
     if args.len()==2 && args.get(1).is_some_and(|s|["lookup","search","ask"].contains(&s.as_str())) {return usage_error("database and query are required");}
     let run=||->sakura_knowledge_runtime::modular::Result<serde_json::Value>{
@@ -106,7 +108,17 @@ fn modular_command(args:&[String])->ExitCode {
         }
         runtime.structured(command,query,&forwarded[forwarded.len().min(1)..],&sources)
     };
-    match run(){Ok(value)=>{println!("{value}");ExitCode::SUCCESS},Err(error)=>{let typ=if error.downcast_ref::<Error>().is_some(){"ValueError"}else{"PackError"};eprintln!("{}",serde_json::json!({"error":typ,"message":error.to_string()}));ExitCode::from(2)}}
+    match run(){Ok(value)=>{
+        #[cfg(feature="semantic")]
+        if args.get(1).is_some_and(|s|s=="retrieve") {
+            return match sakura_knowledge_runtime::semantic_jsonl::send_response(&mut std::io::stdout().lock(),&value,"single",started.elapsed().as_secs_f64()*1000.0) {
+                Ok(false)=>ExitCode::SUCCESS,
+                Ok(true)=>ExitCode::from(1),
+                Err(error)=>{eprintln!("{}",serde_json::json!({"error":"SemanticError","message":error.to_string()}));ExitCode::from(1)}
+            };
+        }
+        println!("{value}");ExitCode::SUCCESS
+    },Err(error)=>{let typ=if error.downcast_ref::<Error>().is_some(){"ValueError"}else{"PackError"};eprintln!("{}",serde_json::json!({"error":typ,"message":error.to_string()}));ExitCode::from(2)}}
 }
 
 fn main() -> ExitCode {

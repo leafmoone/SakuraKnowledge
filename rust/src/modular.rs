@@ -7,6 +7,9 @@ use serde_json::{json,Value};
 use std::path::{Path,PathBuf};
 use std::collections::{BTreeMap,BTreeSet};
 pub type Result<T> = std::result::Result<T,Box<dyn std::error::Error>>;
+fn diagnostic_trace(enabled:bool,phase:&str,pack:Option<&str>,start:std::time::Instant) {
+ if enabled {eprintln!("{}",json!({"event":"retrieval_stage","phase":phase,"source_pack":pack,"elapsed_ms":start.elapsed().as_secs_f64()*1000.0}));}
+}
 pub struct SourcePack { pub id:String,pub manifest:Value,pub root:PathBuf }
 pub struct PackRuntime { pub root:PathBuf,pub packs:Vec<SourcePack>,pub model_directory:PathBuf,pub bin_directory:PathBuf }
 fn key(v:&Value)->Option<String> { let v=v.get("entry_key").or_else(||v.get("entry")).or_else(||v.get("tag_key")).unwrap_or(v); Some(format!("{}\0{}\0{}",v["kind"].as_str()?,v["namespace"].as_str()?,v["value"].as_str()?)) }
@@ -54,9 +57,12 @@ impl ModularSemantic {
  pub fn retrieve(&mut self,query:&str,options:&crate::semantic::RetrieveOptions,sources:&[String])->Result<Value>{
   let start=std::time::Instant::now();options.validate()?;let selected=self.runtime.selected(sources)?;let mut parts=Vec::new();let mut branch_options=options.clone();branch_options.limit=100;
   let before=self.encoder.as_ref().map_or(0,|e|e.borrow().query_encodings);
+  let diagnostic=std::env::var_os("SKNOW_DIAGNOSTICS").is_some();
+  diagnostic_trace(diagnostic,"encoding_begin",None,start);
   let vector=if selected.iter().any(|p|p.manifest["requires_model"]=="bge-m3"){Some(self.encoder.as_ref().ok_or("semantic_model_missing: bge-m3")?.borrow_mut().encode(query)?)}else{None};
+  diagnostic_trace(diagnostic,"encoding_end",None,start);
   let multi=selected.iter().filter(|p|p.manifest["requires_model"]=="bge-m3").count()>1;
-  for pack in selected {let response=if pack.manifest["requires_model"]=="bge-m3"{let h=self.handles.get_mut(&pack.id).ok_or("semantic pack not opened")?;if multi {h.retrieve_branches_encoded(query,&branch_options,vector.as_ref().unwrap())?}else{h.retrieve_encoded(query,&branch_options,vector.as_ref().unwrap())?}}else{crate::semantic::lexical_retrieve(pack.root.join("knowledge.sqlite"),query,&branch_options)?};parts.push((pack.id.clone(),response));}
+  for pack in selected {diagnostic_trace(diagnostic,"pack_begin",Some(&pack.id),start);let response=if pack.manifest["requires_model"]=="bge-m3"{let h=self.handles.get_mut(&pack.id).ok_or("semantic pack not opened")?;if multi {h.retrieve_branches_encoded(query,&branch_options,vector.as_ref().unwrap())?}else{h.retrieve_encoded(query,&branch_options,vector.as_ref().unwrap())?}}else{crate::semantic::lexical_retrieve_until(pack.root.join("knowledge.sqlite"),query,&branch_options,start+std::time::Duration::from_secs(5))?};diagnostic_trace(diagnostic,"pack_end",Some(&pack.id),start);parts.push((pack.id.clone(),response));}
   let semantic:Vec<_>=parts.iter().filter(|(id,_)|self.handles.contains_key(id)).map(|p|p.0.clone()).collect();
   let mut value=if multi {
    let mut candidates=semantic_federation::fuse(&parts,100)?;
@@ -64,7 +70,9 @@ impl ModularSemantic {
    let mut proofs=Vec::new();
    for (id,_) in &parts {if let Some(h)=self.handles.get_mut(id) {
     let local:Vec<_>=candidates.iter().filter(|c|c["source_packs"].as_array().unwrap().contains(&json!(id))).map(|c|{let mut c=c.clone();for f in ["provenance","trusted_pins"] {c[f]=json!(c[f].as_array().unwrap().iter().filter(|p|p["source_pack"]==*id).cloned().collect::<Vec<_>>());}c}).collect();
+    diagnostic_trace(diagnostic,"materialize_begin",Some(id),start);
     proofs.push((id.clone(),h.materialize_candidates(query,options,&local,start+std::time::Duration::from_secs(5))?));
+    diagnostic_trace(diagnostic,"materialize_end",Some(id),start);
    }}
    let mut v=json!({"candidates":candidates,"documents":[],"sources":[],"evidence":[],"citations":[],"trusted_pins":[],"dense_hits":[],"lexical_hits":[],"warnings":[],"contract_version":"2","response_version":"sakura-global-distance-v1","query":query,"installed_packs":self.runtime.packs.iter().map(|p|p.id.clone()).collect::<Vec<_>>(),"participating_packs":parts.iter().map(|p|p.0.clone()).collect::<Vec<_>>(),"fusion_policy":"global_cosine_dense_once_plus_source_lexical_rrf60"});
    for (id,p) in &parts {if !self.handles.contains_key(id) {proofs.push((id.clone(),p.clone()));}}
@@ -73,6 +81,7 @@ impl ModularSemantic {
    let pinned:BTreeSet<_>=v["trusted_pins"].as_array().unwrap().iter().filter_map(key).collect();if pinned.len()>1 {v["warnings"]=json!(["multiple_trusted_identities_preserved_not_resolved"]);}
    v
   }else{merge("retrieve",query,parts.clone(),self.runtime.packs.iter().map(|p|p.id.clone()).collect(),100)};
+  diagnostic_trace(diagnostic,"merge_end",None,start);
   let pins:BTreeSet<_>=parts.iter().flat_map(|p|p.1["trusted_pins"].as_array().into_iter().flatten()).filter_map(key).collect();
   if let Some(candidates)=value["candidates"].as_array_mut(){candidates.sort_by_key(|c|usize::from(!key(c).is_some_and(|k|pins.contains(&k))));candidates.truncate(options.limit);for (i,c) in candidates.iter_mut().enumerate(){c["hybrid_rank"]=json!(i+1);c["source_pack"]=c["source_packs"].clone();}}
   value["hybrid"]=value["candidates"].clone();

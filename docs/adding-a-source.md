@@ -51,6 +51,13 @@ The adapter explicitly declares subjects.json, characters.json, relations.json a
 metadata.json. All four byte bindings are captured before and after every adapter
 read. Original raw files may be removed after normalization; bundle build is offline.
 Each source's metadata retains the full declared inventory (shared-all-inputs scope).
+`source_metadata()` may return one metadata object or an ordered list of source
+owners. Multi-owner records must carry a declared source_id; pack_id never stands
+in for source_id. The builder partitions and freezes per-owner JSONL and reports
+source accounts independently. `inspect()` may explicitly declare
+`expected_unresolved: {source_id: {reason: positive_count}}`; undeclared reasons,
+owners/count mismatches or unexpected imported unresolved records fail closed.
+No candidate is promoted to make an unresolved record disappear.
 Adjacent OUTPUT-import-input holds builder receipts, not distribution dependencies.
 The three-file lexical pack can be moved and validated without raw files or those receipts.
 

@@ -1,6 +1,6 @@
 # SakuraKnowledge
 
-Independent offline knowledge core: Python 3.11+ and a read-only Rust CLI. Basic structured queries need no model/GPU/service/Pool. Optional semantic retrieval uses the locally prepared CPU model and evidence-preserving hybrid pack. Current dev delivery: **runtime120 PASS / quality FAIL** (semantic Recall@10 .975 < original target1); usable with that known limitation, not independently generalized.
+Independent offline knowledge core: Python 3.11+ and a read-only Rust CLI. Basic structured queries need no model/GPU/service/Pool. Optional semantic retrieval uses the locally prepared CPU model and evidence-preserving hybrid pack. Current local Moegirl refresh candidate: **runtime120 PASS / quality FAIL** (semantic Recall@10 .975 < original target1; crosslingual .50, down from .5333 in the saved baseline). New source-only text smoke passes, but does not establish generalized retrieval quality. See [the refresh scope and exact delivery](docs/moegirl-local-refresh.md).
 
 ## Adding a source
 
@@ -11,8 +11,9 @@ other sources. See [adding a source](docs/adding-a-source.md),
 Adapters declare every file through an authoritative input inventory; directory
 inputs and transferable bundles are supported. Semantic preparation keeps FP32 assets
 in a verified resumable workspace and publishes only the runtime artifact closed set.
-Validation uses synthetic tiny native fixtures, not a new real source or production
-BGE embedding run.
+Generic semantic-builder validation uses synthetic tiny native fixtures, not a
+production BGE embedding run. The separately audited local Moegirl refresh adds
+real frozen template text to lexical retrieval; no new embeddings/ANN are built.
 
 ## Modular Windows x64 local candidate
 
@@ -25,16 +26,20 @@ Discovery uses `packs/*/manifest.json`, so removing a source directory takes eff
 |---|---|---|
 | Danbooru | structured, lexical, semantic | BGE-M3 for retrieve only |
 | Bangumi | structured, lexical, semantic | BGE-M3 for retrieve only |
-| Moegirl | structured, exact/alias lexical | no |
-| tag-wiki | structured, exact/alias lexical | no |
+| Moegirl | structured, exact/alias and frozen-template lexical | no |
+| tag-wiki | structured, exact/alias and proven Wiki-text lexical | no |
 
-Moegirl has no source documents in the frozen mother DB. The new tag-wiki text candidate
-adds 66,979 independently Wiki-backed generated text documents to lexical FTS; old
+The frozen mother DB had no Moegirl source documents; the standalone refreshed
+Moegirl pack adds **47,589 exact partial-template documents**, not full articles.
+Historical identities/aliases/mapping candidates are preserved. Current category
+paths are stored raw observations, not new CLI relations/filters. The tag-wiki pack
+retains 66,979 independently Wiki-backed generated text documents in lexical FTS; old
 `no_reference`/`unverified_draft` documents remain unchanged and untrusted. This proves
 text provenance, not native tag identity or verified tag/page mappings. See
 [`docs/tag-wiki-provenance.md`](docs/tag-wiki-provenance.md). Neither pack
 creates an ANN or needs a model. These inherited trust rules are not changed by packaging.
-Source membership and actual per-source counts are in [`docs/source-groups.json`](docs/source-groups.json).
+Historical mother source membership/counts remain in [`docs/source-groups.json`](docs/source-groups.json);
+current Moegirl pack counts/bindings are in [the local refresh report](docs/moegirl-local-refresh.md).
 
 ```powershell
 ./sknow.ps1 packs
@@ -141,8 +146,12 @@ For interactive/multiple requests start `powershell -NoProfile -File ./scripts/s
 and send JSONL on stdin. `lookup/search/related/ask/resolve-tag` are structured exact/alias/
 FTS/template operations, not arbitrary semantic QA; descriptive prompts belong to `retrieve`.
 Results retain source/evidence IDs and typed keys: candidates are not verified tag mappings.
-Semantic single and resident responses share **1MiB serialized UTF-8 including newline**;
-clients must match this budget. Oversize returns explicit FAIL, never a truncated success.
+Semantic single and resident responses share **2MiB serialized UTF-8 including newline**;
+clients must match this budget. The current local Moegirl template refresh needs the
+updated Core/reader; old Core components retain their historical1MiB limit.
+Oversize returns explicit FAIL, never a truncated success. Full template strings,
+proofs, candidates and rankings are not reduced to fit the wire budget.
+See [local Moegirl refresh](docs/moegirl-local-refresh.md) for exact scope and assets.
 Single-query startup cost is additional to retrieval; resident5s evidence does not claim a
 cold single process finishes under5s. Default ef2048/wanted512/entity100, no reranker.
 Pi integration is **NOT_RUN**. Portable packaging is separately validated above.

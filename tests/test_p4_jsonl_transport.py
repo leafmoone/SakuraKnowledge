@@ -7,7 +7,7 @@ from tools.p4_rust_pilot import MAX_BYTES, Driver
 
 
 @pytest.mark.parametrize(('code', 'reason'), [
-    ("import sys;sys.stdout.buffer.write(b'x'*(1048577));sys.stdout.flush();\nwhile True: sys.stdout.buffer.write(b'x'*65536);sys.stdout.flush()", 'oversize'),
+    ("import sys;sys.stdout.buffer.write(b'x'*(2097153));sys.stdout.flush();\nwhile True: sys.stdout.buffer.write(b'x'*65536);sys.stdout.flush()", 'oversize'),
     ("import sys;sys.stdout.write('partial');sys.stdout.flush()", 'unterminated'),
     ("pass", 'EOF'),
 ], ids=['oversize-continuing', 'partial-exit', 'early-eof'])
@@ -25,10 +25,10 @@ def test_terminal_failure_reaps_real_child(code, reason, tmp_path):
 
 
 def test_normal_error_and_utf8_exact_boundary_exit_naturally(tmp_path):
-    # Exactly1MiB including UTF-8 and newline; unmodified complete JSON accepted.
+    # Exactly2MiB including UTF-8 and newline; unmodified complete JSON accepted.
     code = """import sys,json
 v={'status':'PASS','text':'日'}
-n=1048576-len((json.dumps(v,ensure_ascii=False,separators=(',',':'))+'\\n').encode())
+n=2097152-len((json.dumps(v,ensure_ascii=False,separators=(',',':'))+'\\n').encode())
 v['text'] += 'x'*n
 sys.stdout.buffer.write((json.dumps(v,ensure_ascii=False,separators=(',',':'))+'\\n').encode());sys.stdout.flush()
 sys.stdout.write('{"status":"FAIL","error":"normal","retries":0}\\n');sys.stdout.flush()
@@ -44,6 +44,21 @@ sys.stdin.buffer.read(1)
         assert shutdown['exit_code'] == 0 and not shutdown['actively_terminated']
         assert shutdown['reader_joined']
         assert driver.process.poll() == 0
+
+
+def test_timeout_never_attributes_previous_complete_response_bytes(tmp_path):
+    code = "import sys;sys.stdout.write('{\\\"status\\\":\\\"PASS\\\",\\\"previous\\\":true}\\n');sys.stdout.flush();sys.stdin.buffer.read()"
+    with (tmp_path / 'stderr').open('wb') as stderr:
+        driver = Driver([sys.executable, '-u', '-c', code], stderr)
+        previous, size = driver.receive(5)
+        assert previous['previous'] and size > 0
+        with pytest.raises(TimeoutError):
+            driver.request({'case_id': 'next', 'query': 'q'})
+        assert driver.last_raw == b''
+        assert driver.transport_failure['read_bytes'] == 0
+        assert driver.transport_failure['read_bytes_scope'] == 'controller_received_current_line'
+        assert driver.transport_failure['pending_reader_bytes'] == 'unknown'
+        assert driver.process.poll() is not None and driver.shutdown['reader_joined']
 
 
 def test_reader_exception_is_forwarded_and_owned_child_reaped(tmp_path):

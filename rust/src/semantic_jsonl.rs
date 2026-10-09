@@ -3,7 +3,9 @@ use crate::semantic::Result;
 use serde_json::{json, Value};
 use std::io::Write;
 use std::time::Instant;
-pub const MAX_RESPONSE_BYTES: usize = 1048576;
+// Exact frozen Moegirl templates can exceed the historical 1 MiB budget.
+// Keep complete success content and a bounded, explicit failure above 2 MiB.
+pub const MAX_RESPONSE_BYTES: usize = 2 * 1024 * 1024;
 #[derive(Default)]
 struct BoundedJson { bytes: Vec<u8>, total: usize }
 impl Write for BoundedJson {

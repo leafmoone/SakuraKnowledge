@@ -10,7 +10,7 @@ from pathlib import Path
 
 from tools import p4_existing_assets_evaluate as evaluation
 from tools import p4_retrieval_metrics as metrics
-from tools.p4_rust_pilot import Driver
+from tools.p4_rust_pilot import MAX_BYTES, Driver
 from tools.portable_validate import _summary
 
 
@@ -43,6 +43,11 @@ def closure(response, connections):
                         proof=json.loads(payload).get('text_provenance')
                         if not isinstance(proof,dict) or proof.get('trusted_text_sha256')!=hashlib.sha256(original.encode('utf-8')).hexdigest() or proof.get('tag_source_id')!=sid or proof.get('tag_evidence_id')!=eid:
                             raise ValueError('tag text provenance/hash closure missing')
+                    if row and row[2]=='source_backed' and n=='moegirl':
+                        original,payload=c.execute('SELECT original,payload FROM documents WHERE id=?',(int(did),)).fetchone()
+                        proof=json.loads(payload).get('text_provenance')
+                        if not isinstance(proof,dict) or proof.get('version')!='moegirl-frozen-template-v1' or proof.get('method')!='frozen_template_exact' or proof.get('raw_source_id')!=sid or proof.get('trusted_text_sha256')!=hashlib.sha256(original.encode('utf-8')).hexdigest():
+                            raise ValueError('Moegirl exact frozen template/hash closure missing')
                     valid = bool(row and row[0]==sid and row[1]==eid and row[2] in ('source_backed','generated_from_evidence') and (not k or tuple(row[3:])==(k['kind'],k['namespace'],k['value'])))
                 else:
                     k=record.get('entry_key',record.get('entry'))
@@ -75,9 +80,18 @@ def run(root, output):
         started = time.perf_counter()
         try:
             child = Driver([str(root/'bin/semantic_pilot.exe'), '--config', str(root/'sknow-config.json')], stderr)
+            opened, _ = child.receive(180)
+        except (ValueError, RuntimeError, OSError) as error:
+            report.update(status='NOT_RUN', error=repr(error), phase='startup', expected_cases=len(cases))
+            if 'child' in locals():
+                report['shutdown'] = child.close(terminal=True)
+            for c in connections.values():
+                c.close()
+            output.with_suffix('.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+            print(json.dumps({'status': 'NOT_RUN', 'cases': 0, 'error': report['error']}))
+            return report
         finally:
             os.environ['PATH'] = previous
-        opened, _ = child.receive(180)
         report['opened'], report['startup_ms'] = opened, (time.perf_counter()-started)*1000
         try:
             for case in cases:
@@ -86,10 +100,15 @@ def run(root, output):
                 wall = (time.perf_counter()-start)*1000
                 raw.write(child.last_raw)
                 raw.flush()
+                if response['status'] != 'PASS':
+                    report['cases'].append({'case_id': case['case_id'], 'status': 'FAIL', 'wall_ms': wall,
+                                            'response_bytes': size, 'original_response_bytes': response.get('response_bytes'),
+                                            'error': response.get('error'), 'source_closure': 'NOT_RUN', 'scores': {}})
+                    continue
                 validation_start=time.perf_counter()
                 closure(response, connections)
                 validation_ms=(time.perf_counter()-validation_start)*1000
-                if response['status'] != 'PASS' or wall > 5000 or size > 1048576:
+                if wall > 5000 or size > MAX_BYTES:
                     raise ValueError('runtime/byte/wall failure')
                 if response['timings_ms']['query_encodings'] != 1:
                     raise ValueError('query was not encoded exactly once')
@@ -100,11 +119,14 @@ def run(root, output):
                     scores[label] = asdict(metrics.evaluate_case(case['case_id'], evaluation.subset(case), ranking, targets))
                 report['cases'].append({'case_id': case['case_id'], 'status': 'PASS', 'wall_ms': wall, 'response_bytes': size, 'scores': scores, 'timings_ms': response['timings_ms'], 'pack_timings_ms': response['pack_timings_ms'], 'source_closure': 'PASS', 'validation_ms': validation_ms})
                 raw_responses.append(response)
-            report['status'] = 'PASS'
+            report['status'] = 'PASS' if len(report['cases']) == len(cases) == 120 and all(r['status'] == 'PASS' for r in report['cases']) else 'FAIL'
         except (ValueError, KeyError, TypeError, RuntimeError, OSError, sqlite3.Error) as error:
             report['error'] = repr(error)
+            report['failed_case_id'] = case['case_id']
+            report['transport_failure'] = child.transport_failure
+            report['failed_phase'] = 'request_or_validation'
         finally:
-            report['shutdown'] = child.close(terminal=report['status'] != 'PASS')
+            report['shutdown'] = child.close(terminal='error' in report)
     report['wall_ms'] = _summary([r['wall_ms'] for r in report['cases']])
     report['response_bytes'] = _summary([r['response_bytes'] for r in report['cases']])
     for c in connections.values():
@@ -119,4 +141,5 @@ if __name__ == '__main__':
     p.add_argument('--root', required=True)
     p.add_argument('--output', required=True)
     a = p.parse_args()
-    run(a.root, a.output)
+    if run(a.root, a.output)['status'] != 'PASS':
+        raise SystemExit(1)

@@ -26,7 +26,7 @@ JOB = 'configs/p4-rust-pilot-v1.json'
 RAW = 'build/p4/rust-semantic-pilot-v1/qualification'
 RECEIPT = 'reports/P4/rust-semantic-pilot-v1.json'
 SELECTED = 'M16-Eadd256-ef128'
-MAX_BYTES = 1048576
+MAX_BYTES = 2 * 1024 * 1024
 REVISION = '5617a9f61b028005a4858fdac845db406aefb181'
 _DLL = json.loads((ROOT / 'configs/p4-current-assets.json').read_text(encoding='utf8'))['ort_dll']
 DLL_SHA, DLL_SIZE = _DLL['sha256'], _DLL['size']
@@ -286,11 +286,15 @@ class Driver:
         self.reader_thread.start()
 
     def receive(self, timeout):
+        # last_raw belongs to this receive only, never the previous successful query.
+        self.last_raw = b''
         try:
             raw = self.lines.get(timeout=timeout)
         except queue.Empty as exc:
             if hasattr(self, 'process'):
-                self.transport_failure = {'kind': 'timeout', 'read_bytes': len(self.last_raw), 'complete_response': False}
+                self.transport_failure = {'kind': 'timeout', 'read_bytes': 0,
+                                          'read_bytes_scope': 'controller_received_current_line',
+                                          'pending_reader_bytes': 'unknown', 'complete_response': False}
                 self.close(terminal=True)
             raise TimeoutError('Rust response timeout; no retry') from exc
         if isinstance(raw, Exception):

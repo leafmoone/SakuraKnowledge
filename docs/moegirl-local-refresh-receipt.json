@@ -1,0 +1,744 @@
+{
+  "schema": "sakura-moegirl-refresh-local-receipt-index-v1",
+  "baseline_commit": "d572b03e6dbd6690498dde95b848c74f7ac01060",
+  "branch": "dev",
+  "scope": "actual frozen local refresh; no live crawl or full-article claim",
+  "assets_uploaded": false,
+  "source_rights": "NOT_CLEARED",
+  "pack": {
+    "path": "build/moegirl-refresh-v1/SakuraKnowledge-pack-moegirl-final2",
+    "bytes": 836572395,
+    "manifest": {
+      "schema": "sakura-source-pack-v1",
+      "distribution_closed_set": true,
+      "pack_id": "moegirl",
+      "display_name": "moegirl",
+      "version": "1",
+      "capabilities": [
+        "structured",
+        "lexical"
+      ],
+      "requires_model": null,
+      "source_ids": [
+        "moegirl-complete-5072f7cf3e3e",
+        "mapping-complete-c8263a535096",
+        "moegirl-local-templates-356c34cce8d2"
+      ],
+      "namespaces": [
+        "bangumi.character",
+        "moegirl.category",
+        "moegirl.character"
+      ],
+      "trusted_fts_documents": 47589,
+      "lexical_mode": "trusted_documents_and_identity",
+      "lexical_membership": {
+        "version": "p4-full-membership-v1",
+        "snapshot_sha256": "8341eb4a7e0d78b1ea946d2a0f94ad5e32f835ecd0f1e9368e696599253a82b8",
+        "snapshot_size": 835870720,
+        "snapshot_identity": "knowledge.sqlite",
+        "rows": 47589
+      },
+      "artifacts": {
+        "snapshot": {
+          "path": "knowledge.sqlite",
+          "sha256": "8341eb4a7e0d78b1ea946d2a0f94ad5e32f835ecd0f1e9368e696599253a82b8",
+          "size": 835870720,
+          "identity": "knowledge.sqlite"
+        },
+        "lexical_membership": {
+          "path": "lexical-membership.sqlite",
+          "sha256": "fdf3c94069d60800678d67f7622671f7779bf2be357ad0215ae13b6de517b463",
+          "size": 700416
+        }
+      }
+    }
+  },
+  "core": {
+    "path": "build/moegirl-refresh-v1/SakuraKnowledge-core-win-x64-final3",
+    "bytes": 79210105,
+    "role": "copyable no-data no-model Core; component-manifest is local closed-set receipt, not runtime discovery schema",
+    "executables": {
+      "bin/semantic_pilot.exe": {
+        "path": "bin/semantic_pilot.exe",
+        "sha256": "48f0e982886058b51774f695bfaf805eac0e1a98a651d21e41f4c0b06028964a",
+        "size": 21519573
+      },
+      "bin/sknow-rs.exe": {
+        "path": "bin/sknow-rs.exe",
+        "sha256": "d89cb6f593fb993d355efe0f996f77b913c64edf260442613913c2704dedd459",
+        "size": 21566823
+      }
+    },
+    "wire_utf8_bytes_including_newline": 2097152,
+    "single_sender_final3_only_change": true,
+    "resident_binary_identical_to_validated_final2": true,
+    "closed_file_set_validated": true
+  },
+  "source_proof": {
+    "status": "PASS",
+    "documents": 47589,
+    "record_titles": 44862,
+    "raw_records": 45479,
+    "empty_lists": 617,
+    "classification": {
+      "exact_template_documents": 47589,
+      "current_attr_category_paths": 411020,
+      "current_subject_category_paths": 50223,
+      "current_state_template_present": 44862,
+      "current_state_missing": 494,
+      "current_state_empty_template_list": 617,
+      "current_state_skipped_by_user": 25
+    },
+    "seconds": 25.450081199989654,
+    "identity_basis": "independent historical source-backed entry evidence",
+    "scope": "partial frozen templates; not full page or authenticated producer revision"
+  },
+  "business_comparison": {
+    "entries": {
+      "before": 95695,
+      "after": 95695
+    },
+    "documents": {
+      "before": 0,
+      "after": 47589
+    },
+    "search_fts": {
+      "before": 0,
+      "after": 47589
+    },
+    "entry_evidence": {
+      "before": 51557,
+      "after": 141693
+    },
+    "aliases": {
+      "before": 129455,
+      "after": 129455
+    },
+    "links": {
+      "before": 97270,
+      "after": 97270
+    },
+    "typed_keys_equal": true,
+    "historical_entry_evidence_refs_preserved": true,
+    "historical_alias_fields_refs_equal": true,
+    "main_verified_links": 0,
+    "old_verified_links": 0,
+    "typed_candidate_business_original_refs_equal": true,
+    "current_states": {
+      "empty_template_list": 617,
+      "missing": 494,
+      "skipped_by_user": 25,
+      "template_present": 44862
+    },
+    "new_trusted_missing_skip_empty_identity_evidence": 0,
+    "ledger_unresolved": {
+      "moegirl-complete-5072f7cf3e3e": 0,
+      "mapping-complete-c8263a535096": 9,
+      "moegirl-local-templates-356c34cce8d2": 0
+    },
+    "limitation": "new DB numeric IDs/storage fallback link evidence references are reprojected; original candidate references stored in payload"
+  },
+  "source_suite": {
+    "status": "PASS",
+    "cases": 27,
+    "positives": 12,
+    "recall10": 1.0,
+    "recall100": 1.0,
+    "scope": "COMPLETE_FROZEN_SMALL_SOURCE_SUITE",
+    "opened": {
+      "event": "opened",
+      "open_timings_ms": {
+        "model_sessions": 0,
+        "total": 3.6515
+      },
+      "retries": 0
+    },
+    "shutdown": {
+      "poll_before": null,
+      "actively_terminated": false,
+      "exit_code": 0,
+      "reader_joined": true
+    },
+    "CLI_all_exit0": true
+  },
+  "allpack120": {
+    "schema": "sakura-modular-semantic120-v1",
+    "status": "PASS",
+    "opened": {
+      "event": "opened",
+      "open_timings_ms": {
+        "model_sessions": 1,
+        "total": 14045.8521
+      },
+      "retries": 0
+    },
+    "startup_ms": 14168.959500035271,
+    "shutdown": {
+      "poll_before": null,
+      "actively_terminated": false,
+      "exit_code": 0,
+      "reader_joined": true
+    },
+    "wall_ms": {
+      "count": 120,
+      "p50": 982.2752000181936,
+      "p95": 3160.7133999932557,
+      "max": 3835.8334000222385
+    },
+    "response_bytes": {
+      "count": 120,
+      "p50": 729788.0,
+      "p95": 826655,
+      "max": 1024477
+    },
+    "case_count": 120,
+    "raw_stream": {
+      "path": "build/moegirl-refresh-v1/allpack120-fixed-final2.jsonl",
+      "bytes": 80612163
+    },
+    "quality_status": "FAIL",
+    "aggregates": {
+      "new": {
+        "overall": {
+          "case_count": 120,
+          "positive_count": 110,
+          "negative_count": 10,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.7727272727272727,
+              "denominator": 110
+            },
+            "recall_at_10": {
+              "value": 0.8181818181818182,
+              "denominator": 110
+            },
+            "recall_at_20": {
+              "value": 0.8272727272727273,
+              "denominator": 110
+            },
+            "mrr_at_10": {
+              "value": 0.6726767676767677,
+              "denominator": 110
+            },
+            "ndcg_at_10": {
+              "value": 0.7048619519612068,
+              "denominator": 110
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": 1.0,
+            "denominator": 10
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 10
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 120
+          }
+        },
+        "lexical": {
+          "case_count": 30,
+          "positive_count": 30,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 1.0,
+              "denominator": 30
+            },
+            "recall_at_10": {
+              "value": 1.0,
+              "denominator": 30
+            },
+            "recall_at_20": {
+              "value": 1.0,
+              "denominator": 30
+            },
+            "mrr_at_10": {
+              "value": 0.9566666666666667,
+              "denominator": 30
+            },
+            "ndcg_at_10": {
+              "value": 0.9672594186935333,
+              "denominator": 30
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 30
+          }
+        },
+        "semantic": {
+          "case_count": 40,
+          "positive_count": 40,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.975,
+              "denominator": 40
+            },
+            "recall_at_10": {
+              "value": 0.975,
+              "denominator": 40
+            },
+            "recall_at_20": {
+              "value": 0.975,
+              "denominator": 40
+            },
+            "mrr_at_10": {
+              "value": 0.8925,
+              "denominator": 40
+            },
+            "ndcg_at_10": {
+              "value": 0.9135375393772958,
+              "denominator": 40
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 40
+          }
+        },
+        "crosslingual": {
+          "case_count": 30,
+          "positive_count": 30,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.43333333333333335,
+              "denominator": 30
+            },
+            "recall_at_10": {
+              "value": 0.5,
+              "denominator": 30
+            },
+            "recall_at_20": {
+              "value": 0.5333333333333333,
+              "denominator": 30
+            },
+            "mrr_at_10": {
+              "value": 0.19648148148148148,
+              "denominator": 30
+            },
+            "ndcg_at_10": {
+              "value": 0.2699326390456546,
+              "denominator": 30
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 30
+          }
+        },
+        "ambiguous_negative": {
+          "case_count": 20,
+          "positive_count": 10,
+          "negative_count": 10,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.3,
+              "denominator": 10
+            },
+            "recall_at_10": {
+              "value": 0.6,
+              "denominator": 10
+            },
+            "recall_at_20": {
+              "value": 0.6,
+              "denominator": 10
+            },
+            "mrr_at_10": {
+              "value": 0.37,
+              "denominator": 10
+            },
+            "ndcg_at_10": {
+              "value": 0.38775514084652885,
+              "denominator": 10
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": 1.0,
+            "denominator": 10
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 10
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 20
+          }
+        }
+      },
+      "baseline": {
+        "overall": {
+          "case_count": 120,
+          "positive_count": 110,
+          "negative_count": 10,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.7818181818181819,
+              "denominator": 110
+            },
+            "recall_at_10": {
+              "value": 0.8272727272727273,
+              "denominator": 110
+            },
+            "recall_at_20": {
+              "value": 0.8409090909090909,
+              "denominator": 110
+            },
+            "mrr_at_10": {
+              "value": 0.6956926406926407,
+              "denominator": 110
+            },
+            "ndcg_at_10": {
+              "value": 0.7248382411965703,
+              "denominator": 110
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": 1.0,
+            "denominator": 10
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 10
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 120
+          }
+        },
+        "lexical": {
+          "case_count": 30,
+          "positive_count": 30,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 1.0,
+              "denominator": 30
+            },
+            "recall_at_10": {
+              "value": 1.0,
+              "denominator": 30
+            },
+            "recall_at_20": {
+              "value": 1.0,
+              "denominator": 30
+            },
+            "mrr_at_10": {
+              "value": 0.9777777777777777,
+              "denominator": 30
+            },
+            "ndcg_at_10": {
+              "value": 0.9833333333333333,
+              "denominator": 30
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 30
+          }
+        },
+        "semantic": {
+          "case_count": 40,
+          "positive_count": 40,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.975,
+              "denominator": 40
+            },
+            "recall_at_10": {
+              "value": 0.975,
+              "denominator": 40
+            },
+            "recall_at_20": {
+              "value": 0.975,
+              "denominator": 40
+            },
+            "mrr_at_10": {
+              "value": 0.89375,
+              "denominator": 40
+            },
+            "ndcg_at_10": {
+              "value": 0.914633133148267,
+              "denominator": 40
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 40
+          }
+        },
+        "crosslingual": {
+          "case_count": 30,
+          "positive_count": 30,
+          "negative_count": 0,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.4666666666666667,
+              "denominator": 30
+            },
+            "recall_at_10": {
+              "value": 0.5333333333333333,
+              "denominator": 30
+            },
+            "recall_at_20": {
+              "value": 0.5666666666666667,
+              "denominator": 30
+            },
+            "mrr_at_10": {
+              "value": 0.2580952380952381,
+              "denominator": 30
+            },
+            "ndcg_at_10": {
+              "value": 0.3256443265742251,
+              "denominator": 30
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": null,
+            "denominator": 0
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 30
+          }
+        },
+        "ambiguous_negative": {
+          "case_count": 20,
+          "positive_count": 10,
+          "negative_count": 10,
+          "metrics": {
+            "recall_at_5": {
+              "value": 0.3,
+              "denominator": 10
+            },
+            "recall_at_10": {
+              "value": 0.6,
+              "denominator": 10
+            },
+            "recall_at_20": {
+              "value": 0.65,
+              "denominator": 10
+            },
+            "mrr_at_10": {
+              "value": 0.37,
+              "denominator": 10
+            },
+            "ndcg_at_10": {
+              "value": 0.38775514084652885,
+              "denominator": 10
+            }
+          },
+          "negative_nonempty_rate": {
+            "value": 1.0,
+            "denominator": 10
+          },
+          "negative_identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 10
+          },
+          "identity_promotion_error_rate": {
+            "value": 0.0,
+            "denominator": 20
+          }
+        }
+      }
+    },
+    "branch_quality": "N/A; lexical/dense diagnostic arrays empty in multi-pack response",
+    "baseline_rerun": false
+  },
+  "verification": {
+    "full_final2_python": {
+      "exit": 0,
+      "passed": 1331,
+      "skipped": 19,
+      "subtests_passed": 55,
+      "seconds": 100.97,
+      "skips": "Windows symlink privilege unavailable"
+    },
+    "full_final2_rust": {
+      "exit": 0,
+      "library_tests": 64,
+      "binary_tests": 6
+    },
+    "main_only_final3_rust": {
+      "exit": 0,
+      "binary_tests": 1
+    },
+    "scoped_final3_python": {
+      "exit": 0,
+      "passed": 12,
+      "seconds": 6.3,
+      "adds_actual_config_single_query_budget_cases": 2,
+      "not_added_to_full_suite_count": true
+    },
+    "ruff_exit": 0,
+    "diff_check_exit": 0,
+    "single_source_final3": {
+      "status": "PASS",
+      "frozen_case_id": "moe-refresh-positive-1",
+      "actual_argv_receipt": "build/moegirl-refresh-v1/single-query-source-final3.json",
+      "command_scope": "--config runtime-source-final retrieve FROZEN_CASE_QUERY --source moegirl --topk 100",
+      "exit": 0,
+      "wall_ms": 773.9479999290779,
+      "response_bytes": 1342105,
+      "documents": 100,
+      "response_profile": {
+        "case_id": "single",
+        "response_bytes": 1342105,
+        "response_too_large": false,
+        "retrieval_ms": 374.25199999999995,
+        "sent_bytes": 1342105,
+        "serialize_ms": 2.6852,
+        "transmit_ms": 3.5343
+      },
+      "model_directory_absent": true
+    }
+  },
+  "receipt_bindings": [
+    {
+      "path": "build/moegirl-refresh-v1/SakuraKnowledge-pack-moegirl-final2/manifest.json",
+      "sha256": "08c0efdd3c8d17ab011e5ba2c4bc0d9e00fcae04cc2553ec1521884fe598636d",
+      "size": 1259
+    },
+    {
+      "path": "build/moegirl-refresh-v1/SakuraKnowledge-core-win-x64-final3/component-manifest.json",
+      "sha256": "8a32dca07fb165d916f1020a1f1cba4de3ad48fd9350fd5b93f1b65dba447dec",
+      "size": 3319
+    },
+    {
+      "path": "build/moegirl-refresh-v1/independent-owned-template-category-state-proof-final2.json",
+      "sha256": "1b1d9a35cdecfec4ddaba308c0f1803cdae5e3c5d2900248384cd234bb6b73e0",
+      "size": 650
+    },
+    {
+      "path": "build/moegirl-refresh-v1/old-new-pack-business-comparison-final2.json",
+      "sha256": "6e9828c883094c941c15ec70cab07037cf4123a6e369a023a179664925a20ccd",
+      "size": 1142
+    },
+    {
+      "path": "build/moegirl-refresh-v1/tag-wiki-row-diff.json",
+      "sha256": "efa37960a155f3d48aefc6fe003eb1cacbd58c6e5b65f4e5a5faab431affca9d",
+      "size": 12643
+    },
+    {
+      "path": "build/moegirl-refresh-v1/tag-evidence-multiset-comparison.json",
+      "sha256": "eec8a9564b3389e6a4ca73a9d67ca83b5fc1bdcb5d7d579ba3dbd3233156da12",
+      "size": 386
+    },
+    {
+      "path": "build/moegirl-refresh-v1/source-gold-body-before-retrieval.json",
+      "sha256": "91ae360e88d174db9a15ec92da9182268fdbdaf6c1d56aeeb47a18448c65dbe2",
+      "size": 13255
+    },
+    {
+      "path": "build/moegirl-refresh-v1/source-only-no-model-smoke-final2/summary.json",
+      "sha256": "8846481463621ee5cc5a574c394e7ce1c93189106304d32a06827907b12d46ae",
+      "size": 69655
+    },
+    {
+      "path": "build/moegirl-refresh-v1/allpack120-fixed-final2.json",
+      "sha256": "30595b7b06c63440c65598b6134297e0bd63c8dbd4a491c2d17b02032aa024c3",
+      "size": 267320
+    },
+    {
+      "path": "build/moegirl-refresh-v1/allpack120-fixed-final2-canonical-quality-comparison.json",
+      "sha256": "8ecc2e143f4c95bba695c16a20e0ecb5542b78dce7f6ce82bfab13b77fb382d5",
+      "size": 10585
+    },
+    {
+      "path": "build/moegirl-refresh-v1/full-python-tests-final2.xml",
+      "sha256": "0391a49851d265317a76226d3e34793f681383a6477dc71675f387d551a8f9ab",
+      "size": 180935
+    },
+    {
+      "path": "build/moegirl-refresh-v1/single-query-budget-tests-final3-accepted.xml",
+      "sha256": "beaead5c0f29f54842e27c7db0b7db5a6193ee3aa41a765570b0b75d1e85e49f",
+      "size": 1821
+    },
+    {
+      "path": "build/moegirl-refresh-v1/single-query-source-final3.json",
+      "sha256": "6c08109f36a6d4423a8fb2e15bec47d199de523dcac5548149acbc1cb7097cca",
+      "size": 727
+    }
+  ],
+  "preserved_failed_attempts": [
+    "source-only-no-model-smoke/summary.json: 1MiB overflow then harness KeyError",
+    "junction startup: NOT_RUN",
+    "allpack120-final-2mib.json: 27 completed then P4-028 timeout",
+    "source-only-no-model-smoke-final/summary.json: filtered CLI timeout; early partial metric invalid",
+    "parallel Cargo memory/mmap failure and diagnostic compile/fixture mistakes: tool transcript and owned target outputs",
+    "full Python missing development text_probe failures: tool transcript",
+    "single-query-budget-tests-final3.xml and single-query-budget-tests-final3-corrected.xml: fixture setup/schema/record-size/assertion failures"
+  ],
+  "NOT_RUN": [
+    "new wheel",
+    "production embedding or ANN rebuild",
+    "Pi Skill/Pool runtime integration",
+    "full human source-fact review",
+    "archive/upload",
+    "main merge"
+  ],
+  "unchanged": [
+    "mother snapshot",
+    "old source packs",
+    "shared model",
+    "original mapping",
+    "FP32 assets",
+    "ANN",
+    "gold",
+    "fusion/RRF/ranking contract",
+    "tag text proof",
+    "identity/resolve rules"
+  ],
+  "external_write_status": "UNKNOWN; unrelated path not accessed/investigated/cleaned"
+}

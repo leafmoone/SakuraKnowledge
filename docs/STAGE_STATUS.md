@@ -1,6 +1,74 @@
 # Current delivery status
 
-## Local hardening: input inventory and semantic publication
+## Actual local Moegirl refresh candidate
+
+Baseline `d572b03e6dbd6690498dde95b848c74f7ac01060`, ordinary `dev` delivery.
+Actual readonly local source audit/freeze and source-targeted rebuild, not a live
+crawl or merely a rerun of stale derivatives. Current delivery:
+
+- `build/moegirl-refresh-v1/SakuraKnowledge-pack-moegirl-final2`: **836572395 bytes**,
+  snapshot SHA256 `8341eb4a7e0d78b1ea946d2a0f94ad5e32f835ecd0f1e9368e696599253a82b8`.
+- `build/moegirl-refresh-v1/SakuraKnowledge-core-win-x64-final3`: **79210105 bytes**,
+  matching **2097152-byte UTF-8+newline** semantic budget, shared single/resident
+  sender (including config single retrieve), five-second query deadline unchanged.
+- Final normalized bundle/proofs/gold/raw streams remain adjacent, not runtime
+  prerequisites. [Refresh report](moegirl-local-refresh.md) gives exact binaries,
+  manifests/commands/exit codes and [receipt bindings](moegirl-local-refresh-receipt.json).
+
+All **47589 exact partial-template documents** under historical source-backed typed
+identities independently match frozen text/hashes/locators. 44862 indexed titles
+have templates;617 empty lists mean no usable captured template,494 frozen API
+missing and25 user-skipped are not live page facts. char_index45998 has exact
+raw/outcome coverage. Current attr411020/subject50223 direct-tree category paths
+are stored raw observations, not new typed relations, CLI filters or regenerated
+`source_fields`; CLI alias/CV/gender/processed fields remain historical-cut. No
+full articles, authenticated successful page revisions or complete upstream
+flattener equivalence are claimed.485/288 old-processed/current-raw gaps remain.
+
+Final old/new typed keys95695, aliases129455 and candidate business links97270
+are preserved; nine unresolved mapping inputs remain exactly accounted, no extra
+six stubs/nine candidate links, no verified mappings. Stored numeric IDs/fallback
+link evidence refs are reprojected with original refs in payload, not byte-equality
+claims. Tag DB physical backups differ but all14 typed logical row multisets match,
+including193494 duplicated tag_evidence rows; keep the current provenance tag pack,
+66979 trusted texts, without rebuild or tag-proof/identity changes.
+
+Real timeout diagnostics isolated a tag proof-FTS TEMP BM25 sort and, separately,
+Moegirl basic filtered-search TEMP sort. Minimal readonly rank-stream fixes preserve
+eligibility, complete boundary ties/multiplicity, original distinct-entity vs
+100-document depth and basic10000-row cap (exact old-query fallback under the same
+deadline). No new index, candidate pruning, document/evidence clipping, fusion/RRF,
+model/ANN, ranking or gold tuning. Optional stderr traces add no stdout fields.
+
+Final checks: **Rust70PASS**, **Python1331PASS/19 Windows symlink SKIP/55subtests**,
+100.97s, Ruff/diffcheckPASS. Final3 changes only single-query main sender after the
+full final2 matrix: main-bin testPASS plus12 scoped PythonPASS6.30s, not summed
+as extra full-suite passes. Resident pilot bytes unchanged. Source-only27/27PASS,
+12 frozen body-positive R@10=R@100=1.0, model/encoding0, lookup/filtered-search
+CLI exit0, EOF0/readerjoined. This is a small development suite, not general quality.
+
+Fresh final fixed **all-pack120/120 runtimePASS** with source closure120,
+one shared encoding/request, EOF0/readerjoined. Cold startup14168.9595ms separate;
+query p50982.2752/p953160.7134/max3835.8334ms, max response1024477bytes.
+**QUALITY FAIL persists and crosslingual regresses**: final-candidate R@10 lexical
+1.0, semantic.975, crosslingual.5 (saved baseline.533333), mixed positive10/20.6.
+Lexical/semantic/crosslingual MRR=.956667/.8925/.196481; nDCG=.967259/.913538/.269933.
+Empty per-branch arrays are N/A, not measured zero recalls. Ten negatives return
+candidates but raw120 responses assert no identity promotion/canonical/entity tag.
+No saved-baseline rerun or tuning to mask the drop. This candidate is not proof of
+meeting the original quality target or independently generalized adoption.
+
+Earlier1MiB overflow, junction startup NOT_RUN,27-completed allpack timeout,
+source CLI timeout/partial recall-harness error, compiler-memory and missing-helper
+Python attempts remain as failures/NOT_RUN; no failed receipts replaced by claims.
+Inputs/mother/oldpack/model/originalmapping/FP32/ANN preserved. Rights NOT_CLEARED;
+large assets not committed/uploaded. New wheel/production embeddings, Pi Skill/Pool
+runtime, full human source-fact review, archive/upload and main merge NOT_RUN.
+Unrelated external-write status UNKNOWN remains uninvestigated. All new work,
+freezes/testtemp/compiler targets are repository-contained; unrelated working-tree
+files preserved. New Core is required; old1MiB Core plus pack swap is insufficient.
+
+## Historical: local hardening of input inventory and semantic publication
 
 Baseline46e63856ca58d47fa0938b400096f51ab678730b. Only Python adapter freeze,
 normalized distribution, semantic workspace/publication, fixtures/docs changed.

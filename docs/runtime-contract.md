@@ -8,7 +8,11 @@ published snapshot. Both CLIs print JSON only on stdout.
 - One five-second basic-operation deadline covers nested queries, projections, bounded
   JSON-size calculation and success/error paths, including inspect. Titles project256
   Unicode characters; identity values/keys never truncate. Semantic single cold startup
-  is separate; semantic resident wire budget1MiB UTF-8 including newline.
+  is separate; semantic single/resident wire budget2MiB UTF-8 including newline.
+  The local Moegirl refresh increased the historical1MiB bound based on an actual
+  1,342,138-byte normal response. Clients must use the matching updated reader/Core;
+  larger responses fail explicitly without candidate/body/proof truncation. The
+  structured-v3 response bound is a separate unchanged contract.
 - Latin-start continuation uses Unicode16 ALNUM; Kana punctuation/combining marks are
   not words merely because of codepoint block. Template subjects use Python whitespace
   including U+001C–1F; U+200B/literal identities stay unchanged.

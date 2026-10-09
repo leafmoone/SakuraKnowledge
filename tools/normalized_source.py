@@ -6,6 +6,7 @@ import re
 import shutil
 import sqlite3
 import subprocess
+from collections import Counter
 from contextlib import closing
 from pathlib import Path
 
@@ -27,6 +28,9 @@ def normalize(raw, adapter_name, output, pack_id):
     adapter = getattr(importlib.import_module(module), symbol)()
     inventory = capture(adapter, raw)
     source = adapter.source_metadata(raw)
+    sources = source if isinstance(source, list) else [source]
+    if not sources or any(not isinstance(s, dict) for s in sources):
+        raise ValueError('adapter source metadata must be source object or nonempty source list')
     observation = adapter.inspect(raw)
     records = output / 'records.jsonl'
     count = 0
@@ -38,8 +42,9 @@ def normalize(raw, adapter_name, output, pack_id):
         raise ValueError('raw input inventory changed')
     manifest = {'schema': 'sakura-normalized-source-v1', 'pack_id': safe_id(pack_id),
                 'display_name': pack_id, 'version': '1', 'capabilities': ['structured', 'lexical'],
-                'requires_model': None, 'sources': [source], 'namespaces': observation['namespaces'],
+                'requires_model': None, 'sources': sources, 'namespaces': observation['namespaces'],
                 'adapter': {'id': adapter.adapter_id, 'version': adapter.adapter_version},
+                'expected_unresolved': observation.get('expected_unresolved', {}),
                 'input_inventory': inventory, 'input_digests': inventory, 'inventory_scope': 'all_declared_inputs_shared_by_each_source', 'records': {**binding(records), 'count': count},
                 'trust_declarations': 'source-backed identities; generated text never identity; candidate links not verified'}
     (output / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
@@ -69,11 +74,26 @@ def build_normalized(bundle, output):
     owners = [s['source_id'] for s in manifest['sources']]
     if not owners or len(owners) != len(set(owners)):
         raise ValueError('source ownership declaration')
+    expected = manifest.get('expected_unresolved', {})
+    if not isinstance(expected, dict) or any(owner not in owners or not isinstance(reasons, dict) or not reasons for owner, reasons in expected.items()):
+        raise ValueError('unresolved source-account declaration')
+    expected_counts = Counter()
+    for owner, reasons in expected.items():
+        for reason, count in reasons.items():
+            if not isinstance(reason, str) or not re.fullmatch(r'[a-z][a-z0-9_]{0,127}', reason) or type(count) is not int or count <= 0:
+                raise ValueError('unresolved reason/count declaration')
+            expected_counts[(owner, reason)] = count
+    observed_counts = Counter()
     with (bundle / 'records.jsonl').open(encoding='utf-8') as stream:
         for line in stream:
-            owner = json.loads(line).get('source_id', owners[0] if len(owners) == 1 else None)
+            record = json.loads(line)
+            owner = record.get('source_id', owners[0] if len(owners) == 1 else None)
             if owner not in owners:
                 raise ValueError('normalized record source ownership missing')
+            if record.get('record_type') == 'unresolved':
+                observed_counts[(owner, record.get('reason'))] += 1
+    if observed_counts != expected_counts:
+        raise ValueError('unresolved record source-account mismatch')
     work = output.with_name(output.name + '-import-input')
     work.mkdir(parents=True, exist_ok=False)
     sources = []
@@ -87,19 +107,26 @@ def build_normalized(bundle, output):
                        'source_references': [], 'refresh_status': 'frozen_normalized'})
         if len(manifest['sources']) > 1:
             local_records = work / f'source-{index}.jsonl'
+            owner_count = 0
             with (bundle / 'records.jsonl').open(encoding='utf-8') as original, local_records.open('x', encoding='utf-8') as target:
                 for line in original:
                     record = json.loads(line)
                     if record.get('source_id') == meta['source_id']:
                         target.write(line)
+                        owner_count += 1
                     elif record.get('source_id') not in {s['source_id'] for s in manifest['sources']}:
                         raise ValueError('normalized record source ownership missing')
             source['path'] = str(local_records.resolve())
             source['local_sha256'] = binding(local_records)['sha256']
+            source['counts'] = {'records': owner_count}
         sources.append(source)
     importer = work / 'manifest.json'
-    importer.write_text(json.dumps({'sources': sources, 'p3_resolver_version': '1'}), encoding='utf-8')
-    storage.build(importer, output)
+    importer.write_text(json.dumps({'sources': sources, 'p3_resolver_version': '1',
+                                    'allow_unresolved_reasons': sorted({reason for _, reason in expected_counts})}), encoding='utf-8')
+    report = storage.build(importer, output)
+    for owner in owners:
+        if report['counts'][owner]['unresolved'] != sum(count for (sid, _), count in expected_counts.items() if sid == owner):
+            raise ValueError('imported unresolved source-account mismatch')
     snapshot = output / 'knowledge.sqlite'
     # This new snapshot is owned by this builder. Never index generated-only identities.
     with closing(sqlite3.connect(snapshot)) as conn:

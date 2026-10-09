@@ -35,7 +35,7 @@ def test_contract_tracks_actual_rust_fixed_values():
     assert c['intra_threads'] == 8 and c['inter_threads'] == 1 and c['sequential']
     assert c['rrf_k'] == 60 and c['pins'] == 'trusted_exact_alias'
     assert pilot.POLICY['warmups'] == 2 and pilot.POLICY['formal'] == 120
-    assert pilot.POLICY['retries'] == 0 and pilot.MAX_BYTES == 1048576
+    assert pilot.POLICY['retries'] == 0 and pilot.MAX_BYTES == 2 * 1024 * 1024
 
 
 def test_fusion_pins_ties_and_first_document_rank():
