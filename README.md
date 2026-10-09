@@ -49,7 +49,11 @@ current Moegirl pack counts/bindings are in [the local refresh report](docs/moeg
 ```
 
 `--source` accepts repeated arguments or comma-separated IDs. Omission selects all installed
-packs. Basic queries never open the model; selecting semantic retrieval without the model
+packs; explicit empty sources/list members are errors. Modular commands reject unknown,
+missing-value and inapplicable options rather than silently ignoring them. `related`
+supports `--direction out` (default) and `--direction in`. `resolve-tag` accepts both
+`--target-namespace` and `--target-tag-namespace`; conflicting values are usage errors.
+Basic queries never open the model; selecting semantic retrieval without the model
 reports `semantic_model_missing`, without download or substitution. Both semantic packs share
 one tokenizer/model session and one query embedding per resident request.
 
@@ -134,7 +138,18 @@ installer or global environment changes are performed. Missing paths produce exp
 For custom paths use the native CLI directly: `sknow-rs retrieve DB MANIFEST QUERY`.
 
 Resident mode amortizes model/index opening, accepts one JSON object per line, emits an
-`opened` event then one complete result per request, and exits naturally on stdin EOF:
+`opened` event once, then one complete result per request, and exits naturally on stdin EOF.
+A recoverable request error emits `status=FAIL` with a stable error code, message and
+`retries=0`, flushes, and continues in the same loaded session. Valid `case_id` values
+are echoed verbatim; invalid JSON or a missing/invalid ID uses `case_id=null`.
+Invalid requests do not trigger embedding encoding. EOF exits 0 after recoverable
+failures. Initialization, unsafe/unknown internal engine failures, stdin I/O, and
+stdout write/flush failures remain fatal nonzero exits; timeouts are not assumed safe
+for continuation. These rules apply to monolithic and `--config` residents alike.
+See [the exact runtime/error contract](docs/runtime-contract.md) and
+[the Tool-interface acceptance receipt](docs/tool-integration.md), including the
+retained cold-query timeout and limits of this integration baseline.
+
 
 ```powershell
 # UTF-8 input stream (ASCII JSON escapes also preserve Japanese on older shells).
@@ -149,8 +164,12 @@ Results retain source/evidence IDs and typed keys: candidates are not verified t
 Semantic single and resident responses share **2MiB serialized UTF-8 including newline**;
 clients must match this budget. The current local Moegirl template refresh needs the
 updated Core/reader; old Core components retain their historical1MiB limit.
-Oversize returns explicit FAIL, never a truncated success. Full template strings,
-proofs, candidates and rankings are not reduced to fit the wire budget.
+Oversize returns explicit FAIL, never a truncated success. Full text is not truncated
+to fit the wire budget. Public documents and their source/evidence/citation closure are
+restricted to the selected Top-K candidates and independent trusted-pin proofs. Multiple
+documents and multiple source proofs for a typed key are retained; numeric document IDs
+are scoped to their owning pack. Internal bounded hits, RRF and final candidate ordering
+are unchanged. This is response evidence scoping, not retrieval-quality retuning.
 See [local Moegirl refresh](docs/moegirl-local-refresh.md) for exact scope and assets.
 Single-query startup cost is additional to retrieval; resident5s evidence does not claim a
 cold single process finishes under5s. Default ef2048/wanted512/entity100, no reranker.

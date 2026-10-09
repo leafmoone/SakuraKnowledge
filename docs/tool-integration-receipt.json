@@ -1,0 +1,2321 @@
+{
+  "schema": "sakura-tool-integration-interface-receipt-v1",
+  "base_commit": "62886224b3dd0743ac0269cc28fc9bbbe399b20b",
+  "status": "INTERFACE_ACCEPTANCE_PASS_WITH_RETAINED_FULL_SUITE_FAILURE_AND_TARGETED_REPAIR_REVIEW_PENDING",
+  "commit_binding": "Runtime/helper/test file SHA256 below; independent review binds the ordinary pushed commit containing this receipt. No self-referential final SHA is fabricated.",
+  "main_must_remain": "269e34eeeac920c29f2d684cfe37c93a95c73057",
+  "source_assets_rebuilt_or_modified": false,
+  "ranking_rrf_gold_trust_changed": false,
+  "environment": {
+    "utf8": [
+      "PYTHONUTF8=1",
+      "PYTHONIOENCODING=utf-8"
+    ],
+    "cargo_jobs": 1,
+    "existing_cached_target_reused": true,
+    "full_python_runs_this_round": 1
+  },
+  "implementation_bindings": [
+    {
+      "path": "rust/src/main.rs",
+      "size": 18788,
+      "sha256": "6cdcbdf3d644710303c541d1af80c0563e3115b9daddb94b21d12083ecb9e09b"
+    },
+    {
+      "path": "rust/src/lib.rs",
+      "size": 63720,
+      "sha256": "91a064b52075a19031a83591f6933ab3921be82a943b4e8a7abc45531f22f2c7"
+    },
+    {
+      "path": "rust/src/modular.rs",
+      "size": 33295,
+      "sha256": "4e1d06405f6a014f5f11fcf78dc832657f549351fba38dd7b6e5a98969ba0d35"
+    },
+    {
+      "path": "rust/src/modular_cli.rs",
+      "size": 23944,
+      "sha256": "b2b03e42ad0b686f7be7d2553e371981e6456980b7898fc76a1f208ad003cb8f"
+    },
+    {
+      "path": "rust/src/semantic.rs",
+      "size": 145786,
+      "sha256": "56c61f36930d51e5bbdd481fea7a611d764392d5e4eaa171e4f29884b58a8f2d"
+    },
+    {
+      "path": "rust/src/semantic_evidence.rs",
+      "size": 13973,
+      "sha256": "eab2df168455fe426d0efd28be37bd08665d9bab30fb64e81d12e539e6f806ab"
+    },
+    {
+      "path": "rust/src/semantic_federation.rs",
+      "size": 8861,
+      "sha256": "9f65da8453e01c6f2cff32f8da8987a4ad40bec513c3eb77a04d8550610ef432"
+    },
+    {
+      "path": "rust/src/semantic_jsonl.rs",
+      "size": 6733,
+      "sha256": "569a321b3691dac8089e1e8affa014b7108ad00803526b23b1cc03fed3ba5777"
+    },
+    {
+      "path": "rust/src/resident.rs",
+      "size": 23919,
+      "sha256": "df11cc7b06215e50aec7c1ff1449fed7a5380a530b76221e9f84c7ec8a38030e"
+    },
+    {
+      "path": "rust/src/bin/semantic_pilot.rs",
+      "size": 1100,
+      "sha256": "6400c137051c718d95852ec3483a69c4b4933809c930d98faf3a9776621a0b68"
+    },
+    {
+      "path": "tools/tool_integration_validate.py",
+      "size": 14800,
+      "sha256": "cb9e3b3d9f9027200571706f8994f525c811d6194fdf8c0e71b03cf802b6128a"
+    },
+    {
+      "path": "tools/tool_resident_validate.py",
+      "size": 9060,
+      "sha256": "37bab9b590b558a973247941dded1c5e51ae3460d4c12eba98d6fee359bd2eab"
+    },
+    {
+      "path": "tests/test_tool_interface_harness.py",
+      "size": 10870,
+      "sha256": "978118caad7babca75c6bf57bf6fae499057fd0618168d195aa676a72f2e2c16"
+    },
+    {
+      "path": "tests/test_tool_runtime_integration.py",
+      "size": 29582,
+      "sha256": "db75793d46fef9bebd0f340afb626ffc18edbf218a3acf98616340b364b1a902"
+    }
+  ],
+  "commands": [
+    {
+      "command": "cargo test --manifest-path rust/Cargo.toml --features semantic --offline --target-dir build/p4-usearch-native-fix/rust-target -j 1 --lib --bin sknow-rs --bin semantic_pilot",
+      "exit": 0,
+      "stdout": {
+        "path": "build/tool-integration-v1/rust-tests-attempt4.stdout",
+        "size": 9105,
+        "sha256": "0817aa14b8e1595492bf5eef7485cfc79a73a42b1d4e2562465834a49afac9b6"
+      },
+      "stderr": {
+        "path": "build/tool-integration-v1/rust-tests-attempt4.stderr",
+        "size": 544,
+        "sha256": "75f634884b39b1e183a015cb194e9c13591197d14be9fc925d1188c85ea0ac94"
+      }
+    },
+    {
+      "command": "cargo build --manifest-path rust/Cargo.toml --features semantic --release --offline --target-dir build/p4-usearch-native-fix/rust-target -j 1 --bin sknow-rs --bin semantic_pilot",
+      "exit": 0,
+      "stdout": {
+        "path": "build/tool-integration-v1/rust-release-attempt2.stdout",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "build/tool-integration-v1/rust-release-attempt2.stderr",
+        "size": 145,
+        "sha256": "3c29a907bf2ea537a8999ffa9284a52074ffd9daa3eb6d4e6c73aaa279bcd2d4"
+      }
+    },
+    {
+      "command": "Explicit UTF-8 / SKNOW_RS_TEST_BIN / SKNOW_PILOT_TEST_BIN candidate1; python -m pytest -q tests/test_tool_runtime_integration.py tests/test_tool_interface_harness.py tests/test_modular_jsonl_budget.py --junitxml=build/tool-integration-v1/native-fixtures-attempt1.xml --basetemp=build/tool-integration-v1/native-fixtures-attempt1",
+      "exit": 0,
+      "stdout": {
+        "path": "build/tool-integration-v1/native-fixtures-attempt1.stdout",
+        "size": 101,
+        "sha256": "398766a935903f15f205b8c21bd244120b76ff3e89d49d1c8320d5d85ad4fca1"
+      },
+      "stderr": {
+        "path": "build/tool-integration-v1/native-fixtures-attempt1.stderr",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": "cargo build --manifest-path rust/Cargo.toml --features semantic --release --offline --target-dir build/p4-usearch-native-fix/rust-target -j 1 --example text_probe",
+      "exit": 0,
+      "stdout": {
+        "path": "build/tool-integration-v1/text-probe-build.stdout",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "build/tool-integration-v1/text-probe-build.stderr",
+        "size": 144,
+        "sha256": "38b26b9775aaf30bef28f7e7b6b5a9c899a341c288a45479661bf468117eb7ad"
+      }
+    },
+    {
+      "command": "python -m ruff check src tests tools",
+      "exit": 0,
+      "stdout": {
+        "path": "build/tool-integration-v1/ruff-final.stdout",
+        "size": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      "stderr": {
+        "path": "build/tool-integration-v1/ruff-final.stderr",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0,
+      "stdout": {
+        "path": "build/tool-integration-v1/diff-final.stdout",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "build/tool-integration-v1/diff-final.stderr",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "rust_related_tests": {
+    "lib": 103,
+    "main": 1,
+    "failed": 0,
+    "exit": 0
+  },
+  "scoped_native_helper_budget_tests": {
+    "passed": 66,
+    "seconds": 4.28,
+    "exit": 0,
+    "candidate": 1
+  },
+  "full_python": {
+    "tests": 1493,
+    "failures": 4,
+    "errors": 0,
+    "skipped": 19,
+    "exit": 1,
+    "stdout": {
+      "path": "build/tool-integration-v1/full-python-once.stdout",
+      "size": 25708,
+      "sha256": "202d5fc27e87ca18956480550187550f6c6b805805bf981de49927fd8e846102"
+    },
+    "stderr": {
+      "path": "build/tool-integration-v1/full-python-once.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "junit": {
+      "path": "build/tool-integration-v1/full-python-once.xml",
+      "size": 218355,
+      "sha256": "3c2a3cd7a5fd06610649f62982744837578413e70242a635cdeebc3961d2d110"
+    },
+    "status": "FAIL_RETAINED: 4 missing text_probe prerequisite failures",
+    "command": "PYTHONUTF8=1 PYTHONIOENCODING=utf-8 SKNOW_RS_TEST_BIN=candidate2/bin/sknow-rs.exe SKNOW_PILOT_TEST_BIN=candidate2/bin/semantic_pilot.exe python -m pytest -q --junitxml=build/tool-integration-v1/full-python-once.xml --basetemp=build/tool-integration-v1/full-python-once",
+    "console_summary": {
+      "passed": 1415,
+      "failed": 4,
+      "skipped": 19,
+      "subtests_passed": 55,
+      "seconds": 99.24
+    }
+  },
+  "python_targeted_prerequisite_repair": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit": 0,
+    "stdout": {
+      "path": "build/tool-integration-v1/python-prerequisite-repair.stdout",
+      "size": 100,
+      "sha256": "8c92c5dabf5c73f78532eaa0d427e47f7e16635a215b40e446a1500db7eb452e"
+    },
+    "stderr": {
+      "path": "build/tool-integration-v1/python-prerequisite-repair.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "junit": {
+      "path": "build/tool-integration-v1/python-prerequisite-repair.xml",
+      "size": 976,
+      "sha256": "c3987f6f5d62975ca331e88687287998f5fdeae986ce0e649408dfbc8ba545e3"
+    },
+    "covers_exactly_initial_failures": true,
+    "initial_failure_cases": [
+      [
+        "tests.test_review_f99",
+        "test_r2_separator_tokens_match_and_nonempty_fts[a\\u3099b]"
+      ],
+      [
+        "tests.test_review_f99",
+        "test_r2_separator_tokens_match_and_nonempty_fts[a\\u30fbb]"
+      ],
+      [
+        "tests.test_review_f99",
+        "test_r2_separator_tokens_match_and_nonempty_fts[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\u30fb]"
+      ],
+      [
+        "tests.test_rust_repair",
+        "test_direct_unicode_tokens_and_match"
+      ]
+    ],
+    "command": "PYTHONUTF8=1 PYTHONIOENCODING=utf-8 SKNOW_RS_TEST_BIN=build/tool-integration-v1/prerequisite-test-bin/bin/sknow-rs.exe python -m pytest -q tests/test_review_f99.py::test_r2_separator_tokens_match_and_nonempty_fts tests/test_rust_repair.py::test_direct_unicode_tokens_and_match --junitxml=build/tool-integration-v1/python-prerequisite-repair.xml --basetemp=build/tool-integration-v1/python-prerequisite-repair",
+    "binary_copy_bindings": {
+      "path": "build/tool-integration-v1/prerequisite-test-bin/bindings.json",
+      "size": 2576,
+      "sha256": "1d28927ae6ed413c660dc0cd0f237a20962362d8c8b0122aff21d576ef0e049e"
+    },
+    "scope": "Exactly the four initial prerequisite failures; whole suite is not rerun or relabeled PASS."
+  },
+  "core_candidate": {
+    "directory": "build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate2",
+    "files": 19,
+    "size": 83481693,
+    "manifest": {
+      "path": "build/tool-integration-v1/SakuraKnowledge-core-win-x64-candidate2/component-manifest.json",
+      "size": 3345,
+      "sha256": "5aeb64b49f601cc7a5746a9f6a253fab6664a76a9dcd9a46b29b566c84497bba"
+    }
+  },
+  "topk": {
+    "before_status": "BASELINE_CAPTURED",
+    "after_status": "PASS",
+    "cases": [
+      {
+        "case_id": "tag-wiki-top1",
+        "before_candidates": [
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "blue_hair"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {}
+          }
+        ],
+        "after_candidates": [
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "blue_hair"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {}
+          }
+        ],
+        "ranking_unchanged": true,
+        "before_documents": 100,
+        "after_documents": 1,
+        "before_jsonl_bytes": 279908,
+        "after_jsonl_bytes": 51763,
+        "before_query_ms": 189.649,
+        "after_query_ms": 72.8386,
+        "after_scope": {
+          "status": "PASS",
+          "violations": [],
+          "source_qualified_documents": 1,
+          "allowed_typed_key_origins": 1
+        },
+        "exit": 0
+      },
+      {
+        "case_id": "tag-wiki-top5",
+        "before_candidates": [
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "blue_hair"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {}
+          },
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "light_blue_hair"
+            ],
+            "rank": 2,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {
+              "score": -8.410100277253733
+            }
+          },
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "dark_blue_hair"
+            ],
+            "rank": 3,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {
+              "score": -8.397599844304985
+            }
+          },
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "nishina_rie"
+            ],
+            "rank": 4,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {
+              "score": -8.242143922578624
+            }
+          },
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "iris_(drapri_guu-ta-life)"
+            ],
+            "rank": 5,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {
+              "score": -8.125965209885855
+            }
+          }
+        ],
+        "after_candidates": [
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "blue_hair"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {}
+          },
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "light_blue_hair"
+            ],
+            "rank": 2,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {
+              "score": -8.410100277253733
+            }
+          },
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "dark_blue_hair"
+            ],
+            "rank": 3,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {
+              "score": -8.397599844304985
+            }
+          },
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "nishina_rie"
+            ],
+            "rank": 4,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {
+              "score": -8.242143922578624
+            }
+          },
+          {
+            "entry": [
+              "tag",
+              "local.tag_aggregate",
+              "iris_(drapri_guu-ta-life)"
+            ],
+            "rank": 5,
+            "source_packs": [
+              "tag-wiki"
+            ],
+            "ranking_fields": {
+              "score": -8.125965209885855
+            }
+          }
+        ],
+        "ranking_unchanged": true,
+        "before_documents": 100,
+        "after_documents": 5,
+        "before_jsonl_bytes": 296458,
+        "after_jsonl_bytes": 88957,
+        "before_query_ms": 57.7142,
+        "after_query_ms": 62.1874,
+        "after_scope": {
+          "status": "PASS",
+          "violations": [],
+          "source_qualified_documents": 5,
+          "allowed_typed_key_origins": 5
+        },
+        "exit": 0
+      },
+      {
+        "case_id": "moegirl-top1",
+        "before_candidates": [
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "初音未来"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          }
+        ],
+        "after_candidates": [
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "初音未来"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          }
+        ],
+        "ranking_unchanged": true,
+        "before_documents": 100,
+        "after_documents": 9,
+        "before_jsonl_bytes": 339035,
+        "after_jsonl_bytes": 174655,
+        "before_query_ms": 205.7258,
+        "after_query_ms": 190.4021,
+        "after_scope": {
+          "status": "PASS",
+          "violations": [],
+          "source_qualified_documents": 9,
+          "allowed_typed_key_origins": 9
+        },
+        "exit": 0
+      },
+      {
+        "case_id": "moegirl-top5",
+        "before_candidates": [
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "初音未来"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          },
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "初音未来(偶像大师)"
+            ],
+            "rank": 2,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          },
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "初音未来(战斗天赋解析系统)"
+            ],
+            "rank": 3,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          },
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "初音未来(蔚蓝档案)"
+            ],
+            "rank": 4,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          },
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "战舰少女:关岛"
+            ],
+            "rank": 5,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          }
+        ],
+        "after_candidates": [
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "初音未来"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          },
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "初音未来(偶像大师)"
+            ],
+            "rank": 2,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          },
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "初音未来(战斗天赋解析系统)"
+            ],
+            "rank": 3,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          },
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "初音未来(蔚蓝档案)"
+            ],
+            "rank": 4,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          },
+          {
+            "entry": [
+              "character",
+              "moegirl.character",
+              "战舰少女:关岛"
+            ],
+            "rank": 5,
+            "source_packs": [
+              "moegirl"
+            ],
+            "ranking_fields": {}
+          }
+        ],
+        "ranking_unchanged": true,
+        "before_documents": 100,
+        "after_documents": 9,
+        "before_jsonl_bytes": 386333,
+        "after_jsonl_bytes": 237148,
+        "before_query_ms": 62.845200000000006,
+        "after_query_ms": 74.08720000000001,
+        "after_scope": {
+          "status": "PASS",
+          "violations": [],
+          "source_qualified_documents": 9,
+          "allowed_typed_key_origins": 9
+        },
+        "exit": 0
+      },
+      {
+        "case_id": "danbooru-top1",
+        "before_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.03009207275993712,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  1
+                ],
+                [
+                  "dense",
+                  13
+                ]
+              ]
+            }
+          }
+        ],
+        "after_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.03009207275993712,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  1
+                ],
+                [
+                  "dense",
+                  13
+                ]
+              ]
+            }
+          }
+        ],
+        "ranking_unchanged": true,
+        "before_documents": 100,
+        "after_documents": 1,
+        "before_jsonl_bytes": 180513,
+        "after_jsonl_bytes": 83600,
+        "before_query_ms": 250.90030000000002,
+        "after_query_ms": 198.1689,
+        "after_scope": {
+          "status": "PASS",
+          "violations": [],
+          "source_qualified_documents": 1,
+          "allowed_typed_key_origins": 1
+        },
+        "exit": 0
+      },
+      {
+        "case_id": "danbooru-top5",
+        "before_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.03009207275993712,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  1
+                ],
+                [
+                  "dense",
+                  13
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "136282"
+            ],
+            "rank": 2,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.025525990099009903,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  4
+                ],
+                [
+                  "dense",
+                  41
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "114850"
+            ],
+            "rank": 3,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02393753200204813,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  3
+                ],
+                [
+                  "dense",
+                  64
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "90365"
+            ],
+            "rank": 4,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02284044165403767,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  2
+                ],
+                [
+                  "dense",
+                  89
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "121482"
+            ],
+            "rank": 5,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.021530054644808744,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  15
+                ],
+                [
+                  "dense",
+                  62
+                ]
+              ]
+            }
+          }
+        ],
+        "after_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.03009207275993712,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  1
+                ],
+                [
+                  "dense",
+                  13
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "136282"
+            ],
+            "rank": 2,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.025525990099009903,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  4
+                ],
+                [
+                  "dense",
+                  41
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "114850"
+            ],
+            "rank": 3,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02393753200204813,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  3
+                ],
+                [
+                  "dense",
+                  64
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "90365"
+            ],
+            "rank": 4,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02284044165403767,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  2
+                ],
+                [
+                  "dense",
+                  89
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "121482"
+            ],
+            "rank": 5,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.021530054644808744,
+              "backend_ranks": [
+                [
+                  "bm25",
+                  15
+                ],
+                [
+                  "dense",
+                  62
+                ]
+              ]
+            }
+          }
+        ],
+        "ranking_unchanged": true,
+        "before_documents": 100,
+        "after_documents": 5,
+        "before_jsonl_bytes": 189859,
+        "after_jsonl_bytes": 99816,
+        "before_query_ms": 246.66299999999998,
+        "after_query_ms": 200.59660000000002,
+        "after_scope": {
+          "status": "PASS",
+          "violations": [],
+          "source_qualified_documents": 5,
+          "allowed_typed_key_origins": 5
+        },
+        "exit": 0
+      },
+      {
+        "case_id": "danbooru+bangumi-top1",
+        "before_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02738245361196181,
+              "global_semantic_rank": 31,
+              "best_distance": 0.3407251834869385,
+              "backend_ranks": [
+                [
+                  "dense",
+                  31
+                ],
+                [
+                  "bm25:danbooru",
+                  1
+                ]
+              ]
+            }
+          }
+        ],
+        "after_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02738245361196181,
+              "global_semantic_rank": 31,
+              "best_distance": 0.3407251834869385,
+              "backend_ranks": [
+                [
+                  "dense",
+                  31
+                ],
+                [
+                  "bm25:danbooru",
+                  1
+                ]
+              ]
+            }
+          }
+        ],
+        "ranking_unchanged": true,
+        "before_documents": 1,
+        "after_documents": 1,
+        "before_jsonl_bytes": 7044,
+        "after_jsonl_bytes": 7705,
+        "before_query_ms": 459.9479,
+        "after_query_ms": 348.73510000000005,
+        "after_scope": {
+          "status": "PASS",
+          "violations": [],
+          "source_qualified_documents": 1,
+          "allowed_typed_key_origins": 1
+        },
+        "exit": 0
+      },
+      {
+        "case_id": "danbooru+bangumi-top5",
+        "before_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02738245361196181,
+              "global_semantic_rank": 31,
+              "best_distance": 0.3407251834869385,
+              "backend_ranks": [
+                [
+                  "dense",
+                  31
+                ],
+                [
+                  "bm25:danbooru",
+                  1
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "subject",
+              "bangumi.subject",
+              "35169"
+            ],
+            "rank": 2,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.024970794392523366,
+              "global_semantic_rank": 4,
+              "best_distance": 0.26590728759765625,
+              "backend_ranks": [
+                [
+                  "dense",
+                  4
+                ],
+                [
+                  "bm25:bangumi",
+                  47
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "136282"
+            ],
+            "rank": 3,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.022203947368421052,
+              "global_semantic_rank": 92,
+              "best_distance": 0.3783189654350281,
+              "backend_ranks": [
+                [
+                  "dense",
+                  92
+                ],
+                [
+                  "bm25:danbooru",
+                  4
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "person",
+              "bangumi.person",
+              "6499"
+            ],
+            "rank": 4,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.022161324913618493,
+              "global_semantic_rank": 49,
+              "best_distance": 0.3526685833930969,
+              "backend_ranks": [
+                [
+                  "dense",
+                  49
+                ],
+                [
+                  "bm25:bangumi",
+                  17
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "subject",
+              "bangumi.subject",
+              "184156"
+            ],
+            "rank": 5,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.01805465191932336,
+              "global_semantic_rank": 56,
+              "best_distance": 0.3559938669204712,
+              "backend_ranks": [
+                [
+                  "dense",
+                  56
+                ],
+                [
+                  "bm25:bangumi",
+                  46
+                ]
+              ]
+            }
+          }
+        ],
+        "after_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02738245361196181,
+              "global_semantic_rank": 31,
+              "best_distance": 0.3407251834869385,
+              "backend_ranks": [
+                [
+                  "dense",
+                  31
+                ],
+                [
+                  "bm25:danbooru",
+                  1
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "subject",
+              "bangumi.subject",
+              "35169"
+            ],
+            "rank": 2,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.024970794392523366,
+              "global_semantic_rank": 4,
+              "best_distance": 0.26590728759765625,
+              "backend_ranks": [
+                [
+                  "dense",
+                  4
+                ],
+                [
+                  "bm25:bangumi",
+                  47
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "136282"
+            ],
+            "rank": 3,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.022203947368421052,
+              "global_semantic_rank": 92,
+              "best_distance": 0.3783189654350281,
+              "backend_ranks": [
+                [
+                  "dense",
+                  92
+                ],
+                [
+                  "bm25:danbooru",
+                  4
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "person",
+              "bangumi.person",
+              "6499"
+            ],
+            "rank": 4,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.022161324913618493,
+              "global_semantic_rank": 49,
+              "best_distance": 0.3526685833930969,
+              "backend_ranks": [
+                [
+                  "dense",
+                  49
+                ],
+                [
+                  "bm25:bangumi",
+                  17
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "subject",
+              "bangumi.subject",
+              "184156"
+            ],
+            "rank": 5,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.01805465191932336,
+              "global_semantic_rank": 56,
+              "best_distance": 0.3559938669204712,
+              "backend_ranks": [
+                [
+                  "dense",
+                  56
+                ],
+                [
+                  "bm25:bangumi",
+                  46
+                ]
+              ]
+            }
+          }
+        ],
+        "ranking_unchanged": true,
+        "before_documents": 5,
+        "after_documents": 5,
+        "before_jsonl_bytes": 25105,
+        "after_jsonl_bytes": 27963,
+        "before_query_ms": 359.6991,
+        "after_query_ms": 344.3219,
+        "after_scope": {
+          "status": "PASS",
+          "violations": [],
+          "source_qualified_documents": 5,
+          "allowed_typed_key_origins": 5
+        },
+        "exit": 0
+      },
+      {
+        "case_id": "all-top1",
+        "before_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02738245361196181,
+              "global_semantic_rank": 31,
+              "best_distance": 0.3407251834869385,
+              "backend_ranks": [
+                [
+                  "dense",
+                  31
+                ],
+                [
+                  "bm25:danbooru",
+                  1
+                ]
+              ]
+            }
+          }
+        ],
+        "after_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02738245361196181,
+              "global_semantic_rank": 31,
+              "best_distance": 0.3407251834869385,
+              "backend_ranks": [
+                [
+                  "dense",
+                  31
+                ],
+                [
+                  "bm25:danbooru",
+                  1
+                ]
+              ]
+            }
+          }
+        ],
+        "ranking_unchanged": true,
+        "before_documents": 201,
+        "after_documents": 1,
+        "before_jsonl_bytes": 486681,
+        "after_jsonl_bytes": 7811,
+        "before_query_ms": 768.9585,
+        "after_query_ms": 884.2385,
+        "after_scope": {
+          "status": "PASS",
+          "violations": [],
+          "source_qualified_documents": 1,
+          "allowed_typed_key_origins": 1
+        },
+        "exit": 0
+      },
+      {
+        "case_id": "all-top5",
+        "before_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02738245361196181,
+              "global_semantic_rank": 31,
+              "best_distance": 0.3407251834869385,
+              "backend_ranks": [
+                [
+                  "dense",
+                  31
+                ],
+                [
+                  "bm25:danbooru",
+                  1
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "subject",
+              "bangumi.subject",
+              "35169"
+            ],
+            "rank": 2,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.024970794392523366,
+              "global_semantic_rank": 4,
+              "best_distance": 0.26590728759765625,
+              "backend_ranks": [
+                [
+                  "dense",
+                  4
+                ],
+                [
+                  "bm25:bangumi",
+                  47
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "136282"
+            ],
+            "rank": 3,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.022203947368421052,
+              "global_semantic_rank": 92,
+              "best_distance": 0.3783189654350281,
+              "backend_ranks": [
+                [
+                  "dense",
+                  92
+                ],
+                [
+                  "bm25:danbooru",
+                  4
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "person",
+              "bangumi.person",
+              "6499"
+            ],
+            "rank": 4,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.022161324913618493,
+              "global_semantic_rank": 49,
+              "best_distance": 0.3526685833930969,
+              "backend_ranks": [
+                [
+                  "dense",
+                  49
+                ],
+                [
+                  "bm25:bangumi",
+                  17
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "subject",
+              "bangumi.subject",
+              "184156"
+            ],
+            "rank": 5,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.01805465191932336,
+              "global_semantic_rank": 56,
+              "best_distance": 0.3559938669204712,
+              "backend_ranks": [
+                [
+                  "dense",
+                  56
+                ],
+                [
+                  "bm25:bangumi",
+                  46
+                ]
+              ]
+            }
+          }
+        ],
+        "after_candidates": [
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "231843"
+            ],
+            "rank": 1,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.02738245361196181,
+              "global_semantic_rank": 31,
+              "best_distance": 0.3407251834869385,
+              "backend_ranks": [
+                [
+                  "dense",
+                  31
+                ],
+                [
+                  "bm25:danbooru",
+                  1
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "subject",
+              "bangumi.subject",
+              "35169"
+            ],
+            "rank": 2,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.024970794392523366,
+              "global_semantic_rank": 4,
+              "best_distance": 0.26590728759765625,
+              "backend_ranks": [
+                [
+                  "dense",
+                  4
+                ],
+                [
+                  "bm25:bangumi",
+                  47
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "page",
+              "danbooru.wiki",
+              "136282"
+            ],
+            "rank": 3,
+            "source_packs": [
+              "danbooru"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.022203947368421052,
+              "global_semantic_rank": 92,
+              "best_distance": 0.3783189654350281,
+              "backend_ranks": [
+                [
+                  "dense",
+                  92
+                ],
+                [
+                  "bm25:danbooru",
+                  4
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "person",
+              "bangumi.person",
+              "6499"
+            ],
+            "rank": 4,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.022161324913618493,
+              "global_semantic_rank": 49,
+              "best_distance": 0.3526685833930969,
+              "backend_ranks": [
+                [
+                  "dense",
+                  49
+                ],
+                [
+                  "bm25:bangumi",
+                  17
+                ]
+              ]
+            }
+          },
+          {
+            "entry": [
+              "subject",
+              "bangumi.subject",
+              "184156"
+            ],
+            "rank": 5,
+            "source_packs": [
+              "bangumi"
+            ],
+            "ranking_fields": {
+              "rrf_score": 0.01805465191932336,
+              "global_semantic_rank": 56,
+              "best_distance": 0.3559938669204712,
+              "backend_ranks": [
+                [
+                  "dense",
+                  56
+                ],
+                [
+                  "bm25:bangumi",
+                  46
+                ]
+              ]
+            }
+          }
+        ],
+        "ranking_unchanged": true,
+        "before_documents": 205,
+        "after_documents": 5,
+        "before_jsonl_bytes": 504764,
+        "after_jsonl_bytes": 28060,
+        "before_query_ms": 750.7996999999999,
+        "after_query_ms": 791.3443,
+        "after_scope": {
+          "status": "PASS",
+          "violations": [],
+          "source_qualified_documents": 5,
+          "allowed_typed_key_origins": 5
+        },
+        "exit": 0
+      }
+    ],
+    "before_receipt": {
+      "path": "build/tool-integration-v1/topk-before-v1/summary.json",
+      "size": 307155,
+      "sha256": "6ca5ef604817aba6747ec0780eeeb2574a6f6f91695ab5bf9b3853aa97292c41"
+    },
+    "after_receipt": {
+      "path": "build/tool-integration-v1/topk-after-candidate2/summary.json",
+      "size": 27533,
+      "sha256": "9183a5ed3100004c57dc8db87728a2f540f32ef61eabfca2d01c2f0d95c285bf"
+    }
+  },
+  "resident": [
+    {
+      "mode": "modular",
+      "status": "PASS",
+      "exit": 0,
+      "opened_events": 1,
+      "business_responses": 18,
+      "encoding_evidence": {
+        "model_sessions": 1,
+        "valid_request_encodings": [
+          1,
+          1,
+          1
+        ],
+        "process_query_encodings": [
+          1,
+          2,
+          3
+        ]
+      },
+      "cases": [
+        {
+          "expected_case_id": "q1",
+          "case_id": "q1",
+          "status": "PASS",
+          "expected_status": "PASS",
+          "error": null,
+          "retries": null,
+          "timings_ms": {
+            "process_query_encodings": 1,
+            "query_encodings": 1,
+            "total": 910.9612999999999
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "q2",
+          "case_id": "q2",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_limit",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 1
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "q3",
+          "case_id": "q3",
+          "status": "PASS",
+          "expected_status": "PASS",
+          "error": null,
+          "retries": null,
+          "timings_ms": {
+            "process_query_encodings": 2,
+            "query_encodings": 1,
+            "total": 461.5825
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": null,
+          "case_id": null,
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_json",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": null,
+          "case_id": null,
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_case_id",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": null,
+          "case_id": null,
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_case_id",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": null,
+          "case_id": null,
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_request",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "bad-query",
+          "case_id": "bad-query",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_query",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "long-query",
+          "case_id": "long-query",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_query",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "zero-limit",
+          "case_id": "zero-limit",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_limit",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "large-limit",
+          "case_id": "large-limit",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_limit",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "bad-kind",
+          "case_id": "bad-kind",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_kind",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "bad-namespace",
+          "case_id": "bad-namespace",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_namespace",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "unknown-option",
+          "case_id": "unknown-option",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "unsupported_option",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "empty-source",
+          "case_id": "empty-source",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_source",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "missing-pack",
+          "case_id": "missing-pack",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "source_pack_missing",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "bad-source-member",
+          "case_id": "bad-source-member",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_source",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": " 結尾-验证😀 ",
+          "case_id": " 結尾-验证😀 ",
+          "status": "PASS",
+          "expected_status": "PASS",
+          "error": null,
+          "retries": null,
+          "timings_ms": {
+            "process_query_encodings": 3,
+            "query_encodings": 1,
+            "total": 458.7808
+          },
+          "PASS": true
+        }
+      ],
+      "receipt": {
+        "path": "build/tool-integration-v1/resident-modular-candidate2/summary.json",
+        "size": 6288,
+        "sha256": "5aedc785cf150488f98d8ef1ab91d8131d47821b40626da244fece5dad96d7df"
+      }
+    },
+    {
+      "mode": "monolithic",
+      "status": "PASS",
+      "exit": 0,
+      "opened_events": 1,
+      "business_responses": 16,
+      "encoding_evidence": {
+        "model_sessions": 1,
+        "valid_request_encodings": [
+          1,
+          1,
+          1
+        ],
+        "process_query_encodings": [
+          1,
+          2,
+          3
+        ]
+      },
+      "cases": [
+        {
+          "expected_case_id": "q1",
+          "case_id": "q1",
+          "status": "PASS",
+          "expected_status": "PASS",
+          "error": null,
+          "retries": null,
+          "timings_ms": {
+            "ann": 106.8674,
+            "bm25": 282.0986,
+            "bm25_sql": 281.8035,
+            "dense_mapping": 18.2351,
+            "fusion_evidence": 11.1799,
+            "index_search": 88.6322,
+            "ort": 59.9197,
+            "pins_sql": 0.29369999999999996,
+            "process_query_encodings": 1,
+            "query_encodings": 1,
+            "tokenize": 0.0222,
+            "total": 460.5695
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "q2",
+          "case_id": "q2",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_limit",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 1
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "q3",
+          "case_id": "q3",
+          "status": "PASS",
+          "expected_status": "PASS",
+          "error": null,
+          "retries": null,
+          "timings_ms": {
+            "ann": 2707.288,
+            "bm25": 49.692800000000005,
+            "bm25_sql": 48.8669,
+            "dense_mapping": 113.8843,
+            "fusion_evidence": 10.6484,
+            "index_search": 2593.4034,
+            "ort": 61.623200000000004,
+            "pins_sql": 0.8251000000000001,
+            "process_query_encodings": 2,
+            "query_encodings": 1,
+            "tokenize": 0.0152,
+            "total": 2829.4718
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": null,
+          "case_id": null,
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_json",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": null,
+          "case_id": null,
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_case_id",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": null,
+          "case_id": null,
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_case_id",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": null,
+          "case_id": null,
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_request",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "bad-query",
+          "case_id": "bad-query",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_query",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "long-query",
+          "case_id": "long-query",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_query",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "zero-limit",
+          "case_id": "zero-limit",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_limit",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "large-limit",
+          "case_id": "large-limit",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_limit",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "bad-kind",
+          "case_id": "bad-kind",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_kind",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "bad-namespace",
+          "case_id": "bad-namespace",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_namespace",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "unknown-option",
+          "case_id": "unknown-option",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "unsupported_option",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": "empty-source",
+          "case_id": "empty-source",
+          "status": "FAIL",
+          "expected_status": "FAIL",
+          "error": "invalid_source",
+          "retries": 0,
+          "timings_ms": {
+            "process_query_encodings": 2
+          },
+          "PASS": true
+        },
+        {
+          "expected_case_id": " 結尾-验证😀 ",
+          "case_id": " 結尾-验证😀 ",
+          "status": "PASS",
+          "expected_status": "PASS",
+          "error": null,
+          "retries": null,
+          "timings_ms": {
+            "ann": 4382.103800000001,
+            "bm25": 152.6857,
+            "bm25_sql": 145.0156,
+            "dense_mapping": 114.1519,
+            "fusion_evidence": 15.8206,
+            "index_search": 4267.9516,
+            "ort": 63.45249999999999,
+            "pins_sql": 7.669300000000001,
+            "process_query_encodings": 3,
+            "query_encodings": 1,
+            "tokenize": 0.0176,
+            "total": 4614.4957
+          },
+          "PASS": true
+        }
+      ],
+      "receipt": {
+        "path": "build/tool-integration-v1/resident-monolithic-candidate2-attempt2/summary.json",
+        "size": 7061,
+        "sha256": "7f8d7fbf4937515611b7a911e951ad4289b1cd58b90ba839ddf0dca1e833b9fa"
+      }
+    }
+  ],
+  "oversize_native_fixture": {
+    "schema": "sakura-tool-oversize-native-v1",
+    "status": "PASS",
+    "scope": "Actual native lexical fixture, not real-source/model qualification",
+    "command": [
+      "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\SakuraKnowledge-core-win-x64-candidate2\\bin\\semantic_pilot.exe",
+      "--config",
+      "D:\\SakuraTool\\SakuraKnowledge\\build\\tool-integration-v1\\native-fixtures-attempt1\\test_native_resident_response_0\\runtime\\sknow-config.json"
+    ],
+    "exit": 0,
+    "opened_events": 1,
+    "failure": {
+      "case_id": "巨大-完整",
+      "error": "response_too_large",
+      "limit_bytes": 2097152,
+      "message": "response exceeds the UTF-8 plus newline wire limit",
+      "response_bytes": 2235154,
+      "retries": 0,
+      "status": "FAIL",
+      "timings_ms": {
+        "process_query_encodings": 0
+      }
+    },
+    "next": {
+      "case_id": "tiny-next",
+      "status": "PASS",
+      "documents": 1
+    },
+    "diagnostics": [
+      {
+        "case_id": "巨大-完整",
+        "response_bytes": 2235154,
+        "response_too_large": true,
+        "retrieval_ms": 38.2129,
+        "sent_bytes": 238,
+        "serialize_ms": 1.3589,
+        "transmit_ms": 0.0156
+      },
+      {
+        "case_id": "tiny-next",
+        "response_bytes": 12460,
+        "response_too_large": false,
+        "retrieval_ms": 2.8547,
+        "sent_bytes": 12460,
+        "serialize_ms": 0.0291,
+        "transmit_ms": 0.1854
+      }
+    ],
+    "stdout_bytes": 12783,
+    "stderr_bytes": 320,
+    "receipt": {
+      "path": "build/tool-integration-v1/oversize-resident-candidate2/summary.json",
+      "size": 1483,
+      "sha256": "ecad0a04dada942d866f6c041b0a953b72e845dedbc0eb259f5772ed81c991bd"
+    }
+  },
+  "retained_failed_attempts": [
+    {
+      "receipt": "rust-tests-attempt1.stderr",
+      "exit": 101,
+      "reason": "E0106 lifetime declaration, fixed before test/build"
+    },
+    {
+      "receipt": "rust-tests-attempt2.stderr",
+      "exit": 101,
+      "reason": "Windows pagefile allocation1455 under parallel compilation; no global config change; rerun single Cargo job"
+    },
+    {
+      "receipt": "topk-after-candidate1/summary.json",
+      "exit": 1,
+      "reason": "four multi-pack proof closures incorrectly ran before pack qualification; helper tuple/list comparison also reported false rank mismatches; both fixed and final ten rankings verified"
+    },
+    {
+      "receipt": "full-python-once.xml",
+      "exit": 1,
+      "reason": "1415 passed, 4 missing test-only text_probe.exe failures, 19 skipped, 55 passing subtests. Full suite command remains FAIL; only these four tests are rerun against the same built code plus the required helper."
+    },
+    {
+      "receipt": "resident-monolithic-candidate2/summary.json",
+      "exit": 1,
+      "reason": "Real cold ANN query breached five-second budget; fatal response and nonzero exit preserved. A separately invoked acceptance process succeeded; no automatic request/process retry."
+    }
+  ],
+  "not_run": [
+    "full120 quality matrix (rank/identity/fusion unchanged)",
+    "full151 structured business matrix (business algorithm unchanged)",
+    "new-machine acceptance",
+    "Pi/SakuraTool/Pool integration",
+    "full human source-fact review",
+    "live upstream refresh",
+    "source rights clearance",
+    "new wheel or source/model/ANN rebuild"
+  ],
+  "remaining_limits": [
+    "Unsafe/unknown engine errors and query timeouts are fatal, not recoverable by message matching.",
+    "A cold real monolithic ANN query did time out; uninterrupted cold/load performance is not promised.",
+    "QUALITY_FAIL and rights NOT_CLEARED remain; candidate mappings are not verified identities.",
+    "Final ordinary push/live dev SHA equality and independent review remain prerequisites for goal completion."
+  ]
+}

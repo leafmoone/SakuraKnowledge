@@ -21,17 +21,36 @@ impl PackRuntime {
   if packdir.exists(){for entry in std::fs::read_dir(&packdir)? {let path=entry?.path();let file=path.join("manifest.json");if !file.exists(){continue;}let manifest:Value=serde_json::from_slice(&std::fs::read(file)?)?;if manifest["schema"]!="sakura-source-pack-v1"{return Err("unsupported source manifest".into());}let id=manifest["pack_id"].as_str().ok_or("pack_id required")?.to_owned();if id.is_empty()||id.len()>128||id=="."||id==".."||!id.bytes().all(|b|b.is_ascii_alphanumeric()||b"-_.".contains(&b)){return Err("unsafe source pack_id".into());}let capabilities=manifest["capabilities"].as_array().ok_or("capabilities required")?;if !capabilities.iter().any(|v|v=="structured")||!capabilities.iter().any(|v|v=="lexical"){return Err("unsupported source capabilities".into());}let unique:BTreeSet<_>=capabilities.iter().filter_map(Value::as_str).collect();if unique.len()!=capabilities.len(){return Err("duplicate source capabilities".into());}let sem=capabilities.iter().any(|v|v=="semantic");let artifacts=manifest["artifacts"].as_object().ok_or("source artifacts required")?;let expected:BTreeSet<&str>=if sem{["snapshot","lexical_membership","mapping","index"].into_iter().collect()}else{["snapshot","lexical_membership"].into_iter().collect()};if artifacts.keys().map(String::as_str).collect::<BTreeSet<_>>()!=expected||(!sem&&!manifest["semantic"].is_null()){return Err("artifact capability contradiction".into());}let mut artifact_paths=BTreeSet::new();for item in artifacts.values(){if !artifact_paths.insert(item["path"].as_str().ok_or("artifact path required")?){return Err("duplicate artifact path".into());}}if capabilities.iter().any(|v|!matches!(v.as_str(),Some("structured"|"lexical"|"semantic"))){return Err("unsupported source capability".into());}if sem {if manifest["requires_model"]!="bge-m3"{return Err("unsupported_model_contract".into());}}else if !manifest["requires_model"].is_null(){return Err("lexical source must not require semantic model".into());}for field in ["source_ids","namespaces"]{let values=manifest[field].as_array().ok_or("source_ids/namespaces required")?;let mut seen=BTreeSet::new();if values.is_empty(){return Err("empty source_ids/namespaces".into());}for value in values{let s=value.as_str().ok_or("invalid source namespace/id")?;if s.is_empty()||s.len()>256||s.chars().any(char::is_control)||!seen.insert(s){return Err("unsafe/duplicate source namespace/id".into());}}}for item in manifest["artifacts"].as_object().ok_or("source artifacts required")?.values(){let artifact=Path::new(item["path"].as_str().ok_or("artifact path required")?);if artifact.is_absolute()||artifact.components().count()!=1||artifact.components().any(|c|!matches!(c,std::path::Component::Normal(_))){return Err("unsafe source artifact path".into());}if !path.join(artifact).is_file(){return Err("source_asset_missing".into());}}if packs.iter().any(|p:&SourcePack|p.id==id){return Err("duplicate pack_id".into());}packs.push(SourcePack{id,manifest,root:path});}}
   packs.sort_by(|a,b|a.id.cmp(&b.id));Ok(Self{root,packs,model_directory,bin_directory})
  }
- pub fn selected(&self,sources:&[String])->Result<Vec<&SourcePack>> {if sources.is_empty(){return Ok(self.packs.iter().collect());}let wanted:BTreeSet<_>=sources.iter().flat_map(|s|s.split(',')).filter(|s|!s.is_empty()).collect();for s in &wanted {if !self.packs.iter().any(|p|p.id==*s){return Err(format!("source_pack_missing: {s}").into());}}Ok(self.packs.iter().filter(|p|wanted.contains(p.id.as_str())).collect())}
+ pub fn selected(&self,sources:&[String])->Result<Vec<&SourcePack>> {
+  if sources.is_empty(){return Ok(self.packs.iter().collect());}
+  let mut wanted=BTreeSet::new();
+  for value in sources {for id in value.split(',') {
+   if id.is_empty()||id.len()>128||matches!(id,"."|"..")||!id.bytes().all(|b|b.is_ascii_alphanumeric()||b"-_.".contains(&b)) {return Err(crate::modular_cli::UsageError("invalid source pack ID".into()).into());}
+   wanted.insert(id);
+  }}
+  for s in &wanted {if !self.packs.iter().any(|p|p.id==*s){return Err(format!("source_pack_missing: {s}").into());}}
+  Ok(self.packs.iter().filter(|p|wanted.contains(p.id.as_str())).collect())
+ }
  pub fn list(&self)->Value {let installed:Vec<_>=self.packs.iter().map(|p|json!({"pack_id":p.id,"version":p.manifest["version"],"capabilities":p.manifest["capabilities"],"requires_model":p.manifest["requires_model"],"lexical_mode":p.manifest.get("lexical_mode").cloned().unwrap_or(json!("trusted_documents_and_identity")),"trusted_fts_documents":p.manifest["trusted_fts_documents"],"model_present":self.model_directory.join("bge-m3/manifest.json").is_file(),"status":if p.manifest["version"].is_string() && p.root.join("knowledge.sqlite").is_file(){"installed"}else{"invalid"}})).collect();let missing:Vec<String>=Vec::new();json!({"installed_packs":installed,"not_installed":missing,"model":{"id":"bge-m3","installed":self.model_directory.join("bge-m3/manifest.json").is_file()}})}
  pub fn structured(&self,command:&str,query:&str,args:&[String],sources:&[String])->Result<Value>{
-  let selected=self.selected(sources)?;let start=std::time::Instant::now();let mut parts=Vec::new();
-  let option=|name:&str|args.windows(2).find(|p|p[0]==name).map(|p|p[1].as_str());let kind=option("--kind");let ns=option("--namespace");let limit=option("--limit").or_else(||option("--topk")).map(str::parse::<u32>).transpose()?.unwrap_or(10);
-  if ["search","related","resolve-tag"].contains(&command)&&!(1..=100).contains(&limit){return Err(crate::Error::Invalid(if command=="search"{"topk must be 1..100".into()}else{"limit must be 1..100".into()}).into());}
+  let mut forwarded=Vec::new();
+  if command!="inspect" {forwarded.push(query.to_owned());}
+  forwarded.extend_from_slice(args);
+  for source in sources {forwarded.extend(["--source".to_owned(),source.clone()]);}
+  self.structured_parsed(&crate::modular_cli::parse(command,&forwarded)?)
+ }
+ pub fn structured_parsed(&self,options:&crate::modular_cli::ParsedCommand)->Result<Value>{
+  let command=options.command.as_str();let query=options.positionals.first().map(String::as_str).unwrap_or("");
+  let selected=self.selected(&options.sources)?;let start=std::time::Instant::now();let mut parts=Vec::new();
+  let kind=options.kind.as_deref();let ns=options.namespace.as_deref();let limit=options.limit;
   for pack in selected {if start.elapsed().as_secs_f64()>5.0{return Err("operation deadline exceeded".into());}let mut runtime=Runtime::open(pack.root.join("knowledge.sqlite"))?;runtime.set_deadline(start+std::time::Duration::from_secs(5));let value=match command {
-   "lookup"=>if args.iter().any(|a|a=="--key"){runtime.lookup_key(kind.ok_or(crate::Error::Invalid("exact key requires --kind and --namespace".into()))?,ns.ok_or(crate::Error::Invalid("exact key requires --kind and --namespace".into()))?,query)?}else{runtime.lookup(query,kind,ns)?},
-   "search"=>runtime.search(query,100,kind,ns)?,"ask"=>runtime.ask(query,kind,ns,option("--target-namespace").or_else(||option("--target-tag-namespace")))?,
-   "related"=>if args.len()>=2&&!args[0].starts_with("--"){runtime.related(query,&args[0],&args[1],option("--relation"),kind,limit)?}else{runtime.related(kind.ok_or("--kind required")?,ns.ok_or("--namespace required")?,query,option("--relation"),option("--filter"),limit)?},
-   "resolve-tag"=>runtime.resolve_tag(query,TagOptions{kind,namespace:ns,target_namespace:option("--target-namespace"),category:option("--category").map(str::parse).transpose()?,key:args.iter().any(|a|a=="--key"),limit})?,
+   "lookup"=>if options.key{runtime.lookup_key(kind.ok_or("--kind required")?,ns.ok_or("--namespace required")?,query)?}else{runtime.lookup(query,kind,ns)?},
+   "search"=>runtime.search(query,100,kind,ns)?,"ask"=>runtime.ask(query,kind,ns,options.target_namespace.as_deref())?,
+   "related"=>{
+    let (src_kind,src_ns,value,filter)=if options.positionals.len()==3{(options.positionals[0].as_str(),options.positionals[1].as_str(),options.positionals[2].as_str(),kind.or(options.filter.as_deref()))}else{(kind.ok_or("--kind required")?,ns.ok_or("--namespace required")?,query,options.filter.as_deref())};
+    if options.direction=="in"{runtime.related_in(src_kind,src_ns,value,options.relation.as_deref(),filter,limit)?}else{runtime.related(src_kind,src_ns,value,options.relation.as_deref(),filter,limit)?}
+   },
+   "resolve-tag"=>runtime.resolve_tag(query,TagOptions{kind,namespace:ns,target_namespace:options.target_namespace.as_deref(),category:options.category,key:options.key,limit})?,
    "inspect"=>runtime.inspect()?,_=>return Err("unsupported modular command".into())};parts.push((pack.id.clone(),value));}
   Ok(crate::response::bound_response(merge(command,query,parts,self.packs.iter().map(|p|p.id.clone()).collect(),limit as usize),start+std::time::Duration::from_secs(5))?)
  }
@@ -45,6 +64,7 @@ pub struct ModularSemantic {
 }
 #[cfg(feature="semantic")]
 impl ModularSemantic {
+ pub fn query_encodings(&self)->usize {self.encoder.as_ref().map_or(0,|encoder|encoder.borrow().query_encodings)}
  pub fn open(config:&Path,sources:&[String])->Result<Self>{
   let start=std::time::Instant::now();let runtime=PackRuntime::discover(config)?;
   let ids:Vec<_>=runtime.selected(sources)?.iter().map(|p|p.id.clone()).collect();let semantic:Vec<_>=runtime.packs.iter().filter(|p|ids.contains(&p.id)&&p.manifest["requires_model"]=="bge-m3").collect();
@@ -68,22 +88,23 @@ impl ModularSemantic {
    let mut candidates=semantic_federation::fuse(&parts,100)?;
    candidates.retain(|c|options.kind.as_ref().is_none_or(|k|c["entry"]["kind"]==*k)&&options.namespace.as_ref().is_none_or(|n|c["entry"]["namespace"]==*n));candidates.truncate(options.limit);
    let mut proofs=Vec::new();
-   for (id,_) in &parts {if let Some(h)=self.handles.get_mut(id) {
+   for (id,part) in &parts {if let Some(h)=self.handles.get_mut(id) {
     let local:Vec<_>=candidates.iter().filter(|c|c["source_packs"].as_array().unwrap().contains(&json!(id))).map(|c|{let mut c=c.clone();for f in ["provenance","trusted_pins"] {c[f]=json!(c[f].as_array().unwrap().iter().filter(|p|p["source_pack"]==*id).cloned().collect::<Vec<_>>());}c}).collect();
     diagnostic_trace(diagnostic,"materialize_begin",Some(id),start);
-    proofs.push((id.clone(),h.materialize_candidates(query,options,&local,start+std::time::Duration::from_secs(5))?));
+    proofs.push((id.clone(),h.materialize_candidates(query,options,&local,part["trusted_pins"].as_array().ok_or("invalid pins")?,start+std::time::Duration::from_secs(5))?));
     diagnostic_trace(diagnostic,"materialize_end",Some(id),start);
    }}
    let mut v=json!({"candidates":candidates,"documents":[],"sources":[],"evidence":[],"citations":[],"trusted_pins":[],"dense_hits":[],"lexical_hits":[],"warnings":[],"contract_version":"2","response_version":"sakura-global-distance-v1","query":query,"installed_packs":self.runtime.packs.iter().map(|p|p.id.clone()).collect::<Vec<_>>(),"participating_packs":parts.iter().map(|p|p.0.clone()).collect::<Vec<_>>(),"fusion_policy":"global_cosine_dense_once_plus_source_lexical_rrf60"});
    for (id,p) in &parts {if !self.handles.contains_key(id) {proofs.push((id.clone(),p.clone()));}}
-   for f in ["documents","sources","evidence","citations"] {for (id,p) in &proofs {for r in p[f].as_array().unwrap(){let mut r=r.clone();r["source_packs"]=json!([id]);if !v[f].as_array().unwrap().contains(&r){v[f].as_array_mut().unwrap().push(r);}}}}
-   for (id,p) in &parts {for pin in p["trusted_pins"].as_array().into_iter().flatten(){let mut pin=pin.clone();pin["source_packs"]=json!([id]);v["trusted_pins"].as_array_mut().unwrap().push(pin);}}
+   for f in ["documents","sources","evidence","citations"] {for (id,p) in &proofs {for r in p[f].as_array().unwrap(){let r=crate::semantic::qualify_public_record(r,id);if !v[f].as_array().unwrap().contains(&r){v[f].as_array_mut().unwrap().push(r);}}}}
+   for (id,p) in &parts {for pin in p["trusted_pins"].as_array().into_iter().flatten(){let pin=crate::semantic::qualify_public_record(pin,id);v["trusted_pins"].as_array_mut().unwrap().push(pin);}}
    let pinned:BTreeSet<_>=v["trusted_pins"].as_array().unwrap().iter().filter_map(key).collect();if pinned.len()>1 {v["warnings"]=json!(["multiple_trusted_identities_preserved_not_resolved"]);}
    v
   }else{merge("retrieve",query,parts.clone(),self.runtime.packs.iter().map(|p|p.id.clone()).collect(),100)};
   diagnostic_trace(diagnostic,"merge_end",None,start);
   let pins:BTreeSet<_>=parts.iter().flat_map(|p|p.1["trusted_pins"].as_array().into_iter().flatten()).filter_map(key).collect();
   if let Some(candidates)=value["candidates"].as_array_mut(){candidates.sort_by_key(|c|usize::from(!key(c).is_some_and(|k|pins.contains(&k))));candidates.truncate(options.limit);for (i,c) in candidates.iter_mut().enumerate(){c["hybrid_rank"]=json!(i+1);c["source_pack"]=c["source_packs"].clone();}}
+  crate::semantic::close_public_evidence(&mut value);
   value["hybrid"]=value["candidates"].clone();
   value["actual_tokens"]=json!(0);
   value["status"]=json!("PASS");value["identity_status"]=json!("not_asserted");value["promoted_identities"]=json!([]);value["canonical"]=Value::Null;value["entity_tag"]=Value::Null;
@@ -96,9 +117,9 @@ pub fn merge(command:&str,_query:&str,parts:Vec<(String,Value)>,installed:Vec<St
  result["installed_packs"]=json!(installed);result["participating_packs"]=json!(participating);
  for field in ["candidates","relations","descriptions","evidence_chain","citations","documents","sources","evidence","trusted_pins","dense_hits","lexical_hits","hybrid"] {
   let mut rows:BTreeMap<String,(Value,f64)>=BTreeMap::new();
-  for (id,value) in &parts {if let Some(items)=value[field].as_array(){for (rank,item) in items.iter().enumerate(){let identity=if ["candidates","trusted_pins","hybrid"].contains(&field){key(item).unwrap_or_else(||item.to_string())}else{item.to_string()};let record=rows.entry(identity).or_insert_with(||{let mut v=item.clone();v["source_packs"]=json!([]);(v,0.)});record.1+=1./(60.+(rank+1) as f64);if field=="candidates" {for nested in ["citations","descriptions","evidence_ids","source_ids","matched_documents"] {if let Some(other)=item[nested].as_array(){if record.0[nested].is_null(){record.0[nested]=json!([]);}if let Some(target)=record.0[nested].as_array_mut(){for value in other {if !target.contains(value){target.push(value.clone());}}}}}}let ids=record.0["source_packs"].as_array_mut().unwrap();if !ids.contains(&json!(id)){ids.push(json!(id));}}}}
+  for (id,value) in &parts {if let Some(items)=value[field].as_array(){for (rank,item) in items.iter().enumerate(){let mut qualified=item.clone();if command=="retrieve"&&["candidates","trusted_pins","documents","sources","evidence","citations"].contains(&field){#[cfg(feature="semantic")] {qualified=crate::semantic::qualify_public_record(item,id);}}let item=&qualified;let identity=if ["candidates","hybrid"].contains(&field)||(field=="trusted_pins"&&command!="retrieve"){key(item).unwrap_or_else(||item.to_string())}else if command=="retrieve"&&field=="documents"{format!("{id}\0{}",item["document_id"])}else if command=="retrieve"&&["trusted_pins","sources","evidence","citations"].contains(&field){format!("{id}\0{item}")}else{item.to_string()};let record=rows.entry(identity).or_insert_with(||{let mut v=item.clone();v["source_packs"]=json!([]);(v,0.)});record.1+=1./(60.+(rank+1) as f64);if field=="candidates" {let nested_fields:&[&str]=if command=="retrieve"{&["citations","descriptions","evidence_ids","source_ids","matched_documents","identity_evidence","aliases","source_fields_evidence","trusted_pins"]}else{&["citations","descriptions","evidence_ids","source_ids","matched_documents"]};for &nested in nested_fields {if let Some(other)=item[nested].as_array(){if record.0[nested].is_null(){record.0[nested]=json!([]);}if let Some(target)=record.0[nested].as_array_mut(){for value in other {if !target.contains(value){target.push(value.clone());}}}}}}let ids=record.0["source_packs"].as_array_mut().unwrap();if !ids.contains(&json!(id)){ids.push(json!(id));}}}}
   let mut rows:Vec<_>=rows.into_iter().collect();rows.sort_by(|a,b|{let priority=|v:&Value|if v["matched_by"]=="exact"{0}else if v["matched_by"]=="alias"{1}else{2};if field=="candidates"&&command=="search"{priority(&a.1.0).cmp(&priority(&b.1.0)).then_with(||b.1.1.total_cmp(&a.1.1)).then_with(||a.0.cmp(&b.0))}else{b.1.1.total_cmp(&a.1.1).then_with(||a.0.cmp(&b.0))}});
-  let values:Vec<_>=rows.into_iter().take(if field=="candidates"&&["search","retrieve"].contains(&command){limit}else{100}).map(|(_,r)|r.0).collect();if !values.is_empty()||result.get(field).is_some(){result[field]=json!(values);}
+  let values:Vec<_>=rows.into_iter().take(if field=="candidates"&&["search","retrieve"].contains(&command){limit}else if command=="retrieve"&&["trusted_pins","documents","sources","evidence","citations"].contains(&field){usize::MAX}else{100}).map(|(_,r)|r.0).collect();if !values.is_empty()||result.get(field).is_some(){result[field]=json!(values);}
  }
  if command=="search" {
   let exact_parts:Vec<_>=parts.iter().filter(|p|key(&p.1["entry_key"]).is_some()||p.1["status"]=="ambiguous").map(|p|p.0.clone()).collect();
@@ -109,6 +130,8 @@ pub fn merge(command:&str,_query:&str,parts:Vec<(String,Value)>,installed:Vec<St
  if command=="lookup"{let count=result["candidates"].as_array().map_or(0,Vec::len);result["status"]=json!(if count==0{"not_found"}else if count==1{"found"}else{"ambiguous"});}
  if ["lookup","ask","related"].contains(&command){let identities:BTreeSet<_>=parts.iter().filter_map(|p|key(&p.1["entry_key"])).chain(result["candidates"].as_array().into_iter().flatten().filter_map(key)).collect();if identities.len()==1 {if let Some((_,v))=parts.iter().find(|p|key(&p.1["entry_key"]).is_some()){for f in ["entry_key","canonical","matched_documents","source_fields","source_fields_evidence","source_fields_truncated","matched_by","source_id","evidence_id","tag_key"]{result[f]=v[f].clone();}if command!="lookup" {for f in ["status","answer","mapping_status","query","input_query","query_template","parsed_subject","target_namespace","warnings"]{if let Some(value)=v.get(f){result[f]=value.clone();}}}}}else if identities.len()>1 {for f in ["evidence_id","source_id","matched_by","matched_documents","source_fields","source_fields_evidence","source_fields_truncated"]{result.as_object_mut().unwrap().remove(f);}if command=="ask"{result["mapping_status"]=json!(if parts.iter().any(|p|p.1["mapping_status"]=="not_requested"){ "not_requested" }else{"entity_ambiguous"});result["answer"]=json!("Multiple source entity matches; specify a source key.");}result["status"]=json!(if command=="ask"{"entity_ambiguous"}else{"ambiguous"});result["entry_key"]=Value::Null;result["canonical"]=Value::Null;result["citations"]=json!([]);result["descriptions"]=json!([]);}}
  if command=="resolve-tag"{let targets:BTreeSet<_>=parts.iter().filter(|p|p.1["status"]=="resolved").filter_map(|p|key(&p.1["tag_key"])).collect();if targets.len()>1{result["status"]=json!("ambiguous");result["tag_key"]=Value::Null;}else if targets.len()==1{if let Some((_,v))=parts.iter().find(|p|p.1["status"]=="resolved"){result["status"]=json!("resolved");result["tag_key"]=v["tag_key"].clone();}}}
+ #[cfg(feature="semantic")]
+ if command=="retrieve" {crate::semantic::close_public_evidence(&mut result);}
  result
 }
 #[cfg(test)]mod tests {use super::*;

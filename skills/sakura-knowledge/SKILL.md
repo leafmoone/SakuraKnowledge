@@ -14,12 +14,37 @@ Resident JSONL: `powershell -NoProfile -File ./scripts/sknow.ps1 serve`;
 send `{"case_id":"q1","query":"初音ミク","limit":5}` then EOF to close.
 The launcher supplies the default DB/ef2048 pack documented in README, never builds or
 downloads during a query. Model/tokenizer/ORT/ANN/membership must already exist locally.
-Single and resident semantic outputs have the same1MiB UTF-8/newline bound; explicit
-oversize FAIL is not truncated success. Candidates with cited evidence are retrieval
-results, **not automatic tags or verified identities**. Original quality gate remains
+Single and resident semantic outputs have the same **2MiB (2,097,152 bytes)** bound,
+including serialized UTF-8 and the final newline. An explicit `response_too_large`
+FAIL is never a truncated success. Public documents and their source/evidence/citation
+closure belong only to the selected Top-K candidates or independently retained trusted
+pins; multiple documents and source-qualified proofs may support one typed key.
+Candidates with cited evidence are retrieval results, **not automatic tags or verified
+identities**. Original quality gate remains
 FAIL (semantic R10 .975<1);120 is a development regression set, not held-out quality.
 Use lookup/ask/resolve-tag for exact aliases and source-backed tag mapping, not
 semantic similarity as a substitute.
+
+Resident lifecycle (monolithic and `--config`): expect one `opened` event and correlate
+one final response per input line using `case_id`. Recoverable input/filter/source/limit
+errors emit complete FAIL with stable `error`, `message` and `retries=0`, then continue
+in the same process/session. An oversize response does the same; do not retry it
+automatically. Invalid JSON or missing/invalid case ID gives `case_id=null`: treat this
+as a protocol input error, not as a response to a guessed ID. Valid IDs are echoed
+verbatim. IDs must be nonempty and their JSON-string encoding must fit the wire
+limit minus1024 reserved bytes; otherwise they are invalid protocol IDs (null),
+not truncated strings. Natural EOF exits0 even after recoverable FAILs. Asset/engine errors whose
+state is not known safe, stdin I/O and stdout write/flush failures are fatal nonzero
+exits; do not silently retry/restart or claim an undelivered response. The five-second
+query budget remains; timeout recovery is not assumed safe. A cold monolithic
+query actually timed out in this round; the failed attempt is retained in
+[the acceptance receipt](../../docs/tool-integration.md), not marked PASS.
+
+Modular CLI rejects unknown, missing-value and command-inapplicable options.
+`--source` supports repeated options/commas but not empty values/list members.
+`related --direction in|out` selects incoming/outgoing one-hop relations.
+`resolve-tag --target-namespace` and `--target-tag-namespace` are aliases; conflicting
+values are usage errors, never permission to infer a verified mapping.
 
 - Exact entity: `sknow lookup DATABASE VALUE --key --kind character --namespace bangumi.character`
 - Search: `sknow search DATABASE QUERY --limit 20`

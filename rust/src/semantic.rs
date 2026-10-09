@@ -12,6 +12,9 @@ use std::{
 use tokenizers::Tokenizer;
 use usearch::{Index, MetricKind, ScalarKind};
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+#[path = "semantic_evidence.rs"]
+mod semantic_evidence;
+pub(crate) use semantic_evidence::{close_public_evidence, qualify_public_record};
 const ROWS: usize = 52664;
 const WARNING: &str =
     "Retrieval relevance is not verified identity or permission to promote identity.";
@@ -951,6 +954,9 @@ pub struct SemanticEngine {
     pub open_timings_ms: Value,
 }
 impl SemanticEngine {
+    pub fn query_encodings(&self) -> usize {
+        self.encoder.as_ref().map_or(0, |encoder| encoder.borrow().query_encodings)
+    }
     pub fn open_source(base_db: impl AsRef<Path>, source_manifest: impl AsRef<Path>, model_manifest: impl AsRef<Path>, encoder: Rc<RefCell<SharedEncoder>>) -> Result<Self> {
         require(encoder.borrow().model_manifest.as_ref() == Some(&std::fs::canonicalize(model_manifest.as_ref())?), "shared model manifest mismatch")?;
         let p = source_manifest.as_ref();
@@ -1136,7 +1142,8 @@ impl SemanticEngine {
             "fts_membership_allocation_bytes":fts_members.capacity() * 24,
             "membership_count":full_members.len(),
             "membership_payload_bytes":full_members.len() * std::mem::size_of::<(i64,i64)>(),
-            "membership_allocation_bytes":full_members.capacity() * std::mem::size_of::<(i64,i64)>()});
+            "membership_allocation_bytes":full_members.capacity() * std::mem::size_of::<(i64,i64)>(),
+            "model_sessions":1});
         Ok(Self {
             encoder: Some(Rc::new(RefCell::new(SharedEncoder { tokenizer, session, model_manifest: None, last_tokens: 0, query_encodings:0 }))),
             index: Some(index),
@@ -1155,6 +1162,7 @@ impl SemanticEngine {
     pub fn retrieve(&mut self, query: &str, options: &RetrieveOptions) -> Result<Value> {
         options.validate()?;
         let start = Instant::now();
+        let before = self.query_encodings();
         let vector = self.encoder.as_ref().ok_or("no shared encoder")?.borrow_mut().encode(query)?;
         let tokens = self.encoder.as_ref().ok_or("no shared encoder")?.borrow().last_tokens;
         let encoding_ms = ms(start);
@@ -1162,6 +1170,8 @@ impl SemanticEngine {
         result["actual_tokens"] = json!(tokens);
         result["timings_ms"]["ort"] = json!(encoding_ms);
         result["timings_ms"]["total"] = json!(ms(start));
+        result["timings_ms"]["query_encodings"] = json!(self.query_encodings() - before);
+        result["timings_ms"]["process_query_encodings"] = json!(self.query_encodings());
         require(ms(start) <= 5000.0, "query_budget_exceeded")?;
         Ok(result)
     }
@@ -1233,6 +1243,9 @@ impl SemanticEngine {
             }
         }
         let mut evidence = BTreeMap::new();
+        for proof in semantic_evidence::pin_proofs(&self.base, query, &pins, &mut sources)? {
+            evidence.insert((text(&proof, "source_id")?.to_owned(), text(&proof, "evidence_id")?.to_owned(), String::new()), proof);
+        }
         for candidate in fused.iter().take(100) {
             let key = EntryKey::parse(&candidate["entry"])?;
             if !options.accepts(&key) {
@@ -1286,7 +1299,7 @@ impl SemanticEngine {
         if compiled.is_empty() {
             warnings.push("no_fts_tokens");
         }
-        let citations:Vec<_>=documents.values().map(|d|json!({"document_id":d["document_id"],"source_id":d["source_id"],"evidence_id":d["evidence_id"]})).collect();
+        let citations:Vec<_>=documents.values().map(|d|json!({"document_id":d["document_id"],"source_id":d["source_id"],"evidence_id":d["evidence_id"]})).chain(evidence.values().filter(|e|e.get("document_id").is_none()).cloned()).collect();
         let mut result = json!({"contract_version":"2","response_version":"p4-semantic-evidence-v1","pack_version":self.manifest["pack_version"],"snapshot":self.manifest["snapshot"],"contract":self.manifest["contract"],"query":query,"status":"PASS","identity_status":"not_asserted","promoted_identities":[],"canonical":null,"entity_tag":null,"warnings":warnings,"trusted_pins":pins,"dense_hits":dense,"lexical_hits":lexical,"hybrid":fused.iter().take(100).collect::<Vec<_>>(),"candidates":candidates,"documents":documents.into_values().collect::<Vec<_>>(),"sources":sources.into_values().collect::<Vec<_>>(),"evidence":evidence.into_values().collect::<Vec<_>>(),"citations":citations,"actual_tokens":tokens,"filter_policy":"post_fusion_no_backfill"});
         if options.include_vector {
             result["vector"] = json!(vector);
@@ -1296,12 +1309,16 @@ impl SemanticEngine {
         require(elapsed <= 5000.0, "query_budget_exceeded")?;
         result["timings_ms"] = json!({"tokenize":tokenize_ms,"ort":ort_ms,"ann":ann_ms,"index_search":index_search_ms,"dense_mapping":dense_mapping_ms,"bm25":bm25_ms,"pins_sql":lexical_stages.0,"bm25_sql":lexical_stages.1,"fusion_evidence":fusion_ms,"total":elapsed});
         result["lexical_work"] = json!({"cursor_rows":lexical_work.0,"eligible_rows":lexical_work.1,"boundary_ties":lexical_work.2});
+        close_public_evidence(&mut result);
         Ok(result)
     }
-    pub fn materialize_candidates(&mut self, query: &str, options: &RetrieveOptions, candidates: &[Value], deadline: Instant) -> Result<Value> {
+    pub fn materialize_candidates(&mut self, query: &str, options: &RetrieveOptions, candidates: &[Value], all_pins: &[Value], deadline: Instant) -> Result<Value> {
         require(candidates.len() <= 100, "global materialization limit")?;
         self.base.progress_handler(1000, Some(move || Instant::now() > deadline));
         let mut accepted=Vec::new(); let mut documents=BTreeMap::new();let mut sources=BTreeMap::new();let mut evidence=BTreeMap::new();
+        for proof in semantic_evidence::pin_proofs(&self.base, query, all_pins, &mut sources)? {
+            evidence.insert((text(&proof, "source_id")?.to_owned(), text(&proof, "evidence_id")?.to_owned(), String::new()), proof);
+        }
         for candidate in candidates {
             require(Instant::now() <= deadline, "query_budget_exceeded")?;
             let key=EntryKey::parse(&candidate["entry"])?;
@@ -1325,8 +1342,11 @@ impl SemanticEngine {
             }
             accepted.push(candidate.clone());
         }
-        let citations:Vec<_>=documents.values().map(|d|json!({"document_id":d["document_id"],"source_id":d["source_id"],"evidence_id":d["evidence_id"]})).collect();
-        Ok(json!({"candidates":accepted,"documents":documents.into_values().collect::<Vec<_>>(),"sources":sources.into_values().collect::<Vec<_>>(),"evidence":evidence.into_values().collect::<Vec<_>>(),"citations":citations}))
+        let citations:Vec<_>=documents.values().map(|d|json!({"document_id":d["document_id"],"source_id":d["source_id"],"evidence_id":d["evidence_id"]})).chain(evidence.values().filter(|e|e.get("document_id").is_none()).cloned()).collect();
+        // These local documents already belong to selected candidates. Candidate
+        // origins are federated while local proof rows are not yet pack-qualified:
+        // close only in the caller after qualification, never before that boundary.
+        Ok(json!({"candidates":accepted,"trusted_pins":all_pins,"documents":documents.into_values().collect::<Vec<_>>(),"sources":sources.into_values().collect::<Vec<_>>(),"evidence":evidence.into_values().collect::<Vec<_>>(),"citations":citations}))
     }
 }
 fn validate_source_manifest(source: &Value) -> Result<()> {
@@ -1364,12 +1384,17 @@ pub(crate) fn lexical_retrieve_until(db: impl AsRef<Path>, query: &str, options:
             let key=json!({"kind":kind,"namespace":namespace,"value":value});let did=did.to_string();let eid=eid.to_string();
             let hit=json!({"entry":key,"document_id":did,"source_id":sid,"evidence_id":refid,"rank":hits.len()+1,"score":score});hits.push(hit);
             documents.push(json!({"entry_key":key,"entry_id":eid,"document_id":did,"title":title,"original":original,"source_id":sid,"evidence_id":refid,"status":status,"text_provenance":payload["text_provenance"]}));
-            evidence.push(json!({"entry_id":eid,"document_id":did,"source_id":sid,"evidence_id":refid}));add_source(&conn,&mut sources,&sid)?;
+            evidence.push(json!({"entry_id":eid,"document_id":did,"source_id":sid,"evidence_id":refid,"status":status}));add_source(&conn,&mut sources,&sid)?;
         }
     }
     candidates.truncate(options.limit);
-    let citations:Vec<_>=documents.iter().map(|d|json!({"document_id":d["document_id"],"source_id":d["source_id"],"evidence_id":d["evidence_id"]})).collect();
-    Ok(json!({"status":"PASS","query":query,"response_version":"sakura-lexical-evidence-v1","identity_status":"not_asserted","candidates":candidates,"trusted_pins":pins,"dense_hits":[],"lexical_hits":hits,"hybrid":[],"documents":documents,"sources":sources.into_values().collect::<Vec<_>>(),"evidence":evidence,"citations":citations,"promoted_identities":[],"canonical":null,"entity_tag":null,"timings_ms":{},"lexical_mode":"trusted_documents_and_identity"}))
+    let retained:Vec<_>=candidates.iter().chain(pins.iter()).cloned().collect();
+    let identities=semantic_evidence::identity_proofs(&conn,&retained,&mut sources)?;
+    evidence.extend(identities.iter().cloned());
+    let citations:Vec<_>=documents.iter().map(|d|json!({"document_id":d["document_id"],"source_id":d["source_id"],"evidence_id":d["evidence_id"]})).chain(identities).collect();
+    let mut result=json!({"status":"PASS","query":query,"response_version":"sakura-lexical-evidence-v1","identity_status":"not_asserted","candidates":candidates,"trusted_pins":pins,"dense_hits":[],"lexical_hits":hits,"hybrid":[],"documents":documents,"sources":sources.into_values().collect::<Vec<_>>(),"evidence":evidence,"citations":citations,"promoted_identities":[],"canonical":null,"entity_tag":null,"timings_ms":{},"lexical_mode":"trusted_documents_and_identity"});
+    close_public_evidence(&mut result);
+    Ok(result)
 }
 type LexicalDocument = (f64,String,String,String,i64,i64);
 // Preserve the original proof SQL's document depth, eligibility, numeric scores and

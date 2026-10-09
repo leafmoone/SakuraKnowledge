@@ -89,24 +89,22 @@ fn semantic_retrieve(args: &[String]) -> ExitCode {
 fn modular_command(args:&[String])->ExitCode {
     #[cfg(feature="semantic")]
     let started=Instant::now();
-    if args.get(1).is_some_and(|s|!["packs","lookup","search","related","ask","inspect","retrieve","resolve-tag"].contains(&s.as_str())) {return usage_error(&format!("argument command: invalid choice: '{}' (choose from 'lookup', 'search', 'related', 'ask', 'inspect', 'runtime', 'resolve-tag')",args[1]));}
-    if args.len()==2 && args.get(1).is_some_and(|s|["lookup","search","ask"].contains(&s.as_str())) {return usage_error("database and query are required");}
+    if args.len()<2||args[0].is_empty()||args[0].starts_with("--") {return usage_error("--config PATH COMMAND required");}
+    let parsed=match sakura_knowledge_runtime::modular_cli::parse(&args[1],&args[2..]) {Ok(value)=>value,Err(error)=>return usage_error(&error.to_string())};
     let run=||->sakura_knowledge_runtime::modular::Result<serde_json::Value>{
-        let config=args.first().ok_or("--config PATH COMMAND required")?;
-        let command=args.get(1).ok_or("command required")?;
-        let runtime=sakura_knowledge_runtime::modular::PackRuntime::discover(std::path::Path::new(config))?;
-        if command=="packs" {return Ok(runtime.list());}
-        let mut forwarded=Vec::new();let mut sources=Vec::new();let mut i=2;
-        while i<args.len(){if args[i]=="--source" {sources.push(args.get(i+1).ok_or("--source value required")?.clone());i+=2;}else{forwarded.push(args[i].clone());i+=1;}}
-        let query=forwarded.first().map(String::as_str).unwrap_or("");
+        let config=&args[0];let command=parsed.command.as_str();
         #[cfg(feature="semantic")]
         if command=="retrieve" {
-            let mut engine=sakura_knowledge_runtime::modular::ModularSemantic::open(std::path::Path::new(config),&sources)?;
-            let option=|name:&str|forwarded.windows(2).find(|p|p[0]==name).map(|p|p[1].clone());
-            let options=sakura_knowledge_runtime::semantic::RetrieveOptions{kind:option("--kind"),namespace:option("--namespace"),limit:option("--topk").or_else(||option("--limit")).map(|s|s.parse()).transpose()?.unwrap_or(10),include_vector:false};
-            return engine.retrieve(query,&options,&sources);
+            let options=sakura_knowledge_runtime::semantic::RetrieveOptions{kind:parsed.kind.clone(),namespace:parsed.namespace.clone(),limit:parsed.limit as usize,include_vector:false};
+            options.validate().map_err(|error|sakura_knowledge_runtime::modular_cli::UsageError(error.to_string()))?;
+            let mut engine=sakura_knowledge_runtime::modular::ModularSemantic::open(std::path::Path::new(config),&parsed.sources)?;
+            return engine.retrieve(&parsed.positionals[0],&options,&parsed.sources);
         }
-        runtime.structured(command,query,&forwarded[forwarded.len().min(1)..],&sources)
+        #[cfg(not(feature="semantic"))]
+        if command=="retrieve" {return Err(sakura_knowledge_runtime::modular_cli::UsageError("retrieve requires --features semantic".into()).into());}
+        let runtime=sakura_knowledge_runtime::modular::PackRuntime::discover(std::path::Path::new(config))?;
+        if command=="packs" {return Ok(runtime.list());}
+        runtime.structured_parsed(&parsed)
     };
     match run(){Ok(value)=>{
         #[cfg(feature="semantic")]
@@ -118,7 +116,7 @@ fn modular_command(args:&[String])->ExitCode {
             };
         }
         println!("{value}");ExitCode::SUCCESS
-    },Err(error)=>{let typ=if error.downcast_ref::<Error>().is_some(){"ValueError"}else{"PackError"};eprintln!("{}",serde_json::json!({"error":typ,"message":error.to_string()}));ExitCode::from(2)}}
+    },Err(error)=>{let typ=if error.downcast_ref::<sakura_knowledge_runtime::modular_cli::UsageError>().is_some(){"UsageError"}else if error.downcast_ref::<Error>().is_some(){"ValueError"}else{"PackError"};eprintln!("{}",serde_json::json!({"error":typ,"message":error.to_string()}));ExitCode::from(2)}}
 }
 
 fn main() -> ExitCode {

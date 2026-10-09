@@ -9,12 +9,15 @@ use serde_json::{json, Value};
 use std::path::Path;
 use std::time::{Duration, Instant};
 pub mod modular;
+pub mod modular_cli;
 mod resolver;
 mod response;
 #[cfg(feature = "semantic")]
 pub mod semantic;
 #[cfg(feature = "semantic")]
 pub mod semantic_jsonl;
+#[cfg(feature = "semantic")]
+pub mod resident;
 pub use resolver::TagOptions;
 mod search;
 mod unicode16;
