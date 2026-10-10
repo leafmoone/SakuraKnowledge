@@ -14,6 +14,8 @@ use usearch::{Index, MetricKind, ScalarKind};
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[path = "semantic_evidence.rs"]
 mod semantic_evidence;
+#[path = "embedding_cache.rs"]
+mod embedding_cache;
 pub(crate) use semantic_evidence::{close_public_evidence, qualify_public_record};
 const ROWS: usize = 52664;
 const WARNING: &str =
@@ -37,6 +39,13 @@ impl EntryKey {
             namespace: text(v, "namespace")?.into(),
             value: text(v, "value")?.into(),
         };
+        Self::from_parts(k.kind, k.namespace, k.value)
+    }
+    fn from_parts(kind: String, namespace: String, value: String) -> Result<Self> {
+        let k = Self { kind, namespace, value };
+        for (name, value) in [("kind", &k.kind), ("namespace", &k.namespace), ("value", &k.value)] {
+            require(!value.trim().is_empty(), &format!("missing/nontext {name}"))?;
+        }
         require(
             matches!(
                 k.kind.as_str(),
@@ -884,6 +893,8 @@ pub struct SharedEncoder {
     model_manifest: Option<PathBuf>,
     last_tokens: usize,
     pub query_encodings: usize,
+    pub cache_hits: usize,
+    cache: embedding_cache::EmbeddingCache,
 }
 impl SharedEncoder {
     fn from_paths(paths: &BTreeMap<String, PathBuf>) -> Result<Self> {
@@ -899,7 +910,7 @@ impl SharedEncoder {
         require(session.inputs().len() == 2 && session.inputs()[0].name() == "input_ids"
             && session.inputs()[1].name() == "attention_mask" && session.outputs().len() == 1
             && session.outputs()[0].name() == "embeddings", "unexpected ONNX graph interface")?;
-        Ok(Self { tokenizer, session, model_manifest: None, last_tokens: 0, query_encodings:0 })
+        Ok(Self { tokenizer, session, model_manifest: None, last_tokens: 0, query_encodings:0, cache_hits:0, cache:embedding_cache::EmbeddingCache::new() })
     }
     pub fn open_model(model_manifest: impl AsRef<Path>, bin_dir: impl AsRef<Path>) -> Result<Self> {
         let p = model_manifest.as_ref();
@@ -923,6 +934,11 @@ impl SharedEncoder {
     }
     pub fn encode(&mut self, query: &str) -> Result<Vec<f32>> {
         validate_query(query)?;
+        if let Some((vector, tokens)) = self.cache.get(query) {
+            self.last_tokens = tokens;
+            self.cache_hits += 1;
+            return Ok(vector);
+        }
         let encoded = self.tokenizer.encode(query, true).map_err(|e| e.to_string())?;
         let ids: Vec<i64> = encoded.get_ids().iter().map(|&v| i64::from(v)).collect();
         let mask: Vec<i64> = encoded.get_attention_mask().iter().map(|&v| i64::from(v)).collect();
@@ -934,6 +950,7 @@ impl SharedEncoder {
         let (shape, values) = output["embeddings"].try_extract_tensor::<f32>()?;
         require(shape.as_ref() == [1_i64, 1024], "unexpected embeddings shape")?;
         validate_vector(values)?;
+        self.cache.insert(query, values, tokens);
         Ok(values.to_vec())
     }
 }
@@ -954,6 +971,7 @@ pub struct SemanticEngine {
     encoder: Option<Rc<RefCell<SharedEncoder>>>,
     index: Option<Index>,
     mapping: Connection,
+    mapping_projected: bool,
     lexical: Connection,
     base: Connection,
     manifest: Value,
@@ -1005,7 +1023,7 @@ impl SemanticEngine {
         index.view(ip)?;
         require(index.size() == rows && index.dimensions() == 1024 && index.metric_kind() == MetricKind::Cos && index.scalar_kind() == ScalarKind::I8 && index.connectivity() == 16, "index contract mismatch")?;
         configure_search_expansion(&index, &manifest["contract"])?;
-        Ok(Self { encoder: Some(encoder), index: Some(index), mapping, lexical: readonly(&paths["snapshot"] )?, base, manifest, mode: Mode::Full, rows, full_members, fts_members, open_timings_ms: json!({}) })
+        Ok(Self { encoder: Some(encoder), index: Some(index), mapping, mapping_projected: true, lexical: readonly(&paths["snapshot"] )?, base, manifest, mode: Mode::Full, rows, full_members, fts_members, open_timings_ms: json!({}) })
     }
     pub fn open(base_db: impl AsRef<Path>, manifest_path: impl AsRef<Path>) -> Result<Self> {
         let total = Instant::now();
@@ -1097,6 +1115,7 @@ impl SemanticEngine {
         let membership_ms = ms(member_start);
         let mapping = readonly(&paths["mapping"])?;
         validate_mapping(&mapping, rows)?;
+        let mapping_projected = mapping_projection(&mapping)?;
         let metadata_ms = ms(total);
         let start = Instant::now();
         let tokenizer = Tokenizer::from_file(&paths["tokenizer"]).map_err(|e| e.to_string())?;
@@ -1155,9 +1174,10 @@ impl SemanticEngine {
             "membership_allocation_bytes":full_members.capacity() * std::mem::size_of::<(i64,i64)>(),
             "model_sessions":1});
         Ok(Self {
-            encoder: Some(Rc::new(RefCell::new(SharedEncoder { tokenizer, session, model_manifest: None, last_tokens: 0, query_encodings:0 }))),
+            encoder: Some(Rc::new(RefCell::new(SharedEncoder { tokenizer, session, model_manifest: None, last_tokens: 0, query_encodings:0, cache_hits:0, cache:embedding_cache::EmbeddingCache::new() }))),
             index: Some(index),
             mapping,
+            mapping_projected,
             lexical,
             base,
             manifest,
@@ -1181,6 +1201,8 @@ impl SemanticEngine {
         result["timings_ms"]["ort"] = json!(encoding_ms);
         result["timings_ms"]["total"] = json!(ms(start));
         result["timings_ms"]["query_encodings"] = json!(self.query_encodings() - before);
+        result["timings_ms"]["embedding_cache_hit"] = json!(self.query_encodings() == before);
+        result["timings_ms"]["process_embedding_cache_hits"] = json!(self.encoder.as_ref().unwrap().borrow().cache_hits);
         result["timings_ms"]["process_query_encodings"] = json!(self.query_encodings());
         require(ms(start) <= 5000.0, "query_budget_exceeded")?;
         Ok(result)
@@ -1221,6 +1243,7 @@ impl SemanticEngine {
         let mapping_start = Instant::now();
         let dense = if let Some(matches) = matches { dense_hits_for(
             &self.mapping,
+            self.mapping_projected,
             &matches.keys,
             &matches.distances,
             self.rows,
@@ -1240,9 +1263,8 @@ impl SemanticEngine {
         };
         let bm25_ms = ms(start);
         let start = Instant::now();
-        for pin in &pins {
-            validate_pin(&self.base, query, pin)?;
-        }
+        let mut proofs = ProofContext::new(&self.base, query);
+        for pin in &pins { proofs.pin(pin)?; }
         if branches_only {
             for hit in &dense { require(hit["distance"].as_f64().is_some_and(f64::is_finite), "nonfinite ANN distance")?; }
             return Ok(json!({"contract":self.manifest["contract"],"snapshot":self.manifest["snapshot"],"dense_hits":dense,"lexical_hits":lexical,"trusted_pins":pins,"candidates":[],"timings_ms":{"ann":ann_ms,"bm25":bm25_ms,"total":ms(total)}}));
@@ -1259,7 +1281,7 @@ impl SemanticEngine {
             }
         }
         let mut evidence = BTreeMap::new();
-        for proof in semantic_evidence::pin_proofs(&self.base, query, &pins, &mut sources)? {
+        for proof in semantic_evidence::pin_proofs(&mut proofs, &pins, &mut sources)? {
             evidence.insert((text(&proof, "source_id")?.to_owned(), text(&proof, "evidence_id")?.to_owned(), String::new()), proof);
         }
         for candidate in fused.iter().take(100) {
@@ -1272,7 +1294,7 @@ impl SemanticEngine {
                 "FULL episode excluded",
             )?;
             let mut candidate = candidate.clone();
-            let eid = trusted_entry(&self.base, &key)?;
+            let eid = proofs.entry(&key)?;
             candidate["typed_identity"] =
                 json!({"namespace":key.namespace,"kind":key.kind,"entry_id":eid.to_string()});
             for p in candidate["provenance"]
@@ -1337,7 +1359,8 @@ impl SemanticEngine {
         require(candidates.len() <= 100, "global materialization limit")?;
         self.base.progress_handler(1000, Some(move || Instant::now() > deadline));
         let mut accepted=Vec::new(); let mut documents=BTreeMap::new();let mut sources=BTreeMap::new();let mut evidence=BTreeMap::new();
-        for proof in semantic_evidence::pin_proofs(&self.base, query, all_pins, &mut sources)? {
+        let mut proofs = ProofContext::new(&self.base, query);
+        for proof in semantic_evidence::pin_proofs(&mut proofs, all_pins, &mut sources)? {
             evidence.insert((text(&proof, "source_id")?.to_owned(), text(&proof, "evidence_id")?.to_owned(), String::new()), proof);
         }
         for candidate in candidates {
@@ -1345,7 +1368,7 @@ impl SemanticEngine {
             let key=EntryKey::parse(&candidate["entry"])?;
             if !options.accepts(&key) {continue;}
             require(key.kind != "episode", "FULL episode excluded")?;
-            let eid=trusted_entry(&self.base,&key)?;
+            let eid=proofs.entry(&key)?;
             for p in candidate["provenance"].as_array().ok_or("invalid provenance")? {
                 let hit=&p["hit"];
                 require(EntryKey::parse(&hit["entry"])? == key, "hit typed identity mismatch")?;
@@ -1359,7 +1382,7 @@ impl SemanticEngine {
             }
             for pin in candidate["trusted_pins"].as_array().ok_or("invalid pins")? {
                 require(EntryKey::parse(&pin["entry"])? == key,"pin typed identity mismatch")?;
-                validate_pin(&self.base,query,pin)?;add_source(&self.base,&mut sources,text(pin,"source_id")?)?;
+                proofs.pin(pin)?;add_source(&self.base,&mut sources,text(pin,"source_id")?)?;
             }
             accepted.push(candidate.clone());
         }
@@ -1480,15 +1503,42 @@ fn configure_search_expansion(index: &usearch::Index, contract: &Value) -> Resul
 fn trusted_entry(c: &Connection, k: &EntryKey) -> Result<i64> {
     Ok(c.query_row("SELECT id FROM entries WHERE kind=? AND namespace=? AND value=? AND conflicted=0 AND EXISTS(SELECT 1 FROM entry_evidence v JOIN sources s ON s.source_id=v.source_id WHERE v.entry_id=entries.id AND v.status='source_backed')",params![k.kind,k.namespace,k.value],|r|r.get(0))?)
 }
-fn validate_pin(c: &Connection, query: &str, p: &Value) -> Result<()> {
-    let k = EntryKey::parse(&p["entry"])?;
-    let eid = trusted_entry(c, &k)?;
-    let s = text(p, "source_id")?;
-    let e = text(p, "evidence_id")?;
-    let ok:bool=match text(p,"match")? {
-        "exact"=>{ require(query==k.value,"exact pin query mismatch")?; c.query_row("SELECT EXISTS(SELECT 1 FROM entry_evidence v JOIN sources s ON s.source_id=v.source_id WHERE v.entry_id=? AND v.source_id=? AND v.evidence_id=? AND v.status='source_backed')",params![eid,s,e],|r|r.get(0))? },
-        "alias"=>c.query_row("SELECT EXISTS(SELECT 1 FROM aliases a JOIN sources s ON s.source_id=a.source_id WHERE a.entry_id=? AND a.source_id=? AND a.evidence_id=? AND a.text=? AND a.status='source_backed')",params![eid,s,e,query],|r|r.get(0))?,_=>return Err("invalid pin match".into()) };
-    require(ok, "untrusted pin evidence")
+struct ProofContext<'a> {
+    conn: &'a Connection,
+    query: &'a str,
+    entries: BTreeMap<EntryKey, i64>,
+    pins: BTreeSet<(EntryKey, String, String, String)>,
+}
+impl<'a> ProofContext<'a> {
+    fn new(conn: &'a Connection, query: &'a str) -> Self {
+        Self { conn, query, entries: BTreeMap::new(), pins: BTreeSet::new() }
+    }
+    fn entry(&mut self, key: &EntryKey) -> Result<i64> {
+        if let Some(id) = self.entries.get(key) { return Ok(*id); }
+        let id = trusted_entry(self.conn, key)?;
+        self.entries.insert(key.clone(), id);
+        Ok(id)
+    }
+    fn pin(&mut self, pin: &Value) -> Result<i64> {
+        let key = EntryKey::parse(&pin["entry"])?;
+        let source = text(pin, "source_id")?;
+        let evidence = text(pin, "evidence_id")?;
+        let matched = text(pin, "match")?;
+        let identity = (key.clone(), matched.to_owned(), source.to_owned(), evidence.to_owned());
+        let eid = self.entry(&key)?;
+        if self.pins.contains(&identity) { return Ok(eid); }
+        let ok: bool = match matched {
+            "exact" => {
+                require(self.query == key.value, "exact pin query mismatch")?;
+                self.conn.query_row("SELECT EXISTS(SELECT 1 FROM entry_evidence v JOIN sources s ON s.source_id=v.source_id WHERE v.entry_id=? AND v.source_id=? AND v.evidence_id=? AND v.status='source_backed')",params![eid,source,evidence],|r|r.get(0))?
+            },
+            "alias" => self.conn.query_row("SELECT EXISTS(SELECT 1 FROM aliases a JOIN sources s ON s.source_id=a.source_id WHERE a.entry_id=? AND a.source_id=? AND a.evidence_id=? AND a.text=? AND a.status='source_backed')",params![eid,source,evidence,self.query],|r|r.get(0))?,
+            _ => return Err("invalid pin match".into()),
+        };
+        require(ok, "untrusted pin evidence")?;
+        self.pins.insert(identity);
+        Ok(eid)
+    }
 }
 fn add_source(c: &Connection, sources: &mut BTreeMap<String, Value>, s: &str) -> Result<()> {
     if !sources.contains_key(s) {
@@ -1522,8 +1572,28 @@ fn field_string(v: &Value, n: &str) -> Result<String> {
     Ok(text(v, n)?.into())
 }
 
+fn mapping_projection(c: &Connection) -> Result<bool> {
+    let columns: BTreeSet<String> = c.prepare("PRAGMA table_info(chunks)")?
+        .query_map([], |row| row.get(1))?.collect::<std::result::Result<_, _>>()?;
+    let projected = ["chunk_id","document_id","kind","namespace","value","source_id","evidence_id"].iter().all(|name| columns.contains(*name));
+    c.prepare(if projected { "SELECT chunk_id,document_id,kind,namespace,value,source_id,evidence_id FROM chunks LIMIT 0" } else { "SELECT metadata FROM chunks LIMIT 0" })?;
+    Ok(projected)
+}
+fn mapped_text(value: &rusqlite::types::Value, name: &str) -> Result<String> {
+    match value {
+        rusqlite::types::Value::Text(text) if !text.trim().is_empty() => Ok(text.clone()),
+        _ => Err(format!("missing/nontext {name}").into()),
+    }
+}
+fn mapped_id(value: &rusqlite::types::Value, name: &str) -> Result<String> {
+    if let rusqlite::types::Value::Integer(id) = value {
+        require(*id >= 0, "negative mapping ID")?;
+        Ok(id.to_string())
+    } else { mapped_text(value, name) }
+}
 fn dense_hits_for(
     c: &Connection,
+    projected: bool,
     keys: &[u64],
     distances: &[f32],
     rows: usize,
@@ -1539,8 +1609,7 @@ fn dense_hits_for(
     let mut positions = BTreeSet::new();
     let mut previous = f32::NEG_INFINITY;
     let mut hits = Vec::new();
-    let projected = c.prepare("SELECT chunk_id,document_id,kind,namespace,value,source_id,evidence_id FROM chunks LIMIT 0").is_ok();
-    let mut stmt = c.prepare_cached(if projected { "SELECT json_object('chunk_id',chunk_id,'document_id',document_id,'entry_key',json_object('kind',kind,'namespace',namespace,'value',value),'source_id',source_id,'evidence_id',evidence_id) FROM chunks WHERE position=?" } else {"SELECT metadata FROM chunks WHERE position=?"})?;
+    let mut stmt = c.prepare_cached(if projected { "SELECT chunk_id,document_id,kind,namespace,value,source_id,evidence_id FROM chunks WHERE position=?" } else { "SELECT metadata FROM chunks WHERE position=?" })?;
     for (&p, &d) in keys.iter().zip(distances) {
         require(
             p < rows as u64 && positions.insert(p),
@@ -1551,15 +1620,35 @@ fn dense_hits_for(
             "nonfinite/unordered ANN distance",
         )?;
         previous = d;
-        let raw: String = stmt.query_row([p], |r| r.get(0))?;
-        let row: Value = serde_json::from_str(&raw)?;
-        let k = EntryKey::parse(&row["entry_key"])?;
+        let (key, columns, legacy) = if projected {
+            let columns: Vec<rusqlite::types::Value> = stmt.query_row([p], |row| {
+                (0..7).map(|i| row.get(i)).collect()
+            })?;
+            if columns.iter().any(|v| matches!(v, rusqlite::types::Value::Blob(_)) || matches!(v, rusqlite::types::Value::Real(n) if !n.is_finite())) {
+                // Preserve JSONB interpretation and JSON nonfinite-number rejection
+                // without serializing ordinary typed rows.
+                let raw: String = c.prepare_cached("SELECT json_object('chunk_id',chunk_id,'document_id',document_id,'entry_key',json_object('kind',kind,'namespace',namespace,'value',value),'source_id',source_id,'evidence_id',evidence_id) FROM chunks WHERE position=?")?.query_row([p], |r| r.get(0))?;
+                let row: Value = serde_json::from_str(&raw)?;
+                (EntryKey::parse(&row["entry_key"])? , Vec::new(), row)
+            } else {
+                let key = EntryKey::from_parts(mapped_text(&columns[2],"kind")?, mapped_text(&columns[3],"namespace")?, mapped_text(&columns[4],"value")?)?;
+                (key, columns, Value::Null)
+            }
+        } else {
+            let raw: String = stmt.query_row([p], |r| r.get(0))?;
+            let row: Value = serde_json::from_str(&raw)?;
+            (EntryKey::parse(&row["entry_key"])? , Vec::new(), row)
+        };
+        let k = key;
         require(
             m != Mode::Full || k.kind != "episode",
             "FULL episode excluded",
         )?;
         if raw_chunks || (seen.insert(k.clone()) && hits.len() < 100) {
-            let mut hit=json!({"entry":k.json(),"rank":hits.len()+1,"score":1.0-f64::from(d),"document_id":field_string(&row,"document_id")?,"chunk_id":field_string(&row,"chunk_id")?,"source_id":text(&row,"source_id")?,"evidence_id":text(&row,"evidence_id")?});
+            let (chunk, document, source, evidence) = if !columns.is_empty() {
+                (mapped_id(&columns[0],"chunk_id")?, mapped_id(&columns[1],"document_id")?, mapped_text(&columns[5],"source_id")?, mapped_text(&columns[6],"evidence_id")?)
+            } else { (field_string(&legacy,"chunk_id")?, field_string(&legacy,"document_id")?, text(&legacy,"source_id")?.to_owned(), text(&legacy,"evidence_id")?.to_owned()) };
+            let mut hit=json!({"entry":k.json(),"rank":hits.len()+1,"score":1.0-f64::from(d),"document_id":document,"chunk_id":chunk,"source_id":source,"evidence_id":evidence});
             if raw_chunks { hit["distance"]=json!(d);hit["local_position"]=json!(p); }
             hits.push(hit);
         }

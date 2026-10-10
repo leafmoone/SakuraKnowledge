@@ -117,7 +117,7 @@ impl ModularSemantic {
   value["hybrid"]=value["candidates"].clone();
   value["actual_tokens"]=json!(0);
   value["status"]=json!("PASS");value["identity_status"]=json!("not_asserted");value["promoted_identities"]=json!([]);value["canonical"]=Value::Null;value["entity_tag"]=Value::Null;
-  value["semantic_capable_packs"]=json!(semantic);value["pack_timings_ms"]=json!(parts.iter().map(|p|json!({"source_pack":p.0,"timings_ms":p.1["timings_ms"]})).collect::<Vec<_>>());value["timings_ms"]=json!({"total":start.elapsed().as_secs_f64()*1000.,"query_encodings":self.encoder.as_ref().map_or(0,|e|e.borrow().query_encodings)-before,"process_query_encodings":self.encoder.as_ref().map_or(0,|e|e.borrow().query_encodings)});if start.elapsed().as_secs_f64()>5.0{return Err("query_budget_exceeded".into());}Ok(value)
+  value["semantic_capable_packs"]=json!(semantic);value["pack_timings_ms"]=json!(parts.iter().map(|p|json!({"source_pack":p.0,"timings_ms":p.1["timings_ms"]})).collect::<Vec<_>>());value["timings_ms"]=json!({"total":start.elapsed().as_secs_f64()*1000.,"query_encodings":self.encoder.as_ref().map_or(0,|e|e.borrow().query_encodings)-before,"embedding_cache_hit":vector.is_some() && self.encoder.as_ref().is_some_and(|e|e.borrow().query_encodings==before),"process_embedding_cache_hits":self.encoder.as_ref().map_or(0,|e|e.borrow().cache_hits),"process_query_encodings":self.encoder.as_ref().map_or(0,|e|e.borrow().query_encodings)});if start.elapsed().as_secs_f64()>5.0{return Err("query_budget_exceeded".into());}Ok(value)
  }
 }
 

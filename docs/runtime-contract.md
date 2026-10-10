@@ -127,6 +127,24 @@ are `UsageError` (stderr JSON, exit 2, empty stdout), not silently ignored.
 - Existing valid commands retain their business JSON semantics. This parser
   tightening does not change the structured query/identity algorithms.
 
+## Session embedding cache
+
+A shared BGE encoder owns an exact, unnormalized query-string LRU with at most
+64 entries and 512 KiB of accounted key/vector/container storage (allocator
+bookkeeping and process RSS are separate). Only shape-checked, finite, normalized
+vectors are inserted. A new encoder/session starts empty; models never share a
+cache. Invalid encoder inputs and failed encodings are not inserted. A later
+retrieval failure does not turn a valid embedding into a cached failure. No search response,
+identity proof or deadline is cached: every request still ranks current prepared
+assets, validates its proofs and observes its own five-second deadline.
+
+`timings_ms.query_encodings` and `process_query_encodings` count actual encoder
+calls, so a hit contributes zero. `embedding_cache_hit` explicitly marks a hit;
+`process_embedding_cache_hits` is session cumulative. Raw spellings, case and
+whitespace remain distinct cache keys; filters can reuse the same embedding.
+Request-local proof reuse is bound to one database connection and query, and
+includes the complete typed key, match type, source ID and evidence ID.
+
 ## Structured search projection
 
 Exact/alias trust and ambiguity are determined from up to 101 lightweight

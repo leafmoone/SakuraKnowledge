@@ -1,4 +1,4 @@
-use super::{add_source, text, trusted_entry, validate_pin, EntryKey, Result};
+use super::{add_source, text, ProofContext, EntryKey, Result};
 use rusqlite::{params, Connection};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
@@ -31,13 +31,12 @@ pub(crate) fn qualify_public_record(record: &Value, pack: &str) -> Value {
 }
 
 /// Publish every independently validated pin, even when its key is outside TopK.
-pub(super) fn pin_proofs(conn: &Connection, query: &str, pins: &[Value], sources: &mut BTreeMap<String, Value>) -> Result<Vec<Value>> {
+pub(super) fn pin_proofs(context: &mut ProofContext<'_>, pins: &[Value], sources: &mut BTreeMap<String, Value>) -> Result<Vec<Value>> {
     let mut proofs = Vec::new();
     for pin in pins {
-        validate_pin(conn, query, pin)?;
+        let eid = context.pin(pin)?;
         let entry = EntryKey::parse(&pin["entry"])?;
-        let eid = trusted_entry(conn, &entry)?;
-        add_source(conn, sources, text(pin, "source_id")?)?;
+        add_source(context.conn, sources, text(pin, "source_id")?)?;
         let proof = json!({"entry_key":entry.json(),"entry_id":eid.to_string(),"source_id":pin["source_id"],"evidence_id":pin["evidence_id"],"status":"source_backed"});
         if !proofs.contains(&proof) { proofs.push(proof); }
     }
@@ -56,10 +55,11 @@ fn collect_nested<'a>(record: &'a Value, proofs: &mut Vec<&'a Value>) {
 pub(super) fn identity_proofs(conn: &Connection, records: &[Value], sources: &mut BTreeMap<String, Value>) -> Result<Vec<Value>> {
     let mut proofs = Vec::new();
     let mut checked = BTreeSet::new();
+    let mut context = ProofContext::new(conn, "");
     let mut supported = conn.prepare_cached("SELECT EXISTS(SELECT 1 FROM entry_evidence WHERE entry_id=?1 AND source_id=?2 AND evidence_id=?3 AND status='source_backed' UNION ALL SELECT 1 FROM aliases WHERE entry_id=?1 AND source_id=?2 AND evidence_id=?3 AND status='source_backed')")?;
     for record in records {
         let entry = EntryKey::parse(record.get("entry").or_else(|| record.get("entry_key")).unwrap_or(record))?;
-        let eid = trusted_entry(conn, &entry)?;
+        let eid = context.entry(&entry)?;
         let mut nested = Vec::new();
         collect_nested(record, &mut nested);
         for proof in nested {
