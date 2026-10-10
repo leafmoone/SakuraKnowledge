@@ -588,6 +588,10 @@ impl Runtime {
         kind: Option<&str>,
         namespace: Option<&str>,
     ) -> Result<Value> {
+        self.lookup_limited(query, kind, namespace, 100)
+    }
+
+    fn lookup_limited(&mut self, query: &str, kind: Option<&str>, namespace: Option<&str>, candidate_limit: usize) -> Result<Value> {
         self.check_deadline()?;
         if query.is_empty() || query.chars().count() > MAX_QUERY_CHARS {
             return Err(Error::Invalid(
@@ -621,15 +625,18 @@ impl Runtime {
             v
         };
         let mut paired: Vec<(String, Value)> = Vec::new();
-        for (id, k, ns, v, loc) in raw {
+        // SQL already establishes trusted exact/alias identities. Preserve the
+        // full ambiguity count while describing only the returned projection.
+        let identity_count = raw.len();
+        for (id, k, ns, v, loc) in raw.into_iter().take(candidate_limit) {
             let alias_text = if query != v { Some(query) } else { None };
             if let Some(c) = self.candidate_for(id, &k, &ns, &v, loc.as_deref(), alias_text)? {
                 paired.push((k, c));
             }
         }
-        let status = if paired.is_empty() {
+        let status = if identity_count == 0 {
             "not_found"
-        } else if paired.len() == 1 {
+        } else if identity_count == 1 {
             "found"
         } else {
             "ambiguous"
@@ -641,11 +648,11 @@ impl Runtime {
             .take(100)
             .collect::<Vec<_>>());
         if let Some((kind, c)) = paired.first() {
-            if paired.len() == 1 {
+            if identity_count == 1 {
                 Self::apply_found(&mut result, c, kind);
             }
         }
-        if paired.len() > 100 {
+        if identity_count > 100 {
             result["warnings"]
                 .as_array_mut()
                 .unwrap()
@@ -717,7 +724,7 @@ impl Runtime {
         let started = Instant::now();
         self.last_search_profile = json!({"scanned_rows":0,"materialized_matched_documents":0,
                                          "returned_matched_body_utf8_bytes":0});
-        let mut exact = self.lookup(query, kind, namespace)?;
+        let mut exact = self.lookup_limited(query, kind, namespace, topk as usize)?;
         self.last_search_profile["exact_identity_assembly_s"] =
             json!(started.elapsed().as_secs_f64());
         let compiled = match_query(query)?;

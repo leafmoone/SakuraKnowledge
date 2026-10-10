@@ -127,11 +127,28 @@ are `UsageError` (stderr JSON, exit 2, empty stdout), not silently ignored.
 - Existing valid commands retain their business JSON semantics. This parser
   tightening does not change the structured query/identity algorithms.
 
+## Structured search projection
+
+Exact/alias trust and ambiguity are determined from up to 101 lightweight
+identities before descriptions are assembled. Search assembles only its requested
+Top-K; `candidate_limit_reached` still records more than 100 trusted identities.
+The 512 KiB structured response bound applies to the returned projection.
+`response_budget_truncated` no longer reports an oversized discarded lookup
+intermediate when the requested search Top-K itself fits. Final-response overflow
+continues to use the existing truncation/error contract.
+
+Filtered Python FTS consumes rank-ordered complete tie groups. If its 10,000-row
+scan cap is exhausted it retries the historical fully ordered query, preserving
+the selected tie subset and scan-limit warning; this fallback can cost an extra
+scan rather than improve latency.
+
 ## Retrieve Top-K public evidence
 
 Internal bounded lexical/ANN hits retain their original depth and participate in
 unchanged RRF/fusion. The public candidate Top-K ordering is not a wire-size tuning
-parameter. After final selection, `documents` contains only documents supporting
+parameter. Full document bodies are fetched after final selection and proof
+closure; ranking metadata and trust checks retain their original depth.
+After final selection, `documents` contains only documents supporting
 selected typed keys, plus necessary proof for independently retained trusted pins.
 `sources`, `evidence` and `citations` retain that dependency closure, including
 source-backed identity proofs where no document is needed. Unselected FTS matches

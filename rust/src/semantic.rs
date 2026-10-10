@@ -1186,9 +1186,15 @@ impl SemanticEngine {
         Ok(result)
     }
     pub fn federation_contract(&self) -> Value { self.manifest["contract"].clone() }
-    pub fn retrieve_branches_encoded(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32]) -> Result<Value> { self.retrieve_internal(query, options, vector, true) }
-    pub fn retrieve_encoded(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32]) -> Result<Value> { self.retrieve_internal(query, options, vector, false) }
-    fn retrieve_internal(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32], branches_only: bool) -> Result<Value> {
+    pub fn retrieve_branches_encoded(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32]) -> Result<Value> { self.retrieve_internal(query, options, vector, true, false) }
+    pub fn retrieve_encoded(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32]) -> Result<Value> { self.retrieve_internal(query, options, vector, false, false) }
+    pub(crate) fn retrieve_deferred_encoded(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32]) -> Result<Value> {
+        self.retrieve_internal(query, options, vector, false, true)
+    }
+    pub(crate) fn hydrate_documents(&self, response: &mut Value, pack: &str, deadline: Instant) -> Result<()> {
+        hydrate_documents(&self.base, response, pack, deadline)
+    }
+    fn retrieve_internal(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32], branches_only: bool, defer_bodies: bool) -> Result<Value> {
         let total = Instant::now();
         options.validate()?;
         if self.index.is_some() { validate_vector(vector)?; }
@@ -1275,7 +1281,12 @@ impl SemanticEngine {
             {
                 let hit = &p["hit"];
                 let did = text(hit, "document_id")?;
-                let doc=self.base.query_row("SELECT title,original,status,source_id,evidence_id FROM documents WHERE id=? AND entry_id=? AND status IN ('source_backed','generated_from_evidence')",params![did,eid],|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?,r.get::<_,String>(2)?,r.get::<_,String>(3)?,r.get::<_,String>(4)?)))?;
+                let sql = if defer_bodies {
+                    "SELECT '', '',status,source_id,evidence_id FROM documents WHERE id=? AND entry_id=? AND status IN ('source_backed','generated_from_evidence')"
+                } else {
+                    "SELECT title,original,status,source_id,evidence_id FROM documents WHERE id=? AND entry_id=? AND status IN ('source_backed','generated_from_evidence')"
+                };
+                let doc=self.base.query_row(sql,params![did,eid],|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?,r.get::<_,String>(2)?,r.get::<_,String>(3)?,r.get::<_,String>(4)?)))?;
                 require(
                     hit["source_id"] == doc.3 && hit["evidence_id"] == doc.4,
                     "document evidence mismatch",
@@ -1373,9 +1384,15 @@ pub fn lexical_retrieve(db: impl AsRef<Path>, query: &str, options: &RetrieveOpt
     lexical_retrieve_until(db, query, options, Instant::now()+std::time::Duration::from_secs(5))
 }
 pub(crate) fn lexical_retrieve_until(db: impl AsRef<Path>, query: &str, options: &RetrieveOptions, deadline: Instant) -> Result<Value> {
+    lexical_retrieve_projection(db.as_ref(), query, options, deadline, false)
+}
+pub(crate) fn lexical_retrieve_deferred(db: &Path, query: &str, options: &RetrieveOptions, deadline: Instant) -> Result<Value> {
+    lexical_retrieve_projection(db, query, options, deadline, true)
+}
+fn lexical_retrieve_projection(db: &Path, query: &str, options: &RetrieveOptions, deadline: Instant, defer_bodies: bool) -> Result<Value> {
     options.validate()?;
     validate_query(query)?;
-    let mut runtime=crate::Runtime::open(db.as_ref())?;
+    let mut runtime=crate::Runtime::open(db)?;
     runtime.set_deadline(deadline);
     let response=runtime.search(query,100,options.kind.as_deref(),options.namespace.as_deref())?;
     let mut candidates=response["candidates"].as_array().cloned().unwrap_or_default();
@@ -1386,7 +1403,7 @@ pub(crate) fn lexical_retrieve_until(db: impl AsRef<Path>, query: &str, options:
     let mut hits=Vec::new();let mut documents=Vec::new();let mut sources=BTreeMap::new();let mut evidence=Vec::new();
     if !compiled.is_empty() {
         let selected=rank_lexical_documents(&conn,&compiled,deadline)?;
-        let mut stmt=conn.prepare("SELECT title,original,source_id,evidence_id,status,payload FROM documents WHERE id=? AND entry_id=?")?;
+        let mut stmt=conn.prepare("SELECT '', '',source_id,evidence_id,status,payload FROM documents WHERE id=? AND entry_id=?")?;
         for (score,kind,namespace,value,did,eid) in selected {
             require(Instant::now()<=deadline,"query_budget_exceeded lexical materialization")?;
             let (title,original,sid,refid,status,payload):(String,String,String,String,String,String)=stmt.query_row(params![did,eid],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?,r.get(5)?)))?;
@@ -1404,7 +1421,29 @@ pub(crate) fn lexical_retrieve_until(db: impl AsRef<Path>, query: &str, options:
     let citations:Vec<_>=documents.iter().map(|d|json!({"document_id":d["document_id"],"source_id":d["source_id"],"evidence_id":d["evidence_id"]})).chain(identities).collect();
     let mut result=json!({"status":"PASS","query":query,"response_version":"sakura-lexical-evidence-v1","identity_status":"not_asserted","candidates":candidates,"trusted_pins":pins,"dense_hits":[],"lexical_hits":hits,"hybrid":[],"documents":documents,"sources":sources.into_values().collect::<Vec<_>>(),"evidence":evidence,"citations":citations,"promoted_identities":[],"canonical":null,"entity_tag":null,"timings_ms":{},"lexical_mode":"trusted_documents_and_identity"});
     close_public_evidence(&mut result);
+    if !defer_bodies { hydrate_documents(&conn, &mut result, "", deadline)?; }
     Ok(result)
+}
+// Used only after the final candidate limit and pack-qualified evidence closure.
+// Ranking/proof metadata stays at its historical depth; discarded bodies never
+// cross the SQL/Rust boundary. Recheck the exact retained document binding.
+pub(crate) fn hydrate_lexical_documents(db: &Path, response: &mut Value, pack: &str, deadline: Instant) -> Result<()> {
+    hydrate_documents(&readonly(db)?, response, pack, deadline)
+}
+fn hydrate_documents(conn: &Connection, response: &mut Value, pack: &str, deadline: Instant) -> Result<()> {
+    conn.progress_handler(1000, Some(move || Instant::now() > deadline));
+    let mut stmt = conn.prepare_cached("SELECT title,original,status,source_id,evidence_id FROM documents WHERE id=? AND entry_id=?")?;
+    for doc in response["documents"].as_array_mut().ok_or("invalid documents")? {
+        let local = pack.is_empty() && doc.get("source_packs").is_none();
+        if !local && !doc["source_packs"].as_array().is_some_and(|ids| ids.iter().any(|id| id == pack)) { continue; }
+        require(Instant::now() <= deadline, "query_budget_exceeded document hydration")?;
+        let (title, original, status, sid, eid): (String,String,String,String,String) = stmt.query_row(
+            params![text(doc,"document_id")?,text(doc,"entry_id")?], |r| Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?)))?;
+        require(doc["status"] == status && doc["source_id"] == sid && doc["evidence_id"] == eid,
+            "document evidence mismatch during hydration")?;
+        doc["title"] = json!(title); doc["original"] = json!(original);
+    }
+    Ok(())
 }
 type LexicalDocument = (f64,String,String,String,i64,i64);
 // Preserve the original proof SQL's document depth, eligibility, numeric scores and

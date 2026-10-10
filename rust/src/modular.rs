@@ -82,7 +82,7 @@ impl ModularSemantic {
   let vector=if selected.iter().any(|p|p.manifest["requires_model"]=="bge-m3"){Some(self.encoder.as_ref().ok_or("semantic_model_missing: bge-m3")?.borrow_mut().encode(query)?)}else{None};
   diagnostic_trace(diagnostic,"encoding_end",None,start);
   let multi=selected.iter().filter(|p|p.manifest["requires_model"]=="bge-m3").count()>1;
-  for pack in selected {diagnostic_trace(diagnostic,"pack_begin",Some(&pack.id),start);let response=if pack.manifest["requires_model"]=="bge-m3"{let h=self.handles.get_mut(&pack.id).ok_or("semantic pack not opened")?;if multi {h.retrieve_branches_encoded(query,&branch_options,vector.as_ref().unwrap())?}else{h.retrieve_encoded(query,&branch_options,vector.as_ref().unwrap())?}}else{crate::semantic::lexical_retrieve_until(pack.root.join("knowledge.sqlite"),query,&branch_options,start+std::time::Duration::from_secs(5))?};diagnostic_trace(diagnostic,"pack_end",Some(&pack.id),start);parts.push((pack.id.clone(),response));}
+  for pack in selected {diagnostic_trace(diagnostic,"pack_begin",Some(&pack.id),start);let response=if pack.manifest["requires_model"]=="bge-m3"{let h=self.handles.get_mut(&pack.id).ok_or("semantic pack not opened")?;if multi {h.retrieve_branches_encoded(query,&branch_options,vector.as_ref().unwrap())?}else{h.retrieve_deferred_encoded(query,&branch_options,vector.as_ref().unwrap())?}}else{crate::semantic::lexical_retrieve_deferred(&pack.root.join("knowledge.sqlite"),query,&branch_options,start+std::time::Duration::from_secs(5))?};diagnostic_trace(diagnostic,"pack_end",Some(&pack.id),start);parts.push((pack.id.clone(),response));}
   let semantic:Vec<_>=parts.iter().filter(|(id,_)|self.handles.contains_key(id)).map(|p|p.0.clone()).collect();
   let mut value=if multi {
    let mut candidates=semantic_federation::fuse(&parts,100)?;
@@ -105,6 +105,15 @@ impl ModularSemantic {
   let pins:BTreeSet<_>=parts.iter().flat_map(|p|p.1["trusted_pins"].as_array().into_iter().flatten()).filter_map(key).collect();
   if let Some(candidates)=value["candidates"].as_array_mut(){candidates.sort_by_key(|c|usize::from(!key(c).is_some_and(|k|pins.contains(&k))));candidates.truncate(options.limit);for (i,c) in candidates.iter_mut().enumerate(){c["hybrid_rank"]=json!(i+1);c["source_pack"]=c["source_packs"].clone();}}
   crate::semantic::close_public_evidence(&mut value);
+  let deadline=start+std::time::Duration::from_secs(5);
+  for (id,_) in &parts {
+   if let Some(handle)=self.handles.get(id) {
+    if !multi {handle.hydrate_documents(&mut value,id,deadline)?;}
+   } else {
+    let pack=self.runtime.packs.iter().find(|p|p.id==*id).ok_or("source pack missing during hydration")?;
+    crate::semantic::hydrate_lexical_documents(&pack.root.join("knowledge.sqlite"),&mut value,id,deadline)?;
+   }
+  }
   value["hybrid"]=value["candidates"].clone();
   value["actual_tokens"]=json!(0);
   value["status"]=json!("PASS");value["identity_status"]=json!("not_asserted");value["promoted_identities"]=json!([]);value["canonical"]=Value::Null;value["entity_tag"]=Value::Null;

@@ -7,7 +7,7 @@ from functools import wraps
 from . import CONTRACT_VERSION
 from .model import IDENTITY_TRUSTED, TEXT_TRUSTED, EntryKey, match_query
 from .response import FIELD_NAMES, RESPONSE_VERSION, bound_response, source_observations
-from .search import FILTERED_SQL, select_rows
+from .search import FILTERED_SQL, FILTERED_STREAM_SQL, select_rows
 from .search import SQL as SEARCH_SQL
 from .storage import readonly
 
@@ -216,8 +216,11 @@ class Knowledge:
                 "evidence_id": identity_proofs[0]["evidence_id"] if identity_proofs else None,
                 "citations": citations}
 
-    @bounded_response
     def lookup(self, query=None, *, key=None, kind=None, namespace=None):
+        return self._lookup(query, key=key, kind=kind, namespace=namespace)
+
+    @bounded_response
+    def _lookup(self, query=None, *, key=None, kind=None, namespace=None, candidate_limit=100):
         self._budget()
         # Identity resolution: source-anchored evidence only; a generated
         # alias alone can never resolve an identity.
@@ -239,16 +242,19 @@ class Knowledge:
                 f"AND (? IS NULL OR e.kind=?) AND (? IS NULL OR e.namespace=?) "
                 f"AND {trusted} ORDER BY e.kind,e.namespace,e.value LIMIT 101",
                 (query, query, kind, kind, namespace, namespace)).fetchall()
+        # The SQL proves both entry trust and the matching alias (or exact key).
+        # Count all 101 lightweight identities before hydrating returned rows.
+        identity_count = len(rows)
         paired = [(r, self.describe(r, query if key is None and query != r["value"]
-                                    else None)) for r in rows]
+                                    else None)) for r in rows[:candidate_limit]]
         # An alias-only match needs its matching trusted alias, not unrelated
         # entry evidence; a direct value or full key needs trusted entry evidence.
         paired = [(r, c) for r, c in paired if c["citations"]]
         rows = [r for r, _ in paired]
         candidates = [c for _, c in paired]
-        result = self.result(query, "not_found" if not rows else
-                             "found" if len(rows) == 1 else "ambiguous", candidates[:100])
-        if len(rows) == 1:
+        result = self.result(query, "not_found" if not identity_count else
+                             "found" if identity_count == 1 else "ambiguous", candidates[:100])
+        if identity_count == 1:
             result["entry_key"] = candidates[0]["entry_key"]
             result["canonical"] = candidates[0]
             result["descriptions"] = candidates[0]["descriptions"]
@@ -262,7 +268,7 @@ class Knowledge:
             result["citations"] = candidates[0]["citations"]
             if rows[0]["kind"] == "tag":
                 result["tag_key"] = {k: rows[0][k] for k in ("namespace", "value")}
-        if len(rows) > 100:
+        if identity_count > 100:
             result["warnings"].append("candidate_limit_reached")
         return result
 
@@ -274,7 +280,7 @@ class Knowledge:
         started = time.perf_counter()
         self.last_search_profile = {"scanned_rows": 0, "materialized_matched_documents": 0,
                                     "returned_matched_body_utf8_bytes": 0}
-        exact = self.lookup(query, kind=kind, namespace=namespace)
+        exact = self._lookup(query, kind=kind, namespace=namespace, candidate_limit=topk)
         self.last_search_profile["exact_identity_assembly_s"] = time.perf_counter() - started
         compiled = match_query(query)
         if len(exact["candidates"]) >= topk:
@@ -290,7 +296,9 @@ class Knowledge:
         seen = {(c["entry_key"]["kind"], c["entry_key"]["namespace"],
                  c["entry_key"]["value"]) for c in candidates}
         started = time.perf_counter()
-        rows = self._execute(FILTERED_SQL if kind or namespace else SEARCH_SQL,
+        filtered = kind is not None or namespace is not None
+        original_seen = seen.copy()
+        rows = self._execute(FILTERED_STREAM_SQL if filtered else SEARCH_SQL,
                              (compiled, kind, namespace))
         self.last_search_profile["fts_execute_first_row_s"] = time.perf_counter() - started
         started = time.perf_counter()
@@ -299,6 +307,13 @@ class Knowledge:
                                                         self._check_deadline)
         finally:
             rows.close()
+        if filtered and truncated:
+            rows = self._execute(FILTERED_SQL, (compiled, kind, namespace))
+            try:
+                selected, scanned, truncated = select_rows(rows, original_seen,
+                    topk - len(candidates), self._check_deadline)
+            finally:
+                rows.close()
         self.last_search_profile.update(scanned_rows=scanned, selected_identities=len(selected),
                                         fts_select_s=time.perf_counter() - started)
         self.last_search_profile["identity_field_assembly_s"] = 0.0

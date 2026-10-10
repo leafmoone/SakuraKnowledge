@@ -19,6 +19,13 @@ FILTERED_SQL = SQL.replace("search_fts.rank AS score", "bm25(search_fts) AS scor
     "CROSS JOIN documents d ON d.id=search_fts.document_id")
 
 
+# FTS5 can stream rank order without sorting the whole filtered result. At the
+# scan cap callers retry FILTERED_SQL to preserve its historical tie subset.
+FILTERED_STREAM_SQL = FILTERED_SQL.replace("bm25(search_fts) AS score", "search_fts.rank AS score").replace(
+    "WHERE search_fts MATCH ?1", "WHERE search_fts MATCH ?1 AND rank MATCH 'bm25()'").replace(
+    "ORDER BY score,e.kind,e.namespace,e.value,search_fts.rowid", "ORDER BY search_fts.rank")
+
+
 def identity(row):
     return row["kind"], row["namespace"], row["value"]
 
