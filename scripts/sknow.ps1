@@ -53,8 +53,33 @@ if ($command -eq 'serve') {
     try {
         $inputReader = [System.IO.StreamReader]::new([Console]::OpenStandardInput(), $utf8)
         $writer = [System.IO.StreamWriter]::new($child.StandardInput.BaseStream, $utf8)
-        while ($null -ne ($line = $inputReader.ReadLine())) { $writer.WriteLine($line); $writer.Flush() }
-        $writer.Dispose()
+        # A caller may keep stdin open after the native watchdog exits. Never
+        # block the launcher on the next input line (or on a full child pipe).
+        function Wait-ChildIo($task) {
+            while (-not $task.IsCompleted) {
+                if ($child.WaitForExit(50)) { return $false }
+            }
+            return -not $child.HasExited
+        }
+        while (-not $child.HasExited) {
+            $read = $inputReader.ReadLineAsync()
+            if (-not (Wait-ChildIo $read)) { break }
+            $line = $read.GetAwaiter().GetResult()
+            if ($null -eq $line) { $writer.Dispose(); break }
+            try {
+                $write = $writer.WriteLineAsync($line)
+                if (-not (Wait-ChildIo $write)) { break }
+                $write.GetAwaiter().GetResult()
+                $flush = $writer.FlushAsync()
+                if (-not (Wait-ChildIo $flush)) { break }
+                $flush.GetAwaiter().GetResult()
+            } catch {
+                if (-not $child.HasExited) { throw }
+                break
+            }
+        }
+        # Do not dispose a reader with a pending console read, or flush a
+        # writer after child exit; either can wait on an abandoned pipe.
         $child.WaitForExit()
         exit $child.ExitCode
     } finally { if (-not $child.HasExited) { $child.Kill(); $child.WaitForExit() }; $child.Dispose() }
