@@ -98,6 +98,8 @@ project/
 
 `tools.generic_semantic`（可选 `--batch-size 4`）按文档投影、按批编码，通过磁盘向量流生成 NPY；编码阶段除模型外的额外内存由最大单文档投影和批大小决定，不再保留整个语料的 chunks／向量；后续 ANN 构建仍需索引所需内存。默认批大小为 1，保持逐条编码；较大的批适合同长度工作负载，长度差异过大时补齐开销可能使编码更慢。该值写入 workspace 输入绑定，`--resume-workspace` 须使用相同值。BGE-M3 的 1024 维、CLS+L2、512 token 上限不变，批内使用 tokenizer 的 `<pad>=1` 右侧补齐及真实 attention mask。新输出在目标同卷暂存目录完成完整验证后，以原子、禁止覆盖方式发布；已有索引不会自动重建。
 
+向量直接流式写入标准 NPY，编码结束后原位补全行数，不再生成或复制 `vectors.f32`。完整 NPY 与 mapping 的绑定写入原子 `encoded` 检查点后，ANN 构建失败可通过 `--resume-workspace` 重试，无需重新编码。恢复仍校验来源、模型、批大小及产物摘要；未完成编码或损坏的工作区不能恢复，旧 `ready` 工作区继续兼容。该检查点不提供编码中途续跑或断电持久性保证。
+
 - [数据合同](docs/data-contract.md)
 - [运行时合同](docs/runtime-contract.md)
 - [来源包合同](docs/source-pack-contract.md)

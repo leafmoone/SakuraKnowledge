@@ -1,6 +1,8 @@
 """Explicit semantic workspace and create-new, manifest-last runtime publication."""
 import argparse
+import io
 import json
+import os
 import shutil
 import sqlite3
 import subprocess
@@ -24,6 +26,20 @@ def _disjoint(paths):
 
 def _write(path, value):
     path.write_text(json.dumps(value, indent=2), encoding='utf-8')
+
+
+def _checkpoint(path, state):
+    # A failed/interrupted state update must leave the last complete stage readable.
+    fd, temporary = tempfile.mkstemp(prefix='.workspace-', suffix='.json', dir=path.parent)
+    temporary = Path(temporary)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+            json.dump(state, stream, indent=2)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, index_inspector=None,
@@ -73,10 +89,21 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
     try:
         if resume_workspace:
             state = json.loads(state_path.read_bytes())
-            if state['inputs'] != inputs or not state.get('ready'):
+            # Ready workspaces written before stage checkpoints remain resumable.
+            stage = state.get('stage', 'ready' if state.get('ready') is True else None)
+            if (state['inputs'] != inputs or stage not in ('encoded', 'ready')
+                    or state.get('ready') is not (stage == 'ready')):
                 raise ValueError('workspace input/parameter binding mismatch or incomplete')
-            for item in state['artifacts'].values():
-                if Path(item['path']).name != item['path'] or binding(workspace / item['path']) != item:
+            names = {'vectors.npy', 'mapping.sqlite'}
+            if stage == 'ready':
+                names.add('vectors.i8.usearch')
+            if (type(state.get('rows')) is not int or state['rows'] < 1
+                    or set(state['artifacts']) != names):
+                raise ValueError('workspace incomplete artifact state')
+            for name, item in state['artifacts'].items():
+                if (Path(item['path']).name != item['path']
+                        or (name != 'vectors.i8.usearch' and item['path'] != name)
+                        or binding(workspace / item['path']) != item):
                     raise ValueError('workspace artifact binding mismatch')
             vectors = np.load(workspace / 'vectors.npy', mmap_mode='r', allow_pickle=False)
             try:
@@ -85,26 +112,34 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
                 # Release the Windows NPY mapping before publication or workspace cleanup.
                 del vectors
         else:
-            _write(state_path, {'inputs': inputs, 'ready': False})
+            _checkpoint(state_path, {'inputs': inputs, 'stage': 'encoding', 'ready': False})
             if tokenizer is None:
                 from tokenizers import Tokenizer
                 tokenizer = Tokenizer.from_file(str(tokenizer_path))
             rows = _encode_corpus(pack, model, workspace, manifest, contract, inputs,
                                   tokenizer, encoder, batch_size)
             # _encode_corpus owns the ORT session and releases it before ANN construction.
-            result = subprocess.run([str(index_builder), str(workspace / 'vectors.npy'), str(workspace / 'vectors.i8.usearch')], capture_output=True, check=False)
+            state = {'inputs': inputs, 'stage': 'encoded', 'ready': False, 'rows': rows,
+                     'artifacts': {name: binding(workspace / name) for name in ['vectors.npy', 'mapping.sqlite']}}
+            _checkpoint(state_path, state)
+        if not state['ready']:
+            # Each attempt gets a new path: a failed builder can leave a partial index.
+            # Ignore unrecorded attempts instead of overwriting or deleting their bytes.
+            with tempfile.NamedTemporaryFile(prefix='vectors-', suffix='.i8.usearch', dir=workspace) as reserved:
+                index_path = Path(reserved.name)
+            result = subprocess.run([str(index_builder), str(workspace / 'vectors.npy'), str(index_path)], capture_output=True, check=False)
             if result.returncode:
                 raise RuntimeError(result.stderr.decode(errors='replace'))
-            state = {'inputs': inputs, 'ready': True, 'rows': rows, 'native_build': json.loads(result.stdout),
-                     'artifacts': {name: binding(workspace / name) for name in ['vectors.npy', 'mapping.sqlite', 'vectors.i8.usearch']}}
-            _write(state_path, state)
+            state = {**state, 'stage': 'ready', 'ready': True, 'native_build': json.loads(result.stdout),
+                     'artifacts': {**state['artifacts'], 'vectors.i8.usearch': binding(index_path)}}
+            _checkpoint(state_path, state)
         output.parent.mkdir(parents=True, exist_ok=True)
         staging = Path(tempfile.mkdtemp(prefix=output.name + '.publish-', dir=output.parent))
         try:
             for role in ['snapshot', 'lexical_membership']:
                 shutil.copy2(pack / manifest['artifacts'][role]['path'], staging / manifest['artifacts'][role]['path'])
             for name in ['mapping.sqlite', 'vectors.i8.usearch']:
-                shutil.copy2(workspace / name, staging / name)
+                shutil.copy2(workspace / state['artifacts'][name]['path'], staging / name)
             manifest['distribution_closed_set'] = True
             manifest['text_projection'] = {**params, 'tokenizer_sha256': inputs['tokenizer']['sha256'], 'model_revision': contract['revision'], 'synthetic_test_encoder': synthetic}
             manifest['capabilities'] = ['structured', 'lexical', 'semantic']
@@ -112,7 +147,7 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
             manifest['semantic'] = {k: v for k, v in params.items() if k in ['dimension', 'metric', 'dtype', 'connectivity', 'expansion_add', 'expansion_search', 'chunk_depth', 'entry_depth']}
             manifest['semantic']['rows'] = state['rows']
             for role, filename in [('mapping', 'mapping.sqlite'), ('index', 'vectors.i8.usearch')]:
-                manifest['artifacts'][role] = dict(state['artifacts'][filename])
+                manifest['artifacts'][role] = {**state['artifacts'][filename], 'path': filename}
             manifest['artifacts']['snapshot']['identity'] = 'knowledge.sqlite'
             _write(staging / 'manifest.json', manifest)
             # Verify the final bytes and complete proof/key closure once, before publication.
@@ -165,10 +200,13 @@ def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer
             raise ValueError('frozen tokenizer padding token mismatch')
         session = ort.InferenceSession(str(model / contract['artifacts']['model']['path']), providers=['CPUExecutionProvider'])
         encoder = lambda texts: _encode_batch(texts, tokenizer, session, pad_id)
-    spool = workspace / 'vectors.f32'
     rows = 0
     try:
-        with closing(sqlite3.connect(workspace / 'mapping.sqlite')) as conn, spool.open('xb') as stream:
+        with closing(sqlite3.connect(workspace / 'mapping.sqlite')) as conn, (workspace / 'vectors.npy').open('xb') as stream:
+            # NumPy reserves growth-axis digits in its standard header. Finalize it
+            # in place after streaming, producing the same bytes as np.save.
+            header = _npy_header(0)
+            stream.write(header)
             conn.execute('CREATE TABLE chunks(position INTEGER PRIMARY KEY,original_position INTEGER NOT NULL UNIQUE,chunk_id TEXT NOT NULL UNIQUE,document_id INTEGER NOT NULL,kind TEXT NOT NULL,namespace TEXT NOT NULL,value TEXT NOT NULL,source_id TEXT NOT NULL,evidence_id TEXT NOT NULL)')
             batch = []
             def flush():
@@ -191,18 +229,26 @@ def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer
                 flush()
             if not rows:
                 raise ValueError('empty trusted semantic corpus')
+            final_header = _npy_header(rows)
+            if len(final_header) != len(header):
+                raise ValueError('NPY header growth exceeds reserved space')
+            stream.seek(0)
+            stream.write(final_header)
             conn.commit()
     finally:
-        # Drop the callable's session reference too, before finalizing NPY and building ANN.
+        # Drop the callable's session reference too, before checkpointing and building ANN.
         encoder = None
         session = None
-    with spool.open('rb') as source, (workspace / 'vectors.npy').open('xb') as target:
-        np.lib.format.write_array_header_1_0(target, {
-            'descr': np.lib.format.dtype_to_descr(np.dtype(np.float32)),
-            'fortran_order': False, 'shape': (rows, 1024)})
-        shutil.copyfileobj(source, target, length=1024 * 1024)
-    spool.unlink()
     return rows
+
+
+def _npy_header(rows):
+    import numpy as np
+    stream = io.BytesIO()
+    np.lib.format.write_array_header_1_0(stream, {
+        'descr': np.lib.format.dtype_to_descr(np.dtype(np.float32)),
+        'fortran_order': False, 'shape': (rows, 1024)})
+    return stream.getvalue()
 
 
 def _vectors(vectors, rows):
