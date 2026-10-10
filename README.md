@@ -39,7 +39,17 @@ cargo build --release --manifest-path rust/Cargo.toml
 cargo build --release --manifest-path rust/Cargo.toml --features semantic --bin sknow-rs --bin semantic_pilot
 ```
 
-从源码构建的程序在 `rust/target/release/`，可通过 Cargo 配置相对 target 目录。部署时把程序及所需运行时 DLL 放入 `bin/`。语义功能另需匹配的本地 BGE-M3／ONNX Runtime、mapping 和 ANN 资产，Git 不包含这些二进制文件。程序与资产必须一起按配置部署，不能依赖编译机器目录。
+从源码构建的程序在 `rust/target/release/`，可通过 Cargo 配置相对 target 目录。部署时把程序及所需运行时共享库放入 `bin/`。语义功能支持 Windows 和 Linux CPU，另需匹配的本地 BGE-M3／ONNX Runtime 1.24.1、mapping 和 ANN 资产，Git 不包含这些二进制文件。程序与资产必须一起按配置部署，不能依赖编译机器目录。
+
+Linux 直接运行 `bin/sknow-rs --config sknow-config.json retrieve 'blue hair' --source danbooru --limit 5`；常驻入口为 `bin/semantic_pilot --config sknow-config.json`。共享模型 manifest 的 `ort_libraries` 按平台绑定包内运行时，示例见 [运行时绑定](configs/shared-model-runtime.example.json) 和 [部署合同](docs/runtime-contract.md#platform-runtime-binding)。官方 Linux x64 发行包中的实际文件 `libonnxruntime.so.1.24.1` 应复制为包内普通文件（如 `bin/libonnxruntime.so`），不要复制符号链接。已有 Windows manifest 的 `ort_dll` 仍兼容；Linux 必须提供自己的绑定，不能使用 Windows DLL 的摘要。
+
+优先使用已有的 BGE-M3 自定义导出与对应 manifest。需要从官方固定版本 ONNX 准备模型时，可显式运行下列离线工具（仅准备阶段需要 `onnx==1.20.1`）：
+
+```text
+python -m tools.prepare_bge_model --onnx-directory assets/bge-m3/onnx --tokenizer assets/bge-m3/tokenizer.json --output model/bge-m3 --ort-library linux-x86_64=bin/libonnxruntime.so
+```
+
+输入须来自 `BAAI/bge-m3` 的固定版本 `5617a9f61b028005a4858fdac845db406aefb181`；tokenizer 使用仓库根目录版本。官方 `sentence_embedding` 已完成 CLS 与 L2 归一化，工具只选择该输出并改名为 `embeddings`，不会再次池化、归一化或重建索引。新 manifest 记录实际派生文件的摘要，不冒称它与历史自定义导出字节相同；原模型、来源包和索引保持不变。
 
 ## 模块化布局
 

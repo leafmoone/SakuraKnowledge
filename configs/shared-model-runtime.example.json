@@ -1,0 +1,14 @@
+{
+  "ort_libraries": {
+    "linux-x86_64": {
+      "path": "libonnxruntime.so",
+      "size": 22044576,
+      "sha256": "e5a7e3646718d8f1f8f52c8fcb770fe229ab44305caf3ea702d558e6e426c9aa"
+    },
+    "windows-x86_64": {
+      "path": "onnxruntime.dll",
+      "size": 15355936,
+      "sha256": "4fd859a7aeb657f256730a0cd5da8073a30806dd81c00a22bf25c87356baa847"
+    }
+  }
+}

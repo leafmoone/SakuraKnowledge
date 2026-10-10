@@ -32,6 +32,65 @@ published snapshot. Both CLIs print JSON only on stdout.
   (Python `sqlite3` `mode=ro`; Rust `rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY`).
 - Any write attempt must fail (`attempt to write a readonly database`).
 
+## Platform runtime binding
+
+Native semantic queries support Windows and Linux with ONNX Runtime **1.24.1**,
+API 24, CPUExecutionProvider, intra/inter threads 8/1 and sequential execution.
+The BGE-M3 revision, CLS pooling, normalized float32 1024-dimensional embeddings,
+tokenizer, graph interface and source/index contracts are unchanged.
+
+A `sakura-shared-model-v1` model manifest may declare `ort_libraries`, an object
+keyed by Rust OS/architecture names, for example `linux-x86_64`, `linux-aarch64`
+or `windows-x86_64`. Each selected entry is `{path, size, sha256}`. Paths resolve
+relative to the configured `bin_directory`, must remain inside it, and must not
+contain symlinks. Size and SHA-256 are checked before loading. An example binding
+for the official Linux x64 CPU 1.24.1 release is in
+`configs/shared-model-runtime.example.json` (also preserving the existing Windows
+x64 binding); merge its `ort_libraries` field into
+the prepared shared-model manifest, retaining every model/tokenizer/tensor binding.
+Other platforms need their own official binary and measured binding.
+
+When `ort_libraries` is present, the current platform entry is required; an invalid
+or missing entry never falls back to a different runtime. For a dual-platform
+package, include both entries and both matching binary files. Without this field,
+Windows retains the legacy pathless `ort_dll` binding to `bin/onnxruntime.dll`.
+Linux requires an explicit platform binding. The runtime always passes the verified
+canonical path to ORT and reads `GetVersionString` from that already-loaded module;
+there is no runtime discovery through environment variables or system search paths.
+No query downloads, installs or builds anything. Missing assets fail explicitly.
+
+For Linux deployment, copy the actual versioned file from the official CPU package
+to a regular package-local `libonnxruntime.so` file. Keep the required standard
+C/C++ system runtime and upstream license notices. Do not substitute a raw upstream
+ONNX model for the prepared graph: the required two inputs are `input_ids` and
+`attention_mask`, with one normalized `embeddings` output. Source ANN assets must
+remain compatible with the exact prepared encoder. Historical Windows-only legacy
+pack bindings remain unchanged; portable monolithic `artifacts.ort_dll` retains its
+historical field name but may explicitly bind a Linux shared library.
+
+## Preparing the official BGE ONNX output
+
+Prefer the existing prepared model and its exact bindings when available.
+`tools.prepare_bge_model` is an explicit, offline preparation command for the
+official `BAAI/bge-m3` revision `5617a9f61b028005a4858fdac845db406aefb181`.
+It pins the upstream graph, external tensors, repository-root tokenizer and
+platform runtime identities, and creates a new directory and manifest only.
+Preparation requires `onnx==1.20.1`; native queries do not need Python.
+
+The official graph exposes `token_embeddings` and `sentence_embedding`. The latter
+already gathers token zero (CLS) and L2-normalizes it. Preparation changes only the
+public output selection/name to `embeddings`; it never applies another pooling or
+normalization layer, changes weights, or rebuilds an ANN. The root tokenizer is
+retained literally, rather than assuming the ONNX-folder tokenizer has identical
+bytes. The derived graph's actual digest and provenance are recorded separately
+from any historical custom export whose exact artifact identity is unavailable.
+
+Supply `--ort-library PLATFORM=FILE` for each deployed runtime and place those
+regular files, under their declared basenames, in the configured `bin_directory`.
+Supported preparation bindings are `linux-x86_64` and `windows-x86_64` with the
+pinned runtime files. Adding a platform does not change the BGE encoder contract,
+source proof semantics, existing index rows or query/resident deadline behavior.
+
 ## Commands (identical argv surface)
 
 ```

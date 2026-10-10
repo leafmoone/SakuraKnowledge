@@ -791,9 +791,58 @@ fn runtime_version(dll: &Path) -> Result<String> {
         Ok(CStr::from_ptr(v).to_str()?.into())
     }
 }
-#[cfg(not(windows))]
+#[cfg(target_os = "linux")]
+fn runtime_version(library: &Path) -> Result<String> {
+    use std::{ffi::{c_char, c_int, c_void, CStr, CString}, os::unix::ffi::OsStrExt};
+    #[link(name = "dl")]
+    extern "C" {
+        fn dlopen(filename: *const c_char, flags: c_int) -> *mut c_void;
+        fn dlsym(handle: *mut c_void, symbol: *const c_char) -> *mut c_void;
+        fn dlclose(handle: *mut c_void) -> c_int;
+    }
+    let name = CString::new(library.as_os_str().as_bytes())?;
+    // Probe only the exact module retained by ort::init_from. RTLD_NOLOAD
+    // forbids loading another library or searching a system runtime.
+    unsafe {
+        let module = dlopen(name.as_ptr(), 2 /* RTLD_NOW */ | 4 /* RTLD_NOLOAD */);
+        require(!module.is_null(), "explicit ORT library not loaded")?;
+        let result = (|| -> Result<String> {
+            let symbol = dlsym(module, c"OrtGetApiBase".as_ptr());
+            require(!symbol.is_null(), "missing OrtGetApiBase")?;
+            let get: unsafe extern "C" fn() -> *const ort::sys::OrtApiBase =
+                std::mem::transmute(symbol);
+            let base = get().as_ref().ok_or("null OrtApiBase")?;
+            let version = (base.GetVersionString)();
+            require(!version.is_null(), "null runtime version")?;
+            Ok(CStr::from_ptr(version).to_str()?.into())
+        })();
+        dlclose(module); // Release only our NOLOAD reference; ORT retains its own.
+        result
+    }
+}
+#[cfg(not(any(windows, target_os = "linux")))]
 fn runtime_version(_: &Path) -> Result<String> {
-    Err("pinned Windows DLL required".into())
+    Err("semantic runtime supports Windows and Linux only".into())
+}
+
+fn shared_runtime_path(manifest: &Value, bin_dir: &Path) -> Result<PathBuf> {
+    if let Some(libraries) = manifest.get("ort_libraries") {
+        let libraries = libraries.as_object().ok_or("ort_libraries must be an object")?;
+        let platform = format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH);
+        let binding = libraries.get(&platform).ok_or("ORT library missing for current platform")?;
+        return portable_artifact(bin_dir, binding);
+    }
+    #[cfg(windows)]
+    {
+        require(manifest["ort_dll"].get("path").is_none(), "ort_dll must not supply a path")?;
+        let mut binding = manifest["ort_dll"].clone();
+        binding["path"] = json!("onnxruntime.dll");
+        portable_artifact(bin_dir, &binding)
+    }
+    #[cfg(not(windows))]
+    {
+        Err("shared model requires an explicit ort_libraries binding for this platform".into())
+    }
 }
 fn validate_snapshot_policy(c: &Connection, m: Mode) -> Result<()> {
     let id: String = c.query_row(
@@ -867,10 +916,7 @@ impl SharedEncoder {
         let tensors = manifest["artifacts"]["external_data"].as_array().ok_or("missing external_data")?;
         require(!tensors.is_empty(), "missing external tensors")?;
         for binding in tensors { portable_artifact(root, binding)?; }
-        require(manifest["ort_dll"].get("path").is_none(), "ort_dll must not supply a path")?;
-        let mut dll = manifest["ort_dll"].clone();
-        dll["path"] = json!("onnxruntime.dll");
-        paths.insert("ort_dll".into(), portable_artifact(bin_dir.as_ref(), &dll)?);
+        paths.insert("ort_dll".into(), shared_runtime_path(&manifest, bin_dir.as_ref())?);
         let mut encoder = Self::from_paths(&paths)?;
         encoder.model_manifest = Some(std::fs::canonicalize(p)?);
         Ok(encoder)
