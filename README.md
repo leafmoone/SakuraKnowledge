@@ -13,7 +13,7 @@
 - `skills/sakura-knowledge/`：离线查询 Skill。
 - `vendor/usearch-2.26.2/`：原生运行时所需的 vendored USearch 源码和许可证。
 
-构建产物、知识库、模型、索引、开发测试、报告、日志和任务上下文不纳入 Git。规则见 `AGENTS.md`。
+构建产物、知识库、模型、索引、开发测试、报告、日志和任务上下文不纳入 Git。Git 仅保留正式产品文件。
 
 ## Python 安装与使用
 

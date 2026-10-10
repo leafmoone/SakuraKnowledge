@@ -94,3 +94,6 @@ PLAN.md
 NUL
 /p4-auth-blocker-replacements.json
 /uv.lock
+
+# Local agent instructions stay outside the product tree
+/AGENTS.md
