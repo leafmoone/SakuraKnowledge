@@ -96,6 +96,8 @@ project/
 
 新增来源使用显式 `SourceAdapter`，不要求修改 Core 或母库。通用工具：`tools.normalized_source`、`tools.generic_semantic`、`tools.source_pack`、`tools.modular_components`。准备工作与查询分离，输出使用新目录。
 
+`tools.generic_semantic`（可选 `--batch-size 4`）按文档投影、按批编码，通过磁盘向量流生成 NPY；编码阶段除模型外的额外内存由最大单文档投影和批大小决定，不再保留整个语料的 chunks／向量；后续 ANN 构建仍需索引所需内存。默认批大小为 1，保持逐条编码；较大的批适合同长度工作负载，长度差异过大时补齐开销可能使编码更慢。该值写入 workspace 输入绑定，`--resume-workspace` 须使用相同值。BGE-M3 的 1024 维、CLS+L2、512 token 上限不变，批内使用 tokenizer 的 `<pad>=1` 右侧补齐及真实 attention mask。新输出在目标同卷暂存目录完成完整验证后，以原子、禁止覆盖方式发布；已有索引不会自动重建。
+
 - [数据合同](docs/data-contract.md)
 - [运行时合同](docs/runtime-contract.md)
 - [来源包合同](docs/source-pack-contract.md)

@@ -8,6 +8,7 @@ import tempfile
 from contextlib import closing
 from pathlib import Path
 
+from sakura_knowledge.storage import _publish_new_directory
 from tools import semantic_chunks
 from tools.normalized_source import validate
 from tools.source_pack import binding
@@ -26,8 +27,10 @@ def _write(path, value):
 
 
 def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, index_inspector=None,
-            workspace=None, resume_workspace=False, keep_workspace=False):
+            workspace=None, resume_workspace=False, keep_workspace=False, batch_size=1):
     import numpy as np
+    if type(batch_size) is not int or batch_size < 1:
+        raise ValueError('batch_size must be a positive integer')
     pack, model, output = Path(pack).resolve(), Path(model).resolve(), Path(output).resolve()
     workspace = Path(workspace).resolve() if workspace else output.with_name(output.name + '.semantic-work')
     _disjoint([pack, model, output, workspace])
@@ -62,7 +65,8 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
               'chunk_depth': 512, 'entry_depth': 100}
     inputs = {'pack_manifest': binding(pack / 'manifest.json'), 'pack_artifacts': manifest['artifacts'],
               'model_manifest': binding(model / 'manifest.json'), 'tokenizer': binding(tokenizer_path),
-              'parameters': params, 'synthetic_test_encoder': synthetic}
+              'parameters': params, 'build': {'batch_size': batch_size},
+              'synthetic_test_encoder': synthetic}
     if not resume_workspace:
         workspace.mkdir(parents=True, exist_ok=False)
     state_path = workspace / 'workspace.json'
@@ -75,73 +79,49 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
                 if Path(item['path']).name != item['path'] or binding(workspace / item['path']) != item:
                     raise ValueError('workspace artifact binding mismatch')
             vectors = np.load(workspace / 'vectors.npy', mmap_mode='r', allow_pickle=False)
-            _vectors(vectors, state['rows'])
+            try:
+                _vectors(vectors, state['rows'])
+            finally:
+                # Release the Windows NPY mapping before publication or workspace cleanup.
+                del vectors
         else:
             _write(state_path, {'inputs': inputs, 'ready': False})
             if tokenizer is None:
                 from tokenizers import Tokenizer
                 tokenizer = Tokenizer.from_file(str(tokenizer_path))
-            chunks = []
-            with closing(sqlite3.connect((pack / 'knowledge.sqlite').as_uri() + '?mode=ro', uri=True)) as conn:
-                for row in conn.execute("SELECT d.id,d.entry_id,d.title,d.original,e.kind,e.namespace,e.value,d.source_id,d.evidence_id FROM documents d JOIN entries e ON e.id=d.entry_id WHERE e.conflicted=0 AND e.kind!='episode' AND d.status IN ('source_backed','generated_from_evidence') AND EXISTS(SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id AND v.status='source_backed') ORDER BY d.id"):
-                    doc = {'document_id': row[0], 'entry_id': row[1], 'title': row[2], 'original': row[3], 'entry_key': dict(zip(['kind', 'namespace', 'value'], row[4:7])), 'source_id': row[7], 'evidence_id': row[8]}
-                    chunks.extend(semantic_chunks.project_document(doc, tokenizer, base_snapshot_sha256=manifest['artifacts']['snapshot']['sha256'], tokenizer_inventory_sha256=inputs['tokenizer']['sha256'], passage_prefix='', max_sequence_tokens=512))
-            if not chunks:
-                raise ValueError('empty trusted semantic corpus')
-            with closing(sqlite3.connect(workspace / 'mapping.sqlite')) as conn:
-                conn.execute('CREATE TABLE chunks(position INTEGER PRIMARY KEY,original_position INTEGER NOT NULL UNIQUE,chunk_id TEXT NOT NULL UNIQUE,document_id INTEGER NOT NULL,kind TEXT NOT NULL,namespace TEXT NOT NULL,value TEXT NOT NULL,source_id TEXT NOT NULL,evidence_id TEXT NOT NULL)')
-                for i, chunk in enumerate(chunks):
-                    k = chunk['entry_key']
-                    conn.execute('INSERT INTO chunks VALUES(?,?,?,?,?,?,?,?,?)', (i, i, chunk['chunk_id'], chunk['document_id'], k['kind'], k['namespace'], k['value'], chunk['source_id'], chunk['evidence_id']))
-                conn.commit()
-            if encoder is None:
-                import onnxruntime as ort
-                session = ort.InferenceSession(str(model / contract['artifacts']['model']['path']), providers=['CPUExecutionProvider'])
-                def encoder(texts):
-                    outputs = []
-                    for text in texts:
-                        encoded = tokenizer.encode(text)
-                        if len(encoded.ids) > 512:
-                            raise ValueError('chunk exceeds frozen model context')
-                        ids = np.asarray([encoded.ids], dtype=np.int64)
-                        outputs.append(session.run(['embeddings'], {'input_ids': ids, 'attention_mask': np.ones_like(ids)})[0][0])
-                    return np.asarray(outputs, dtype=np.float32)
-            vectors = encoder([c['text'] for c in chunks])
-            _vectors(vectors, len(chunks))
-            np.save(workspace / 'vectors.npy', vectors)
+            rows = _encode_corpus(pack, model, workspace, manifest, contract, inputs,
+                                  tokenizer, encoder, batch_size)
+            # _encode_corpus owns the ORT session and releases it before ANN construction.
             result = subprocess.run([str(index_builder), str(workspace / 'vectors.npy'), str(workspace / 'vectors.i8.usearch')], capture_output=True, check=False)
             if result.returncode:
                 raise RuntimeError(result.stderr.decode(errors='replace'))
-            state = {'inputs': inputs, 'ready': True, 'rows': len(chunks), 'native_build': json.loads(result.stdout),
+            state = {'inputs': inputs, 'ready': True, 'rows': rows, 'native_build': json.loads(result.stdout),
                      'artifacts': {name: binding(workspace / name) for name in ['vectors.npy', 'mapping.sqlite', 'vectors.i8.usearch']}}
             _write(state_path, state)
-        result = subprocess.run([str(index_inspector), str(workspace / 'vectors.i8.usearch'), str(state['rows'])], capture_output=True, check=False)
-        if result.returncode or json.loads(result.stdout).get('validation') != 'PASS':
-            raise ValueError('workspace native index validation')
-        staging = workspace / 'runtime-staging'
-        if staging.exists():
-            shutil.rmtree(staging)
-        staging.mkdir()
-        for role in ['snapshot', 'lexical_membership']:
-            shutil.copy2(pack / manifest['artifacts'][role]['path'], staging / manifest['artifacts'][role]['path'])
-        for name in ['mapping.sqlite', 'vectors.i8.usearch']:
-            shutil.copy2(workspace / name, staging / name)
-        manifest['distribution_closed_set'] = True
-        manifest['text_projection'] = {**params, 'tokenizer_sha256': inputs['tokenizer']['sha256'], 'model_revision': contract['revision'], 'synthetic_test_encoder': synthetic}
-        manifest['capabilities'] = ['structured', 'lexical', 'semantic']
-        manifest['requires_model'] = 'bge-m3'
-        manifest['semantic'] = {k: v for k, v in params.items() if k in ['dimension', 'metric', 'dtype', 'connectivity', 'expansion_add', 'expansion_search', 'chunk_depth', 'entry_depth']}
-        manifest['semantic']['rows'] = state['rows']
-        for role, filename in [('snapshot', 'knowledge.sqlite'), ('mapping', 'mapping.sqlite'), ('index', 'vectors.i8.usearch')]:
-            manifest['artifacts'][role] = binding(staging / filename)
-        manifest['artifacts']['snapshot']['identity'] = 'knowledge.sqlite'
-        _write(staging / 'manifest.json', manifest)
-        validate(staging, index_inspector)
-        _publish(staging, output)
-        validation = validate(output, index_inspector)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        staging = Path(tempfile.mkdtemp(prefix=output.name + '.publish-', dir=output.parent))
+        try:
+            for role in ['snapshot', 'lexical_membership']:
+                shutil.copy2(pack / manifest['artifacts'][role]['path'], staging / manifest['artifacts'][role]['path'])
+            for name in ['mapping.sqlite', 'vectors.i8.usearch']:
+                shutil.copy2(workspace / name, staging / name)
+            manifest['distribution_closed_set'] = True
+            manifest['text_projection'] = {**params, 'tokenizer_sha256': inputs['tokenizer']['sha256'], 'model_revision': contract['revision'], 'synthetic_test_encoder': synthetic}
+            manifest['capabilities'] = ['structured', 'lexical', 'semantic']
+            manifest['requires_model'] = 'bge-m3'
+            manifest['semantic'] = {k: v for k, v in params.items() if k in ['dimension', 'metric', 'dtype', 'connectivity', 'expansion_add', 'expansion_search', 'chunk_depth', 'entry_depth']}
+            manifest['semantic']['rows'] = state['rows']
+            for role, filename in [('mapping', 'mapping.sqlite'), ('index', 'vectors.i8.usearch')]:
+                manifest['artifacts'][role] = dict(state['artifacts'][filename])
+            manifest['artifacts']['snapshot']['identity'] = 'knowledge.sqlite'
+            _write(staging / 'manifest.json', manifest)
+            # Verify the final bytes and complete proof/key closure once, before publication.
+            validation = validate(staging, index_inspector)
+            _publish_new_directory(staging, output)
+        finally:
+            if staging.exists():
+                shutil.rmtree(staging)
         workspace_bytes = sum(p.stat().st_size for p in workspace.rglob('*') if p.is_file())
-        # Release the Windows read-only NPY mapping before optional workspace cleanup.
-        del vectors
         if not keep_workspace:
             shutil.rmtree(workspace)
         return {'rows': state['rows'], 'native_build': state['native_build'], 'validation': validation,
@@ -151,27 +131,89 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
         raise RuntimeError(f'semantic preparation failed; workspace preserved at {workspace}: {exc}') from exc
 
 
+def _document_chunks(pack, manifest, tokenizer, tokenizer_sha256):
+    # Projection still owns one document at a time, never the complete corpus.
+    with closing(sqlite3.connect((pack / 'knowledge.sqlite').as_uri() + '?mode=ro', uri=True)) as conn:
+        for row in conn.execute("SELECT d.id,d.entry_id,d.title,d.original,e.kind,e.namespace,e.value,d.source_id,d.evidence_id FROM documents d JOIN entries e ON e.id=d.entry_id WHERE e.conflicted=0 AND e.kind!='episode' AND d.status IN ('source_backed','generated_from_evidence') AND EXISTS(SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id AND v.status='source_backed') ORDER BY d.id"):
+            doc = {'document_id': row[0], 'entry_id': row[1], 'title': row[2], 'original': row[3], 'entry_key': dict(zip(['kind', 'namespace', 'value'], row[4:7])), 'source_id': row[7], 'evidence_id': row[8]}
+            yield from semantic_chunks.project_document(
+                doc, tokenizer, base_snapshot_sha256=manifest['artifacts']['snapshot']['sha256'],
+                tokenizer_inventory_sha256=tokenizer_sha256, passage_prefix='', max_sequence_tokens=512)
+
+
+def _encode_batch(texts, tokenizer, session, pad_id):
+    import numpy as np
+    encoded = [tokenizer.encode(text) for text in texts]
+    if any(not item.ids or len(item.ids) > 512 for item in encoded):
+        raise ValueError('chunk exceeds frozen model context or is empty')
+    ids = np.full((len(encoded), max(len(item.ids) for item in encoded)), pad_id, dtype=np.int64)
+    attention = np.zeros_like(ids)
+    for i, item in enumerate(encoded):
+        ids[i, :len(item.ids)] = item.ids
+        attention[i, :len(item.ids)] = item.attention_mask
+    return session.run(['embeddings'], {'input_ids': ids, 'attention_mask': attention})[0]
+
+
+def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer, encoder, batch_size):
+    import numpy as np
+    session = None
+    if encoder is None:
+        import onnxruntime as ort
+        # The frozen XLM-R tokenizer uses <pad>=1; zero is its start token.
+        pad_id = tokenizer.token_to_id('<pad>')
+        if pad_id != 1:
+            raise ValueError('frozen tokenizer padding token mismatch')
+        session = ort.InferenceSession(str(model / contract['artifacts']['model']['path']), providers=['CPUExecutionProvider'])
+        encoder = lambda texts: _encode_batch(texts, tokenizer, session, pad_id)
+    spool = workspace / 'vectors.f32'
+    rows = 0
+    try:
+        with closing(sqlite3.connect(workspace / 'mapping.sqlite')) as conn, spool.open('xb') as stream:
+            conn.execute('CREATE TABLE chunks(position INTEGER PRIMARY KEY,original_position INTEGER NOT NULL UNIQUE,chunk_id TEXT NOT NULL UNIQUE,document_id INTEGER NOT NULL,kind TEXT NOT NULL,namespace TEXT NOT NULL,value TEXT NOT NULL,source_id TEXT NOT NULL,evidence_id TEXT NOT NULL)')
+            batch = []
+            def flush():
+                nonlocal rows
+                vectors = encoder([chunk['text'] for chunk in batch])
+                _vectors(vectors, len(batch))
+                np.asarray(vectors, order='C').tofile(stream)
+                for chunk in batch:
+                    key = chunk['entry_key']
+                    conn.execute('INSERT INTO chunks VALUES(?,?,?,?,?,?,?,?,?)',
+                                 (rows, rows, chunk['chunk_id'], chunk['document_id'],
+                                  key['kind'], key['namespace'], key['value'], chunk['source_id'], chunk['evidence_id']))
+                    rows += 1
+                batch.clear()
+            for chunk in _document_chunks(pack, manifest, tokenizer, inputs['tokenizer']['sha256']):
+                batch.append(chunk)
+                if len(batch) == batch_size:
+                    flush()
+            if batch:
+                flush()
+            if not rows:
+                raise ValueError('empty trusted semantic corpus')
+            conn.commit()
+    finally:
+        # Drop the callable's session reference too, before finalizing NPY and building ANN.
+        encoder = None
+        session = None
+    with spool.open('rb') as source, (workspace / 'vectors.npy').open('xb') as target:
+        np.lib.format.write_array_header_1_0(target, {
+            'descr': np.lib.format.dtype_to_descr(np.dtype(np.float32)),
+            'fortran_order': False, 'shape': (rows, 1024)})
+        shutil.copyfileobj(source, target, length=1024 * 1024)
+    spool.unlink()
+    return rows
+
+
 def _vectors(vectors, rows):
     import numpy as np
-    if vectors.shape != (rows, 1024) or vectors.dtype != np.float32 or not np.isfinite(vectors).all() or not np.allclose(np.linalg.norm(vectors, axis=1), 1, atol=1e-4):
+    if vectors.shape != (rows, 1024) or vectors.dtype != np.float32:
         raise ValueError('invalid frozen encoder vectors')
-
-
-def _publish(staging, output):
-    output.parent.mkdir(parents=True, exist_ok=True)
-    pending = Path(tempfile.mkdtemp(prefix=output.name + '.publish-', dir=output.parent))
-    try:
-        for path in staging.iterdir():
-            if path.name != 'manifest.json':
-                shutil.copy2(path, pending / path.name)
-        shutil.copy2(staging / 'manifest.json', pending / 'manifest.json')
-        # Same-volume directory rename: no discoverable final manifest until complete.
-        if output.exists():
-            raise FileExistsError(f'output already exists: {output}')
-        pending.rename(output)
-    finally:
-        if pending.exists():
-            shutil.rmtree(pending)
+    # Keep resume validation bounded even when vectors is a very large NPY mmap.
+    for start in range(0, rows, 256):
+        block = vectors[start:start + 256]
+        if not np.isfinite(block).all() or not np.allclose(np.linalg.norm(block, axis=1), 1, atol=1e-4):
+            raise ValueError('invalid frozen encoder vectors')
 
 
 def main():
@@ -182,9 +224,10 @@ def main():
     p.add_argument('--workspace')
     p.add_argument('--resume-workspace', action='store_true')
     p.add_argument('--keep-workspace', action='store_true')
+    p.add_argument('--batch-size', type=int, default=1, help='maximum encoder batch size (default: 1)')
     a = p.parse_args()
     print(json.dumps(prepare(a.pack, a.model, a.output, a.index_builder, index_inspector=a.index_inspector,
-                             workspace=a.workspace, resume_workspace=a.resume_workspace, keep_workspace=a.keep_workspace)))
+                             workspace=a.workspace, resume_workspace=a.resume_workspace, keep_workspace=a.keep_workspace, batch_size=a.batch_size)))
 
 
 if __name__ == '__main__':
