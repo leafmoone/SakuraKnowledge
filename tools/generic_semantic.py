@@ -280,6 +280,8 @@ def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer
         # Release this source's ORT session; the explicit CUDA owner spans serial sources.
         encoder = None
         session = None
+    if cuda_encoder is not None:
+        cuda_encoder.end_source()
     return rows
 
 

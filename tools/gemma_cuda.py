@@ -43,7 +43,7 @@ def load_text_model(directory: Path, device: str) -> torch.nn.Module:
         vision_config=None, audio_config=None)
     model = transformers.AutoModel.from_pretrained(
         directory, config=config, local_files_only=True, trust_remote_code=False,
-        dtype=torch.float32, attn_implementation='eager', use_safetensors=True)
+        dtype=torch.float32, attn_implementation='sdpa', use_safetensors=True)
     return model.to(device=device, dtype=torch.float32).eval().requires_grad_(False)
 
 
@@ -95,7 +95,7 @@ class GemmaCudaEncoder:
             'tokenizers': tokenizers.__version__,
             'cuda': torch.version.cuda, 'device': self.device, 'device_name': properties.name,
             'device_memory_bytes': properties.total_memory,
-            'dtype': 'float32', 'tf32': False, 'attention': 'eager',
+            'dtype': 'float32', 'tf32': False, 'attention': 'sdpa',
             'pooling': 'attention_mask_mean', 'normalize': True,
         }
         self.model: torch.nn.Module | None = None
@@ -127,8 +127,12 @@ class GemmaCudaEncoder:
                 'model_load_seconds': self.load_seconds,
                 'peak_device_allocated_bytes': torch.cuda.max_memory_allocated(self.device)}
 
-    def close(self) -> None:
+    def end_source(self) -> None:
+        """Release unused allocator blocks before ANN work, retaining the model."""
         import torch
-        self.model = None
         with torch.cuda.device(self.device):
             torch.cuda.empty_cache()
+
+    def close(self) -> None:
+        self.model = None
+        self.end_source()

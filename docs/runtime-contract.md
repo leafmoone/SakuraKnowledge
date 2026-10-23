@@ -157,7 +157,7 @@ and safetensors to the reference revision above, loads only the text tower throu
 native Transformers, and applies mask-aware mean/L2 after the 768-dimensional
 projection. Prompt and special tokens remain included. It consumes the same
 prepared tokenizer's IDs and masks as ORT; there is no second tokenizer or chunker.
-FP32, eager attention and disabled TF32/autocast are explicit. Missing CUDA,
+FP32, native SDPA attention and disabled TF32/autocast are explicit. Missing CUDA,
 a mismatched Transformers version, OOM and model failures are errors, never CPU or
 half-precision fallbacks. The query manifest remains ORT CPU.
 
@@ -176,17 +176,35 @@ repeat `--workspace` in the same count. Single-source argv remains valid. One CU
 invocation verifies both the prepared model artifacts and original checkpoint once,
 loads one tokenizer and one GPU model, and reuses them across sources. The input
 model directories must remain read-only for that invocation. Each source still
-validates its own input and final output. A completed output is never overwritten;
+validates its own input and final output. After each source's encoding, unused
+CUDA allocator blocks are released before ANN construction; the loaded model is
+retained, with no per-batch cache clearing or memory-threshold policy.
+A completed output is never overwritten;
 a failed later source can be retried separately through the existing encoded/ready
 workspace recovery. Incomplete encoding remains non-resumable.
 
 Workspace inputs and published `semantic_build` record the actual torch/CUDA/device,
-Transformers, fixed checkpoint artifact bindings, FP32 policy and batch size.
+Transformers, fixed checkpoint artifact bindings, attention implementation, FP32
+policy and batch size. Existing eager-built packs retain their original provenance
+and the same encoder/index contract; switching attention does not rewrite them.
 Results report encoder time, rows/second and peak allocated device bytes; these are
 measurements of that invocation, not a throughput guarantee. Before a full corpus,
 run a real short CUDA batch, compare it with the CPU contract, and check GPU memory
 and throughput. CPU parity alone does not establish GPU acceptance or four-source
 publication. Synthetic test callbacks remain separate from the CUDA connector.
+
+A Windows RTX 4060 / PyTorch 2.11 CUDA / Transformers 5.20.2 short-batch check
+observed native `aten::_scaled_dot_product_efficient_attention` with
+`fmha_cutlassF_f32`. The same eight real TagWiki inputs differed from eager by at
+most 2.36556e-7 (below the 1e-5 acceptance bound), with finite, L2-normalized output.
+Another seven batches did not increase the observed SDPA memory levels. This did
+not demonstrate lower same-batch peak allocation or process commit, or long-run
+stability. SDPA kernel selection still depends on inputs and the installed runtime;
+the implementation name alone does not prove use of a memory-efficient kernel.
+Separately, releasing unused allocator blocks reduced reserved CUDA memory by
+about 1 GiB and process commit by 0.802 GiB without changing live allocation; it
+does not explain all memory pressure or establish the cause of a later SQLite I/O
+failure. Neither short check is a full-corpus acceptance result.
 
 Rebuilding consumes `validate_source` (`validate-source` CLI), which shares the
 existing snapshot/lexical hashes, SQLite integrity, ownership and evidence-closure
