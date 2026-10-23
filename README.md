@@ -51,6 +51,8 @@ python -m tools.prepare_bge_model --onnx-directory assets/bge-m3/onnx --tokenize
 
 输入须来自 `BAAI/bge-m3` 的固定版本 `5617a9f61b028005a4858fdac845db406aefb181`；tokenizer 使用仓库根目录版本。官方 `sentence_embedding` 已完成 CLS 与 L2 归一化，工具只选择该输出并改名为 `embeddings`，不会再次池化、归一化或重建索引。新 manifest 记录实际派生文件的摘要，不冒称它与历史自定义导出字节相同；原模型、来源包和索引保持不变。
 
+EmbeddingGemma 2 的独立 FP32 文本模型可用 `tools.prepare_embeddinggemma2_model` 离线准备，参数与上述工具相同；输入必须是固定社区 ONNX 转换及对应 tokenizer，详见[模型准备合同](docs/runtime-contract.md#preparing-the-embeddinggemma-2-text-model)。工具附带来源与 Apache-2.0 许可，只生成新模型目录，不切换现有 BGE、修改来源包或重建索引；共享查询和建包入口支持该固定 768 维合同及原 BGE 1024 维合同；必须重建匹配来源索引，不得混合两个模型的距离。建包当前使用分批 ORT CPU，GPU 编码与四源发布不由模型准备自动完成。
+
 ## 模块化布局
 
 ```text

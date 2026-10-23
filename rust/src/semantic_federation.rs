@@ -10,7 +10,8 @@ pub fn compatible(contracts:&[Value])->Result<()> {
  if let Some(first)=contracts.first() {
   for c in contracts {
    for n in ["revision","dimension","pooling","normalize","query_prefix","dtype","output"] {if c[n].is_null()||c[n]!=first[n] {return Err("incompatible semantic encoder contract".into());}}
-   if c["dimension"]!=1024||c["ann"]["metric"]!="cos"||c["ann"]["dtype"]!="i8" {return Err("incompatible semantic distance contract".into());}
+   for n in ["document_template","untitled_document","pad_token_id"] {if c[n]!=first[n] {return Err("incompatible semantic document contract".into());}}
+   if !matches!(c["dimension"].as_u64(),Some(768|1024))||c["ann"]["metric"]!="cos"||c["ann"]["dtype"]!="i8" {return Err("incompatible semantic distance contract".into());}
   }
  }
  Ok(())

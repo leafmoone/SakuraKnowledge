@@ -13,6 +13,7 @@ from pathlib import Path
 from sakura_knowledge.storage import _publish_new_directory
 from tools import semantic_chunks
 from tools.normalized_source import validate
+from tools.model_artifacts import encoder_contract
 from tools.source_pack import binding
 
 
@@ -57,28 +58,33 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
             raise ValueError('resume workspace missing')
     elif workspace.exists():
         raise FileExistsError(f'workspace already exists: {workspace}')
-    validate(pack)
+    if index_inspector is None:
+        index_inspector = Path(index_builder).with_name('inspect_i8' + Path(index_builder).suffix)
+    validate(pack, index_inspector)
     manifest = json.loads((pack / 'manifest.json').read_bytes())
     contract = json.loads((model / 'manifest.json').read_bytes())
-    if contract.get('revision') != '5617a9f61b028005a4858fdac845db406aefb181':
-        raise ValueError('unsupported frozen model revision')
     synthetic = encoder is not None
+    model_id = contract.get('model_id', 'bge-m3') if synthetic else contract.get('model_id')
+    frozen = encoder_contract(model_id)
+    if contract.get('revision') != frozen['revision']:
+        raise ValueError('unsupported frozen model revision')
     if not synthetic:
-        if contract.get('schema') != 'sakura-shared-model-v1' or contract.get('model_id') != 'bge-m3':
+        if contract.get('schema') != 'sakura-shared-model-v1':
             raise ValueError('unsupported_model_contract')
-        for field, expected in {'dimension': 1024, 'pooling': 'cls', 'normalize': True, 'query_prefix': '', 'dtype': 'float32', 'output': 'embeddings'}.items():
+        for field, expected in frozen.items():
             if contract['contract'].get(field) != expected:
                 raise ValueError('frozen encoder contract mismatch')
         for item in [contract['artifacts']['model'], contract['artifacts']['tokenizer'], *contract['artifacts']['external_data']]:
             if Path(item['path']).name != item['path'] or binding(model / item['path']) != {k: item[k] for k in ('path', 'sha256', 'size')}:
                 raise ValueError('frozen model artifact binding mismatch')
     tokenizer_path = model / contract.get('artifacts', {}).get('tokenizer', {}).get('path', 'tokenizer.json')
-    if index_inspector is None:
-        index_inspector = Path(index_builder).with_name('inspect_i8' + Path(index_builder).suffix)
     params = {'version': semantic_chunks.VERSION, 'max_tokens': 384, 'overlap_tokens': 64,
-              'passage_prefix': '', 'dimension': 1024, 'metric': 'cos', 'dtype': 'i8',
+              'passage_prefix': '', 'dimension': frozen['dimension'], 'metric': 'cos', 'dtype': 'i8',
               'connectivity': 16, 'expansion_add': 256, 'expansion_search': 2048,
               'chunk_depth': 512, 'entry_depth': 100}
+    if model_id == 'embeddinggemma-2':
+        params.update(document_template=frozen['document_template'], untitled_document=frozen['untitled_document'],
+                      document_text='canonical_title_and_original', max_sequence_tokens=512)
     inputs = {'pack_manifest': binding(pack / 'manifest.json'), 'pack_artifacts': manifest['artifacts'],
               'model_manifest': binding(model / 'manifest.json'), 'tokenizer': binding(tokenizer_path),
               'parameters': params, 'build': {'batch_size': batch_size},
@@ -107,7 +113,7 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
                     raise ValueError('workspace artifact binding mismatch')
             vectors = np.load(workspace / 'vectors.npy', mmap_mode='r', allow_pickle=False)
             try:
-                _vectors(vectors, state['rows'])
+                _vectors(vectors, state['rows'], params['dimension'])
             finally:
                 # Release the Windows NPY mapping before publication or workspace cleanup.
                 del vectors
@@ -143,7 +149,7 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
             manifest['distribution_closed_set'] = True
             manifest['text_projection'] = {**params, 'tokenizer_sha256': inputs['tokenizer']['sha256'], 'model_revision': contract['revision'], 'synthetic_test_encoder': synthetic}
             manifest['capabilities'] = ['structured', 'lexical', 'semantic']
-            manifest['requires_model'] = 'bge-m3'
+            manifest['requires_model'] = model_id
             manifest['semantic'] = {k: v for k, v in params.items() if k in ['dimension', 'metric', 'dtype', 'connectivity', 'expansion_add', 'expansion_search', 'chunk_depth', 'entry_depth']}
             manifest['semantic']['rows'] = state['rows']
             for role, filename in [('mapping', 'mapping.sqlite'), ('index', 'vectors.i8.usearch')]:
@@ -166,20 +172,31 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
         raise RuntimeError(f'semantic preparation failed; workspace preserved at {workspace}: {exc}') from exc
 
 
-def _document_chunks(pack, manifest, tokenizer, tokenizer_sha256):
+def _document_chunks(pack, manifest, tokenizer, tokenizer_sha256, parameters):
     # Projection still owns one document at a time, never the complete corpus.
     with closing(sqlite3.connect((pack / 'knowledge.sqlite').as_uri() + '?mode=ro', uri=True)) as conn:
         for row in conn.execute("SELECT d.id,d.entry_id,d.title,d.original,e.kind,e.namespace,e.value,d.source_id,d.evidence_id FROM documents d JOIN entries e ON e.id=d.entry_id WHERE e.conflicted=0 AND e.kind!='episode' AND d.status IN ('source_backed','generated_from_evidence') AND EXISTS(SELECT 1 FROM entry_evidence v WHERE v.entry_id=e.id AND v.status='source_backed') ORDER BY d.id"):
             doc = {'document_id': row[0], 'entry_id': row[1], 'title': row[2], 'original': row[3], 'entry_key': dict(zip(['kind', 'namespace', 'value'], row[4:7])), 'source_id': row[7], 'evidence_id': row[8]}
-            yield from semantic_chunks.project_document(
-                doc, tokenizer, base_snapshot_sha256=manifest['artifacts']['snapshot']['sha256'],
-                tokenizer_inventory_sha256=tokenizer_sha256, passage_prefix='', max_sequence_tokens=512)
+            prefix = ''
+            if 'document_template' in parameters:
+                title = (doc['title'] or '').replace('\r\n', '\n').replace('\r', '\n')
+                prefix = parameters['document_template'].format(title=title or parameters['untitled_document'], text='')
+            try:
+                chunks = semantic_chunks.project_document(
+                    doc, tokenizer, base_snapshot_sha256=manifest['artifacts']['snapshot']['sha256'],
+                    tokenizer_inventory_sha256=tokenizer_sha256, passage_prefix=prefix,
+                    max_sequence_tokens=parameters.get('max_sequence_tokens', 512))
+            except semantic_chunks.ChunkError as exc:
+                raise semantic_chunks.ChunkError(f"document {doc['document_id']}: {exc}") from exc
+            for chunk in chunks:
+                # Keep canonical source spans/IDs; only the encoder receives the task prompt.
+                yield {**chunk, 'encoding_text': prefix + chunk['text']}
 
 
-def _encode_batch(texts, tokenizer, session, pad_id):
+def _encode_batch(texts, tokenizer, session, pad_id, max_tokens):
     import numpy as np
     encoded = [tokenizer.encode(text) for text in texts]
-    if any(not item.ids or len(item.ids) > 512 for item in encoded):
+    if any(not item.ids or len(item.ids) > max_tokens for item in encoded):
         raise ValueError('chunk exceeds frozen model context or is empty')
     ids = np.full((len(encoded), max(len(item.ids) for item in encoded)), pad_id, dtype=np.int64)
     attention = np.zeros_like(ids)
@@ -194,25 +211,34 @@ def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer
     session = None
     if encoder is None:
         import onnxruntime as ort
-        # The frozen XLM-R tokenizer uses <pad>=1; zero is its start token.
         pad_id = tokenizer.token_to_id('<pad>')
-        if pad_id != 1:
+        expected_pad = 0 if contract['model_id'] == 'embeddinggemma-2' else 1
+        if pad_id != expected_pad:
             raise ValueError('frozen tokenizer padding token mismatch')
-        session = ort.InferenceSession(str(model / contract['artifacts']['model']['path']), providers=['CPUExecutionProvider'])
-        encoder = lambda texts: _encode_batch(texts, tokenizer, session, pad_id)
+        if ort.__version__ != contract['contract']['ort_version']:
+            raise ValueError('frozen ORT version mismatch')
+        options = ort.SessionOptions()
+        options.intra_op_num_threads = 8
+        options.inter_op_num_threads = 1
+        options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+        session = ort.InferenceSession(str(model / contract['artifacts']['model']['path']),
+                                       sess_options=options, providers=['CPUExecutionProvider'])
+        encoder = lambda texts: _encode_batch(texts, tokenizer, session, pad_id,
+                                              inputs['parameters'].get('max_sequence_tokens', 512))
+    dimension = inputs['parameters']['dimension']
     rows = 0
     try:
         with closing(sqlite3.connect(workspace / 'mapping.sqlite')) as conn, (workspace / 'vectors.npy').open('xb') as stream:
             # NumPy reserves growth-axis digits in its standard header. Finalize it
             # in place after streaming, producing the same bytes as np.save.
-            header = _npy_header(0)
+            header = _npy_header(0, dimension)
             stream.write(header)
             conn.execute('CREATE TABLE chunks(position INTEGER PRIMARY KEY,original_position INTEGER NOT NULL UNIQUE,chunk_id TEXT NOT NULL UNIQUE,document_id INTEGER NOT NULL,kind TEXT NOT NULL,namespace TEXT NOT NULL,value TEXT NOT NULL,source_id TEXT NOT NULL,evidence_id TEXT NOT NULL)')
             batch = []
             def flush():
                 nonlocal rows
-                vectors = encoder([chunk['text'] for chunk in batch])
-                _vectors(vectors, len(batch))
+                vectors = encoder([chunk['encoding_text'] for chunk in batch])
+                _vectors(vectors, len(batch), dimension)
                 np.asarray(vectors, order='C').tofile(stream)
                 for chunk in batch:
                     key = chunk['entry_key']
@@ -221,7 +247,7 @@ def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer
                                   key['kind'], key['namespace'], key['value'], chunk['source_id'], chunk['evidence_id']))
                     rows += 1
                 batch.clear()
-            for chunk in _document_chunks(pack, manifest, tokenizer, inputs['tokenizer']['sha256']):
+            for chunk in _document_chunks(pack, manifest, tokenizer, inputs['tokenizer']['sha256'], inputs['parameters']):
                 batch.append(chunk)
                 if len(batch) == batch_size:
                     flush()
@@ -229,7 +255,7 @@ def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer
                 flush()
             if not rows:
                 raise ValueError('empty trusted semantic corpus')
-            final_header = _npy_header(rows)
+            final_header = _npy_header(rows, dimension)
             if len(final_header) != len(header):
                 raise ValueError('NPY header growth exceeds reserved space')
             stream.seek(0)
@@ -242,18 +268,18 @@ def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer
     return rows
 
 
-def _npy_header(rows):
+def _npy_header(rows, dimension):
     import numpy as np
     stream = io.BytesIO()
     np.lib.format.write_array_header_1_0(stream, {
         'descr': np.lib.format.dtype_to_descr(np.dtype(np.float32)),
-        'fortran_order': False, 'shape': (rows, 1024)})
+        'fortran_order': False, 'shape': (rows, dimension)})
     return stream.getvalue()
 
 
-def _vectors(vectors, rows):
+def _vectors(vectors, rows, dimension):
     import numpy as np
-    if vectors.shape != (rows, 1024) or vectors.dtype != np.float32:
+    if vectors.shape != (rows, dimension) or vectors.dtype != np.float32:
         raise ValueError('invalid frozen encoder vectors')
     # Keep resume validation bounded even when vectors is a very large NPY mmap.
     for start in range(0, rows, 256):

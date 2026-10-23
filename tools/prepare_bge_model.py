@@ -16,6 +16,13 @@ import hashlib
 import json
 from pathlib import Path
 
+from tools.model_artifacts import (
+    RUNTIMES,
+    checked_source as _checked_source,
+    copy_verified as _copy_verified,
+    runtime_bindings as _runtime_bindings,
+)
+
 REVISION = '5617a9f61b028005a4858fdac845db406aefb181'
 SOURCE_MODEL = {
     'size': 724923,
@@ -29,58 +36,6 @@ ROOT_TOKENIZER = {
     'size': 17098108,
     'sha256': '21106b6d7dab2952c1d496fb21d5dc9db75c28ed361a05f5020bbba27810dd08',
 }
-RUNTIMES = {
-    'linux-x86_64': {
-        'size': 22044576,
-        'sha256': 'e5a7e3646718d8f1f8f52c8fcb770fe229ab44305caf3ea702d558e6e426c9aa',
-    },
-    'windows-x86_64': {
-        'size': 15355936,
-        'sha256': '4fd859a7aeb657f256730a0cd5da8073a30806dd81c00a22bf25c87356baa847',
-    },
-}
-
-
-def _checked_source(path, expected):
-    if not path.is_file() or path.stat().st_size != expected['size']:
-        raise ValueError(f'wrong or missing source size: {path.name}')
-
-
-def _copy_verified(source, destination, expected):
-    """Copy and hash in one pass; never share mutable tensor inodes with input."""
-    _checked_source(source, expected)
-    sha = hashlib.sha256()
-    size = 0
-    with source.open('rb') as src, destination.open('xb') as dst:
-        while block := src.read(8 * 1024 * 1024):
-            size += len(block)
-            sha.update(block)
-            dst.write(block)
-    if size != expected['size'] or sha.hexdigest() != expected['sha256']:
-        raise ValueError(f'source binding mismatch: {source.name}; output remains incomplete')
-    return {'path': destination.name, **expected}
-
-
-def _runtime_bindings(libraries):
-    if not libraries:
-        raise ValueError('at least one explicit ORT library is required')
-    bindings = {}
-    for platform, path in libraries.items():
-        if platform not in RUNTIMES:
-            raise ValueError(f'unsupported ORT platform: {platform}')
-        path = Path(path)
-        if path.is_symlink() or ':' in path.name or '\\' in path.name:
-            raise ValueError('ORT library must be a regular file with a portable basename')
-        expected = RUNTIMES[platform]
-        _checked_source(path, expected)
-        with path.open('rb') as stream:
-            sha = hashlib.file_digest(stream, 'sha256').hexdigest()
-        if sha != expected['sha256']:
-            raise ValueError(f'ORT 1.24.1 library binding mismatch: {platform}')
-        if any(b['path'] == path.name for b in bindings.values()):
-            raise ValueError('platform runtimes require distinct basenames')
-        bindings[platform] = {'path': path.name, **expected}
-    return bindings
 
 
 def prepare(onnx_directory, tokenizer, output, ort_libraries):

@@ -91,6 +91,71 @@ Supported preparation bindings are `linux-x86_64` and `windows-x86_64` with the
 pinned runtime files. Adding a platform does not change the BGE encoder contract,
 source proof semantics, existing index rows or query/resident deadline behavior.
 
+## Preparing the EmbeddingGemma 2 text model
+
+`tools.prepare_embeddinggemma2_model` prepares only the FP32 text graph from
+[`onnx-community/embeddinggemma-2-ONNX`](https://huggingface.co/onnx-community/embeddinggemma-2-ONNX/tree/daa72c51243991dfcaf9f9137d2c573d8f7790c0)
+at `daa72c51243991dfcaf9f9137d2c573d8f7790c0`. It uses the same explicit
+`--onnx-directory`, `--tokenizer`, `--output` and `--ort-library` arguments as BGE.
+The graph, 1,084,170,240-byte external FP32 tensor file, tokenizer and deployed
+ORT libraries are bound during preparation; no download or query-time rehash is added.
+
+The exporter does not declare its Google base commit. The tokenizer is byte-identical
+to [`google/embeddinggemma-2`](https://huggingface.co/google/embeddinggemma-2/tree/914f7f89142e33e77833254d9c9b90c3cef7303b)
+at `914f7f89142e33e77833254d9c9b90c3cef7303b`. All 413 text tensors correspond
+exactly after the graph's transposes, QKV/gate-up concatenations, embedding scale
+and last-layer scalar folding into RMS epsilon. This identifies the text weights,
+not an exporter-declared revision or the absent image/audio towers.
+
+Preparation keeps all external tensor bytes and the existing mask-aware mean/L2
+output. It replaces the media-feature merge with Google's no-media behavior:
+map image/video/audio placeholder IDs to PAD before text embedding lookup.
+The public interface is `input_ids`, `attention_mask` to `embeddings` with 768
+float32 dimensions. No second pooling or normalization is added. The pinned graph
+uses ORT's default-domain `SimplifiedLayerNormalization`, absent from the ONNX
+1.20.1 checker schema; compatibility is established by executing the derived
+graph with ORT 1.24.1, not by registering a substitute schema or changing operators.
+
+The model contract records the asymmetric query prefix `task: search result | query: `
+and document template `title: {title} | text: {text}` (`none` only when untitled),
+with prefix tokens included in mean pooling. PAD is token 0. FP16 is not supported:
+the upstream model explicitly warns of NaNs or silent degradation in that precision.
+Preparation copies the Apache-2.0 `LICENSE` and attribution/change `NOTICE` beside
+the model and writes the manifest last. Failed output is incomplete and is not
+silently resumed or activated.
+
+Preparation does not switch installed packs or rebuild any ANN. The shared native
+encoder accepts this fixed 768-dimensional contract as well as the unchanged BGE
+1024-dimensional contract. It prepends the recorded query prompt before tokenization;
+the existing 512-token limit includes prompt and special tokens. Caches remain local
+to one loaded encoder. A query selecting both model families is rejected before
+opening a session: their cosine distances are not comparable.
+
+`tools.generic_semantic` uses the existing paragraph/token projection (384 canonical
+tokens, overlap 64), mapping, checkpoint and create-new publication flow for either
+model. Gemma encodes every chunk as `title: {title} | text: {canonical chunk}`,
+using the document's newline-normalized title or `none` when empty. Canonical chunks
+still project the existing title-plus-original text, preserving source spans and
+proof ownership; the first chunk may therefore also contain the title in its text.
+The complete prefixed input is checked against 512 tokens before encoding, never
+silently truncated. An over-budget title/chunk fails explicitly. Source manifests
+bind this projection, tokenizer and model revision; raw knowledge and lexical
+membership files are copied unchanged. The graph already performs mean/L2 pooling.
+
+The current production corpus encoder is batched ORT CPU, with the manifest's
+1.24.1 / 8+1 threads / sequential contract and model-specific PAD (BGE 1, Gemma 0).
+`build_i8` reads 768 or 1024 dimensions from the NPY header; it only constructs ANN,
+not model embeddings. `inspect_i8 INDEX ROWS [DIMENSION]` keeps the old default
+1024 and requires explicit 768 for Gemma. GPU corpus encoding and four-source
+publication are separate operations, not implied by preparing or loading a model.
+Injected test encoders remain marked synthetic and cannot activate Gemma runtime packs.
+
+Modular discovery reports each pack's own `requires_model` / `model_present`.
+The historical top-level `model` object remains the BGE availability summary for
+older clients, not a selected-model declaration. Runtime selection uses only the
+chosen packs' model IDs and rejects missing/incompatible assets without lexical
+fallback. Existing BGE assets and legacy monolithic/pilot contracts remain valid.
+
 ## Commands (identical argv surface)
 
 ```

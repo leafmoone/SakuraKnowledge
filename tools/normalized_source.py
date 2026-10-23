@@ -12,6 +12,7 @@ from pathlib import Path
 
 from sakura_knowledge import storage
 from tools.source_inventory import capture, validate_inventory
+from tools.model_artifacts import encoder_contract
 from tools.source_pack import binding, build_membership
 
 
@@ -180,8 +181,19 @@ def validate(pack, index_inspector=None):
     if len(caps) != len(set(caps)) or not {'structured', 'lexical'} <= set(caps) or set(caps) - {'structured', 'lexical', 'semantic'}:
         raise ValueError('capability contradiction')
     sem = 'semantic' in caps
-    if (sem and manifest.get('requires_model') != 'bge-m3') or (not sem and manifest.get('requires_model') is not None):
+    if not sem and manifest.get('requires_model') is not None:
         raise ValueError('unsupported_model_contract')
+    model_contract = encoder_contract(manifest['requires_model']) if sem else None
+    if sem and manifest['requires_model'] == 'embeddinggemma-2':
+        projection = manifest.get('text_projection', {})
+        if projection.get('model_revision') != model_contract['revision']:
+            raise ValueError('source model revision mismatch')
+        for field in ['document_template', 'untitled_document']:
+            if projection.get(field) != model_contract[field]:
+                raise ValueError('source document encoding mismatch')
+        if (projection.get('document_text') != 'canonical_title_and_original'
+                or projection.get('max_sequence_tokens') != 512):
+            raise ValueError('source text projection mismatch')
     required = {'snapshot', 'lexical_membership'} | ({'mapping', 'index'} if sem else set())
     if len({item.get('path') for item in manifest['artifacts'].values()}) != len(manifest['artifacts']):
         raise ValueError('duplicate artifact paths')
@@ -216,7 +228,7 @@ def validate(pack, index_inspector=None):
             raise ValueError('membership snapshot binding')
         if sem:
             s = manifest['semantic']
-            for field, expected in {'dimension': 1024, 'metric': 'cos', 'dtype': 'i8', 'connectivity': 16, 'expansion_add': 256, 'expansion_search': 2048, 'chunk_depth': 512, 'entry_depth': 100}.items():
+            for field, expected in {'dimension': model_contract['dimension'], 'metric': 'cos', 'dtype': 'i8', 'connectivity': 16, 'expansion_add': 256, 'expansion_search': 2048, 'chunk_depth': 512, 'entry_depth': 100}.items():
                 if s.get(field) != expected:
                     raise ValueError('semantic contract mismatch')
             conn.execute('ATTACH DATABASE ? AS mapping', ((pack / manifest['artifacts']['mapping']['path']).resolve().as_uri() + '?mode=ro',))
@@ -227,7 +239,10 @@ def validate(pack, index_inspector=None):
                 raise ValueError('semantic mapping proof closure')
             if index_inspector is None:
                 raise ValueError('semantic validation requires explicit --index-inspector native executable')
-            result = subprocess.run([str(index_inspector), str(pack / manifest['artifacts']['index']['path']), str(count)], capture_output=True, check=False)
+            arguments = [str(index_inspector), str(pack / manifest['artifacts']['index']['path']), str(count)]
+            if s['dimension'] != 1024:
+                arguments.append(str(s['dimension']))
+            result = subprocess.run(arguments, capture_output=True, check=False)
             if result.returncode or json.loads(result.stdout).get('validation') != 'PASS':
                 raise ValueError('native index contract/keys')
     return {**inspect(pack), 'validation': 'PASS'}

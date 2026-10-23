@@ -1,0 +1,17 @@
+SakuraKnowledge distribution notice for the text-only EmbeddingGemma 2 model.
+
+Original model: Google DeepMind, google/embeddinggemma-2.
+Reference revision: 914f7f89142e33e77833254d9c9b90c3cef7303b.
+https://huggingface.co/google/embeddinggemma-2/tree/914f7f89142e33e77833254d9c9b90c3cef7303b
+
+Community ONNX conversion: onnx-community/embeddinggemma-2-ONNX.
+Conversion revision: daa72c51243991dfcaf9f9137d2c573d8f7790c0.
+https://huggingface.co/onnx-community/embeddinggemma-2-ONNX/tree/daa72c51243991dfcaf9f9137d2c573d8f7790c0
+Both model cards declare Apache-2.0. See LICENSE for its complete terms.
+The conversion does not declare a base checkpoint commit. The reference is
+identified by correspondence of the text weights, not by an exporter claim.
+
+SakuraKnowledge modifications: use the original text-only placeholder-to-PAD
+behavior, remove media-feature merging and select the existing mask-aware
+mean/L2 output as embeddings. External tensor and tokenizer bytes are unchanged.
+This package is text-only and does not contain the image or audio encoders.

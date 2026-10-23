@@ -102,6 +102,26 @@ impl RetrieveOptions {
 pub fn fixed_contract() -> Value {
     json!({"lexical_mode":"pilot_sidecar","revision":"5617a9f61b028005a4858fdac845db406aefb181","dimension":1024,"pooling":"cls","normalize":true,"query_prefix":"","dtype":"float32","output":"embeddings","provider":"CPUExecutionProvider","ort_version":"1.24.1","intra_threads":8,"inter_threads":1,"sequential":true,"ann":{"rows":52664,"metric":"cos","dtype":"f32","connectivity":16,"expansion_add":256,"expansion_search":128,"chunk_depth":512,"entry_depth":100},"bm25_document_depth":100,"rrf_k":60,"ties":"kind,namespace,value","pins":"trusted_exact_alias"})
 }
+fn shared_encoder_contract(model_id: &str) -> Result<Value> {
+    let mut contract = fixed_contract();
+    match model_id {
+        "bge-m3" => {},
+        "embeddinggemma-2" => {
+            contract["revision"] = json!("daa72c51243991dfcaf9f9137d2c573d8f7790c0");
+            contract["dimension"] = json!(768);
+            contract["pooling"] = json!("mean");
+            contract["query_prefix"] = json!("task: search result | query: ");
+            contract["document_template"] = json!("title: {title} | text: {text}");
+            contract["untitled_document"] = json!("none");
+            contract["pad_token_id"] = json!(0);
+        },
+        _ => return Err("unsupported shared model".into()),
+    }
+    for field in ["lexical_mode", "ann", "bm25_document_depth", "rrf_k", "ties", "pins"] {
+        contract.as_object_mut().unwrap().remove(field);
+    }
+    Ok(contract)
+}
 /// The exact shared Python declaration, embedded rather than read at runtime.
 pub fn full_declaration() -> Value {
     serde_json::from_str(FULL_DECLARATION).expect("embedded FULL declaration must be JSON")
@@ -890,14 +910,17 @@ fn validate_mapping(c: &Connection, n: usize) -> Result<()> {
 pub struct SharedEncoder {
     tokenizer: Tokenizer,
     session: Session,
+    model_id: String,
+    contract: Value,
     model_manifest: Option<PathBuf>,
+    tokenizer_sha256: Option<String>,
     last_tokens: usize,
     pub query_encodings: usize,
     pub cache_hits: usize,
     cache: embedding_cache::EmbeddingCache,
 }
 impl SharedEncoder {
-    fn from_paths(paths: &BTreeMap<String, PathBuf>) -> Result<Self> {
+    fn from_paths(paths: &BTreeMap<String, PathBuf>, model_id: String, contract: Value) -> Result<Self> {
         let tokenizer = Tokenizer::from_file(&paths["tokenizer"]).map_err(|e| e.to_string())?;
         let environment = ort::init_from(&paths["ort_dll"])?;
         require(runtime_version(&paths["ort_dll"])? == "1.24.1", "ORT runtime version mismatch")?;
@@ -910,15 +933,17 @@ impl SharedEncoder {
         require(session.inputs().len() == 2 && session.inputs()[0].name() == "input_ids"
             && session.inputs()[1].name() == "attention_mask" && session.outputs().len() == 1
             && session.outputs()[0].name() == "embeddings", "unexpected ONNX graph interface")?;
-        Ok(Self { tokenizer, session, model_manifest: None, last_tokens: 0, query_encodings:0, cache_hits:0, cache:embedding_cache::EmbeddingCache::new() })
+        Ok(Self { tokenizer, session, model_id, contract, model_manifest: None, tokenizer_sha256: None, last_tokens: 0, query_encodings:0, cache_hits:0, cache:embedding_cache::EmbeddingCache::new() })
     }
     pub fn open_model(model_manifest: impl AsRef<Path>, bin_dir: impl AsRef<Path>) -> Result<Self> {
         let p = model_manifest.as_ref();
         let manifest = read_package_manifest(p, "sakura-shared-model-v1")?;
-        require(manifest["model_id"] == "bge-m3", "unsupported shared model")?;
-        require(manifest["revision"]=="5617a9f61b028005a4858fdac845db406aefb181","shared model revision mismatch")?;
-        let contract=&manifest["contract"];
-        for field in ["dimension","pooling","normalize","query_prefix","dtype","output","provider","ort_version","intra_threads","inter_threads","sequential","revision"]{require(contract[field]==fixed_contract()[field],"shared encoder contract mismatch")?;}
+        let model_id = text(&manifest, "model_id")?;
+        let contract = shared_encoder_contract(model_id)?;
+        require(manifest["revision"] == contract["revision"], "shared model revision mismatch")?;
+        for (field, expected) in contract.as_object().unwrap() {
+            require(manifest["contract"][field] == *expected, "shared encoder contract mismatch")?;
+        }
         let root = p.parent().ok_or("manifest has no parent")?;
         let mut paths = BTreeMap::new();
         for name in ["model", "tokenizer"] {
@@ -928,8 +953,9 @@ impl SharedEncoder {
         require(!tensors.is_empty(), "missing external tensors")?;
         for binding in tensors { portable_artifact(root, binding)?; }
         paths.insert("ort_dll".into(), shared_runtime_path(&manifest, bin_dir.as_ref())?);
-        let mut encoder = Self::from_paths(&paths)?;
+        let mut encoder = Self::from_paths(&paths, model_id.to_owned(), contract)?;
         encoder.model_manifest = Some(std::fs::canonicalize(p)?);
+        encoder.tokenizer_sha256 = Some(text(&manifest["artifacts"]["tokenizer"], "sha256")?.to_owned());
         Ok(encoder)
     }
     pub fn encode(&mut self, query: &str) -> Result<Vec<f32>> {
@@ -939,7 +965,8 @@ impl SharedEncoder {
             self.cache_hits += 1;
             return Ok(vector);
         }
-        let encoded = self.tokenizer.encode(query, true).map_err(|e| e.to_string())?;
+        let input = format!("{}{}", self.contract["query_prefix"].as_str().unwrap(), query);
+        let encoded = self.tokenizer.encode(input, true).map_err(|e| e.to_string())?;
         let ids: Vec<i64> = encoded.get_ids().iter().map(|&v| i64::from(v)).collect();
         let mask: Vec<i64> = encoded.get_attention_mask().iter().map(|&v| i64::from(v)).collect();
         require(!ids.is_empty() && ids.len() == mask.len() && ids.len() <= 512, "invalid token shape")?;
@@ -948,8 +975,9 @@ impl SharedEncoder {
         self.query_encodings+=1;
         let output = self.session.run(ort::inputs!["input_ids"=>Tensor::from_array(([1usize,tokens],ids))?,"attention_mask"=>Tensor::from_array(([1usize,tokens],mask))?])?;
         let (shape, values) = output["embeddings"].try_extract_tensor::<f32>()?;
-        require(shape.as_ref() == [1_i64, 1024], "unexpected embeddings shape")?;
-        validate_vector(values)?;
+        let dimension = self.contract["dimension"].as_u64().unwrap() as usize;
+        require(shape.as_ref() == [1_i64, dimension as i64], "unexpected embeddings shape")?;
+        validate_vector(values, dimension)?;
         self.cache.insert(query, values, tokens);
         Ok(values.to_vec())
     }
@@ -990,6 +1018,11 @@ impl SemanticEngine {
         let p = source_manifest.as_ref();
         let source = read_package_manifest(p, "sakura-source-pack-v1")?;
         validate_source_manifest(&source)?;
+        require(source["requires_model"] == encoder.borrow().model_id, "source/shared encoder mismatch")?;
+        if source["requires_model"] == "embeddinggemma-2" {
+            require(source["text_projection"]["tokenizer_sha256"].as_str() == encoder.borrow().tokenizer_sha256.as_deref(),
+                "source/model tokenizer mismatch")?;
+        }
         let root = p.parent().ok_or("manifest has no parent")?;
         let mut paths = BTreeMap::new();
         for name in ["snapshot", "mapping", "index", "lexical_membership"] {
@@ -999,6 +1032,10 @@ impl SemanticEngine {
         require(paths["snapshot"].ends_with("knowledge.sqlite"), "snapshot identity mismatch")?;
         let rows = source["semantic"]["rows"].as_u64().ok_or("missing semantic rows")? as usize;
         let mut contract = portable_contract(rows)?;
+        for (field, value) in encoder.borrow().contract.as_object().unwrap() {
+            contract[field] = value.clone();
+        }
+        let dimension = contract["dimension"].as_u64().unwrap() as usize;
         contract["ann"]["expansion_search"] = json!(2048);
         contract["ann"]["chunk_depth"] = source["semantic"]["chunk_depth"].clone();
         let manifest = json!({"pack_version":"portable-cpu-i8-v1","pack_id":source["pack_id"],"snapshot":source["artifacts"]["snapshot"],"artifacts":source["artifacts"],"lexical_membership":source["lexical_membership"],"contract":contract});
@@ -1018,10 +1055,10 @@ impl SemanticEngine {
         mapping.prepare("SELECT position,original_position,chunk_id,document_id,kind,namespace,value,source_id,evidence_id FROM chunks LIMIT 0")?;
         let ip = paths["index"].to_str().ok_or("non UTF-8 index path")?;
         let metadata = Index::metadata(ip)?;
-        require(metadata.dimensions == 1024 && metadata.metric == MetricKind::Cos, "index metadata mismatch")?;
+        require(metadata.dimensions == dimension as u64 && metadata.metric == MetricKind::Cos, "index metadata mismatch")?;
         let index = Index::new(&metadata.into())?;
         index.view(ip)?;
-        require(index.size() == rows && index.dimensions() == 1024 && index.metric_kind() == MetricKind::Cos && index.scalar_kind() == ScalarKind::I8 && index.connectivity() == 16, "index contract mismatch")?;
+        require(index.size() == rows && index.dimensions() == dimension && index.metric_kind() == MetricKind::Cos && index.scalar_kind() == ScalarKind::I8 && index.connectivity() == 16, "index contract mismatch")?;
         configure_search_expansion(&index, &manifest["contract"])?;
         Ok(Self { encoder: Some(encoder), index: Some(index), mapping, mapping_projected: true, lexical: readonly(&paths["snapshot"] )?, base, manifest, mode: Mode::Full, rows, full_members, fts_members, open_timings_ms: json!({}) })
     }
@@ -1174,7 +1211,7 @@ impl SemanticEngine {
             "membership_allocation_bytes":full_members.capacity() * std::mem::size_of::<(i64,i64)>(),
             "model_sessions":1});
         Ok(Self {
-            encoder: Some(Rc::new(RefCell::new(SharedEncoder { tokenizer, session, model_manifest: None, last_tokens: 0, query_encodings:0, cache_hits:0, cache:embedding_cache::EmbeddingCache::new() }))),
+            encoder: Some(Rc::new(RefCell::new(SharedEncoder { tokenizer, session, model_id: "bge-m3".into(), contract: shared_encoder_contract("bge-m3")?, model_manifest: None, tokenizer_sha256: None, last_tokens: 0, query_encodings:0, cache_hits:0, cache:embedding_cache::EmbeddingCache::new() }))),
             index: Some(index),
             mapping,
             mapping_projected,
@@ -1219,7 +1256,7 @@ impl SemanticEngine {
     fn retrieve_internal(&mut self, query: &str, options: &RetrieveOptions, vector: &[f32], branches_only: bool, defer_bodies: bool) -> Result<Value> {
         let total = Instant::now();
         options.validate()?;
-        if self.index.is_some() { validate_vector(vector)?; }
+        if let Some(index) = &self.index { validate_vector(vector, index.dimensions())?; }
         require(
             !query.is_empty() && query.chars().count() <= 4096,
             "query must contain 1..4096 characters",
@@ -1394,11 +1431,23 @@ impl SemanticEngine {
     }
 }
 fn validate_source_manifest(source: &Value) -> Result<()> {
-    require(source["schema"] == "sakura-source-pack-v1" && source["requires_model"] == "bge-m3", "unsupported source model/schema")?;
+    require(source["schema"] == "sakura-source-pack-v1", "unsupported source schema")?;
+    let model_id = text(source, "requires_model")?;
+    let contract = shared_encoder_contract(model_id)?;
+    if model_id == "embeddinggemma-2" {
+        let projection = &source["text_projection"];
+        require(projection["model_revision"] == contract["revision"], "source model revision mismatch")?;
+        for field in ["document_template", "untitled_document"] {
+            require(projection[field] == contract[field], "source document encoding mismatch")?;
+        }
+        require(projection["synthetic_test_encoder"] == false, "synthetic source cannot use the production encoder")?;
+        require(projection["document_text"] == "canonical_title_and_original" && projection["max_sequence_tokens"] == 512,
+            "source text projection mismatch")?;
+    }
     text(source, "pack_id")?;
     require(source["capabilities"].as_array().is_some_and(|v| v.iter().any(|s| s == "semantic")), "semantic capability required")?;
     let s = &source["semantic"];
-    require(s["rows"].as_u64().is_some_and(|n| n > 0 && n <= i64::MAX as u64) && s["dimension"] == 1024 && s["metric"] == "cos" && s["dtype"] == "i8" && s["connectivity"] == 16 && s["expansion_add"] == 256 && s["expansion_search"] == 2048 && s["chunk_depth"].as_u64().is_some_and(|n| (512..=65536).contains(&n)), "invalid source semantic contract")?;
+    require(s["rows"].as_u64().is_some_and(|n| n > 0 && n <= i64::MAX as u64) && s["dimension"] == contract["dimension"] && s["metric"] == "cos" && s["dtype"] == "i8" && s["connectivity"] == 16 && s["expansion_add"] == 256 && s["expansion_search"] == 2048 && s["chunk_depth"].as_u64().is_some_and(|n| (512..=65536).contains(&n)), "invalid source semantic contract")?;
     require(source["artifacts"]["snapshot"]["identity"] == "knowledge.sqlite", "source snapshot identity must be knowledge.sqlite")?;
     Ok(())
 }
@@ -1553,9 +1602,9 @@ fn add_source(c: &Connection, sources: &mut BTreeMap<String, Value>, s: &str) ->
     }
     Ok(())
 }
-fn validate_vector(v: &[f32]) -> Result<()> {
+fn validate_vector(v: &[f32], dimension: usize) -> Result<()> {
     require(
-        v.len() == 1024 && v.iter().all(|n| n.is_finite()),
+        v.len() == dimension && v.iter().all(|n| n.is_finite()),
         "invalid embedding values",
     )?;
     let n: f64 = v.iter().map(|&x| f64::from(x).powi(2)).sum();
