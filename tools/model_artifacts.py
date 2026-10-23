@@ -1,5 +1,6 @@
 """Shared offline artifact copying and pinned ORT bindings for model preparation."""
 import hashlib
+import json
 from collections.abc import Mapping
 from pathlib import Path
 from typing import TypedDict
@@ -83,3 +84,20 @@ def runtime_bindings(libraries: Mapping[str, str | Path]) -> dict[str, ArtifactB
             raise ValueError('platform runtimes require distinct basenames')
         bindings[platform] = {'path': path.name, **expected}
     return bindings
+
+
+def verified_model(directory: Path) -> dict:
+    """Verify a prepared model once at a read-only build invocation boundary."""
+    from tools.source_pack import binding
+    manifest = json.loads((directory / 'manifest.json').read_bytes())
+    frozen = encoder_contract(manifest.get('model_id'))
+    if (manifest.get('schema') != 'sakura-shared-model-v1'
+            or manifest.get('revision') != frozen['revision']
+            or any(manifest.get('contract', {}).get(k) != v for k, v in frozen.items())):
+        raise ValueError('frozen encoder contract mismatch')
+    for item in [manifest['artifacts']['model'], manifest['artifacts']['tokenizer'],
+                 *manifest['artifacts']['external_data']]:
+        if (Path(item['path']).name != item['path']
+                or binding(directory / item['path']) != {k: item[k] for k in ('path', 'sha256', 'size')}):
+            raise ValueError('frozen model artifact binding mismatch')
+    return manifest

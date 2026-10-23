@@ -166,15 +166,8 @@ def inspect(pack):
             'requires_model': manifest['requires_model'], 'actual_bytes': sum(p.stat().st_size for p in pack.rglob('*') if p.is_file())}
 
 
-def validate(pack, index_inspector=None):
-    pack = Path(pack)
-    manifest = json.loads((pack / 'manifest.json').read_bytes())
+def _validate_source(pack, manifest):
     safe_id(manifest['pack_id'])
-    if manifest.get('distribution_closed_set'):
-        expected_files = {'manifest.json'} | {item['path'] for item in manifest['artifacts'].values()}
-        actual_files = {p.relative_to(pack).as_posix() for p in pack.rglob('*') if p.is_file()}
-        if actual_files != expected_files or any(p.is_symlink() for p in pack.rglob('*')):
-            raise ValueError('runtime distribution file closed set')
     if manifest.get('schema') != 'sakura-source-pack-v1':
         raise ValueError('source pack schema')
     caps = manifest.get('capabilities', [])
@@ -183,17 +176,6 @@ def validate(pack, index_inspector=None):
     sem = 'semantic' in caps
     if not sem and manifest.get('requires_model') is not None:
         raise ValueError('unsupported_model_contract')
-    model_contract = encoder_contract(manifest['requires_model']) if sem else None
-    if sem and manifest['requires_model'] == 'embeddinggemma-2':
-        projection = manifest.get('text_projection', {})
-        if projection.get('model_revision') != model_contract['revision']:
-            raise ValueError('source model revision mismatch')
-        for field in ['document_template', 'untitled_document']:
-            if projection.get(field) != model_contract[field]:
-                raise ValueError('source document encoding mismatch')
-        if (projection.get('document_text') != 'canonical_title_and_original'
-                or projection.get('max_sequence_tokens') != 512):
-            raise ValueError('source text projection mismatch')
     required = {'snapshot', 'lexical_membership'} | ({'mapping', 'index'} if sem else set())
     if len({item.get('path') for item in manifest['artifacts'].values()}) != len(manifest['artifacts']):
         raise ValueError('duplicate artifact paths')
@@ -205,8 +187,10 @@ def validate(pack, index_inspector=None):
         items = manifest[field]
         if not items or len(items) != len(set(items)) or any(not isinstance(s, str) or not s or len(s) > 256 or any(ord(c) < 32 for c in s) for s in items):
             raise ValueError('source/namespace declaration')
-    for item in manifest['artifacts'].values():
-        if Path(item['path']).name != item['path'] or binding(pack / item['path']) != {k: item[k] for k in ('path', 'sha256', 'size')}:
+    for role, item in manifest['artifacts'].items():
+        if Path(item['path']).name != item['path']:
+            raise ValueError('unsafe artifact path')
+        if role in {'snapshot', 'lexical_membership'} and binding(pack / item['path']) != {k: item[k] for k in ('path', 'sha256', 'size')}:
             raise ValueError('artifact binding mismatch')
     with closing(sqlite3.connect((pack / 'knowledge.sqlite').resolve().as_uri() + '?mode=ro', uri=True)) as conn:
         if conn.execute('PRAGMA integrity_check').fetchall() != [('ok',)] or conn.execute('PRAGMA foreign_key_check').fetchall():
@@ -226,7 +210,48 @@ def validate(pack, index_inspector=None):
         meta = dict(conn.execute('SELECT key,value FROM membership.meta'))
         if meta['snapshot_sha256'] != manifest['artifacts']['snapshot']['sha256'] or int(meta['rows']) != manifest['trusted_fts_documents']:
             raise ValueError('membership snapshot binding')
-        if sem:
+
+
+def validate_source(pack):
+    """Validate rebuild inputs, not the old model's optional mapping/ANN files."""
+    pack = Path(pack)
+    manifest = json.loads((pack / 'manifest.json').read_bytes())
+    if manifest.get('distribution_closed_set'):
+        declared = {'manifest.json'} | {item['path'] for item in manifest['artifacts'].values()}
+        actual = {p.relative_to(pack).as_posix() for p in pack.rglob('*') if p.is_file()}
+        if not actual <= declared or any(p.is_symlink() for p in pack.rglob('*')):
+            raise ValueError('source input contains undeclared files or symlinks')
+    _validate_source(pack, manifest)
+    return {**inspect(pack), 'validation': 'PASS', 'validation_scope': 'source-only'}
+
+
+def validate(pack, index_inspector=None):
+    pack = Path(pack)
+    manifest = json.loads((pack / 'manifest.json').read_bytes())
+    if manifest.get('distribution_closed_set'):
+        expected_files = {'manifest.json'} | {item['path'] for item in manifest['artifacts'].values()}
+        actual_files = {p.relative_to(pack).as_posix() for p in pack.rglob('*') if p.is_file()}
+        if actual_files != expected_files or any(p.is_symlink() for p in pack.rglob('*')):
+            raise ValueError('runtime distribution file closed set')
+    _validate_source(pack, manifest)
+    sem = 'semantic' in manifest['capabilities']
+    model_contract = encoder_contract(manifest['requires_model']) if sem else None
+    if sem and manifest['requires_model'] == 'embeddinggemma-2':
+        projection = manifest.get('text_projection', {})
+        if projection.get('model_revision') != model_contract['revision']:
+            raise ValueError('source model revision mismatch')
+        for field in ['document_template', 'untitled_document']:
+            if projection.get(field) != model_contract[field]:
+                raise ValueError('source document encoding mismatch')
+        if (projection.get('document_text') != 'canonical_title_and_original'
+                or projection.get('max_sequence_tokens') != 512):
+            raise ValueError('source text projection mismatch')
+    if sem:
+        for role in ['mapping', 'index']:
+            item = manifest['artifacts'][role]
+            if binding(pack / item['path']) != {k: item[k] for k in ('path', 'sha256', 'size')}:
+                raise ValueError('artifact binding mismatch')
+        with closing(sqlite3.connect((pack / 'knowledge.sqlite').resolve().as_uri() + '?mode=ro', uri=True)) as conn:
             s = manifest['semantic']
             for field, expected in {'dimension': model_contract['dimension'], 'metric': 'cos', 'dtype': 'i8', 'connectivity': 16, 'expansion_add': 256, 'expansion_search': 2048, 'chunk_depth': 512, 'entry_depth': 100}.items():
                 if s.get(field) != expected:
@@ -250,7 +275,7 @@ def validate(pack, index_inspector=None):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('command', choices=['normalize', 'build-normalized', 'inspect', 'validate'])
+    p.add_argument('command', choices=['normalize', 'build-normalized', 'inspect', 'validate', 'validate-source'])
     p.add_argument('--input', required=True)
     p.add_argument('--output')
     p.add_argument('--adapter')
@@ -261,6 +286,8 @@ def main():
         result = normalize(a.input, a.adapter, a.output, a.pack_id)
     elif a.command == 'build-normalized':
         result = build_normalized(a.input, Path(a.output))
+    elif a.command == 'validate-source':
+        result = validate_source(a.input)
     elif a.command == 'validate':
         result = validate(a.input, a.index_inspector)
     else:

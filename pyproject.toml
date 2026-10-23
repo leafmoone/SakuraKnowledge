@@ -9,6 +9,14 @@ description = "Offline evidence-preserving knowledge snapshot core"
 requires-python = ">=3.11"
 dependencies = []
 
+[project.optional-dependencies]
+semantic-cuda = [
+    "numpy>=2,<3",
+    "tokenizers==0.23.3",
+    "transformers==5.20.2",
+    "torch>=2.11,<2.14",
+]
+
 [project.scripts]
 sknow = "sakura_knowledge.cli:main"
 

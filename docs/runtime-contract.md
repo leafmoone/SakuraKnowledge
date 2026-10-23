@@ -142,13 +142,58 @@ silently truncated. An over-budget title/chunk fails explicitly. Source manifest
 bind this projection, tokenizer and model revision; raw knowledge and lexical
 membership files are copied unchanged. The graph already performs mean/L2 pooling.
 
-The current production corpus encoder is batched ORT CPU, with the manifest's
+The default production corpus encoder is batched ORT CPU, with the manifest's
 1.24.1 / 8+1 threads / sequential contract and model-specific PAD (BGE 1, Gemma 0).
 `build_i8` reads 768 or 1024 dimensions from the NPY header; it only constructs ANN,
 not model embeddings. `inspect_i8 INDEX ROWS [DIMENSION]` keeps the old default
-1024 and requires explicit 768 for Gemma. GPU corpus encoding and four-source
-publication are separate operations, not implied by preparing or loading a model.
-Injected test encoders remain marked synthetic and cannot activate Gemma runtime packs.
+1024 and requires explicit 768 for Gemma. Injected test encoders remain marked
+synthetic and cannot activate Gemma runtime packs.
+
+### CUDA document construction
+
+The explicit `--cuda-model` option uses the fixed original Google checkpoint,
+not a different ONNX precision. `tools/gemma_cuda.py` binds its original config
+and safetensors to the reference revision above, loads only the text tower through
+native Transformers, and applies mask-aware mean/L2 after the 768-dimensional
+projection. Prompt and special tokens remain included. It consumes the same
+prepared tokenizer's IDs and masks as ORT; there is no second tokenizer or chunker.
+FP32, eager attention and disabled TF32/autocast are explicit. Missing CUDA,
+a mismatched Transformers version, OOM and model failures are errors, never CPU or
+half-precision fallbacks. The query manifest remains ORT CPU.
+
+The `semantic-cuda` extra declares the build dependencies, including
+`transformers==5.20.2` and `tokenizers==0.23.3`; an existing compatible CUDA PyTorch
+2.11–2.13 installation can be reused. SentenceTransformers is not required. Install
+into the build environment, not globally; this command never installs dependencies
+or downloads models. Supply an explicit device and batch size:
+
+```text
+python -m tools.generic_semantic --pack packs/danbooru --model models/embeddinggemma-2 --output new-packs/danbooru --index-builder bin/build_i8 --cuda-model original/embeddinggemma-2 --device cuda:0 --batch-size 8
+```
+
+Repeat `--pack` and `--output` in matching order for serial sources; if supplied,
+repeat `--workspace` in the same count. Single-source argv remains valid. One CUDA
+invocation verifies both the prepared model artifacts and original checkpoint once,
+loads one tokenizer and one GPU model, and reuses them across sources. The input
+model directories must remain read-only for that invocation. Each source still
+validates its own input and final output. A completed output is never overwritten;
+a failed later source can be retried separately through the existing encoded/ready
+workspace recovery. Incomplete encoding remains non-resumable.
+
+Workspace inputs and published `semantic_build` record the actual torch/CUDA/device,
+Transformers, fixed checkpoint artifact bindings, FP32 policy and batch size.
+Results report encoder time, rows/second and peak allocated device bytes; these are
+measurements of that invocation, not a throughput guarantee. Before a full corpus,
+run a real short CUDA batch, compare it with the CPU contract, and check GPU memory
+and throughput. CPU parity alone does not establish GPU acceptance or four-source
+publication. Synthetic test callbacks remain separate from the CUDA connector.
+
+Rebuilding consumes `validate_source` (`validate-source` CLI), which shares the
+existing snapshot/lexical hashes, SQLite integrity, ownership and evidence-closure
+checks. Old mapping/ANN files may be absent and are not read, even when the unchanged
+input manifest declares them. Its result is explicitly `validation_scope: source-only`,
+not a valid runtime distribution. New output still requires the complete file set,
+new mapping proof closure and native ANN validation before manifest-last publication.
 
 Modular discovery reports each pack's own `requires_model` / `model_present`.
 The historical top-level `model` object remains the BGE availability summary for

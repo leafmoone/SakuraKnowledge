@@ -1,4 +1,5 @@
 """Explicit semantic workspace and create-new, manifest-last runtime publication."""
+from __future__ import annotations
 import argparse
 import io
 import json
@@ -9,12 +10,17 @@ import subprocess
 import tempfile
 from contextlib import closing
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from sakura_knowledge.storage import _publish_new_directory
 from tools import semantic_chunks
-from tools.normalized_source import validate
-from tools.model_artifacts import encoder_contract
+from tools.normalized_source import validate, validate_source
+from tools.model_artifacts import encoder_contract, verified_model
 from tools.source_pack import binding
+
+
+if TYPE_CHECKING:
+    from tools.gemma_cuda import GemmaCudaEncoder
 
 
 def _disjoint(paths):
@@ -43,14 +49,7 @@ def _checkpoint(path, state):
         temporary.unlink(missing_ok=True)
 
 
-def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, index_inspector=None,
-            workspace=None, resume_workspace=False, keep_workspace=False, batch_size=1):
-    import numpy as np
-    if type(batch_size) is not int or batch_size < 1:
-        raise ValueError('batch_size must be a positive integer')
-    pack, model, output = Path(pack).resolve(), Path(model).resolve(), Path(output).resolve()
-    workspace = Path(workspace).resolve() if workspace else output.with_name(output.name + '.semantic-work')
-    _disjoint([pack, model, output, workspace])
+def _check_destination(output: Path, workspace: Path, resume_workspace: bool) -> None:
     if output.exists():
         raise FileExistsError(f'output already exists: {output}')
     if resume_workspace:
@@ -58,25 +57,30 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
             raise ValueError('resume workspace missing')
     elif workspace.exists():
         raise FileExistsError(f'workspace already exists: {workspace}')
+
+
+def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, index_inspector=None,
+            workspace=None, resume_workspace=False, keep_workspace=False, batch_size=1, *, cuda_encoder: GemmaCudaEncoder | None):
+    import numpy as np
+    if type(batch_size) is not int or batch_size < 1:
+        raise ValueError('batch_size must be a positive integer')
+    pack, model, output = Path(pack).resolve(), Path(model).resolve(), Path(output).resolve()
+    workspace = Path(workspace).resolve() if workspace else output.with_name(output.name + '.semantic-work')
+    _disjoint([pack, model, output, workspace])
+    _check_destination(output, workspace, resume_workspace)
     if index_inspector is None:
         index_inspector = Path(index_builder).with_name('inspect_i8' + Path(index_builder).suffix)
-    validate(pack, index_inspector)
+    validate_source(pack)
     manifest = json.loads((pack / 'manifest.json').read_bytes())
-    contract = json.loads((model / 'manifest.json').read_bytes())
+    if cuda_encoder is not None and (encoder is not None or model != cuda_encoder.prepared):
+        raise ValueError('CUDA encoder must use its verified prepared model, not a test encoder')
+    contract = (cuda_encoder.contract if cuda_encoder is not None else
+                json.loads((model / 'manifest.json').read_bytes()) if encoder is not None else verified_model(model))
     synthetic = encoder is not None
     model_id = contract.get('model_id', 'bge-m3') if synthetic else contract.get('model_id')
     frozen = encoder_contract(model_id)
     if contract.get('revision') != frozen['revision']:
         raise ValueError('unsupported frozen model revision')
-    if not synthetic:
-        if contract.get('schema') != 'sakura-shared-model-v1':
-            raise ValueError('unsupported_model_contract')
-        for field, expected in frozen.items():
-            if contract['contract'].get(field) != expected:
-                raise ValueError('frozen encoder contract mismatch')
-        for item in [contract['artifacts']['model'], contract['artifacts']['tokenizer'], *contract['artifacts']['external_data']]:
-            if Path(item['path']).name != item['path'] or binding(model / item['path']) != {k: item[k] for k in ('path', 'sha256', 'size')}:
-                raise ValueError('frozen model artifact binding mismatch')
     tokenizer_path = model / contract.get('artifacts', {}).get('tokenizer', {}).get('path', 'tokenizer.json')
     params = {'version': semantic_chunks.VERSION, 'max_tokens': 384, 'overlap_tokens': 64,
               'passage_prefix': '', 'dimension': frozen['dimension'], 'metric': 'cos', 'dtype': 'i8',
@@ -85,9 +89,13 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
     if model_id == 'embeddinggemma-2':
         params.update(document_template=frozen['document_template'], untitled_document=frozen['untitled_document'],
                       document_text='canonical_title_and_original', max_sequence_tokens=512)
+    build = {'batch_size': batch_size}
+    if cuda_encoder is not None:
+        build['document_encoder'] = cuda_encoder.provenance
     inputs = {'pack_manifest': binding(pack / 'manifest.json'), 'pack_artifacts': manifest['artifacts'],
-              'model_manifest': binding(model / 'manifest.json'), 'tokenizer': binding(tokenizer_path),
-              'parameters': params, 'build': {'batch_size': batch_size},
+              'model_manifest': cuda_encoder.manifest_binding if cuda_encoder is not None else binding(model / 'manifest.json'),
+              'tokenizer': contract['artifacts']['tokenizer'] if not synthetic else binding(tokenizer_path),
+              'parameters': params, 'build': build,
               'synthetic_test_encoder': synthetic}
     if not resume_workspace:
         workspace.mkdir(parents=True, exist_ok=False)
@@ -123,7 +131,7 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
                 from tokenizers import Tokenizer
                 tokenizer = Tokenizer.from_file(str(tokenizer_path))
             rows = _encode_corpus(pack, model, workspace, manifest, contract, inputs,
-                                  tokenizer, encoder, batch_size)
+                                  tokenizer, encoder, batch_size, cuda_encoder)
             # _encode_corpus owns the ORT session and releases it before ANN construction.
             state = {'inputs': inputs, 'stage': 'encoded', 'ready': False, 'rows': rows,
                      'artifacts': {name: binding(workspace / name) for name in ['vectors.npy', 'mapping.sqlite']}}
@@ -148,6 +156,7 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
                 shutil.copy2(workspace / state['artifacts'][name]['path'], staging / name)
             manifest['distribution_closed_set'] = True
             manifest['text_projection'] = {**params, 'tokenizer_sha256': inputs['tokenizer']['sha256'], 'model_revision': contract['revision'], 'synthetic_test_encoder': synthetic}
+            manifest['semantic_build'] = build
             manifest['capabilities'] = ['structured', 'lexical', 'semantic']
             manifest['requires_model'] = model_id
             manifest['semantic'] = {k: v for k, v in params.items() if k in ['dimension', 'metric', 'dtype', 'connectivity', 'expansion_add', 'expansion_search', 'chunk_depth', 'entry_depth']}
@@ -167,7 +176,8 @@ def prepare(pack, model, output, index_builder, encoder=None, tokenizer=None, in
             shutil.rmtree(workspace)
         return {'rows': state['rows'], 'native_build': state['native_build'], 'validation': validation,
                 'manifest': str(output / 'manifest.json'), 'workspace': str(workspace),
-                'workspace_kept': keep_workspace, 'workspace_bytes': workspace_bytes}
+                'workspace_kept': keep_workspace, 'workspace_bytes': workspace_bytes,
+                'document_encoding': cuda_encoder.statistics() if cuda_encoder is not None and not resume_workspace else None}
     except Exception as exc:
         raise RuntimeError(f'semantic preparation failed; workspace preserved at {workspace}: {exc}') from exc
 
@@ -193,7 +203,7 @@ def _document_chunks(pack, manifest, tokenizer, tokenizer_sha256, parameters):
                 yield {**chunk, 'encoding_text': prefix + chunk['text']}
 
 
-def _encode_batch(texts, tokenizer, session, pad_id, max_tokens):
+def _batch_inputs(texts, tokenizer, pad_id, max_tokens):
     import numpy as np
     encoded = [tokenizer.encode(text) for text in texts]
     if any(not item.ids or len(item.ids) > max_tokens for item in encoded):
@@ -203,28 +213,33 @@ def _encode_batch(texts, tokenizer, session, pad_id, max_tokens):
     for i, item in enumerate(encoded):
         ids[i, :len(item.ids)] = item.ids
         attention[i, :len(item.ids)] = item.attention_mask
-    return session.run(['embeddings'], {'input_ids': ids, 'attention_mask': attention})[0]
+    return {'input_ids': ids, 'attention_mask': attention}
 
 
-def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer, encoder, batch_size):
+def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer, encoder, batch_size, cuda_encoder):
     import numpy as np
     session = None
     if encoder is None:
-        import onnxruntime as ort
         pad_id = tokenizer.token_to_id('<pad>')
         expected_pad = 0 if contract['model_id'] == 'embeddinggemma-2' else 1
         if pad_id != expected_pad:
             raise ValueError('frozen tokenizer padding token mismatch')
-        if ort.__version__ != contract['contract']['ort_version']:
-            raise ValueError('frozen ORT version mismatch')
-        options = ort.SessionOptions()
-        options.intra_op_num_threads = 8
-        options.inter_op_num_threads = 1
-        options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
-        session = ort.InferenceSession(str(model / contract['artifacts']['model']['path']),
-                                       sess_options=options, providers=['CPUExecutionProvider'])
-        encoder = lambda texts: _encode_batch(texts, tokenizer, session, pad_id,
-                                              inputs['parameters'].get('max_sequence_tokens', 512))
+        if cuda_encoder is not None:
+            cuda_encoder.begin_source()
+            encode_inputs = cuda_encoder.encode
+        else:
+            import onnxruntime as ort
+            if ort.__version__ != contract['contract']['ort_version']:
+                raise ValueError('frozen ORT version mismatch')
+            options = ort.SessionOptions()
+            options.intra_op_num_threads = 8
+            options.inter_op_num_threads = 1
+            options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+            session = ort.InferenceSession(str(model / contract['artifacts']['model']['path']),
+                                           sess_options=options, providers=['CPUExecutionProvider'])
+            encode_inputs = lambda batch: session.run(['embeddings'], batch)[0]
+        encoder = lambda texts: encode_inputs(_batch_inputs(
+            texts, tokenizer, pad_id, inputs['parameters'].get('max_sequence_tokens', 512)))
     dimension = inputs['parameters']['dimension']
     rows = 0
     try:
@@ -262,7 +277,7 @@ def _encode_corpus(pack, model, workspace, manifest, contract, inputs, tokenizer
             stream.write(final_header)
             conn.commit()
     finally:
-        # Drop the callable's session reference too, before checkpointing and building ANN.
+        # Release this source's ORT session; the explicit CUDA owner spans serial sources.
         encoder = None
         session = None
     return rows
@@ -290,16 +305,47 @@ def _vectors(vectors, rows, dimension):
 
 def main():
     p = argparse.ArgumentParser()
-    for name in ['pack', 'model', 'output', 'index-builder']:
+    for name in ['pack', 'output']:
+        p.add_argument('--' + name, required=True, action='append')
+    for name in ['model', 'index-builder']:
         p.add_argument('--' + name, required=True)
     p.add_argument('--index-inspector')
-    p.add_argument('--workspace')
+    p.add_argument('--workspace', action='append')
     p.add_argument('--resume-workspace', action='store_true')
     p.add_argument('--keep-workspace', action='store_true')
-    p.add_argument('--batch-size', type=int, default=1, help='maximum encoder batch size (default: 1)')
+    p.add_argument('--batch-size', type=int, help='maximum encoder batch size; CPU defaults to 1')
+    p.add_argument('--cuda-model', type=Path, help='fixed local Google checkpoint; enables CUDA document encoding')
+    p.add_argument('--device', help='explicit CUDA device, for example cuda:0')
     a = p.parse_args()
-    print(json.dumps(prepare(a.pack, a.model, a.output, a.index_builder, index_inspector=a.index_inspector,
-                             workspace=a.workspace, resume_workspace=a.resume_workspace, keep_workspace=a.keep_workspace, batch_size=a.batch_size)))
+    if len(a.pack) != len(a.output) or (a.workspace and len(a.workspace) != len(a.pack)):
+        p.error('supply equal counts of --pack, --output and optional --workspace')
+    if a.cuda_model is not None and (not a.device or a.batch_size is None):
+        p.error('--cuda-model requires explicit --device and --batch-size')
+    if a.device and a.cuda_model is None:
+        p.error('--device requires --cuda-model')
+    workspaces = a.workspace or [str(Path(output).with_name(Path(output).name + '.semantic-work')) for output in a.output]
+    _disjoint([*a.pack, *a.output, *workspaces, a.model, *([a.cuda_model] if a.cuda_model is not None else [])])
+    if a.batch_size is not None and a.batch_size < 1:
+        p.error('--batch-size must be positive')
+    for output, workspace in zip(a.output, workspaces):
+        _check_destination(Path(output).resolve(), Path(workspace).resolve(), a.resume_workspace)
+    cuda_encoder = None
+    tokenizer = None
+    if a.cuda_model is not None:
+        from tools.gemma_cuda import GemmaCudaEncoder
+        cuda_encoder = GemmaCudaEncoder(Path(a.model), a.cuda_model, a.device)
+        from tokenizers import Tokenizer
+        tokenizer = Tokenizer.from_file(str(Path(a.model) / cuda_encoder.contract['artifacts']['tokenizer']['path']))
+    try:
+        for pack, output, workspace in zip(a.pack, a.output, workspaces):
+            print(json.dumps(prepare(
+                pack, a.model, output, a.index_builder, index_inspector=a.index_inspector,
+                workspace=workspace, resume_workspace=a.resume_workspace,
+                keep_workspace=a.keep_workspace, batch_size=a.batch_size if a.batch_size is not None else 1,
+                tokenizer=tokenizer, cuda_encoder=cuda_encoder)), flush=True)
+    finally:
+        if cuda_encoder is not None:
+            cuda_encoder.close()
 
 
 if __name__ == '__main__':
