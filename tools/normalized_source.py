@@ -5,6 +5,7 @@ import json
 import re
 import shutil
 import sqlite3
+import stat
 import subprocess
 from collections import Counter
 from contextlib import closing
@@ -216,8 +217,25 @@ def validate_source(pack):
     """Validate rebuild inputs, not the old model's optional mapping/ANN files."""
     pack = Path(pack)
     manifest = json.loads((pack / 'manifest.json').read_bytes())
+    metadata = set()
+    receipt = pack / '.installed.json'
+    try:
+        receipt_mode = receipt.lstat().st_mode
+    except FileNotFoundError:
+        pass
+    else:
+        if not stat.S_ISREG(receipt_mode):
+            raise ValueError('source installation receipt must be a regular file')
+        record = json.loads(receipt.read_bytes())
+        if (not isinstance(record, dict) or record.get('format') != 'sakuratool-installed-source-v1'
+                or record.get('kind') != 'knowledge'
+                or any(not isinstance(record.get(key), str) or not record[key] for key in ('source', 'repository'))
+                or not isinstance(record.get('files'), list)):
+            raise ValueError('unsupported source installation receipt')
+        # Host bookkeeping is not source identity and is never copied to output.
+        metadata.add(receipt.name)
     if manifest.get('distribution_closed_set'):
-        declared = {'manifest.json'} | {item['path'] for item in manifest['artifacts'].values()}
+        declared = {'manifest.json'} | metadata | {item['path'] for item in manifest['artifacts'].values()}
         actual = {p.relative_to(pack).as_posix() for p in pack.rglob('*') if p.is_file()}
         if not actual <= declared or any(p.is_symlink() for p in pack.rglob('*')):
             raise ValueError('source input contains undeclared files or symlinks')

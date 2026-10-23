@@ -192,7 +192,9 @@ Rebuilding consumes `validate_source` (`validate-source` CLI), which shares the
 existing snapshot/lexical hashes, SQLite integrity, ownership and evidence-closure
 checks. Old mapping/ANN files may be absent and are not read, even when the unchanged
 input manifest declares them. Its result is explicitly `validation_scope: source-only`,
-not a valid runtime distribution. New output still requires the complete file set,
+not a valid runtime distribution. A regular SakuraTool `.installed.json` receipt is
+recognized as host metadata only; it proves no source identity and is not copied.
+New output still requires the complete file set,
 new mapping proof closure and native ANN validation before manifest-last publication.
 
 Modular discovery reports each pack's own `requires_model` / `model_present`.
