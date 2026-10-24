@@ -155,13 +155,16 @@ def project_document(document, tokenizer, *, base_snapshot_sha256,
             count = len(offsets_for(tokenizer, sliced))
             require(count > 0, "nonempty slice retokenized to empty stream")
             if count <= MAX_TOKENS:
-                break
+                inference_count = len(tokenizer.encode(
+                    passage_prefix + sliced, add_special_tokens=True).ids)
+                if inference_count <= max_sequence_tokens:
+                    break
             end -= 1
-            require(end > start + OVERLAP, "retokenization cannot progress with 64-token overlap")
+            require(end > start + OVERLAP,
+                    f"chunk cannot fit {MAX_TOKENS}-token text and {max_sequence_tokens}-token "
+                    f"inference budgets with {OVERLAP}-token overlap")
         require(end == total or end > start + OVERLAP,
                 "chunk cannot progress with 64-token overlap")
-        inference_count = inference_token_count(
-            tokenizer, sliced, prefix=passage_prefix, max_sequence_tokens=max_sequence_tokens)
         identity = {"version": VERSION, "base_snapshot_sha256": base_snapshot_sha256,
                     "tokenizer_inventory_sha256": tokenizer_inventory_sha256,
                     "document_id": document["document_id"], "chunk_index": len(chunks),

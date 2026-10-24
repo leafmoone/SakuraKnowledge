@@ -131,14 +131,17 @@ the existing 512-token limit includes prompt and special tokens. Caches remain l
 to one loaded encoder. A query selecting both model families is rejected before
 opening a session: their cosine distances are not comparable.
 
-`tools.generic_semantic` uses the existing paragraph/token projection (384 canonical
+`tools.generic_semantic` uses the existing paragraph/token projection (at most 384 canonical
 tokens, overlap 64), mapping, checkpoint and create-new publication flow for either
 model. Gemma encodes every chunk as `title: {title} | text: {canonical chunk}`,
 using the document's newline-normalized title or `none` when empty. Canonical chunks
 still project the existing title-plus-original text, preserving source spans and
 proof ownership; the first chunk may therefore also contain the title in its text.
-The complete prefixed input is checked against 512 tokens before encoding, never
-silently truncated. An over-budget title/chunk fails explicitly. Source manifests
+The complete prefixed input is checked against 512 tokens before encoding. Only an
+over-budget candidate is shortened at its canonical token boundary, retaining the
+64-token overlap and complete source coverage; already-fitting chunks are unchanged.
+If the fixed title/prefix leaves too little room to progress, preparation fails
+explicitly rather than truncating input or omitting the document. Source manifests
 bind this projection, tokenizer and model revision; raw knowledge and lexical
 membership files are copied unchanged. The graph already performs mean/L2 pooling.
 
