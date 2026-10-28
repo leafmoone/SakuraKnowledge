@@ -960,16 +960,36 @@ impl SharedEncoder {
     }
     pub fn encode(&mut self, query: &str) -> Result<Vec<f32>> {
         validate_query(query)?;
-        if let Some((vector, tokens)) = self.cache.get(query) {
-            self.last_tokens = tokens;
+        let input = format!("{}{}", self.contract["query_prefix"].as_str().unwrap(), query);
+        self.encode_input(&input, false)
+    }
+    /// Text-only use of the shared model, independent of any Knowledge pack/index.
+    /// Derived memory vectors use at most 512 tokens; the original text is untouched.
+    pub fn encode_text(&mut self, text: &str, document: bool) -> Result<Vec<f32>> {
+        require(!text.trim().is_empty() && text.chars().count() <= 8000, "text must contain 1..8000 characters")?;
+        let input = if document {
+            self.contract["document_template"].as_str().unwrap_or("{text}")
+                .replace("{title}", self.contract["untitled_document"].as_str().unwrap_or("none"))
+                .replace("{text}", text)
+        } else { format!("{}{}", self.contract["query_prefix"].as_str().unwrap(), text) };
+        self.encode_input(&input, true)
+    }
+    pub fn model_identity(&self) -> Value {
+        json!({"model_id":self.model_id,"revision":self.contract["revision"],"dimension":self.contract["dimension"]})
+    }
+    fn encode_input(&mut self, input: &str, truncate: bool) -> Result<Vec<f32>> {
+        if let Some((vector, tokens)) = self.cache.get(input) {
+            require(truncate || tokens <= 512, "invalid token shape")?;
+            self.last_tokens = tokens.min(512);
             self.cache_hits += 1;
             return Ok(vector);
         }
-        let input = format!("{}{}", self.contract["query_prefix"].as_str().unwrap(), query);
         let encoded = self.tokenizer.encode(input, true).map_err(|e| e.to_string())?;
-        let ids: Vec<i64> = encoded.get_ids().iter().map(|&v| i64::from(v)).collect();
-        let mask: Vec<i64> = encoded.get_attention_mask().iter().map(|&v| i64::from(v)).collect();
-        require(!ids.is_empty() && ids.len() == mask.len() && ids.len() <= 512, "invalid token shape")?;
+        let full_tokens = encoded.get_ids().len();
+        require(truncate || full_tokens <= 512, "invalid token shape")?;
+        let ids: Vec<i64> = encoded.get_ids().iter().take(512).map(|&v| i64::from(v)).collect();
+        let mask: Vec<i64> = encoded.get_attention_mask().iter().take(512).map(|&v| i64::from(v)).collect();
+        require(!ids.is_empty() && ids.len() == mask.len(), "invalid token shape")?;
         let tokens = ids.len();
         self.last_tokens = tokens;
         self.query_encodings+=1;
@@ -978,7 +998,7 @@ impl SharedEncoder {
         let dimension = self.contract["dimension"].as_u64().unwrap() as usize;
         require(shape.as_ref() == [1_i64, dimension as i64], "unexpected embeddings shape")?;
         validate_vector(values, dimension)?;
-        self.cache.insert(query, values, tokens);
+        self.cache.insert(input, values, full_tokens);
         Ok(values.to_vec())
     }
 }

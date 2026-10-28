@@ -30,6 +30,7 @@ const USAGE: &str = "usage: sknow-rs lookup DB QUERY [--kind K --namespace N] [-
          Requires build --features semantic; example: retrieve knowledge.sqlite manifest.json \"blue hair\"
        sknow-rs inspect DB
        sknow-rs runtime
+       sknow-rs embed MODEL_MANIFEST BIN_DIRECTORY (text-only JSONL stdin)
        sknow-rs -h | --help";
 
 /// Usage errors follow the same contract as the Python CLI:
@@ -149,8 +150,52 @@ fn modular_command(args:&[String])->ExitCode {
     },Err(error)=>{let typ=if error.downcast_ref::<sakura_knowledge_runtime::modular_cli::UsageError>().is_some(){"UsageError"}else if error.downcast_ref::<Error>().is_some(){"ValueError"}else{"PackError"};eprintln!("{}",serde_json::json!({"error":typ,"message":error.to_string()}));ExitCode::from(2)}}
 }
 
+#[cfg(feature = "semantic")]
+fn embedding_command(args: &[String]) -> ExitCode {
+    use std::io::{BufRead, Write};
+    use sakura_knowledge_runtime::semantic::{Result, SharedEncoder};
+    if args.len() != 2 { return usage_error("embed requires MODEL_MANIFEST BIN_DIRECTORY"); }
+    let run = || -> Result<()> {
+        let mut encoder = SharedEncoder::open_model(&args[0], &args[1])?;
+        let mut output = std::io::stdout().lock();
+        writeln!(output, "{}", serde_json::json!({"ready":true,"protocol":"sakura-text-embedding-v1","model":encoder.model_identity()}))?;
+        output.flush()?;
+        for line in std::io::stdin().lock().lines() {
+            let line = line?;
+            let mut encode = || -> Result<serde_json::Value> {
+                if line.len() > 512 * 1024 { return Err("embedding request too large".into()); }
+                let request: serde_json::Value = serde_json::from_str(&line)?;
+                let document = match request["task"].as_str() {
+                    Some("query") => false, Some("document") => true,
+                    _ => return Err("task must be query or document".into()),
+                };
+                let texts = request["texts"].as_array().filter(|v| !v.is_empty() && v.len() <= 16)
+                    .ok_or("texts must contain 1..16 strings")?;
+                let vectors = texts.iter().map(|text| encoder.encode_text(text.as_str().ok_or("text must be a string")?, document))
+                    .collect::<Result<Vec<_>>>()?;
+                Ok(serde_json::json!({"ok":true,"vectors":vectors}))
+            };
+            let response = match encode() {
+                Ok(value) => value,
+                Err(error) => serde_json::json!({"ok":false,"error":error.to_string()}),
+            };
+            writeln!(output, "{response}")?;
+            output.flush()?;
+        }
+        Ok(())
+    };
+    match run() {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => { eprintln!("{}", serde_json::json!({"error":"EmbeddingError","message":error.to_string()})); ExitCode::from(1) }
+    }
+}
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
+    #[cfg(feature = "semantic")]
+    if args.first().map(String::as_str) == Some("embed") {
+        return embedding_command(&args[1..]);
+    }
     if args.first().map(String::as_str)==Some("--config") {
         return modular_command(&args[1..]);
     }

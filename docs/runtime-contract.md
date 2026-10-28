@@ -262,6 +262,20 @@ are `UsageError` (stderr JSON, exit 2, empty stdout), not silently ignored.
 
 ## Session embedding cache
 
+### Shared text encoding without a source pack
+
+`sknow-rs embed MODEL_MANIFEST BIN_DIRECTORY` opens the existing shared model
+without opening a Knowledge database or vector index. It writes one
+`sakura-text-embedding-v1` ready line with model ID/revision/dimension, then accepts
+JSONL `{ "task": "query" | "document", "texts": ["..."] }` (1–16 texts).
+Responses contain `ok` and `vectors`, or `ok: false` and an error. EOF ends the
+owned child; this mode exposes no HTTP service and downloads nothing.
+
+Query/document prefixes follow the frozen model contract. This text-only route
+encodes the first 512 tokens of each input (1–8,000 characters); callers retain
+the original text. Ordinary Knowledge retrieval retains its strict query limit.
+Both routes share the native encoder implementation, runtime, and model files.
+
 A shared BGE encoder owns an exact, unnormalized query-string LRU with at most
 64 entries and 512 KiB of accounted key/vector/container storage (allocator
 bookkeeping and process RSS are separate). Only shape-checked, finite, normalized
